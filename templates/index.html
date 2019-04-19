@@ -30,15 +30,6 @@
         <div class="space-1"></div>
         <div class="section-hidden" id="settings-expanded">
             <div class="section-setting">
-                <div class="section-title-secondary">Execution Mode</div>
-                <div class="space-1"></div>
-                <select id="settings-mode" value="multi" oninput="settingMode()">
-                    <option value="single">Singlethread</option>
-                    <option value="multi">Multithread</option>
-                </select>
-            </div>
-            <div class="space-s-1"></div>
-            <div class="section-setting">
                 <div class="section-title-secondary">Brightness</div>
                 <div class="space-1"></div>
                 <input type="range" value="25" min="1" max="255" id="settings-brightness" oninput="settingBrightness()">
@@ -85,7 +76,6 @@
             <input type="button" value="Red Pulse" onclick="lights.pulse('thread',255,0,0,0,20,10)">
             <input type="button" value="Green Pulse" onclick="lights.pulse('thread',0,255,0,0,10,4)">
             <input type="button" value="Blue Pulse" onclick="lights.pulse('thread',0,0,255,1,25,6)">
-            <input type="button" value="!Demo!" onclick="demo()">
             <input type="button" value="RCGMBY" onclick="preset.run(0)">
             <input type="button" value="RGB" onclick="preset.run(1)">
         </div>
@@ -263,25 +253,9 @@
             lights.currentColor = target.value;
         }
 
-        function settingMode() {
-            let mode = document.getElementById("settings-mode").value;
-            path = "settings/mode=" + mode;
-            console.log("SENT:", path);
-            send.src = path;
-        }
-
         function settingBrightness() {
             let brightness = document.getElementById("settings-brightness").value;
             path = "settings/brightness=" + brightness;
-            console.log("SENT:", path);
-            send.src = path;
-        }
-
-        function thread(a, b) {
-            let path = "thread/" + a;
-            if (a == "change") {
-                path += "/" + b;
-            }
             console.log("SENT:", path);
             send.src = path;
         }
@@ -326,41 +300,6 @@
             if (send || (num == 0 && liveCheck)) {
                 lights.colorAll(r, g, b);
             }
-        }
-
-        function wave(i, speed) {
-            send.src = "run/single/" + i + ",255,0,255";
-            console.log("SENT: run/single/" + i + ",255,0,255");
-            if (i > 58) {
-                clearTimeout(time);
-                return
-            }
-            time = setTimeout(function () {
-                wave(i + 1, speed);
-            }, speed);
-        }
-
-        function demo() {
-            setTimeout(function () {
-                lights.rainbowCycle(10);
-                setTimeout(function () {
-                    lights.chase(0, 0, 255, 50);
-                    setTimeout(function () {
-                        lights.chase(255, 0, 255, 50);
-                        setTimeout(function () {
-                            lights.stopAnimation();
-                            lights.colorAll(0, 0, 255);
-                            lights.pulse('animate', 0, 255, 0, 0, 10, 4, 250);
-                            setTimeout(function () {
-                                lights.randomCycle(false, 200);
-                                setTimeout(function () {
-                                    lights.randomCycle(true, 100);
-                                }, 4000);
-                            }, 4000);
-                        }, 4000);
-                    }, 4000);
-                }, 4000);
-            }, 2000);
         }
     </script>
 </body>
