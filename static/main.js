@@ -260,16 +260,10 @@ class LightStrip {
 
     // Send
 
-    send(path, double) {
+    send(path) {
         console.log("Send Window:", this.currentSendWindow, "Sending:", path);
         this.sendWindow[this.currentSendWindow].src = path;
-        //this.currentSendWindow = (this.currentSendWindow + 1) % this.maxSendWindows;
         this.pathLog.push(path);
-        if (double) {
-            setTimeout(function () {
-                //lights.send(path, false);
-            }, 75)
-        }
     }
 }
 

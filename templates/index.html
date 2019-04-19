@@ -93,13 +93,14 @@
 
     <div class="section" id="operations">
         <div class="section-title">Operations<input type="button" class="expand-button" value="^" style="width: 2vw;"
-                onclick="expand('operations','block')"></div>
+                onclick="expand('operations','block')"><input type="button" class="expand-button" value="+"
+                style="width: 2vw;" onclick="addShift()"><input type="button" class="expand-button" value="-"
+                style="width: 2vw;" onclick="removeShift()"></div>
         <div class="space-1"></div>
         <div class="section-hidden" id="operations-expanded" style="display: block;">
             <input type="button" value="Flip" onclick="lights.reverseStrip()">
             <input type="button" value="Shift Left" onclick="lights.shift(-1,0)">
             <input type="button" value="Shift Right" onclick="lights.shift(1,0)">
-
         </div>
     </div>
 
@@ -221,12 +222,9 @@
             saves.addSave(true, 255, 0, 255);
             saves.addSave(true, 255, 255, 0);
             for (let i = 0; i < 3; i++) {
-                wipes.push(new Wipe(i));
-                wipes[i].create();
-                shift.push(new Shift(i));
-                shift[i].create();
-                pulse.push(new Pulse(i));
-                pulse[i].create();
+                addWipe();
+                addPulse();
+                addShift();
             }
             lswitch.create();
             setupDisplay();
