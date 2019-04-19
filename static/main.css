@@ -1,0 +1,140 @@
+body {
+    font-family: sans-serif;
+    font-size: 1em;
+}
+
+input[type=button] {
+    width: 8vw;
+    height: 1.5vw;
+    border: .2vh solid rgb(200,200,200);
+    background-color: rgb(225,225,225);
+}
+
+input[type=range] {
+    width: 16vw;
+}
+
+input[type=checkbox] {
+    width: 1.5vw;
+    height: 1.5vw;
+    margin: 0;
+    border: .2vh solid rgb(200,200,200);
+    background-color: rgb(225,5,225);
+}
+
+select {
+    width:100%;
+}
+
+
+.send-data {
+    display: none;
+}
+
+
+#page-title {
+    font-size: 2em;
+}
+
+.section {
+    width: 98%;
+    border: .1vh solid rgb(155,155,155);
+    border-radius: 1vh;
+    margin-top: 1vh;
+    margin-bottom: 1vh;
+    padding: 1vh;
+}
+
+.section-flex {
+    display: flex;
+    border: .1vh solid rgb(155,155,155);
+    border-radius: 1vh;
+    margin-top: 1vh;
+    margin-bottom: 1vh;
+    padding: 1vh;
+    flex-wrap: wrap;
+}
+
+.section-hidden {
+    display: flex;
+}
+
+
+.section-setting {
+    border: .1vh solid rgb(155,155,155);
+    border-radius: 1vh;
+    padding: 1vh;
+    margin-top: .25vh;
+    margin-bottom: .25vh;
+}
+
+
+
+.section-title {
+    font-size: 1.5em;
+}
+
+.section-title-secondary {
+    font-size: 1.25em;
+}
+
+.section-send {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+}
+
+.section-send-button {
+  margin: auto;
+}
+
+.expand-button {
+    width: 2vw;
+    margin-left: 1vw;
+}
+
+.divider {
+    margin-top: 1vh;
+    margin-bottom: 1vh;
+    border-bottom: .1vh solid rgb(155,155,155); 
+}
+
+.color-sample-display {
+    width: 1.5vw;
+    height: 1.5vw;
+    border: .1vh solid rgb(155,155,155);
+    border-radius: .5vh;
+}
+
+    
+
+.space-1 {
+    margin-top: .5vh;
+    margin-bottom: .5vh;
+}
+
+.space-s-1 {
+    margin-left: .5vh;
+    margin-right: .5vh;
+}
+
+.space-s-2 {
+    margin-left: 1vh;
+    margin-right: 1vh;
+}
+
+
+.space-s-5 {
+    margin-left: 2.5vh;
+    margin-right: 2.5vh;
+}
+
+.pixel-display {
+    width: 1vw;
+    height: 1vw;
+    border: .1vw solid rgb(0,0,0);
+    border-radius: 1vw;
+    margin: .18vw;
+    background-color: rgb(0,0,0);
+}

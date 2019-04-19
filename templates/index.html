@@ -1,0 +1,370 @@
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="../static/main.css">
+    <script src="../static/writehtml.js"></script>
+    <script src="../static/main.js"></script>
+    <script src="../static/shift.js"></script>
+    <script src="../static/preset.js"></script>
+    <script src="../static/wipe.js"></script>
+    <script src="../static/pulse.js"></script>
+    <script src="../static/switch.js"></script>
+</head>
+
+<body onload="pageLoad()">
+    <iframe id="send-data-0" class="send-data" src=""></iframe>
+    <iframe id="send-data-1" class="send-data" src=""></iframe>
+    <iframe id="send-data-2" class="send-data" src=""></iframe>
+    <iframe id="send-data-3" class="send-data" src=""></iframe>
+
+    <div id="page-title">RGB Control</div>
+
+
+    <div class="section" id="main-display" style="display: none;">
+        <div class="section-flex" id="main-pixel-display"></div>
+    </div>
+
+    <div class="section" id="settings">
+        <div class="section-title">Settings<input type="button" class="expand-button" value="^" style="width: 2vw;"
+                onclick="expand('settings','flex')"></div>
+        <div class="space-1"></div>
+        <div class="section-hidden" id="settings-expanded">
+            <div class="section-setting">
+                <div class="section-title-secondary">Execution Mode</div>
+                <div class="space-1"></div>
+                <select id="settings-mode" value="multi" oninput="settingMode()">
+                    <option value="single">Singlethread</option>
+                    <option value="multi">Multithread</option>
+                </select>
+            </div>
+            <div class="space-s-1"></div>
+            <div class="section-setting">
+                <div class="section-title-secondary">Brightness</div>
+                <div class="space-1"></div>
+                <input type="range" value="25" min="1" max="255" id="settings-brightness" oninput="settingBrightness()">
+            </div>
+            <div class="space-s-1"></div>
+            <div class="section-setting">
+                <div class="section-title-secondary">Reverse</div>
+                <div class="space-1"></div>
+                <input type="checkbox" value="Send Color" checked id="settings-reversed" onclick="settingReversed()">
+            </div>
+        </div>
+
+    </div>
+
+    <div class="section" id="quick">
+        <div class="section-title">Quick Buttons<input type="button" class="expand-button" value="^" style="width: 2vw;"
+                onclick="expand('quick','block')"></div>
+        <div class="space-1"></div>
+        <div class="section-hidden" id="quick-expanded" style="display: block;">
+            <input type="button" value="Off" onclick="lights.off()">
+            <input type="button" value="Random Each" onclick="lightsRandom(true)">
+            <input type="button" value="Random" onclick="lightsRandom(false)">
+            <input type="button" value="Red" onclick="lights.colorAll(255,0,0)">
+            <input type="button" value="Green" onclick="lights.colorAll(0,255,0)">
+            <input type="button" value="Blue" onclick="lights.colorAll(0,0,255)">
+            <input type="button" value="White" onclick="lights.colorAll(255,255,255)">
+            <input type="button" value="Black" onclick="lights.colorAll(0,0,0)">
+            <input type="button" value="#Red Wipe#" onclick="lights.wipe(255,0,0,-1,40)">
+            <input type="button" value="#Green Wipe#" onclick="lights.wipe(0,255,0,1,20)">
+            <input type="button" value="#Blue Wipe#" onclick="lights.wipe(0,0,255,-1,10)">
+            <div class="space-1"></div>
+            <input type="button" value="Stop Animation" onclick="lights.stopAnimation()">
+            <input type="button" value="*Red Chase*" onclick="lights.chase(255,0,0,50)">
+            <input type="button" value="*Green Chase*" onclick="lights.chase(0,255,0,50)">
+            <input type="button" value="*Blue Chase*" onclick="lights.chase(0,0,255,50)">
+            <input type="button" value="*Rainbow Chase*" onclick="lights.rainbowChase(50)">
+            <input type="button" value="*Rainbow Cycle*" onclick="lights.rainbowCycle(50)">
+            <input type="button" value="*Random Each*" onclick="lights.randomCycle(true, 100)">
+            <input type="button" value="*Random*" onclick="lights.randomCycle(false, 200)">
+            <input type="button" value="*Red Pulse*" onclick="lights.pulse('animate',255,0,0,0,20,10,500)">
+            <input type="button" value="*Green Pulse*" onclick="lights.pulse('animate',0,255,0,0,10,4,250)">
+            <input type="button" value="*Blue Pulse*" onclick="lights.pulse('animate',0,0,255,1,25,6,500)">
+            <div class="space-1"></div>
+            <input type="button" value="Red Pulse" onclick="lights.pulse('thread',255,0,0,0,20,10)">
+            <input type="button" value="Green Pulse" onclick="lights.pulse('thread',0,255,0,0,10,4)">
+            <input type="button" value="Blue Pulse" onclick="lights.pulse('thread',0,0,255,1,25,6)">
+            <input type="button" value="!Demo!" onclick="demo()">
+            <input type="button" value="RCGMBY" onclick="preset.run(0)">
+            <input type="button" value="RGB" onclick="preset.run(1)">
+        </div>
+    </div>
+
+    <div class="section" id="operations">
+        <div class="section-title">Operations<input type="button" class="expand-button" value="^" style="width: 2vw;"
+                onclick="expand('operations','block')"></div>
+        <div class="space-1"></div>
+        <div class="section-hidden" id="operations-expanded" style="display: block;">
+            <input type="button" value="Flip" onclick="lights.reverseStrip()">
+            <input type="button" value="Shift Left" onclick="lights.shift(-1,0)">
+            <input type="button" value="Shift Right" onclick="lights.shift(1,0)">
+
+        </div>
+    </div>
+
+    <div class="section" id="full-color">
+        <div class="section-title">Full Color<input type="button" class="expand-button" value="^" style="width: 2vw;"
+                onclick="expand('full-color','block')"></div>
+        <div class="space-1"></div>
+        <div class="section-hidden" id="full-color-expanded" style="display: block;">
+            <div class="section-flex">
+                <div class="section-title-secondary">Live&nbsp&nbsp&nbsp&nbsp</div>
+                <div class="space-s-1"></div>
+                <input type="range" value="0" min="0" max="255" id="full-color-0-r" oninput="fullColor(0,false)">
+                <input type="range" value="0" min="0" max="255" id="full-color-0-g" oninput="fullColor(0,false)">
+                <input type="range" value="0" min="0" max="255" id="full-color-0-b" oninput="fullColor(0,false)">
+                <div class="space-s-1"></div>
+                <div class="color-sample-display" id="full-color-sample-0"></div>
+                <div class="space-s-1"></div>
+                <input type="checkbox" value="Send Color" id="full-color-0-check" onclick="fullColor(0,false)">
+                <div class="space-s-1"></div>
+                <div class="section-title-secondary">Live</div>
+                <div class="space-s-5"></div>
+                <div class="space-s-2"></div>
+                <div class="section-title-secondary">
+                    Color Values:
+                    <span class="space-s-1"></span>
+                    <span id="full-color-0-values-r">222</span>
+                    <span class="space-s-1"></span>
+                    <span id="full-color-0-values-g">222</span>
+                    <span class="space-s-1"></span>
+                    <span id="full-color-0-values-b">222</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section" id="switch">
+        <div class="section-title">Switch<input type="button" class="expand-button" value="^" style="width: 2vw;"
+                onclick="expand('switch','block')"></div>
+        <div class="space-1"></div>
+        <div class="section-hidden" id="switch-expanded" style="display: block;">
+
+        </div>
+    </div>
+
+    <div class="section" id="pulse">
+        <div class="section-title">Pulse<input type="button" class="expand-button" value="^" style="width: 2vw;"
+                onclick="expand('pulse','block')"><input type="button" class="expand-button" value="+"
+                style="width: 2vw;" onclick="addPulse()"><input type="button" class="expand-button" value="-"
+                style="width: 2vw;" onclick="removePulse()"></div>
+        <div class="space-1"></div>
+        <div class="section-hidden" id="pulse-expanded" style="display: block;">
+
+        </div>
+    </div>
+
+    <div class="section" id="wipe">
+        <div class="section-title">Wipe<input type="button" class="expand-button" value="^" style="width: 2vw;"
+                onclick="expand('wipe','block')"><input type="button" class="expand-button" value="+"
+                style="width: 2vw;" onclick="addWipe()"><input type="button" class="expand-button" value="-"
+                style="width: 2vw;" onclick="removeWipe()"></div>
+        <div class="space-1"></div>
+        <div class="section-hidden" id="wipe-expanded" style="display: block;">
+
+        </div>
+    </div>
+
+    <div class="section" id="individual-pixels">
+        <div class="section-title">Individual Pixels<input type="button" class="expand-button" value="^"
+                style="width: 2vw;" onclick="expand('individual-pixels','block')"></div>
+        <div class="space-1"></div>
+        <div class="section-hidden" id="individual-pixels-expanded" style="display: block;">
+            <div class="section-flex" id="pixel-holder" style="padding: 0;">
+            </div>
+            <div class="section-hidden">
+                <div class="section-setting">
+                    <div class="section-title-secondary">Color Save Number</div>
+                    <input type="number" min="1" max="10" value="1" oninput="colorSaveCheck()"
+                        id="individual-pixel-save-input">
+                </div>
+                <div class="space-s-1"></div>
+                <div class="section-setting">
+                    <div class="section-title-secondary">Live</div>
+                    <input type="checkbox" value="Send Color" id="individual-pixels-live-check">
+                </div>
+                <div class="space-s-1" style="display: none;"></div>
+                <div class="section-setting" style="display: none;">
+                    <div class="section-title-secondary">Reset</div>
+                    <input type="button" value="Send" id="individual-pixels-reset">
+                </div>
+                <div class="space-s-1"></div>
+                <div class="section-setting">
+                    <div class="section-title-secondary">Resend</div>
+                    <input type="button" value="Send" id="individual-pixels-resend" onclick="lights.resendIndividual()">
+                </div>
+                <div class="space-s-1"></div>
+                <div class="section-setting">
+                    <div class="section-title-secondary">Multiple</div>
+                    <input type="number" min="1" max="10" value="1" id="individual-pixels-multi-start">
+                    <input type="number" min="1" max="10" value="1" id="individual-pixels-multi-end">
+                    <input type="button" value="Send" id="individual-pixels-multi-send" onclick="lights.setMultiple()">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var send = document.getElementById("send-data-0");
+        var html = new HTMLWriter();
+        var lights = new LightStrip(60);
+        var saves = new Saves();
+        var wipes = new Array();
+        var shift = new Array();
+        var preset = new Preset();
+        var pulse = new Array();
+        var lswitch = new LSwitch();
+
+        function pageLoad() {
+            saves.addSave(true, 0, 255, 255);
+            saves.addSave(true, 255, 0, 255);
+            saves.addSave(true, 255, 255, 0);
+            for (let i = 0; i < 3; i++) {
+                wipes.push(new Wipe(i));
+                wipes[i].create();
+                shift.push(new Shift(i));
+                shift[i].create();
+                pulse.push(new Pulse(i));
+                pulse[i].create();
+            }
+            lswitch.create();
+            setupDisplay();
+        }
+
+        function setupDisplay() {
+            let target = document.getElementById("main-pixel-display");
+            for (let i = 0; i < lights.numPixels; i++) {
+                target.innerHTML += "<div class='pixel-display' id='main-pixel-display-" + i + "'>";
+            }
+        }
+
+        function settingReversed() {
+            if (document.getElementById("settings-reversed").checked) {
+                lights.direction = -1;
+            } else {
+                lights.direction = 1;
+            }
+            lights.reverseStrip();
+        }
+
+        function expand(id, displayType) {
+            let target = document.getElementById(id + "-expanded");
+            if (target.style.display == "none") {
+                target.style.display = displayType;
+            } else {
+                target.style.display = "none";
+            }
+        }
+
+        function colorSaveCheck() {
+            let target = document.getElementById("individual-pixel-save-input");
+            if (target.value < 1 || target.value > saves.num) {
+                target.value = 1;
+            }
+            lights.currentColor = target.value;
+        }
+
+        function settingMode() {
+            let mode = document.getElementById("settings-mode").value;
+            path = "settings/mode=" + mode;
+            console.log("SENT:", path);
+            send.src = path;
+        }
+
+        function settingBrightness() {
+            let brightness = document.getElementById("settings-brightness").value;
+            path = "settings/brightness=" + brightness;
+            console.log("SENT:", path);
+            send.src = path;
+        }
+
+        function thread(a, b) {
+            let path = "thread/" + a;
+            if (a == "change") {
+                path += "/" + b;
+            }
+            console.log("SENT:", path);
+            send.src = path;
+        }
+
+        function lightsRandom(each) {
+            if (each) {
+                path = "run/random/none"
+                console.log("SENT:", path);
+                send.src = path;
+            } else {
+                let r = 0;
+                let g = 0;
+                let b = 0;
+                let skip = Math.floor(Math.random() * 3);
+                if (skip != 0) {
+                    r = Math.floor(Math.random() * 255);
+                }
+                if (skip != 1) {
+                    g = Math.floor(Math.random() * 255);
+                }
+                if (skip != 2) {
+                    b = Math.floor(Math.random() * 255);
+                }
+                lights.colorAll(r, g, b);
+            }
+        }
+
+        function fullColor(num, send) {
+            let liveCheck = document.getElementById("full-color-0-check").checked;
+            let r = document.getElementById("full-color-" + num + "-r").value;
+            let g = document.getElementById("full-color-" + num + "-g").value;
+            let b = document.getElementById("full-color-" + num + "-b").value;
+            let sample = document.getElementById("full-color-sample-" + num);
+            let displayValueR = document.getElementById("full-color-" + num + "-values-r");
+            let displayValueG = document.getElementById("full-color-" + num + "-values-g");
+            let displayValueB = document.getElementById("full-color-" + num + "-values-b");
+            sample.style.backgroundColor = "rgb(" + r + "," + g + "," + b + ")";
+            displayValueR.innerText = r;
+            displayValueG.innerText = g;
+            displayValueB.innerText = b;
+            saves.set(num - 1, r, g, b);
+            if (send || (num == 0 && liveCheck)) {
+                lights.colorAll(r, g, b);
+            }
+        }
+
+        function wave(i, speed) {
+            send.src = "run/single/" + i + ",255,0,255";
+            console.log("SENT: run/single/" + i + ",255,0,255");
+            if (i > 58) {
+                clearTimeout(time);
+                return
+            }
+            time = setTimeout(function () {
+                wave(i + 1, speed);
+            }, speed);
+        }
+
+        function demo() {
+            setTimeout(function () {
+                lights.rainbowCycle(10);
+                setTimeout(function () {
+                    lights.chase(0, 0, 255, 50);
+                    setTimeout(function () {
+                        lights.chase(255, 0, 255, 50);
+                        setTimeout(function () {
+                            lights.stopAnimation();
+                            lights.colorAll(0, 0, 255);
+                            lights.pulse('animate', 0, 255, 0, 0, 10, 4, 250);
+                            setTimeout(function () {
+                                lights.randomCycle(false, 200);
+                                setTimeout(function () {
+                                    lights.randomCycle(true, 100);
+                                }, 4000);
+                            }, 4000);
+                        }, 4000);
+                    }, 4000);
+                }, 4000);
+            }, 2000);
+        }
+    </script>
+</body>
+
+</html>
