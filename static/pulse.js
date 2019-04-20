@@ -8,10 +8,9 @@ class Pulse {
         let section_flex = document.createElement("div");
         section_flex.className = "section-flex";
         section_flex.id = "pulse-slot-"+this.id;
-
-        html.appendSetting(section_flex, "Color Save Number", html.createInputNumber(1, 3, this.id % 3 +  1, function () { return colorSaveCheck() }, "pulse-save-color-" + this.id));
+        html.appendSetting(section_flex, "Color Save Number", html.createInputNumber(0, 3, (this.id + 1) % saves.length,  "checkSaveNumber('pulse-save-color-" + this.id + "')", "pulse-save-color-" + this.id));
         html.appendSetting(section_flex, "Direction", html.createInputSelect([{ "value": 1, "name": "Right" }, { "value": -1, "name": "Left" }], "pulse-direction-" + this.id));
-        html.appendSetting(section_flex, "Wait ms", html.createInputNumber(1, 100, 20, null, "pulse-waitms-" + this.id));
+        html.appendSetting(section_flex, "Wait ms", html.createInputNumber(1, 100, 1000, null, "pulse-waitms-" + this.id));
         html.appendSetting(section_flex, "Length", html.createInputNumber(1, 60, 5, null, "pulse-length-" + this.id));
         html.appendSetting(section_flex, "Delay Between", html.createInputNumber(1, 10000, 50, null, "pulse-delay-" + this.id));
         html.appendSetting(section_flex, "Repeated", html.createInputCheckBox("none", "pulse-repeated-" + this.id));
@@ -36,7 +35,8 @@ class Pulse {
         if (document.getElementById("pulse-repeated-"+this.id).checked) {
             this.mode = "animate";
         }
-        lights.pulse(this.mode, saves.data[this.colorSave - 1].r, saves.data[this.colorSave - 1].g, saves.data[this.colorSave - 1].b, this.direction, this.waitms, this.length, this.delay);
+        let color = getSaveColor(this.colorSave, "pulse-save-color-" + this.id);
+        lights.pulse(this.mode, color.r, color.g, color.b, this.direction, this.waitms, this.length, this.delay);
     }
 }
 

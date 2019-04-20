@@ -34,7 +34,7 @@ class LSwitch {
     }
 
     addColor() {
-        html.appendSettingID(this.colorslots, "Color Save Number", html.createInputNumber(1, 3, this.count % 3 + 1, function () { return colorSaveCheck() }, "switch-save-color-" + this.count), "switch-slot-"+this.count);
+        html.appendSettingID(this.colorslots, "Color Save Number", html.createInputNumber(0, 3, (this.count + 1) % saves.length,  "checkSaveNumber('switch-save-color-" + this.count + "')", "switch-save-color-" + this.count), "switch-slot-"+this.count);
         this.count++;
     }
 

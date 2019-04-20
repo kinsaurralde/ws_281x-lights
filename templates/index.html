@@ -4,6 +4,7 @@
     <link rel="stylesheet" type="text/css" href="../static/main.css">
     <script src="../static/writehtml.js"></script>
     <script src="../static/main.js"></script>
+    <script src="../static/save.js"></script>
     <script src="../static/shift.js"></script>
     <script src="../static/preset.js"></script>
     <script src="../static/wipe.js"></script>
@@ -96,33 +97,12 @@
 
     <div class="section" id="full-color">
         <div class="section-title">Full Color<input type="button" class="expand-button" value="^" style="width: 2vw;"
-                onclick="expand('full-color','block')"></div>
+                onclick="expand('full-color','block')"><input type="button" class="expand-button" value="+"
+                style="width: 2vw;" onclick="addSave()"><input type="button" class="expand-button" value="-"
+                style="width: 2vw;" onclick="removeSave()"></div>
         <div class="space-1"></div>
         <div class="section-hidden" id="full-color-expanded" style="display: block;">
-            <div class="section-flex">
-                <div class="section-title-secondary">Live&nbsp&nbsp&nbsp&nbsp</div>
-                <div class="space-s-1"></div>
-                <input type="range" value="0" min="0" max="255" id="full-color-0-r" oninput="fullColor(0,false)">
-                <input type="range" value="0" min="0" max="255" id="full-color-0-g" oninput="fullColor(0,false)">
-                <input type="range" value="0" min="0" max="255" id="full-color-0-b" oninput="fullColor(0,false)">
-                <div class="space-s-1"></div>
-                <div class="color-sample-display" id="full-color-sample-0"></div>
-                <div class="space-s-1"></div>
-                <input type="checkbox" value="Send Color" id="full-color-0-check" onclick="fullColor(0,false)">
-                <div class="space-s-1"></div>
-                <div class="section-title-secondary">Live</div>
-                <div class="space-s-5"></div>
-                <div class="space-s-2"></div>
-                <div class="section-title-secondary">
-                    Color Values:
-                    <span class="space-s-1"></span>
-                    <span id="full-color-0-values-r">222</span>
-                    <span class="space-s-1"></span>
-                    <span id="full-color-0-values-g">222</span>
-                    <span class="space-s-1"></span>
-                    <span id="full-color-0-values-b">222</span>
-                </div>
-            </div>
+        
         </div>
     </div>
 
@@ -200,7 +180,7 @@
         var send = document.getElementById("send-data-0");
         var html = new HTMLWriter();
         var lights = new LightStrip(60);
-        var saves = new Saves();
+        var saves = new Array();
         var wipes = new Array();
         var shift = new Array();
         var preset = new Preset();
@@ -208,9 +188,10 @@
         var lswitch = new LSwitch();
 
         function pageLoad() {
-            saves.addSave(true, 0, 255, 255);
-            saves.addSave(true, 255, 0, 255);
-            saves.addSave(true, 255, 255, 0);
+            addSaveLive();
+            addSave(0,255,255);
+            addSave(255,0,255);
+            addSave(255,255,0);
             for (let i = 0; i < 3; i++) {
                 addWipe();
                 addPulse();
@@ -245,14 +226,6 @@
             }
         }
 
-        function colorSaveCheck() {
-            let target = document.getElementById("individual-pixel-save-input");
-            if (target.value < 1 || target.value > saves.num) {
-                target.value = 1;
-            }
-            lights.currentColor = target.value;
-        }
-
         function settingBrightness() {
             let brightness = document.getElementById("settings-brightness").value;
             path = "settings/brightness=" + brightness;
@@ -279,25 +252,6 @@
                 if (skip != 2) {
                     b = Math.floor(Math.random() * 255);
                 }
-                lights.colorAll(r, g, b);
-            }
-        }
-
-        function fullColor(num, send) {
-            let liveCheck = document.getElementById("full-color-0-check").checked;
-            let r = document.getElementById("full-color-" + num + "-r").value;
-            let g = document.getElementById("full-color-" + num + "-g").value;
-            let b = document.getElementById("full-color-" + num + "-b").value;
-            let sample = document.getElementById("full-color-sample-" + num);
-            let displayValueR = document.getElementById("full-color-" + num + "-values-r");
-            let displayValueG = document.getElementById("full-color-" + num + "-values-g");
-            let displayValueB = document.getElementById("full-color-" + num + "-values-b");
-            sample.style.backgroundColor = "rgb(" + r + "," + g + "," + b + ")";
-            displayValueR.innerText = r;
-            displayValueG.innerText = g;
-            displayValueB.innerText = b;
-            saves.set(num - 1, r, g, b);
-            if (send || (num == 0 && liveCheck)) {
                 lights.colorAll(r, g, b);
             }
         }

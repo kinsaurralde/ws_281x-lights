@@ -46,7 +46,7 @@ class LightStrip {
     }
 
     updatePixel(id, r, g, b) {
-        this.pixels[id].setPixel(r, g, b);
+        //this.pixels[id].setPixel(r, g, b);
     }
 
     updateAllPixels(r, g, b) {
@@ -190,18 +190,14 @@ class LightStrip {
         let color_string = "";
         for (let i = 0; i < max_num; i++) {
             color_string += ",";
-            let current_color_save = document.getElementById(id + i).value - 1;
-            let r = saves.data[current_color_save].r;
-            let g = saves.data[current_color_save].g;
-            let b = saves.data[current_color_save].b;
-            color_string += r + "." + g + "." + b;
+            let current_color_save = document.getElementById(id + i).value;
+            let color = getSaveColor(current_color_save, id + i);
+            color_string += color.r + "." + color.g + "." + color.b;
         }
         if (loop_start || max_num < 2) {
-            let current_color_save = document.getElementById(id + 0).value - 1;
-            let r = saves.data[current_color_save].r;
-            let g = saves.data[current_color_save].g;
-            let b = saves.data[current_color_save].b;
-            color_string += "," + r + "." + g + "." + b;
+            let current_color_save = document.getElementById(id + 0).value;
+            let color = getSaveColor(current_color_save);
+            color_string += "," + color.r + "." + color.g + "." + color.b;
         }
         let path = "animate/mix/" + wait_ms + color_string;
         this.send(path, false);
@@ -217,6 +213,10 @@ class LightStrip {
         let path = "animate/rainbowCycle/" + wait_ms;
         this.updateAllPixels(0, 0, 0);
         this.send(path, true);
+    }
+
+    random(each) {
+        
     }
 
     randomCycle(each, wait_ms) {
@@ -284,96 +284,96 @@ class Pixel {
     }
 }
 
-class Saves {
-    constructor() {
-        this.num = 0;
-        this.numVisible = 0;
-        this.data = new Array();
-        this.location = document.getElementById("full-color-expanded");
-    }
+// class Saves {
+//     constructor() {
+//         this.num = 0;
+//         this.numVisible = 0;
+//         this.data = new Array();
+//         this.location = document.getElementById("full-color-expanded");
+//     }
 
-    addSave(preset, r, g, b) {
-        if (this.num == this.numVisible) {
-            if (this.num < 10) {
-                if (!preset) {
-                    r = 100;
-                    g = 100;
-                    b = 100;
-                }
-                let added = {
-                    "stauts": "show",
-                    "id": this.num,
-                    "r": r,
-                    "g": g,
-                    "b": b,
-                };
-                this.data.push(added);
-                this.num += 1;
-                this.numVisible += 1;
-                this.addSaveHTML(this.num, r, g, b);
-            } else {
-                console.log("Too Many Saves!");
-            }
-        } else {
-            this.show(this.numVisible);
-        }
-    }
+//     addSave(preset, r, g, b) {
+//         if (this.num == this.numVisible) {
+//             if (this.num < 10) {
+//                 if (!preset) {
+//                     r = 100;
+//                     g = 100;
+//                     b = 100;
+//                 }
+//                 let added = {
+//                     "stauts": "show",
+//                     "id": this.num,
+//                     "r": r,
+//                     "g": g,
+//                     "b": b,
+//                 };
+//                 this.data.push(added);
+//                 this.num += 1;
+//                 this.numVisible += 1;
+//                 this.addSaveHTML(this.num, r, g, b);
+//             } else {
+//                 console.log("Too Many Saves!");
+//             }
+//         } else {
+//             this.show(this.numVisible);
+//         }
+//     }
 
-    deleteSave() {
-        this.hide(this.numVisible - 1);
-    }
+//     deleteSave() {
+//         this.hide(this.numVisible - 1);
+//     }
 
-    addSaveHTML(num, r, g, b) {
-        this.location.innerHTML +=
-            "<div class='section-flex' id='full-color-save-" + num + "'>" +
-            "<div class='section-title-secondary'>Save " + num + "</div>" +
-            "<div class='space-s-1'></div>" +
-            "<input type='range' value='" + r + "' min='0' max='255' id='full-color-" + num + "-r' oninput='fullColor(" + num + ",false)'>" +
-            "<input type='range' value='" + g + "' min='0' max='255' id='full-color-" + num + "-g' oninput='fullColor(" + num + ",false)'>" +
-            "<input type='range' value='" + b + "' min='0' max='255' id='full-color-" + num + "-b' oninput='fullColor(" + num + ",false)'>" +
-            "<div class='space-s-1'></div>" +
-            "<div class='color-sample-display' id='full-color-sample-" + num + "'></div>" +
-            "<div class='space-s-1'></div>" +
-            "<input type='button' value='Send Color' onclick='fullColor(" + num + ",true)'>" +
-            "<div class='space-s-5'></div>" +
-            "<div class='section-title-secondary'>" +
-            "    Color Values:" +
-            "    <span class='space-s-1'></span>" +
-            "    <span id='full-color-" + num + "-values-r'>" + r + "</span>" +
-            "   <span class='space-s-1'></span>" +
-            "    <span id='full-color-" + num + "-values-g'>" + g + "</span>" +
-            "    <span class='space-s-1'></span>" +
-            "    <span id='full-color-" + num + "-values-b'>" + b + "</span>" +
-            "</div>" +
-            "</div>";
+//     addSaveHTML(num, r, g, b) {
+//         //this.location.innerHTML +=
+//             "<div class='section-flex' id='full-color-save-" + num + "'>" +
+//             "<div class='section-title-secondary'>Save " + num + "</div>" +
+//             "<div class='space-s-1'></div>" +
+//             "<input type='range' value='" + r + "' min='0' max='255' id='full-color-" + num + "-r' oninput='fullColor(" + num + ",false)'>" +
+//             "<input type='range' value='" + g + "' min='0' max='255' id='full-color-" + num + "-g' oninput='fullColor(" + num + ",false)'>" +
+//             "<input type='range' value='" + b + "' min='0' max='255' id='full-color-" + num + "-b' oninput='fullColor(" + num + ",false)'>" +
+//             "<div class='space-s-1'></div>" +
+//             "<div class='color-sample-display' id='full-color-sample-" + num + "'></div>" +
+//             "<div class='space-s-1'></div>" +
+//             "<input type='button' value='Send Color' onclick='fullColor(" + num + ",true)'>" +
+//             "<div class='space-s-5'></div>" +
+//             "<div class='section-title-secondary'>" +
+//             "    Color Values:" +
+//             "    <span class='space-s-1'></span>" +
+//             "    <span id='full-color-" + num + "-values-r'>" + r + "</span>" +
+//             "   <span class='space-s-1'></span>" +
+//             "    <span id='full-color-" + num + "-values-g'>" + g + "</span>" +
+//             "    <span class='space-s-1'></span>" +
+//             "    <span id='full-color-" + num + "-values-b'>" + b + "</span>" +
+//             "</div>" +
+//             "</div>";
 
-        fullColor(num, false);
-    }
+//         //fullColor(num, false);
+//     }
 
-    show(num) {
-        let target = document.getElementById("full-color-save-" + num);
-        if (target.style.display == "none") {
-            target.style.display = "flex";
-            this.numVisible += 1;
-        }
-        console.log(this.num, this.numVisible);
-    }
+//     show(num) {
+//         let target = document.getElementById("full-color-save-" + num);
+//         if (target.style.display == "none") {
+//             target.style.display = "flex";
+//             this.numVisible += 1;
+//         }
+//         console.log(this.num, this.numVisible);
+//     }
 
-    hide(num) {
-        let target = document.getElementById("full-color-save-" + num);
-        if (target.style.display == "flex") {
-            target.style.display = "none";
-            this.numVisible -= 1;
-        }
-    }
+//     hide(num) {
+//         let target = document.getElementById("full-color-save-" + num);
+//         if (target.style.display == "flex") {
+//             target.style.display = "none";
+//             this.numVisible -= 1;
+//         }
+//     }
 
-    set(num, r, g, b) {
-        this.data[num] = {
-            "stauts": "show",
-            "id": this.num,
-            "r": r,
-            "g": g,
-            "b": b,
-        }
-    }
-}
+//     set(num, r, g, b) {
+//         this.data[num] = {
+//             "stauts": "show",
+//             "id": this.num,
+//             "r": r,
+//             "g": g,
+//             "b": b,
+//         }
+//     }
+// }

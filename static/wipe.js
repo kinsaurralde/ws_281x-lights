@@ -12,7 +12,7 @@ class Wipe {
         section_flex.className = "section-flex";
         section_flex.id = "wipe-slot-"+this.id;
 
-        html.appendSetting(section_flex, "Color Save Number", html.createInputNumber(1, 3, this.id % 3 +  1, function () { return colorSaveCheck() }, "wipe-save-color-" + this.id));
+        html.appendSetting(section_flex, "Color Save Number", html.createInputNumber(0, 3, (this.id + 1) % saves.length, "checkSaveNumber('wipe-save-color-" + this.id + "')", "wipe-save-color-" + this.id));
         html.appendSetting(section_flex, "Direction", html.createInputSelect([{ "value": 1, "name": "Right" }, { "value": -1, "name": "Left" }], "wipe-direction-" + this.id));
         html.appendSetting(section_flex, "Wait ms", html.createInputNumber(1, 100, 20, null, "wipe-waitms-" + this.id));
 
@@ -30,7 +30,8 @@ class Wipe {
         this.colorSave = document.getElementById("wipe-save-color-"+this.id).value;
         this.direction = document.getElementById("wipe-direction-"+this.id).value;
         this.waitms = document.getElementById("wipe-waitms-"+this.id).value;
-        lights.wipe(saves.data[this.colorSave-1].r,saves.data[this.colorSave-1].g,saves.data[this.colorSave-1].b, this.direction, this.waitms);
+        let color = getSaveColor(this.colorSave, "wipe-save-color-" + this.id);
+        lights.wipe(color.r, color.g, color.b, this.direction, this.waitms);
     }
 }
 

@@ -3,6 +3,24 @@ class HTMLWriter {
 
     }
 
+    createSpacerS1() {
+        let spacer = document.createElement("div");
+        spacer.className = "space-s-1";
+        return spacer;
+    }
+
+    createSpacerS2() {
+        let spacer = document.createElement("div");
+        spacer.className = "space-s-2";
+        return spacer;
+    }
+
+    createSpacerS5() {
+        let spacer = document.createElement("div");
+        spacer.className = "space-s-5";
+        return spacer;
+    }
+
     appendSetting(parent, title, input) {
         let final_div = document.createElement("div");
         final_div.className = "section-setting";
@@ -11,10 +29,8 @@ class HTMLWriter {
         title_div.innerText = title;
         final_div.appendChild(title_div);
         final_div.appendChild(input);
-        let spacer = document.createElement("div");
-        spacer.className = "space-s-1";
         parent.appendChild(final_div);
-        parent.appendChild(spacer);
+        parent.appendChild(html.createSpacerS1());
     }
 
     appendSettingID(parent, title, input, id) {
@@ -50,8 +66,8 @@ class HTMLWriter {
         input.type = "number";
         input.min = min;
         input.max = max;
-        input.value = value;
-        input.oninput = oninput;
+        input.value = value; 
+        input.oninput = new Function(oninput);
         input.id = id;
         return input;
     }
@@ -85,5 +101,36 @@ class HTMLWriter {
         input_div.id = id;
         input_div.onclick = new Function(onclick);
         return input_div;
+    }
+
+    createSlider(value, min, max, id, oninput) {
+        let slider = document.createElement("input");
+        slider.type = "range";
+        slider.min = min;
+        slider.max = max;
+        slider.value = value;
+        slider.id = id;
+        slider.oninput = new Function(oninput);
+        return slider;
+    }
+
+    createWritableTitle(title, id) {
+        let title_div = this.createSecondaryTitle(title);
+        title_div.id = id;
+        return title_div;
+    }
+
+    appendColorDisplay(target, num) {
+        let display = document.createElement("div");
+        display.className = "color-sample-display";
+        display.id = "full-color-sample-"+num;
+        target.appendChild(display);
+    }
+
+    createSecondaryTitle(title) {
+        let title_div = document.createElement("div");
+        title_div.className = "section-title-secondary";
+        title_div.innerText = title;
+        return title_div;
     }
 }

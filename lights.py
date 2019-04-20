@@ -58,6 +58,7 @@ def save_lights():
     lights_save = []
     for i in range(strip.numPixels()):
         lights_save.append(strip.getPixelColor(i))
+    print(lights_save)
     return lights_save
 
 # Strip shifting
