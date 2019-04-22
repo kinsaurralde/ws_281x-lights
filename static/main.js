@@ -11,7 +11,6 @@ class LightStrip {
 
         this.createPixels();
         this.createSendWindows();
-        this.setup();
     }
 
     // Setups
@@ -28,13 +27,6 @@ class LightStrip {
         }
     }
 
-    setup() {
-        let target = document.getElementById("pixel-holder");
-        for (let i = 0; i < this.numPixels; i++) {
-            target.innerHTML += "<div class='pixel-display' id='pixel-display-" + i + "' onmouseover='lights.setIndividual(" + i + ")'>";
-        }
-    }
-
     // Other
 
     applyDirection(id) {
@@ -46,7 +38,7 @@ class LightStrip {
     }
 
     updatePixel(id, r, g, b) {
-        //this.pixels[id].setPixel(r, g, b);
+        this.pixels[id].setPixel(r, g, b);
     }
 
     updateAllPixels(r, g, b) {
@@ -58,7 +50,7 @@ class LightStrip {
     setIndividual(id) {
         let update_individual = document.getElementById("individual-pixels-live-check").checked;
         if (update_individual) {
-            let color = saves.data[this.currentColor - 1];
+            let color = getSaveColor(this.currentColor);
             let r = color.r;
             let g = color.g;
             let b = color.b;
@@ -72,7 +64,7 @@ class LightStrip {
         let start_num = document.getElementById("individual-pixels-multi-start").value;
         let end_num = document.getElementById("individual-pixels-multi-end").value;
         if (start_num >= 0 && end_num < this.numPixels) {
-            let color = saves.data[this.currentColor - 1];
+            let color = saves.data[this.currentColor];
             let r = color.r;
             let g = color.g;
             let b = color.b;
@@ -138,7 +130,7 @@ class LightStrip {
 
     sendPixel(id, r, g, b) {
         id = this.applyDirection(id);
-        this.updatePixel(id, r, g, b);
+        //this.updatePixel(id, r, g, b);
         let path = "run/single/" + id + "," + r + "," + g + "," + b;
         this.send(path, true);
     }
@@ -273,107 +265,27 @@ class Pixel {
         this.r = 0;
         this.g = 0;
         this.b = 0;
+        this.display_div;
+        this.setup();
+    }
+
+    setup() {
+        let target = document.getElementById("pixel-holder");
+        let div = document.createElement("div");
+        div.className = "pixel-display";
+        div.id = "pixel-display-"+this.id;
+        let onoverfunc = "lights.setIndividual("+this.id+")";
+        div.onmouseover = new Function(onoverfunc);
+        target.appendChild(div);
+        this.display_div = document.getElementById("pixel-display-"+this.id); 
     }
 
     setPixel(r, g, b) {
         this.r = r;
         this.g = g;
         this.b = b;
-        let displayPixel = document.getElementById("main-pixel-display-" + this.id);
-        displayPixel.style.backgroundColor = "rgb(" + r + "," + g + "," + b + ")";
+        //let displayPixel = document.getElementById("main-pixel-display-" + this.id);
+        //displayPixel.style.backgroundColor = "rgb(" + r + "," + g + "," + b + ")";
+        this.display_div.style.backgroundColor = "rgb(" + r + "," + g + "," + b + ")";
     }
 }
-
-// class Saves {
-//     constructor() {
-//         this.num = 0;
-//         this.numVisible = 0;
-//         this.data = new Array();
-//         this.location = document.getElementById("full-color-expanded");
-//     }
-
-//     addSave(preset, r, g, b) {
-//         if (this.num == this.numVisible) {
-//             if (this.num < 10) {
-//                 if (!preset) {
-//                     r = 100;
-//                     g = 100;
-//                     b = 100;
-//                 }
-//                 let added = {
-//                     "stauts": "show",
-//                     "id": this.num,
-//                     "r": r,
-//                     "g": g,
-//                     "b": b,
-//                 };
-//                 this.data.push(added);
-//                 this.num += 1;
-//                 this.numVisible += 1;
-//                 this.addSaveHTML(this.num, r, g, b);
-//             } else {
-//                 console.log("Too Many Saves!");
-//             }
-//         } else {
-//             this.show(this.numVisible);
-//         }
-//     }
-
-//     deleteSave() {
-//         this.hide(this.numVisible - 1);
-//     }
-
-//     addSaveHTML(num, r, g, b) {
-//         //this.location.innerHTML +=
-//             "<div class='section-flex' id='full-color-save-" + num + "'>" +
-//             "<div class='section-title-secondary'>Save " + num + "</div>" +
-//             "<div class='space-s-1'></div>" +
-//             "<input type='range' value='" + r + "' min='0' max='255' id='full-color-" + num + "-r' oninput='fullColor(" + num + ",false)'>" +
-//             "<input type='range' value='" + g + "' min='0' max='255' id='full-color-" + num + "-g' oninput='fullColor(" + num + ",false)'>" +
-//             "<input type='range' value='" + b + "' min='0' max='255' id='full-color-" + num + "-b' oninput='fullColor(" + num + ",false)'>" +
-//             "<div class='space-s-1'></div>" +
-//             "<div class='color-sample-display' id='full-color-sample-" + num + "'></div>" +
-//             "<div class='space-s-1'></div>" +
-//             "<input type='button' value='Send Color' onclick='fullColor(" + num + ",true)'>" +
-//             "<div class='space-s-5'></div>" +
-//             "<div class='section-title-secondary'>" +
-//             "    Color Values:" +
-//             "    <span class='space-s-1'></span>" +
-//             "    <span id='full-color-" + num + "-values-r'>" + r + "</span>" +
-//             "   <span class='space-s-1'></span>" +
-//             "    <span id='full-color-" + num + "-values-g'>" + g + "</span>" +
-//             "    <span class='space-s-1'></span>" +
-//             "    <span id='full-color-" + num + "-values-b'>" + b + "</span>" +
-//             "</div>" +
-//             "</div>";
-
-//         //fullColor(num, false);
-//     }
-
-//     show(num) {
-//         let target = document.getElementById("full-color-save-" + num);
-//         if (target.style.display == "none") {
-//             target.style.display = "flex";
-//             this.numVisible += 1;
-//         }
-//         console.log(this.num, this.numVisible);
-//     }
-
-//     hide(num) {
-//         let target = document.getElementById("full-color-save-" + num);
-//         if (target.style.display == "flex") {
-//             target.style.display = "none";
-//             this.numVisible -= 1;
-//         }
-//     }
-
-//     set(num, r, g, b) {
-//         this.data[num] = {
-//             "stauts": "show",
-//             "id": this.num,
-//             "r": r,
-//             "g": g,
-//             "b": b,
-//         }
-//     }
-// }

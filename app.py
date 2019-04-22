@@ -85,7 +85,6 @@ def animation(function, param):
             next_color = (int(current[0]),int(current[1]),int(current[2]))
             colors.append(next_color)
         arguments = (float(params[0]), colors)
-    #start_animation(execute, arguments)
     lights_process(execute, arguments)
     return "/animate/<function>/<param>"
 
@@ -138,17 +137,6 @@ def off():
 def reverse():
     lights_reverse()
     return "/reverse"
-
-@app.route('/killtree')
-def killtree():
-    pid = os.getpid()
-    parent = psutil.Process(pid)
-    i = 0
-    for child in parent.children(recursive=True):
-        child.kill()
-        i += 1
-    return "Killed children: "+str(i)
-
 
 
 def set_color(r, g, b):
@@ -216,19 +204,6 @@ def lights_process(function, arguments):
     while this_id == animation_id.get():
         function(arguments)
 
-
-def blank(a):
-    pass
-
-
-def start_animation(function, arguments):
-    global animation_process
-    animation_process = Process(
-        target=lights_process, args=(function, arguments))
-    animation_process.daemon = True
-    animation_process.start()
-
-
 def end_animation():
     animation_id.increment()
     global animation_process
@@ -239,12 +214,6 @@ def end_animation():
 
 
 global_settings = Setting()
-
-
-# Error if this line removed
-start_animation(blank, (0,))
-sleep(.1)
-end_animation()
 
 # Set port from command line arguments
 port = 5000

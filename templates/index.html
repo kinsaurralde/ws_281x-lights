@@ -198,14 +198,6 @@
                 addShift();
             }
             lswitch.create();
-            setupDisplay();
-        }
-
-        function setupDisplay() {
-            let target = document.getElementById("main-pixel-display");
-            for (let i = 0; i < lights.numPixels; i++) {
-                target.innerHTML += "<div class='pixel-display' id='main-pixel-display-" + i + "'>";
-            }
         }
 
         function settingReversed() {
