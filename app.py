@@ -1,36 +1,25 @@
 from flask import Flask, render_template, redirect, url_for
-from multiprocessing import Process, Queue
 from lights import *
 from time import sleep
-import importlib
-import thread
-import psutil
-import os
 import sys
 
 app = Flask(__name__)
 
 
+ # main control page
 @app.route('/')
 def index():
-    return render_template('index.html')  # "Hi"
+    return render_template('index.html')
 
 
+# instant commands
 @app.route('/run/<function>/<param>')
 def run(function, param):
     end_animation()
     params = param.split(",")
     thread_lights_main = ""
-    if function == "color":
+    if function == "color": # set entire strip to given color
         set_color(int(params[0]), int(params[1]), int(params[2]))
-    elif function == "wipe":
-        if global_settings.mode == "multi":
-            thread_lights_main = ""
-            thread_lights_main = thread.start_new_thread(set_wipe, (int(params[0]), int(
-                params[1]), int(params[2]), int(params[3]), int(params[4])))
-        else:
-            set_wipe(int(params[0]), int(params[1]), int(
-                params[2]), int(params[3]), int(params[4]))
     elif function == "random":
         set_random()
     elif function == "chase":
@@ -47,6 +36,7 @@ def run(function, param):
     return "/run/<function>/<param>"
 
 
+# animated actions
 @app.route('/animate/<function>/<param>')
 def animation(function, param):
     params = param.split(",")
@@ -55,6 +45,10 @@ def animation(function, param):
         end_animation()
         set_color(0, 0, 0)
         return "Animation Stopped"
+    elif function == "wipe":
+        execute = set_wipe
+        arguments = (int(params[0]), int(params[1]), int(
+                params[2]), int(params[3]), int(params[4]))
     elif function == "chase":
         execute = animation_chase
         arguments = (int(params[0]), int(params[1]),
@@ -194,7 +188,6 @@ def set_specific(pixels):
 
 
 class Setting:
-    mode = "single"
     brightness = .25
     
 
