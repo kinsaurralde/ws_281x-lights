@@ -246,7 +246,7 @@ class LightStrip {
     printLog() {
         console.log("Printing Log ...");
         for (let i = 0; i < this.pathLog.length; i++) {
-            console.log(this.pathLog[i]);
+            console.log(i,this.pathLog[i]);
         }
     }
 
@@ -255,7 +255,8 @@ class LightStrip {
     send(path) {
         console.log("Send Window:", this.currentSendWindow, "Sending:", path);
         this.sendWindow[this.currentSendWindow].src = path;
-        this.pathLog.push(path);
+        this.currentSendWindow = (this.currentSendWindow + 1) % this.maxSendWindows;
+	this.pathLog.push(path);
     }
 }
 

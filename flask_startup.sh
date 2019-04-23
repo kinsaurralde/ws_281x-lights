@@ -1,1 +1,1 @@
-sudo screen -S rgb sudo python app.py $1
+sudo screen -S rgb sudo python3 app.py $1

@@ -7,7 +7,6 @@
 
 import time
 from random import randint
-#from neopixel import *
 from rpi_ws281x import *
 import math
 import argparse
@@ -454,7 +453,7 @@ def get_color(r, g, b):
             r, g, b: color
     """
     # Swaps g and r since strip uses grb
-    return ((int(g) * 65536) + (int(r) * 256) + int(b))
+    return ((int(r) * 65536) + (int(g) * 256) + int(b))
 
 def get_color_seperate(value):
     """Seperates colors into rgb from single value
@@ -466,7 +465,7 @@ def get_color_seperate(value):
     r = (value >> 16) & 0xFF
     g = (value >> 8) & 0xFF
     b = value & 0xFF
-    return (g, r, b)  # Swaps g and r since strip uses grb
+    return (r, g, b)  # Swaps g and r since strip uses grb
 
 def set_brightness(value):
     """Change brightness value of strip
@@ -496,7 +495,7 @@ animation_id = AnimationID()
 # Run on Startup
 strip.setBrightness(75)
 
-lights_wipe(255, 0, 0, 1, 2)
-lights_wipe(0, 255, 0, 1, 2)
-lights_wipe(0, 0, 255, 1, 2)
-lights_wipe(0, 0, 0, 1, 2)
+lights_wipe(255, 0, 0, 1, 1)
+lights_wipe(0, 255, 0, 1, 1)
+lights_wipe(0, 0, 255, 1, 1)
+lights_wipe(0, 0, 0, 1, 1)
