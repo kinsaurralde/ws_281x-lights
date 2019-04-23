@@ -160,6 +160,7 @@ class LightStrip {
         if (type == "animate") {
             path += ",1," + delay;
         }
+        console.log(type);
         this.send(path, false);
     }
 

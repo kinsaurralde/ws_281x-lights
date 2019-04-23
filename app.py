@@ -30,7 +30,7 @@ def run(function, param):
                   int(params[2]), int(params[3]))
     elif function == "pulse":
         lights_pulse(int(params[0]), int(params[1]), int(
-                params[2]), int(params[3]), int(params[4]),int(params[5]))
+                params[2]), int(params[3]), int(params[4]),int(params[5]), animation_id.get())
     elif function == "specific":
         set_specific(params)
     return "/run/<function>/<param>"
@@ -162,11 +162,12 @@ def animation_random_cycle(arguments): # each ,wait_ms
     lights_random_cycle(arguments[0], arguments[1], 1, animation_id.get())
 
 def animation_pulse(arguments): # r, g, b, direction, wait_ms, length
-    #if arguments[6] == 1:
-    #    thread.start_new_thread(lights_pulse, (arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5]))
-    #    sleep(arguments[7]/1000.0)
-    #else:
-    lights_pulse(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], animation_id.get())
+    if arguments[6] == 1:
+        lights_pulse(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], animation_id.get())
+        sleep(arguments[7]/1000.0)
+    else:
+        print("ANIMATION PULSE")
+        lights_pulse(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], animation_id.get())
 
 def animation_mix_colors(arguments):
     lights_mix_switch(arguments[0], arguments[1], animation_id.get())

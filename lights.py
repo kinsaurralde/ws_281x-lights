@@ -37,7 +37,7 @@ strip.begin()
 def lights_reverse():
     """Reverse order of lights on strip"""
     lights_save = [None] * strip.numPixels()
-    for i in range(strip.numPixels()/2):
+    for i in range(strip.numPixels() // 2):
         lights_save[i] = strip.getPixelColor(i)
         strip.setPixelColor(i, 0)
         lights_save[strip.numPixels()-i -
@@ -45,10 +45,10 @@ def lights_reverse():
         strip.setPixelColor(strip.numPixels()-i-1, 0)
         strip.show()
         time.sleep(.005)
-    high_start = int(math.floor(strip.numPixels()/2))
-    low_start = int(math.ceil(strip.numPixels()/2)) - 1
+    high_start = int(math.floor(strip.numPixels() // 2))
+    low_start = int(math.ceil(strip.numPixels() // 2)) - 1
 
-    for i in range((strip.numPixels()/2)):
+    for i in range((strip.numPixels() // 2)):
         strip.setPixelColor(low_start-i, lights_save[high_start+i])
         strip.setPixelColor(high_start+i, lights_save[low_start-i])
         strip.show()
@@ -436,7 +436,6 @@ def save_lights():
     lights_save = []
     for i in range(strip.numPixels()):
         lights_save.append(strip.getPixelColor(i))
-    print(lights_save)
     return lights_save
 
 
