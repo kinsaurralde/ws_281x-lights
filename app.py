@@ -5,19 +5,19 @@ import sys
 
 app = Flask(__name__)
 
+# Routes
 
- # main control page
 @app.route('/')
 def index():
+    """Main control page"""
     return render_template('index.html')
 
 
-# instant commands
 @app.route('/run/<function>/<param>')
 def run(function, param):
+    """Non repeating functions"""
     end_animation()
     params = param.split(",")
-    thread_lights_main = ""
     if function == "color": # set entire strip to given color
         set_color(int(params[0]), int(params[1]), int(params[2]))
     elif function == "random":
@@ -36,9 +36,9 @@ def run(function, param):
     return "/run/<function>/<param>"
 
 
-# animated actions
 @app.route('/animate/<function>/<param>')
 def animation(function, param):
+    """Repeating functions"""
     params = param.split(",")
     end_animation()
     if function == "stop":
@@ -84,6 +84,7 @@ def animation(function, param):
 
 @app.route('/operations/<function>/<param>')
 def operations(function, param):
+    """Shifting / Reversing"""
     params = param.split(",")
     if function == "shift":
         lights_shift(int(params[0]),int(params[1]))
@@ -138,33 +139,33 @@ def set_color(r, g, b):
 
 
 def set_wipe(r, g, b, direction, wait_ms):
-    lights_wipe(r, g, b, direction, wait_ms)
+    lights_wipe(r, g, b, direction, wait_ms, animation_id.get())
 
 
 def set_chase(r, g, b, wait_ms, iterations):
-    lights_chase(r, g, b, wait_ms, iterations)
+    lights_chase(r, g, b, wait_ms, iterations, animation_id.get())
 
 
 def animation_chase(arguments):  # r, g, b, wait_ms
-    lights_chase(arguments[0], arguments[1], arguments[2], arguments[3], 1)
+    lights_chase(arguments[0], arguments[1], arguments[2], arguments[3], 1, animation_id.get())
 
 
 def animation_rainbow_cycle(arguments):  # wait_ms
-    lights_rainbow_cycle(arguments[0], 1)
+    lights_rainbow_cycle(arguments[0], 1, animation_id.get(), animation_id.get())
 
 
 def animation_rainbow_chase(arguments):  # wait_ms
-    lights_rainbow_chase(arguments[0])
+    lights_rainbow_chase(arguments[0], animation_id.get(), animation_id.get())
 
 def animation_random_cycle(arguments): # each ,wait_ms
-    lights_random_cycle(arguments[0], arguments[1], 1)
+    lights_random_cycle(arguments[0], arguments[1], 1, animation_id.get())
 
 def animation_pulse(arguments): # r, g, b, direction, wait_ms, length
     if arguments[6] == 1:
         thread.start_new_thread(lights_pulse, (arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5]))
         sleep(arguments[7]/1000.0)
     else:
-        lights_pulse(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5])
+        lights_pulse(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], animation_id.get())
 
 def animation_mix_colors(arguments):
     lights_mix_switch(arguments[0], arguments[1], animation_id.get())
@@ -199,12 +200,6 @@ def lights_process(function, arguments):
 
 def end_animation():
     animation_id.increment()
-    global animation_process
-    try:
-        animation_process.terminate()
-    except:
-        print("End Animation Error")
-
 
 global_settings = Setting()
 

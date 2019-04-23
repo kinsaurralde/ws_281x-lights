@@ -25,54 +25,11 @@ LED_CHANNEL = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 strip = Adafruit_NeoPixel(
     LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
 # Intialize the library (must be called once before other functions).
+
 strip.begin()
 
 # Used to get values for other functions
 
-
-def wheel(pos):
-    """Generate rainbow colors across 0-255 positions.
-    
-        Parameters:
-
-            pos: current pixel
-    """
-    if pos < 85:
-        return get_color(pos * 3, 255 - pos * 3, 0)
-    elif pos < 170:
-        pos -= 85
-        return get_color(255 - pos * 3, 0, pos * 3)
-    else:
-        pos -= 170
-        return get_color(0, pos * 3, 255 - pos * 3)
-
-
-def get_mix(color_1, color_2, percent):
-    """Get the mixed color between 2 colors
-    
-        Parameters:
-            
-            color_1, color_2: two colors to mix
-
-            percent: how far towards color 2 from color 1
-    
-    """
-    r_diff = color_2[0] - color_1[0]
-    g_diff = color_2[1] - color_1[1]
-    b_diff = color_2[2] - color_1[2]
-    r = color_1[0] + (r_diff * percent/100.0)
-    g = color_1[1] + (g_diff * percent/100.0)
-    b = color_1[2] + (b_diff * percent/100.0)
-    return get_color(r, g, b)
-
-
-def save_lights():
-    """Return current color of strip"""
-    lights_save = []
-    for i in range(strip.numPixels()):
-        lights_save.append(strip.getPixelColor(i))
-    print(lights_save)
-    return lights_save
 
 # Strip shifting
 
@@ -140,7 +97,7 @@ def lights_average_neighbors():
         strip.show()
 
 
-def rainbow(wait_ms, iterations):
+def rainbow(wait_ms, iterations, this_id):
     """Draw rainbow that fades across all pixels at once
 
         Parameters:
@@ -149,15 +106,17 @@ def rainbow(wait_ms, iterations):
 
             iterations: number of times to repeat
     
+            this_id: break if this value does not equal global animation_id
     """
     for j in range(256*iterations):
         for i in range(strip.numPixels()):
             strip.setPixelColor(i, wheel((i+j) & 255))
         strip.show()
-        time.sleep(wait_ms/1000.0)
+        #time.sleep(wait_ms/1000.0)
+        sleepListenForBreak(wait_ms, this_id)
 
 
-def lights_random_cycle(each, wait_ms, iterations):
+def lights_random_cycle(each, wait_ms, iterations, this_id):
     """Flashes random lights
         
         Parameters:
@@ -169,6 +128,8 @@ def lights_random_cycle(each, wait_ms, iterations):
             wait_ms: time between color changes (in ms)
 
             iterations: number of time to change
+
+            this_id: break if this value does not equal global animation_id
     """
     current_color = get_random_color()
     for i in range(iterations):
@@ -177,46 +138,11 @@ def lights_random_cycle(each, wait_ms, iterations):
                 current_color = get_random_color()
             strip.setPixelColor(j, current_color)
         strip.show()
-        time.sleep(wait_ms/1000.0)
+        #time.sleep(wait_ms/1000.0)
+        sleepListenForBreak(wait_ms, this_id)
 
 
-def get_random_color():
-    """Generates a random color"""
-    r = 0
-    g = 0
-    b = 0
-    color_off = randint(0, 2)
-    if color_off != 0:
-        r = randint(0, 255)
-    if color_off != 1:
-        g = randint(0, 255)
-    if color_off != 2:
-        b = randint(0, 255)
-    return get_color(r, g, b)
-
-
-def lights_off():
-    """Turns all pixels off"""
-    for i in range(strip.numPixels() / 2 + 1):
-        strip.setPixelColor(i, 0)
-        strip.setPixelColor(LED_COUNT - i, 0)
-        strip.show()
-        time.sleep(6/1000.0)
-
-
-def lights_set_color(r, g, b):
-    """Sets all pixels to rgb color given
-
-        Parameters:
-
-            r, g, b: color
-    """
-    for i in range(strip.numPixels()):
-        strip.setPixelColor(i, get_color(r, g, b))
-    strip.show()
-
-
-def lights_pulse(r, g, b, direction, wait_ms, length, layer=True):
+def lights_pulse(r, g, b, direction, wait_ms, length, this_id, layer=True):
     """Sends a pulse of color through strip
 
     Parameters:
@@ -234,6 +160,8 @@ def lights_pulse(r, g, b, direction, wait_ms, length, layer=True):
         layer: 
             True: restore pixel to previous color after pulse passes (default)
             False: pixels turn off after pulse passes
+
+        this_id: break if this value does not equal global animation_id
     """
     previous = []
     if direction == 1:
@@ -246,7 +174,8 @@ def lights_pulse(r, g, b, direction, wait_ms, length, layer=True):
                     strip.setPixelColor(j, previous[j])
                 else:
                     strip.setPixelColor(j, 0)
-            time.sleep(wait_ms/1000.0)
+            sleepListenForBreak(wait_ms, this_id)
+            #time.sleep(wait_ms/1000.0)
             strip.show()
     else:
         for i in reversed(range(strip.numPixels()+length)):
@@ -259,11 +188,12 @@ def lights_pulse(r, g, b, direction, wait_ms, length, layer=True):
                     strip.setPixelColor(i, previous[strip.numPixels()-i-1])
                 else:
                     strip.setPixelColor(i, 0)
-            time.sleep(wait_ms/1000.0)
+            sleepListenForBreak(wait_ms, this_id)
+            #time.sleep(wait_ms/1000.0)
             strip.show()
 
 
-def lights_wipe(r, g, b, direction, wait_ms):
+def lights_wipe(r, g, b, direction, wait_ms, this_id):
     """New color wipes across strip
         
         Parameters:
@@ -275,20 +205,24 @@ def lights_wipe(r, g, b, direction, wait_ms):
                 -1: reverse direction
 
             wait_ms: how long before moving to next pixel (in ms)
+
+            this_id: break if this value does not equal global animation_id
     """
     if direction == 1:
         for i in range(strip.numPixels()):
             strip.setPixelColor(i, get_color(r, g, b))
             strip.show()
-            time.sleep(wait_ms/1000.0)
+            sleepListenForBreak(wait_ms, this_id)
+            #time.sleep(wait_ms/1000.0)
     elif direction == -1:
         for i in reversed(range(strip.numPixels())):
             strip.setPixelColor(i, get_color(r, g, b))
             strip.show()
-            time.sleep(wait_ms/1000.0)
+            sleepListenForBreak(wait_ms, this_id)
+            #time.sleep(wait_ms/1000.0)
 
 
-def lights_chase(r, g, b, wait_ms, iterations):
+def lights_chase(r, g, b, wait_ms, iterations, this_id):
     """Movie theater light style chaser animation
 
         Parameters:
@@ -298,18 +232,21 @@ def lights_chase(r, g, b, wait_ms, iterations):
             wait_ms: how long before next frame (in ms)
 
             iterations: how many times to run
+
+            this_id: break if this value does not equal global animation_id
     """
     for j in range(iterations):
         for q in range(3):
             for i in range(0, strip.numPixels(), 3):
                 strip.setPixelColor(i+q, get_color(r, g, b))
             strip.show()
-            time.sleep(wait_ms/1000.0)
+            #time.sleep(wait_ms/1000.0)
+            sleepListenForBreak(wait_ms, this_id)
             for i in range(0, strip.numPixels(), 3):
                 strip.setPixelColor(i+q, 0)
 
 
-def lights_rainbow_cycle(wait_ms, iterations):
+def lights_rainbow_cycle(wait_ms, iterations, this_id):
     """Draw rainbow that uniformly distributes itself across all pixels
 
         Parameters:
@@ -317,28 +254,34 @@ def lights_rainbow_cycle(wait_ms, iterations):
             wait_ms: how long before next frame (in ms)
 
             iterations: how many times to run
+
+            this_id: break if this value does not equal global animation_id
     """
     for j in range(256*iterations):
         for i in range(strip.numPixels()):
             strip.setPixelColor(
-                i, wheel((int(i * 256 / strip.numPixels()) + j) & 255))
+                i, wheel((int(i * 256 // strip.numPixels()) + j) & 255))
         strip.show()
-        time.sleep(wait_ms/1000.0)
+        sleepListenForBreak(wait_ms, this_id)
+        #time.sleep(wait_ms/1000.0)
 
 
-def lights_rainbow_chase(wait_ms):
+def lights_rainbow_chase(wait_ms, this_id):
     """Rainbow movie theater light style chaser animation
 
         Parameters:
 
             wait_ms: how long before next frame (in ms)
+
+            this_id: break if this value does not equal global animation_id
     """
     for j in range(256):
         for q in range(3):
             for i in range(0, strip.numPixels(), 3):
                 strip.setPixelColor(i+q, wheel((i+j) % 255))
             strip.show()
-            time.sleep(wait_ms/1000.0)
+            #time.sleep(wait_ms/1000.0)
+            sleepListenForBreak(wait_ms, this_id)
             for i in range(0, strip.numPixels(), 3):
                 strip.setPixelColor(i+q, 0)
 
@@ -385,9 +328,33 @@ def lights_mix_switch_instant(wait_ms, colors, this_id):
     for j in range(0, len(colors)):
         for i in range(0, strip.numPixels()):
             strip.setPixelColor(i, get_mix(
-                    colors[j], colors[j], 100))
+                colors[j], colors[j], 100))
         strip.show()
         sleepListenForBreak(wait_ms, this_id)
+
+# Instant no animation
+
+
+def lights_off():
+    """Turns all pixels off"""
+    for i in range(strip.numPixels() // 2 + 1):
+        strip.setPixelColor(i, 0)
+        strip.setPixelColor(LED_COUNT - i, 0)
+        strip.show()
+        time.sleep(5/1000.0)
+
+
+def lights_set_color(r, g, b):
+    """Sets all pixels to rgb color given
+
+        Parameters:
+
+            r, g, b: color
+    """
+    for i in range(strip.numPixels()):
+        strip.setPixelColor(i, get_color(r, g, b))
+    strip.show()
+
 
 def lights_set_random(each):
     """Set lights randomly
@@ -407,6 +374,7 @@ def lights_set_random(each):
             strip.setPixelColor(i, color)
     strip.show()
 
+
 def lights_set(id, r, g, b):
     """Set specific pixel to color
 
@@ -419,11 +387,58 @@ def lights_set(id, r, g, b):
     strip.setPixelColor(id, get_color(r, g, b))
     strip.show()
 
+
 def lights_set_multiple():
     """For future implementaion"""
     pass
 
-# Other
+# Utilities
+
+
+def wheel(pos):
+    """Generate rainbow colors across 0-255 positions.
+    
+        Parameters:
+
+            pos: current pixel
+    """
+    if pos < 85:
+        return get_color(pos * 3, 255 - pos * 3, 0)
+    elif pos < 170:
+        pos -= 85
+        return get_color(255 - pos * 3, 0, pos * 3)
+    else:
+        pos -= 170
+        return get_color(0, pos * 3, 255 - pos * 3)
+
+
+def get_mix(color_1, color_2, percent):
+    """Get the mixed color between 2 colors
+    
+        Parameters:
+            
+            color_1, color_2: two colors to mix
+
+            percent: how far towards color 2 from color 1
+    
+    """
+    r_diff = color_2[0] - color_1[0]
+    g_diff = color_2[1] - color_1[1]
+    b_diff = color_2[2] - color_1[2]
+    r = color_1[0] + (r_diff * percent/100.0)
+    g = color_1[1] + (g_diff * percent/100.0)
+    b = color_1[2] + (b_diff * percent/100.0)
+    return get_color(r, g, b)
+
+
+def save_lights():
+    """Return current color of strip"""
+    lights_save = []
+    for i in range(strip.numPixels()):
+        lights_save.append(strip.getPixelColor(i))
+    print(lights_save)
+    return lights_save
+
 
 def sleepListenForBreak(wait_ms, this_id):
     """While sleeping check if global id has changed
@@ -442,7 +457,22 @@ def sleepListenForBreak(wait_ms, this_id):
         if this_id != animation_id.get():
             return True
         wait_ms -= 100
-        return False
+    return False
+
+
+def get_random_color():
+    """Generates a random color"""
+    r = 0
+    g = 0
+    b = 0
+    color_off = randint(0, 2)
+    if color_off != 0:
+        r = randint(0, 255)
+    if color_off != 1:
+        g = randint(0, 255)
+    if color_off != 2:
+        b = randint(0, 255)
+    return get_color(r, g, b)
 
 
 def get_color(r, g, b):
@@ -452,8 +482,8 @@ def get_color(r, g, b):
 
             r, g, b: color
     """
-    # Swaps g and r since strip uses grb
     return ((int(r) * 65536) + (int(g) * 256) + int(b))
+
 
 def get_color_seperate(value):
     """Seperates colors into rgb from single value
@@ -465,7 +495,8 @@ def get_color_seperate(value):
     r = (value >> 16) & 0xFF
     g = (value >> 8) & 0xFF
     b = value & 0xFF
-    return (r, g, b)  # Swaps g and r since strip uses grb
+    return (r, g, b)
+
 
 def set_brightness(value):
     """Change brightness value of strip
@@ -477,8 +508,10 @@ def set_brightness(value):
     strip.setBrightness(value)
     strip.show()
 
+
 class AnimationID:
     """Holds the current animation_id used globally"""
+
     def __init__(self):
         self.id = 0
 
@@ -490,12 +523,13 @@ class AnimationID:
         """Return current animation_id"""
         return self.id
 
+
 animation_id = AnimationID()
 
 # Run on Startup
 strip.setBrightness(75)
 
-lights_wipe(255, 0, 0, 1, 1)
-lights_wipe(0, 255, 0, 1, 1)
-lights_wipe(0, 0, 255, 1, 1)
-lights_wipe(0, 0, 0, 1, 1)
+lights_wipe(255, 0, 0, 1, 1, 0)
+lights_wipe(0, 255, 0, 1, 1, 0)
+lights_wipe(0, 0, 255, 1, 1, 0)
+lights_wipe(0, 0, 0, 1, 1, 0)
