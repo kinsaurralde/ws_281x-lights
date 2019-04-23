@@ -33,7 +33,7 @@
             <div class="section-setting">
                 <div class="section-title-secondary">Brightness</div>
                 <div class="space-1"></div>
-                <input type="range" value="25" min="1" max="255" id="settings-brightness" oninput="settingBrightness()">
+                <input type="range" value="25" min="1" max="255" id="settings-brightness" oninput="lights.setBrightness()">
             </div>
             <div class="space-s-1"></div>
             <div class="section-setting">
@@ -219,10 +219,10 @@
         }
 
         function settingBrightness() {
-            let brightness = document.getElementById("settings-brightness").value;
-            path = "settings/brightness=" + brightness;
-            console.log("SENT:", path);
-            send.src = path;
+            //let brightness = document.getElementById("settings-brightness").value;
+            //path = "settings/brightness=" + brightness;
+            console.log("FAIL:", path);
+            //send.src = path;
         }
 
         function lightsRandom(each) {

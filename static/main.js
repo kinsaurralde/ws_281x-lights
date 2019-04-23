@@ -160,7 +160,6 @@ class LightStrip {
         if (type == "animate") {
             path += ",1," + delay;
         }
-        console.log(type);
         this.send(path, false);
     }
 
@@ -221,6 +220,12 @@ class LightStrip {
         }
         this.updateAllPixels(0, 0, 0);
         this.send(path, true);
+    }
+
+    setBrightness() {
+        let brightness = document.getElementById("settings-brightness").value;
+        let path = "settings/brightness=" + brightness;
+        this.send(path, false);
     }
 
     reverseStrip() {
