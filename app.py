@@ -96,7 +96,8 @@ def operations(function, param):
 def thread_run(function, param):
     params = param.split(",")
     if function == "pulse":
-        thread.start_new_thread(lights_pulse, (int(params[0]), int(params[1]), int(params[2]), int(params[3]), int(params[4]), int(params[5])))
+        #thread.start_new_thread(lights_pulse, (int(params[0]), int(params[1]), int(params[2]), int(params[3]), int(params[4]), int(params[5])))
+        print("ERROR: THREAD")
     return "thread/<function>/<param>"
 
 
@@ -151,21 +152,21 @@ def animation_chase(arguments):  # r, g, b, wait_ms
 
 
 def animation_rainbow_cycle(arguments):  # wait_ms
-    lights_rainbow_cycle(arguments[0], 1, animation_id.get(), animation_id.get())
+    lights_rainbow_cycle(arguments[0], 1, animation_id.get())
 
 
 def animation_rainbow_chase(arguments):  # wait_ms
-    lights_rainbow_chase(arguments[0], animation_id.get(), animation_id.get())
+    lights_rainbow_chase(arguments[0], animation_id.get())
 
 def animation_random_cycle(arguments): # each ,wait_ms
     lights_random_cycle(arguments[0], arguments[1], 1, animation_id.get())
 
 def animation_pulse(arguments): # r, g, b, direction, wait_ms, length
-    if arguments[6] == 1:
-        thread.start_new_thread(lights_pulse, (arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5]))
-        sleep(arguments[7]/1000.0)
-    else:
-        lights_pulse(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], animation_id.get())
+    #if arguments[6] == 1:
+    #    thread.start_new_thread(lights_pulse, (arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5]))
+    #    sleep(arguments[7]/1000.0)
+    #else:
+    lights_pulse(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], animation_id.get())
 
 def animation_mix_colors(arguments):
     lights_mix_switch(arguments[0], arguments[1], animation_id.get())
@@ -210,3 +211,4 @@ if (len(sys.argv) > 1):
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=port, threaded=True)
+    
