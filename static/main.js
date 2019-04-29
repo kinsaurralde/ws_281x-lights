@@ -19,7 +19,15 @@ class LightStrip {
         for (let i = 0; i < this.numPixels; i++) {
             this.pixels[i] = new Pixel(i);
         }
+        let section_flex = document.createElement("div");
+        section_flex.className = "section-flex";
+        html.appendSetting(section_flex, "Color Save Number", html.createInputNumber(0, 3, 1,  "checkSaveNumber('individual-pixel-save-color')", "individual-pixel-save-color"));
+        html.appendSetting(section_flex, "Live", html.createInputCheckBox("Live", "individual-pixels-live-check"));
+        html.appendSetting(section_flex, "Resend", html.createButton("Send", "individual-pixels-resend", "lights.resendIndividual()"));
+        html.appendSetting(section_flex, "Multiple", [html.createInputNumber(0, 60, 0,  null, "individual-pixels-multi-start"), html.createInputNumber(0, 60, 29,  null, "individual-pixels-multi-end"),html.createButton("Send", "individual-pixels-multi-send", "lights.setMultiple()")], true);
+        document.getElementById("individual-pixels-settings").appendChild(section_flex);
     }
+
 
     createSendWindows() {
         for (let i = 0; i < this.maxSendWindows; i++) {
@@ -50,7 +58,7 @@ class LightStrip {
     setIndividual(id) {
         let update_individual = document.getElementById("individual-pixels-live-check").checked;
         if (update_individual) {
-            let color = getSaveColor(this.currentColor);
+            let color = getSaveColor(document.getElementById("individual-pixel-save-color").value);
             let r = color.r;
             let g = color.g;
             let b = color.b;
@@ -64,7 +72,7 @@ class LightStrip {
         let start_num = document.getElementById("individual-pixels-multi-start").value;
         let end_num = document.getElementById("individual-pixels-multi-end").value;
         if (start_num >= 0 && end_num < this.numPixels) {
-            let color = saves.data[this.currentColor];
+            let color = getSaveColor(document.getElementById("individual-pixel-save-color").value);
             let r = color.r;
             let g = color.g;
             let b = color.b;
@@ -137,20 +145,20 @@ class LightStrip {
 
     colorAll(r, g, b) {
         let path = "run/color/" + r + "," + g + "," + b;
-        this.updateAllPixels(r, g, b);
+        //this.updateAllPixels(r, g, b);
         this.send(path, true);
     }
 
     wipe(r, g, b, dir, wait_ms) {
         dir *= this.direction;
         let path = "run/wipe/" + r + "," + g + "," + b + "," + dir + "," + wait_ms;
-        this.updateAllPixels(r, g, b);
+        //this.updateAllPixels(r, g, b);
         this.send(path, false);
     }
 
     chase(r, g, b, wait_ms) {
         let path = "animate/chase/" + r + "," + g + "," + b + "," + wait_ms;
-        this.updateAllPixels(r, g, b);
+        //this.updateAllPixels(r, g, b);
         this.send(path, true);
     }
 
@@ -291,8 +299,6 @@ class Pixel {
         this.r = r;
         this.g = g;
         this.b = b;
-        //let displayPixel = document.getElementById("main-pixel-display-" + this.id);
-        //displayPixel.style.backgroundColor = "rgb(" + r + "," + g + "," + b + ")";
         this.display_div.style.backgroundColor = "rgb(" + r + "," + g + "," + b + ")";
     }
 }

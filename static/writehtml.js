@@ -21,14 +21,20 @@ class HTMLWriter {
         return spacer;
     }
 
-    appendSetting(parent, title, input) {
+    appendSetting(parent, title, input, multiple = false) {
         let final_div = document.createElement("div");
         final_div.className = "section-setting";
         let title_div = document.createElement("div");
         title_div.className = "section-title-secondary";
         title_div.innerText = title;
         final_div.appendChild(title_div);
-        final_div.appendChild(input);
+        if (multiple) {
+            for (let i = 0; i < input.length; i++) {
+                final_div.appendChild(input[i]);
+            }
+        } else {
+            final_div.appendChild(input);
+        }
         parent.appendChild(final_div);
         parent.appendChild(html.createSpacerS1());
     }

@@ -144,34 +144,7 @@
         <div class="section-hidden" id="individual-pixels-expanded" style="display: block;">
             <div class="section-flex" id="pixel-holder" style="padding: 0;">
             </div>
-            <div class="section-hidden">
-                <div class="section-setting">
-                    <div class="section-title-secondary">Color Save Number</div>
-                    <input type="number" min="1" max="10" value="1" oninput="colorSaveCheck()"
-                        id="individual-pixel-save-input">
-                </div>
-                <div class="space-s-1"></div>
-                <div class="section-setting">
-                    <div class="section-title-secondary">Live</div>
-                    <input type="checkbox" value="Send Color" id="individual-pixels-live-check">
-                </div>
-                <div class="space-s-1" style="display: none;"></div>
-                <div class="section-setting" style="display: none;">
-                    <div class="section-title-secondary">Reset</div>
-                    <input type="button" value="Send" id="individual-pixels-reset">
-                </div>
-                <div class="space-s-1"></div>
-                <div class="section-setting">
-                    <div class="section-title-secondary">Resend</div>
-                    <input type="button" value="Send" id="individual-pixels-resend" onclick="lights.resendIndividual()">
-                </div>
-                <div class="space-s-1"></div>
-                <div class="section-setting">
-                    <div class="section-title-secondary">Multiple</div>
-                    <input type="number" min="1" max="10" value="1" id="individual-pixels-multi-start">
-                    <input type="number" min="1" max="10" value="1" id="individual-pixels-multi-end">
-                    <input type="button" value="Send" id="individual-pixels-multi-send" onclick="lights.setMultiple()">
-                </div>
+            <div class="section-hidden" id="individual-pixels-settings">
             </div>
         </div>
     </div>
@@ -216,13 +189,6 @@
             } else {
                 target.style.display = "none";
             }
-        }
-
-        function settingBrightness() {
-            //let brightness = document.getElementById("settings-brightness").value;
-            //path = "settings/brightness=" + brightness;
-            console.log("FAIL:", path);
-            //send.src = path;
         }
 
         function lightsRandom(each) {
