@@ -41,8 +41,25 @@
                 <div class="space-1"></div>
                 <input type="checkbox" value="Send Color" checked id="settings-reversed" onclick="settingReversed()">
             </div>
+            <div class="space-s-1"></div>
+            <div class="section-setting">
+                <div class="section-title-secondary">Web Theme</div>
+                <div class="space-1"></div>
+                <select id="settings-web-theme" oninput="colorTheme()">
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                    <option value="high_contrast">High Contrast</option>
+                    <option value="high_contrast_colored">Contrast Colored</option>
+                    <option value="dark_rgb">Dark RGB</option>
+                    <option value="custom">Custom</option>
+                </select>
+            </div>
         </div>
-
+        <div class="section"  id="settings-web-theme-expanded" style="display: none;">
+            <div class="section-title-secondary">Custom Web Theme</div>
+            <div style="display: flex;" id="settings-web-custom-container">
+            </div>
+        </div>
     </div>
 
     <div class="section" id="quick">
@@ -82,6 +99,17 @@
         </div>
     </div>
 
+    <div class="section" id="full-color">
+        <div class="section-title">Full Color<input type="button" class="expand-button" value="^" style="width: 2vw;"
+                onclick="expand('full-color','block')"><input type="button" class="expand-button" value="+"
+                style="width: 2vw;" onclick="addSave()"><input type="button" class="expand-button" value="-"
+                style="width: 2vw;" onclick="removeSave()"></div>
+        <div class="space-1"></div>
+        <div class="section-hidden" id="full-color-expanded" style="display: block;">
+        
+        </div>
+    </div>
+
     <div class="section" id="operations">
         <div class="section-title">Operations<input type="button" class="expand-button" value="^" style="width: 2vw;"
                 onclick="expand('operations','block')"><input type="button" class="expand-button" value="+"
@@ -92,17 +120,6 @@
             <input type="button" value="Flip" onclick="lights.reverseStrip()">
             <input type="button" value="Shift Left" onclick="lights.shift(-1,0)">
             <input type="button" value="Shift Right" onclick="lights.shift(1,0)">
-        </div>
-    </div>
-
-    <div class="section" id="full-color">
-        <div class="section-title">Full Color<input type="button" class="expand-button" value="^" style="width: 2vw;"
-                onclick="expand('full-color','block')"><input type="button" class="expand-button" value="+"
-                style="width: 2vw;" onclick="addSave()"><input type="button" class="expand-button" value="-"
-                style="width: 2vw;" onclick="removeSave()"></div>
-        <div class="space-1"></div>
-        <div class="section-hidden" id="full-color-expanded" style="display: block;">
-        
         </div>
     </div>
 
@@ -162,6 +179,9 @@
 
         function pageLoad() {
             addSaveLive();
+            addSave(255,0,0);
+            addSave(0,255,0);
+            addSave(0,0,255);
             addSave(0,255,255);
             addSave(255,0,255);
             addSave(255,255,0);
