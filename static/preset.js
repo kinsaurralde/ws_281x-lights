@@ -162,3 +162,28 @@ function colorTheme() {
     css_vars.setProperty("--input-background", "var(--"+new_theme["input-background"]);
     css_vars.setProperty("--border-color", "var(--"+new_theme["border-color"]);
 }
+
+function toggleFullScreen() {
+    let elem = document.documentElement;
+    if (document.fullscreenElement == null) { // not currently in fullscreen
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+        } else if (elem.mozRequestFullScreen) { /* Firefox */
+            elem.mozRequestFullScreen();
+        } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+            elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) { /* IE/Edge */
+            elem.msRequestFullscreen();
+        }
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) { /* Firefox */
+            document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) { /* IE/Edge */
+            document.msExitFullscreen();
+        }
+    }
+}

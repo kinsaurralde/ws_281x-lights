@@ -29,21 +29,36 @@ html {
     --input-background: var(--light-input-background);
     --border-color: var(--light-border-color);
 
+    /* Accessability */
+    --slider-thumb-width: .5vw;
+    --slider-thumb-height: 1.25vw;
 
+    overflow: scroll;
+    overflow-x: hidden;
+}
+
+::-webkit-scrollbar {
+    width: 0px;  /* Remove scrollbar space */
+    background: transparent;  /* Optional: just make scrollbar invisible */
 }
 
 body {
     font-family: sans-serif;
-    font-size: 1em;
+    font-size: 1vw;
     background: var(--body-background);
     color: var(--text-color);
+    -webkit-user-select: none;
+}
 
+input, select {
+    font-size: .75vw;
+    -webkit-appearance: none;
 }
 
 input[type=button] {
     width: 8vw;
     height: 1.5vw;
-    border: .2vh solid var(--input-border);
+    border: .1vw solid var(--input-border);
     background-color: var(--input-background);
     color: var(--text-color);
 }
@@ -63,12 +78,19 @@ input[type=range] {
 input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: .5vw;
-    height: 1.25vw;
+    width: var(--slider-thumb-width);
+    height: var(--slider-thumb-height);
     background-color: var(--input-background);
     border: .1vw solid var(--input-border);
     cursor: pointer;
 }
+
+@media screen and (max-width: 1000px) {
+    html {
+        --slider-thumb-width: 1.25vw;
+        --slider-thumb-height: 2vw;
+    }
+} 
 
 input[type=checkbox] {
     width: 1.5vw;
@@ -76,12 +98,12 @@ input[type=checkbox] {
     margin: 0;
     appearance: none;
     -webkit-appearance: none;
-    border: .2vh solid var(--input-border);
+    border: .1vw solid var(--input-border);
     background-color: var(--input-background);
 }
 
 input[type=checkbox]:checked {
-    border: .5vh solid var(--input-border);
+    border: .25vw solid var(--input-border);
     background-color: var(--text-color);
 }
 
@@ -107,12 +129,12 @@ select {
 
 
 #page-title {
-    font-size: 2em;
+    font-size: 2vw;
 }
 
 .section {
     width: 98%;
-    border: .1vh solid var(--border-color);
+    border: .08vw solid var(--border-color);
     border-radius: 1vh;
     margin-top: 1vh;
     margin-bottom: 1vh;
@@ -121,7 +143,7 @@ select {
 
 .section-flex {
     display: flex;
-    border: .1vh solid var(--border-color);
+    border: .08vw solid var(--border-color);
     border-radius: 1vh;
     margin-top: 1vh;
     margin-bottom: 1vh;
@@ -135,7 +157,7 @@ select {
 
 
 .section-setting {
-    border: .1vh solid var(--border-color);
+    border: .08vw solid var(--border-color);
     border-radius: 1vh;
     padding: 1vh;
     margin-top: .25vh;
@@ -145,11 +167,11 @@ select {
 
 
 .section-title {
-    font-size: 1.5em;
+    font-size: 1.5vw;
 }
 
 .section-title-secondary {
-    font-size: 1.25em;
+    font-size: 1.25vw;
 }
 
 .section-send {
@@ -171,14 +193,14 @@ select {
 .divider {
     margin-top: 1vh;
     margin-bottom: 1vh;
-    border-bottom: .1vh solid var(--border-color); 
+    border-bottom: .1vw solid var(--border-color); 
 }
 
 .color-sample-display {
     width: 1.5vw;
     height: 1.5vw;
-    border: .1vh solid var(--border-color);
-    border-radius: .5vh;
+    border: .1vw solid var(--border-color);
+    border-radius: .25vw;
 }
 
     
