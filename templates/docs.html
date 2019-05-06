@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Lights</title>
+  <link rel="stylesheet" type="text/css" href="../static/main.css">
+  <style></style>
+</head>
+
+<h1><a id="Lights_0"></a>Lights</h1>
+<p>This project contains a flask webserver that provides a website to control rgb lights through the rpi_ws281x library.
+</p>
+<hr>
+<h2><a id="Web_API_Routes_4"></a>Web API Routes</h2>
+<p>Params are seperated by a ‘,’</p>
+<h4><a id="Index__8"></a>Index: ‘/’</h4>
+<ul>
+  <li>Main control page</li>
+</ul>
+<h4><a id="Off_off_11"></a>Off: ‘/off’</h4>
+<ul>
+  <li>Stop animations and turn all pixels off</li>
+</ul>
+<h4><a id="Stop_Animation_stopanimation_14"></a>Stop Animation: ‘/stopanimation’</h4>
+<ul>
+  <li>Stops all animations</li>
+</ul>
+<h4><a id="Get_Data_get_17"></a>Get Data: ‘/get’</h4>
+<ul>
+  <li>Get data on current settings and pixel colors</li>
+</ul>
+<h4><a id="Get_Docs_docs_20"></a>Get Docs: ‘/docs’</h4>
+<ul>
+  <li>Get this document in html form</li>
+</ul>
+<h4><a id="Reverse_reverse_23"></a>Reverse: ‘/reverse’</h4>
+<ul>
+  <li>Flip strip</li>
+</ul>
+<h4><a id="Settings_settingsparam_26"></a>Settings: ‘/settings/&lt;param&gt;’</h4>
+<ul>
+  <li>Change settings</li>
+  <li>given setting_name=value</li>
+  <li>Functions:
+    <ul>
+      <li>“break”: change break_animation value</li>
+      <li>“brightness”: change brightness</li>
+    </ul>
+  </li>
+</ul>
+<h4><a id="Operations_operationsfunctionparam_33"></a>Operations: ‘/operations/&lt;function&gt;/&lt;param&gt;’</h4>
+<ul>
+  <li>One time pixel changes</li>
+  <li>Functions:
+    <ul>
+      <li>“shift”: shift pixels by amount
+        <ul>
+          <li>Params:
+            <ol>
+              <li>amount: amount to pixels to shift by</li>
+              <li>post_delay: amount of pixels to wait after shifting</li>
+            </ol>
+          </li>
+        </ul>
+      </li>
+      <li>“reverse”: Flip strip</li>
+    </ul>
+  </li>
+</ul>
+<h4><a id="Run_runfunctionparam_42"></a>Run: ‘/run/&lt;function&gt;/&lt;param&gt;’</h4>
+<ul>
+  <li>Non repeating actions</li>
+  <li>Functions:
+    <ul>
+      <li>“color”: set all lights to same color
+        <ul>
+          <li>Params:
+            <ol>
+              <li>r value</li>
+              <li>g value</li>
+              <li>b value</li>
+            </ol>
+          </li>
+        </ul>
+      </li>
+      <li>“wipe”: wipe a color across the strip
+        <ul>
+          <li>Params:
+            <ol>
+              <li>r value</li>
+              <li>g value</li>
+              <li>b value</li>
+              <li>direction
+                <ul>
+                  <li>1: forward direction</li>
+                  <li>-1: reverse direction</li>
+                </ul>
+              </li>
+              <li>wait_ms: how long before moving to next pixel (in ms)</li>
+            </ol>
+          </li>
+        </ul>
+      </li>
+      <li>“single”: set a single pixel to a color
+        <ul>
+          <li>Params:
+            <ol>
+              <li>pixel id: which pixel to set</li>
+              <li>r value</li>
+              <li>g value</li>
+              <li>b value</li>
+            </ol>
+          </li>
+        </ul>
+      </li>
+      <li>“pulse”: move a pulse of color across strip
+        <ul>
+          <li>Params:
+            <ol>
+              <li>r value</li>
+              <li>g value</li>
+              <li>b value</li>
+              <li>direction
+                <ul>
+                  <li>1: forward direction</li>
+                  <li>-1: reverse direction</li>
+                </ul>
+              </li>
+              <li>wait_ms: how long before moving to next pixel (in ms)</li>
+              <li>length: how many pixels in pulse</li>
+            </ol>
+          </li>
+        </ul>
+      </li>
+      <li>“specific”: set specific pixels to same color
+        <ul>
+          <li>Params:
+            <ul>
+              <li>One param per pixel to set</li>
+              <li>Each pixel has following data seperated by a ‘.’
+                <ol>
+                  <li>pixel id:</li>
+                  <li>r value</li>
+                  <li>g value</li>
+                  <li>b value</li>
+                </ol>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<h4><a id="Animate_animatefunctionparam_85"></a>Animate: ‘/animate/&lt;function&gt;/&lt;param&gt;’</h4>
+<ul>
+  <li>Repeating actions</li>
+  <li>Will stop any previous animations</li>
+  <li>Functions:
+    <ul>
+      <li>“chase”: movie theater light style chaser animation
+        <ul>
+          <li>Params:
+            <ol>
+              <li>r value</li>
+              <li>g value</li>
+              <li>b value</li>
+              <li>wait_ms: delay between pixel changes (in ms)</li>
+            </ol>
+          </li>
+        </ul>
+      </li>
+      <li>“rainbowCycle”: draw rainbow that uniformly distributes itself across all pixels
+        <ul>
+          <li>Params:
+            <ol>
+              <li>wait_ms: delay between pixel changes (in ms)</li>
+            </ol>
+          </li>
+        </ul>
+      </li>
+      <li>“rainbowChase”: rainbow movie theater light style chaser animation
+        <ul>
+          <li>Params:
+            <ol>
+              <li>wait_ms: delay between pixel changes (in ms)</li>
+            </ol>
+          </li>
+        </ul>
+      </li>
+      <li>“randomCycle”: change to random colors
+        <ul>
+          <li>Params:
+            <ol>
+              <li>each: number of pixels before new color is selected</li>
+              <li>wait_ms: delay between color changes (in ms)</li>
+            </ol>
+          </li>
+        </ul>
+      </li>
+      <li>“shift”: shift each pixel by an amount
+        <ul>
+          <li>Params:
+            <ol>
+              <li>amount: number of pixels to shift by each frame</li>
+              <li>wait_ms: delay between shifts (in ms)</li>
+            </ol>
+          </li>
+        </ul>
+      </li>
+      <li>“pulse”: move a pulse of color across strip
+        <ul>
+          <li>Params:
+            <ol>
+              <li>r value</li>
+              <li>g value</li>
+              <li>b value</li>
+              <li>direction
+                <ul>
+                  <li>1: forward direction</li>
+                  <li>else: reverse direction</li>
+                </ul>
+              </li>
+              <li>wait_ms: how long before moving to next pixel (in ms)</li>
+              <li>length: number of pixels in pulse</li>
+            </ol>
+          </li>
+        </ul>
+      </li>
+      <li>“mix”: switch between multiple colors
+        <ul>
+          <li>Params:
+            <ol>
+              <li>wait_ms: delay between given color changes
+                <ul>
+                  <li>&lt;0: instantly switch between given color changes after |wait_ms| ms</li>
+                  <li>else: mix between colors with wait_ms between full given colors</li>
+                </ul>
+              </li>
+              <li>colors: array of colors to switch between
+                <ul>
+                  <li>colors seperated by a ‘,’</li>
+                  <li>r, g, b values seperated by a ‘.’</li>
+                </ul>
+              </li>
+            </ol>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<p>Last Update: 5/5/2019</p>

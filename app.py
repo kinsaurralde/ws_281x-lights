@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, json
 from lights import *
 from time import sleep
 import sys
@@ -21,12 +21,12 @@ def run(function, param):
     params = param.split(",")
     if function == "color":  # set entire strip to given color
         set_color(int(params[0]), int(params[1]), int(params[2]))
-    elif function == "random":
+    elif function == "random": # REMOVE
         set_random()
     elif function == "wipe":
         set_wipe(int(params[0]), int(params[1]), int(
             params[2]), int(params[3]), int(params[4]))
-    elif function == "chase":
+    elif function == "chase": # REMOVE
         set_chase(int(params[0]), int(params[1]), int(
             params[2]), int(params[3]), int(params[4]))
     elif function == "single":
@@ -45,7 +45,7 @@ def animation(function, param):
     """Repeating functions"""
     params = param.split(",")
     end_animation()
-    if function == "stop":
+    if function == "stop": # REMOVE
         end_animation()
         set_color(0, 0, 0)
         return "Animation Stopped"
@@ -106,9 +106,20 @@ def change_settings(param):
                 global_settings.set_break_animation(False)
         if current[0] == "brightness":
             global_settings.set_brightness(int(current[1]))
-            #set_brightness(int(current[1]))
     return "/settings/<param>"
 
+@app.route('/get')
+def get():
+    data = state.get_state()
+    response = app.response_class(
+        response=json.dumps(data),
+        mimetype='application/json'
+    )
+    return response
+
+@app.route('/docs')
+def docs():
+    return render_template('docs.html')
 
 @app.route('/stopanimation')
 def stopanimation():
@@ -163,7 +174,7 @@ def animation_pulse(arguments):  # r, g, b, direction, wait_ms, length
         lights_pulse(arguments[0], arguments[1], arguments[2],
                      arguments[3], arguments[4], arguments[5], animation_id.get())
         sleep(arguments[7]/1000.0)
-    else:
+    else: # REMOVE
         print("ANIMATION PULSE")
         lights_pulse(arguments[0], arguments[1], arguments[2],
                      arguments[3], arguments[4], arguments[5], animation_id.get())

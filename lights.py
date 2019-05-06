@@ -1,9 +1,4 @@
 #!/usr/bin/env python3
-# NeoPixel library strandtest example
-# Author: Tony DiCola (tony@tonydicola.com)
-#
-# Direct port of the Arduino NeoPixel library strandtest example.  Showcases
-# various animations on a strip of NeoPixels.
 
 import time
 from random import randint
@@ -28,7 +23,85 @@ strip = Adafruit_NeoPixel(
 
 strip.begin()
 
-# Used to get values for other functions
+# Classes
+
+class Settings:
+    """Holds current global settings"""
+
+    def __init__(self):
+        self.brightness = 75
+        self.num_pixels = strip.numPixels()
+        self.break_animation = True
+
+    def get_brightness(self):
+        return self.brightness
+
+    def set_brightness(self, value):
+        self.brightness = value
+        strip.setBrightness(value)
+        strip.show()
+    
+    def get_break_animation(self):
+        return self.break_animation
+
+    def set_break_animation(self, value):
+        self.break_animation = value
+
+    def get_all_settings(self):
+        cur_settings = {
+            "brightness": self.brightness,
+            "break_animation": self.break_animation,
+            "num_pixels": self.num_pixels,
+        }
+        return cur_settings
+
+global_settings = Settings()
+    
+class AnimationID:
+    """Holds the current animation_id used globally"""
+
+    def __init__(self):
+        self.id = 0
+
+    def increment(self):
+        """Increase animation_id by 1"""
+        self.id += 1
+
+    def get(self):
+        """Return current animation_id"""
+        return self.id
+
+
+animation_id = AnimationID()
+
+class State:
+    def __init__(self):
+        pass
+
+    def get_pixel_data(self):
+        pixel_data_save = save_lights()
+        pixel_data = []
+        for i in range(len(pixel_data_save)):
+            cur_pixel = get_color_seperate(pixel_data_save[i])
+            pixel = {
+                "id": i,
+                "r": cur_pixel[0],
+                "g": cur_pixel[1],
+                "b": cur_pixel[2],
+            }
+            pixel_data.append(pixel)
+        return pixel_data
+    
+    def get_state(self):
+        settings = global_settings.get_all_settings()
+        pixel_data = self.get_pixel_data()
+        data = {
+            "settings": settings,
+            "pixel_data": pixel_data
+        }
+        return data
+
+state = State()
 
 
 # Strip shifting
@@ -121,9 +194,7 @@ def lights_random_cycle(each, wait_ms, iterations, this_id):
         
         Parameters:
             
-            each:
-                "true": each pixel picks a random color seperatly
-                else: entire strip switch to same random color
+            each: number of pixels before new color is selected
 
             wait_ms: time between color changes (in ms)
 
@@ -134,8 +205,10 @@ def lights_random_cycle(each, wait_ms, iterations, this_id):
     current_color = get_random_color()
     for i in range(iterations):
         for j in range(strip.numPixels()):
-            if each == "true":
-                current_color = get_random_color()
+            # if each == "true":
+            #     current_color = get_random_color()
+            if j % each == 0:
+                    current_color = get_random_color()
             strip.setPixelColor(j, current_color)
         strip.show()
         if sleepListenForBreak(wait_ms, this_id):
@@ -151,7 +224,7 @@ def lights_pulse(r, g, b, direction, wait_ms, length, this_id, layer=True):
 
         direction:
             1: forward direction
-            2: reverse direction
+            -1: reverse direction
 
         wait_ms: how long before moving to next pixel (in ms)
 
@@ -499,44 +572,6 @@ def get_color_seperate(value):
     b = value & 0xFF
     return (r, g, b)
 
-class Settings:
-    """Holds current global settings"""
-
-    def __init__(self):
-        self.brightness = 75
-        self.break_animation = True
-
-    def get_brightness(self):
-        return self.brightness
-
-    def set_brightness(self, value):
-        self.brightness = value
-        strip.setBrightness(value)
-        strip.show()
-    
-    def get_break_animation(self):
-        return self.break_animation
-
-    def set_break_animation(self, value):
-        self.break_animation = value
-    
-class AnimationID:
-    """Holds the current animation_id used globally"""
-
-    def __init__(self):
-        self.id = 0
-
-    def increment(self):
-        """Increase animation_id by 1"""
-        self.id += 1
-
-    def get(self):
-        """Return current animation_id"""
-        return self.id
-
-global_settings = Settings()
-animation_id = AnimationID()
-
 # Run on Startup
 strip.setBrightness(75)
 
@@ -544,3 +579,5 @@ lights_wipe(255, 0, 0, 1, 1, 0)
 lights_wipe(0, 255, 0, 1, 1, 0)
 lights_wipe(0, 0, 255, 1, 1, 0)
 lights_wipe(0, 0, 0, 1, 1, 0)
+
+lights_random_cycle(10, 500, 10, animation_id.get())

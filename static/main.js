@@ -205,13 +205,13 @@ class LightStrip {
 
     rainbowChase(wait_ms) {
         let path = "animate/rainbowChase/" + wait_ms;
-        this.updateAllPixels(0, 0, 0);
+        //this.updateAllPixels(0, 0, 0);
         this.send(path, true);
     }
 
     rainbowCycle(wait_ms) {
         let path = "animate/rainbowCycle/" + wait_ms;
-        this.updateAllPixels(0, 0, 0);
+        //this.updateAllPixels(0, 0, 0);
         this.send(path, true);
     }
 
@@ -226,7 +226,7 @@ class LightStrip {
         } else {
             path = "animate/randomCycle/false," + wait_ms;
         }
-        this.updateAllPixels(0, 0, 0);
+        //this.updateAllPixels(0, 0, 0);
         this.send(path, true);
     }
 
@@ -248,7 +248,7 @@ class LightStrip {
 
     off() {
         let path = "off";
-        this.updateAllPixels(0, 0, 0);
+        //this.updateAllPixels(0, 0, 0);
         this.send(path, true);
     }
 
