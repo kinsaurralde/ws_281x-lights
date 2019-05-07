@@ -215,8 +215,14 @@ class LightStrip {
         this.send(path, true);
     }
 
-    random(each) {
-        
+    random(segment_size, wait_ms = 0, repeated = false) {
+        let path = "";
+        if (repeated) {
+            path = "animate/random/" + segment_size+ "," + wait_ms;
+        } else {
+            path = "run/random/" + segment_size + "," + wait_ms;
+        }
+        this.send(path, true);
     }
 
     randomCycle(each, wait_ms) {

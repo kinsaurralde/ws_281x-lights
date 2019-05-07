@@ -579,5 +579,3 @@ lights_wipe(255, 0, 0, 1, 1, 0)
 lights_wipe(0, 255, 0, 1, 1, 0)
 lights_wipe(0, 0, 255, 1, 1, 0)
 lights_wipe(0, 0, 0, 1, 1, 0)
-
-lights_random_cycle(10, 500, 10, animation_id.get())

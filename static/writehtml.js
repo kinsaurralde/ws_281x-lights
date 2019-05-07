@@ -140,3 +140,11 @@ class HTMLWriter {
         return title_div;
     }
 }
+
+function verify_number(min, max, d_value, div_id) {
+    let div = document.getElementById(div_id);
+    let value = div.value;
+    if (value < min || value > max || value == "") {
+        div.value = d_value;
+    }
+}

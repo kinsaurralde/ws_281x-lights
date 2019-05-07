@@ -11,6 +11,7 @@
     <script src="../static/wipe.js"></script>
     <script src="../static/pulse.js"></script>
     <script src="../static/switch.js"></script>
+    <script src="../static/random.js"></script>
 </head>
 
 <body onload="pageLoad()">
@@ -75,8 +76,8 @@
         <div class="space-1"></div>
         <div class="section-hidden" id="quick-expanded" style="display: block;">
             <input type="button" value="Off" onclick="lights.off()">
-            <input type="button" value="Random Each" onclick="lightsRandom(true)">
-            <input type="button" value="Random" onclick="lightsRandom(false)">
+            <input type="button" value="Random Each" onclick="lights.random(1)">
+            <input type="button" value="Random" onclick="lights.random(60)">
             <input type="button" value="Red" onclick="lights.colorAll(255,0,0)">
             <input type="button" value="Green" onclick="lights.colorAll(0,255,0)">
             <input type="button" value="Blue" onclick="lights.colorAll(0,0,255)">
@@ -92,8 +93,8 @@
             <input type="button" value="*Blue Chase*" onclick="lights.chase(0,0,255,50)">
             <input type="button" value="*Rainbow Chase*" onclick="lights.rainbowChase(50)">
             <input type="button" value="*Rainbow Cycle*" onclick="lights.rainbowCycle(50)">
-            <input type="button" value="*Random Each*" onclick="lights.randomCycle(true, 100)">
-            <input type="button" value="*Random*" onclick="lights.randomCycle(false, 200)">
+            <input type="button" value="*Random Each*" onclick="lights.random(1, 50, true)">
+            <input type="button" value="*Random*" onclick="lights.random(60, 100, true)">
             <input type="button" value="*Red Pulse*" onclick="lights.pulse('animate',255,0,0,0,20,10,500)">
             <input type="button" value="*Green Pulse*" onclick="lights.pulse('animate',0,255,0,0,10,4,250)">
             <input type="button" value="*Blue Pulse*" onclick="lights.pulse('animate',0,0,255,1,25,6,500)">
@@ -161,6 +162,17 @@
         </div>
     </div>
 
+    <div class="section" id="random">
+        <div class="section-title">Random<input type="button" class="expand-button" value="^" style="width: 2vw;"
+                onclick="expand('random','block')"><input type="button" class="expand-button" value="+"
+                style="width: 2vw;" onclick="addRandom()"><input type="button" class="expand-button" value="-"
+                style="width: 2vw;" onclick="removeRandom()"></div>
+        <div class="space-1"></div>
+        <div class="section-hidden" id="random-expanded" style="display: block;">
+
+        </div>
+    </div>
+
     <div class="section" id="individual-pixels">
         <div class="section-title">Individual Pixels<input type="button" class="expand-button" value="^"
                 style="width: 2vw;" onclick="expand('individual-pixels','block')"></div>
@@ -182,6 +194,7 @@
         var shift = new Array();
         var preset = new Preset();
         var pulse = new Array();
+        var random = new Array();
         var lswitch = new LSwitch();
 
         function pageLoad() {
@@ -196,6 +209,7 @@
                 addWipe();
                 addPulse();
                 addShift();
+                addRandom();
             }
             lswitch.create();
         }

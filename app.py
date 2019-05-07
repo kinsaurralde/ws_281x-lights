@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, url_for, json
 from lights import *
 from time import sleep
 import sys
+import threading
 
 app = Flask(__name__)
 
@@ -21,8 +22,8 @@ def run(function, param):
     params = param.split(",")
     if function == "color":  # set entire strip to given color
         set_color(int(params[0]), int(params[1]), int(params[2]))
-    elif function == "random": # REMOVE
-        set_random()
+    elif function == "random":
+        set_random((int(params[0]), int(params[1])))
     elif function == "wipe":
         set_wipe(int(params[0]), int(params[1]), int(
             params[2]), int(params[3]), int(params[4]))
@@ -59,9 +60,9 @@ def animation(function, param):
     elif function == "rainbowChase":
         execute = animation_rainbow_chase
         arguments = (int(params[0]),)
-    elif function == "randomCycle":
+    elif function == "random":
         execute = animation_random_cycle
-        arguments = (params[0], int(params[1]))
+        arguments = (int(params[0]), int(params[1]))
     elif function == "shift":
         execute = animation_shift
         arguments = (int(params[0]), int(params[1]))
@@ -188,8 +189,8 @@ def animation_shift(arguments):
     lights_shift(arguments[0], arguments[1])
 
 
-def set_random():
-    lights_set_random()
+def set_random(arguments):
+    lights_random_cycle(arguments[0], arguments[1], 1, animation_id.get())
 
 
 def set_light(i, r, g, b):
