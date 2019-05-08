@@ -295,7 +295,7 @@ def lights_wipe(r, g, b, direction, wait_ms, this_id):
                 return
 
 
-def lights_chase(r, g, b, wait_ms, iterations, this_id):
+def lights_chase(r, g, b, wait_ms, interval, direction, iterations, this_id):
     """Movie theater light style chaser animation
 
         Parameters:
@@ -304,19 +304,29 @@ def lights_chase(r, g, b, wait_ms, iterations, this_id):
 
             wait_ms: how long before next frame (in ms)
 
+            interval: step amount from pixel to next
+
+            direction:
+                1: forward direction
+                -1: reverse direction
+
             iterations: how many times to run
 
             this_id: break if this value does not equal global animation_id
     """
+    iter_range = range(interval)
+    if direction == -1:
+        print("Reversed")
+        iter_range = reversed(iter_range)
     for j in range(iterations):
-        for q in range(3):
-            for i in range(0, strip.numPixels(), 3):
-                strip.setPixelColor(i+q, get_color(r, g, b))
+        for q in iter_range:
+            for i in range(0, strip.numPixels(), interval):
+                strip.setPixelColor(i + q, get_color(r, g, b))
             strip.show()
             if sleepListenForBreak(wait_ms, this_id):
                 return
-            for i in range(0, strip.numPixels(), 3):
-                strip.setPixelColor(i+q, 0)
+            for i in range(0, strip.numPixels(), interval):
+                strip.setPixelColor(i + q, 0)
 
 
 def lights_rainbow_cycle(wait_ms, iterations, this_id):

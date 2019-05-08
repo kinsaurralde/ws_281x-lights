@@ -53,7 +53,8 @@ def animation(function, param):
     elif function == "chase":
         execute = animation_chase
         arguments = (int(params[0]), int(params[1]),
-                     int(params[2]), int(params[3]))
+                     int(params[2]), int(params[3]),
+                     int(params[4]), int(params[5]))
     elif function == "rainbowCycle":
         execute = animation_rainbow_cycle
         arguments = (int(params[0]),)
@@ -149,13 +150,13 @@ def set_wipe(r, g, b, direction, wait_ms):
     lights_wipe(r, g, b, direction, wait_ms, animation_id.get())
 
 
-def set_chase(r, g, b, wait_ms, iterations):
+def set_chase(r, g, b, wait_ms, iterations):    # REMOVE
     lights_chase(r, g, b, wait_ms, iterations, animation_id.get())
 
 
-def animation_chase(arguments):  # r, g, b, wait_ms
+def animation_chase(arguments):  # r, g, b, wait_ms, distance, direction
     lights_chase(arguments[0], arguments[1], arguments[2],
-                 arguments[3], 1, animation_id.get())
+                 arguments[3], arguments[4], arguments[5], 1, animation_id.get())
 
 
 def animation_rainbow_cycle(arguments):  # wait_ms

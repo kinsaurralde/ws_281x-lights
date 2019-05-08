@@ -144,21 +144,19 @@ class LightStrip {
     }
 
     colorAll(r, g, b) {
-        let path = "run/color/" + r + "," + g + "," + b;
-        //this.updateAllPixels(r, g, b);
+        let path = "run/color/" + r + "," + g + "," + b;    
         this.send(path, true);
     }
 
     wipe(r, g, b, dir, wait_ms) {
         dir *= this.direction;
-        let path = "run/wipe/" + r + "," + g + "," + b + "," + dir + "," + wait_ms;
-        //this.updateAllPixels(r, g, b);
+        let path = "run/wipe/" + r + "," + g + "," + b + "," + dir + "," + wait_ms;     
         this.send(path, false);
     }
 
-    chase(r, g, b, wait_ms) {
-        let path = "animate/chase/" + r + "," + g + "," + b + "," + wait_ms;
-        //this.updateAllPixels(r, g, b);
+    chase(r, g, b, wait_ms, interval, dir) {
+        dir *= this.direction;
+        let path = "animate/chase/" + r + "," + g + "," + b + "," + wait_ms + "," + interval + "," + dir;
         this.send(path, true);
     }
 
