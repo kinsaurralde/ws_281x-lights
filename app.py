@@ -138,8 +138,8 @@ def off():
 
 @app.route('/reverse')
 def reverse():
-    lights_reverse()
-    return "/reverse"
+    lights_off()
+    return "DELETE"
 
 
 def set_color(r, g, b):
@@ -197,13 +197,8 @@ def set_random(arguments):
 def set_light(i, r, g, b):
     lights_set(i, r, g, b)
 
-
 def set_specific(pixels):
-    for pixel in pixels:
-        data = pixel.split(".")
-        lights_set(int(data[0]), int(data[1]), int(data[2]), int(data[3]))
-
-
+    lights_set_multiple(pixels)
 
 def lights_process(function, arguments):
     animation_id.increment()

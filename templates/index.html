@@ -33,6 +33,7 @@
                 onclick="expand('settings','flex')"></div>
         <div class="space-1"></div>
         <div class="section-hidden" id="settings-expanded">
+            <div class="divider"></div>
             <div class="section-setting">
                 <div class="section-title-secondary">Brightness</div>
                 <div class="space-1"></div>
@@ -42,7 +43,7 @@
             <div class="section-setting">
                 <div class="section-title-secondary">Reverse</div>
                 <div class="space-1"></div>
-                <input type="checkbox" value="Send Color" checked id="settings-reversed" onclick="settingReversed()">
+                <input type="checkbox" value="Send Color" checked id="settings-reversed" onclick="lights.settingReversed()">
             </div>
             <div class="space-s-1"></div>
             <div class="section-setting">
@@ -76,6 +77,7 @@
                 onclick="expand('quick','block')"></div>
         <div class="space-1"></div>
         <div class="section-hidden" id="quick-expanded" style="display: block;">
+            <div class="divider"></div>
             <input type="button" value="Off" onclick="lights.off()">
             <input type="button" value="Random Each" onclick="lights.random(1)">
             <input type="button" value="Random" onclick="lights.random(60)">
@@ -115,7 +117,7 @@
                 style="width: 2vw;" onclick="removeSave()"></div>
         <div class="space-1"></div>
         <div class="section-hidden" id="full-color-expanded" style="display: block;">
-        
+            <div class="divider"></div>
         </div>
     </div>
 
@@ -126,9 +128,11 @@
                 style="width: 2vw;" onclick="removeShift()"></div>
         <div class="space-1"></div>
         <div class="section-hidden" id="operations-expanded" style="display: block;">
+            <div class="divider"></div>
             <input type="button" value="Flip" onclick="lights.reverseStrip()">
             <input type="button" value="Shift Left" onclick="lights.shift(-1,0)">
             <input type="button" value="Shift Right" onclick="lights.shift(1,0)">
+            <div class="divider"></div>
         </div>
     </div>
 
@@ -137,7 +141,7 @@
                 onclick="expand('switch','block')"></div>
         <div class="space-1"></div>
         <div class="section-hidden" id="switch-expanded" style="display: block;">
-
+            <div class="divider"></div>
         </div>
     </div>
 
@@ -148,7 +152,7 @@
                 style="width: 2vw;" onclick="removePulse()"></div>
         <div class="space-1"></div>
         <div class="section-hidden" id="pulse-expanded" style="display: block;">
-
+            <div class="divider"></div>
         </div>
     </div>
 
@@ -159,7 +163,7 @@
                 style="width: 2vw;" onclick="removeChase()"></div>
         <div class="space-1"></div>
         <div class="section-hidden" id="chase-expanded" style="display: block;">
-
+            <div class="divider"></div>
         </div>
     </div>
 
@@ -170,7 +174,7 @@
                 style="width: 2vw;" onclick="removeWipe()"></div>
         <div class="space-1"></div>
         <div class="section-hidden" id="wipe-expanded" style="display: block;">
-
+            <div class="divider"></div>
         </div>
     </div>
 
@@ -181,7 +185,7 @@
                 style="width: 2vw;" onclick="removeRandom()"></div>
         <div class="space-1"></div>
         <div class="section-hidden" id="random-expanded" style="display: block;">
-
+            <div class="divider"></div>
         </div>
     </div>
 
@@ -190,10 +194,56 @@
                 style="width: 2vw;" onclick="expand('individual-pixels','block')"></div>
         <div class="space-1"></div>
         <div class="section-hidden" id="individual-pixels-expanded" style="display: block;">
+            <div class="divider"></div>
             <div class="section-flex" id="pixel-holder" style="padding: 0;">
             </div>
             <div class="section-hidden" id="individual-pixels-settings">
             </div>
+        </div>
+    </div>
+
+    <div class="section" id="manualurl">
+        <div class="section-title">Manual URL<input type="button" class="expand-button" value="^"
+                style="width: 2vw;" onclick="expand('manualurl','block')"></div>
+        <div class="space-1"></div>
+        <div class="section-hidden" id="manualurl-expanded" style="display: block;">
+            <div class="divider"></div>
+            <div class="space-1"></div>
+            <span id="info-manual-urlbase">[ LOADING ]</span>
+            <input type="text" id="manual-text">
+            <input type="button" value="Send" onclick="lights.manual('manual-text', false)">
+            <input type="button" value="Send in New Tab" onclick="lights.manual('manual-text', true)">
+            <div class="divider"></div>
+            <!--<div class="space-1"></div>
+            <div class="section-title-secondary">Send Queue</div>
+            <textarea readonly>
+                queue
+            </textarea>
+            <div class="divider"></div>
+            <div class="space-1"></div>
+            <div class="section-title-secondary">Send Stack</div>
+            <textarea readonly>
+                test
+            </textarea>-->
+        </div>
+    </div>
+
+    <div class="section" id="info">
+        <div class="section-title">Info<input type="button" class="expand-button" value="^" style="width: 2vw;"
+                onclick="expand('info','block')"></div>
+        <div class="space-1"></div>
+        <div class="section-hidden" id="info-expanded" style="display: block;">
+            <div class="divider"></div>
+            <div class="space-1"></div>
+            <div class="section-title-secondary">History</div>
+            <textarea id="info-log" readonly>
+            </textarea>
+            <div class="divider"></div>
+            <input type="button" value="View Code" onclick="openURL('https:\/\/github.com/kinsaurralde/ws_281x-lights')">
+            <input type="button" value="View Docs" onclick="openURL('docs')">
+            <input type="button" value="View Strip Status" onclick="openURL('get')">
+            <input type="button" value="kinsaurralde.com" onclick="openURL('https:\/\/kinsaurralde.com')">
+            <div class="divider"></div>
         </div>
     </div>
 
@@ -226,15 +276,7 @@
                 addChase();
             }
             lswitch.create();
-        }
-
-        function settingReversed() {
-            if (document.getElementById("settings-reversed").checked) {
-                lights.direction = -1;
-            } else {
-                lights.direction = 1;
-            }
-            lights.reverseStrip();
+            document.getElementById("info-manual-urlbase").innerText = location.href;
         }
 
         function expand(id, displayType) {
@@ -246,29 +288,10 @@
             }
         }
 
-
-        function lightsRandom(each) {
-            if (each) {
-                path = "run/random/none"
-                console.log("SENT:", path);
-                send.src = path;
-            } else {
-                let r = 0;
-                let g = 0;
-                let b = 0;
-                let skip = Math.floor(Math.random() * 3);
-                if (skip != 0) {
-                    r = Math.floor(Math.random() * 255);
-                }
-                if (skip != 1) {
-                    g = Math.floor(Math.random() * 255);
-                }
-                if (skip != 2) {
-                    b = Math.floor(Math.random() * 255);
-                }
-                lights.colorAll(r, g, b);
-            }
+        function openURL(url) {
+            window.open(url, "_blank");
         }
+
     </script>
 </body>
 

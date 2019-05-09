@@ -8,6 +8,8 @@ class LightStrip {
         this.pixels = new Array(numPixels);
         this.sendWindow = new Array(numPixels);
         this.pathLog = new Array();
+        this.logPrintDiv = document.getElementById("info-log");
+        this.logPrintDiv.innerHTML = "";
 
         this.createPixels();
         this.createSendWindows();
@@ -33,6 +35,23 @@ class LightStrip {
         for (let i = 0; i < this.maxSendWindows; i++) {
             this.sendWindow[i] = document.getElementById("send-data-" + i);
         }
+    }
+
+    // Settings
+
+    settingReversed() {
+        if (document.getElementById("settings-reversed").checked) {
+            lights.direction = -1;
+        } else {
+            lights.direction = 1;
+        }
+        lights.reverseStrip();
+    }
+
+    setBrightness() {
+        let brightness = document.getElementById("settings-brightness").value;
+        let path = "settings/brightness=" + brightness;
+        this.send(path, false);
     }
 
     // Other
@@ -122,7 +141,7 @@ class LightStrip {
     resendIndividual() {
         let params = "";
         for (let i = 0; i < this.numPixels; i++) {
-            params += i + "." + this.pixels[i].r + "." + this.pixels[i].g + "." + this.pixels[i].b;
+            params += this.applyDirection(i) + "." + this.pixels[i].r + "." + this.pixels[i].g + "." + this.pixels[i].b;
             if (i != this.numPixels - 1) {
                 params += ",";
             }
@@ -131,7 +150,15 @@ class LightStrip {
         this.send(path, false);
     }
 
-
+    manual(id, new_window) {
+        let path = document.getElementById(id).value;
+        if (new_window) {
+            this.pathLog.push(path);
+            window.open(path, "_blank");
+        } else {
+            this.send(path);
+        }
+    }
 
 
     // Set Paths
@@ -234,14 +261,8 @@ class LightStrip {
         this.send(path, true);
     }
 
-    setBrightness() {
-        let brightness = document.getElementById("settings-brightness").value;
-        let path = "settings/brightness=" + brightness;
-        this.send(path, false);
-    }
-
     reverseStrip() {
-        let path = "reverse";
+        let path = "operations/reverse/null";
         this.send(path, false);
     }
 
@@ -268,13 +289,30 @@ class LightStrip {
         }
     }
 
+    updateLog(text) {
+        this.pathLog.push(text);
+        this.writeTopLog();
+    }
+
+    writeTopLog() {
+        let div = document.getElementById("info-log");
+        div.innerHTML += this.pathLog[this.pathLog.length - 1] + "\n";
+        div.scrollTop = div.scrollHeight;
+    }
+
     // Send
 
     send(path) {
         console.log("Send Window:", this.currentSendWindow, "Sending:", path);
         this.sendWindow[this.currentSendWindow].src = path;
         this.currentSendWindow = (this.currentSendWindow + 1) % this.maxSendWindows;
-	this.pathLog.push(path);
+	    this.updateLog(path);
+    }
+
+    sendWindow(path) {
+        this.sendWindow[this.currentSendWindow].src = path;
+        this.currentSendWindow = (this.currentSendWindow + 1) % this.maxSendWindows;
+	    this.updateLog(path);
     }
 }
 

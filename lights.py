@@ -474,9 +474,21 @@ def lights_set(id, r, g, b):
     strip.show()
 
 
-def lights_set_multiple():
-    """For future implementaion"""
-    pass
+def lights_set_multiple(pixels):
+    """Set multiple pixels to colors
+    
+        Parameters:
+
+            pixels: array of pixels to change in string form (sub paramters seperated by '.')
+                [0]: id (which pixel to change)
+                [1]: r value
+                [2]: g value
+                [3]: b value
+    """
+    for pixel in pixels:
+        data = pixel.split(".")
+        strip.setPixelColor(int(data[0]), get_color(int(data[1]), int(data[2]), int(data[3])))
+    strip.show()
 
 # Utilities
 

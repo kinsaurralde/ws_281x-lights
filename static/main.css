@@ -52,6 +52,7 @@ body {
 
 input, select {
     font-size: .75vw;
+    font-family: sans-serif;
     -webkit-appearance: none;
 }
 
@@ -60,6 +61,14 @@ input[type=button] {
     height: 1.5vw;
     border: .1vw solid var(--input-border);
     background-color: var(--input-background);
+    color: var(--text-color);
+}
+
+input[type=text] {
+    width: 40vw;
+    height: 1.5vw;
+    border: .1vw solid var(--input-border);
+    background-color: var(--body-background);
     color: var(--text-color);
 }
 
@@ -83,6 +92,15 @@ input[type=range]::-webkit-slider-thumb {
     background-color: var(--input-background);
     border: .1vw solid var(--input-border);
     cursor: pointer;
+}
+
+textarea {
+    width: 100%;
+    height: 5vw;
+    min-height: 3vw;
+    border: .1vw solid var(--input-border);
+    background-color: var(--body-background);
+    color: var(--text-color);
 }
 
 @media screen and (max-width: 1000px) {
