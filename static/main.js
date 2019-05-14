@@ -191,14 +191,14 @@ class LightStrip {
         dir *= this.direction;
         let path = type + "/pulse/" + r + "," + g + "," + b + "," + dir + "," + wait_ms + "," + length;
         if (type == "animate") {
-            path += ",1," + delay;
+            path +=  "/" + delay;
         }
         this.send(path, false);
     }
 
     shift(amount, post_delay) {
         amount *= this.direction;
-        let path = "operations/shift/" + amount + "," + post_delay;
+        let path = "run/shift/" + amount + "," + post_delay;
         this.send(path, false);
     }
 
@@ -262,7 +262,7 @@ class LightStrip {
     }
 
     reverseStrip() {
-        let path = "operations/reverse/null";
+        let path = "run/reverse";
         this.send(path, false);
     }
 

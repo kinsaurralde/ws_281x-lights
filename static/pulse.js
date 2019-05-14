@@ -31,7 +31,7 @@ class Pulse {
         this.waitms = document.getElementById("pulse-waitms-" + this.id).value;
         this.length = document.getElementById("pulse-length-" + this.id).value;
         this.delay = document.getElementById("pulse-delay-" + this.id).value;
-        this.mode = "run";
+        this.mode = "thread";
         if (document.getElementById("pulse-repeated-"+this.id).checked) {
             this.mode = "animate";
         }

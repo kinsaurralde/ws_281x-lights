@@ -9,7 +9,7 @@ class LSwitch {
         let section_flex = document.createElement("div");
         section_flex.className = "section-flex";
 
-        html.appendSetting(section_flex, "Transition ms", html.createInputNumber(1, 100, 20, null, "switch-waitms"));
+        html.appendSetting(section_flex, "Transition ms", html.createInputNumber(1, 100, 2000, null, "switch-waitms"));
         html.appendSetting(section_flex, "Instant", html.createInputCheckBox("none", "switch-instant"));
         html.appendSetting(section_flex, "Loop to start", html.createInputCheckBox("none", "switch-loop-start", true));
 
