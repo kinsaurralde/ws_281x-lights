@@ -3,12 +3,13 @@ import threading
 import time
 
 class Controller:
-    def __init__(self):
+    def __init__(self, controller_id):
         # Settings
         self.brightness = 100
         neopixels.setBrightness(self.brightness)
         self.num_pixels = LED_COUNT
         self.break_animation = True
+        self.id = controller_id
 
         self.strips = []
         self.strip_data = []
@@ -28,12 +29,38 @@ class Controller:
         self.strip_data.append(data)
         neopixels.update(self.strip_data)
 
+    def response(self, command_run, error, message, detailed=False, strip_id=None):
+        data = {
+            "controller_id": self.id,
+            "command_run": command_run,
+            "brightness": neopixels.getBrightness(),
+            "error": error,
+            "message": message,
+            "strip_info": self.strip_data,
+        }
+        if detailed:
+            data["settings"] = self.get_all_settings()
+            data["strips"] = []
+            if strip_id == None:
+                for i in range(len(self.strips)):
+                    data["strips"].append({
+                        "strip_id": i,
+                        "data": self.strips[i].save_split()
+                    })
+            else:
+                data["strips"].append({
+                        "strip_id": strip_id,
+                        "data": self.strips[strip_id].save_split()
+                    })
+        return data
+
     def stop(self, strip_id=None):
         if strip_id == None:
             for strip in self.strips:
                 strip.stop_animation()
         else:
             self.strips[strip_id].stop_animation()
+        return self.response("stop",False, None, True, strip_id)
 
     def off(self, strip_id=None):
         if strip_id == None:
@@ -41,8 +68,10 @@ class Controller:
                 strip.off()
         else:
             self.strips[strip_id].off()
+        return self.response("off",False, None, True, strip_id)
 
     def get_brightness(self):
+        self.brightness = neopixels.getBrightness()
         return self.brightness
 
     def set_brightness(self, value):
@@ -93,6 +122,7 @@ class Controller:
             run_function(arguments)
         else:
             run_function(*arguments)
+        return self.response(function, False, None, True, strip_id)
 
     def thread(self, strip_id, function, arguments):
         print("[  Threads  ] ", "[", strip_id, "] ", function, arguments)
@@ -101,6 +131,7 @@ class Controller:
         threading_thread = threading.Thread(
             target=threading_function, args=arguments)
         threading_thread.start()
+        return self.response(function, False, None, True, strip_id)
 
     def animate(self, strip_id, function, arguments, delay_between=0, dont_split=False):
         print("[ Animation ] ", "[", strip_id, "] ", function, arguments, "Delay Between:",delay_between)
@@ -115,6 +146,7 @@ class Controller:
         animation_thread = threading.Thread(
             target=self._animate_run, args=animation_arguments)
         animation_thread.start()
+        return self.response(function, False, None, True, strip_id)
 
     def _animate_run(self, strip_id, function, arguments, animation_id, delay_between, dont_split):
         while animation_id == self.strips[strip_id].animation_id.get():
@@ -127,12 +159,5 @@ class Controller:
                     target=function, args=arguments)
                 threading_thread.start()
                 time.sleep(int(delay_between)/1000)
-
-controller = Controller()
-
-controller.run(0, "wipe", (255, 0, 0, 1, 1))
-controller.run(0, "wipe", (0, 255, 0, 1, 1))
-controller.run(0, "wipe", (0, 0, 255, 1, 1))
-controller.run(0, "wipe", (0, 0, 0, 1, 1))
 
 print("controller.py loaded")

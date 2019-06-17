@@ -3,6 +3,9 @@ from controller import *
 
 app = Flask(__name__)
 
+def create_response(data):
+    return app.response_class(response = json.dumps(data), status = 200, mimetype = 'application/json')
+    
 @app.route('/')
 def index():
     """Main control page"""
@@ -11,14 +14,14 @@ def index():
 @app.route('/off')
 @app.route('/<strip_id>/off')
 def off(strip_id = 0):
-    controller.off(int(strip_id))
-    return 'OFF'
+    controller_response = controller.off(int(strip_id))
+    return create_response(controller_response)
 
 @app.route('/stopanimation')
 @app.route('/<strip_id>/stopanimation')
 def stopanimation(strip_id = 0):
-    controller.stop(int(strip_id))
-    return 'STOP'
+    controller_response = controller.stop(int(strip_id))
+    return create_response(controller_response)
 
 @app.route('/settings/<param>')
 def change_settings(param):
@@ -32,7 +35,7 @@ def change_settings(param):
                 controller.set_break_animation(False)
         if current[0] == "brightness":
             controller.set_brightness(int(current[1]))
-    return "/settings/<param>"
+    return create_response({})
 
 @app.route('/run/<function>')
 @app.route('/run/<function>/<param>')
@@ -45,9 +48,9 @@ def run(function, param = None, strip_id = 0):
     except:
         if param == None:
             params = None
-    controller.stop(strip_id)
-    controller.run(int(strip_id), function, params)
-    return '/run/function/param'
+    controller.stop(int(strip_id))
+    controller_response = controller.run(int(strip_id), function, params)
+    return create_response(controller_response)
 
 @app.route('/thread/<function>/<param>')
 @app.route('/<strip_id>/thread/<function>/<param>')
@@ -57,8 +60,8 @@ def thread(function, param, strip_id = 0):
         params = list(map(int, params))
     except ValueError:
         pass
-    controller.thread(int(strip_id), function, params)
-    return '/thread/function/param'
+    controller_response = controller.thread(int(strip_id), function, params)
+    return create_response(controller_response)
 
 @app.route('/animate/<function>/<param>')
 @app.route('/animate/<function>/<param>/<delay>')
@@ -71,8 +74,15 @@ def animate(function, param, strip_id = 0, delay = 0):
     except ValueError:
         pass
     controller.stop(strip_id)
-    controller.animate(int(strip_id), function, params, delay)
-    return '/animate/<function>/<param>'
+    controller_response = controller.animate(int(strip_id), function, params, delay)
+    return create_response(controller_response)
+
+controller = Controller(0)
+
+controller.run(0, "wipe", (255, 0, 0, 1, 1))
+controller.run(0, "wipe", (0, 255, 0, 1, 1))
+controller.run(0, "wipe", (0, 0, 255, 1, 1))
+controller.run(0, "wipe", (0, 0, 0, 1, 1))
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=200, threaded=True)

@@ -14,6 +14,10 @@ LED_BRIGHTNESS = 255     # Set to 0 for darkest and 255 for brightest
 LED_INVERT = False
 LED_CHANNEL = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
+PROVIDED_MILLIAMPS=10000
+POWER_MULTIPLIER=0.8
+MAX_MILLIAMPS=PROVIDED_MILLIAMPS*POWER_MULTIPLIER
+
 # Create NeoPixel object with appropriate configuration.
 # Intialize the library (must be called once before other functions).
 
@@ -49,6 +53,16 @@ class NeoPixels:
         """
         return ((int(r) * 65536) + (int(g) * 256) + int(b))
 
+    def get_color_seperate(self, value):
+        """Seperates colors into rgb from single value
+            Parameters:
+                value: value of color to seperate
+        """
+        r = (value >> 16) & 0xFF
+        g = (value >> 8) & 0xFF
+        b = value & 0xFF
+        return (r, g, b)
+
     def get_random_color(self):
         """Generates a random color"""
         r = 0
@@ -69,6 +83,9 @@ class NeoPixels:
     def setBrightness(self, value):
         self.strip.setBrightness(value)
 
+    def getBrightness(self):
+        return self.strip.getBrightness()
+
     def setPixelColor(self, strip_id, pixel_id, r, g=None, b=None):
         real_pixel_id = self.v_strips[strip_id]["start"] + pixel_id
         if real_pixel_id >= self.num_pixels:
@@ -82,7 +99,18 @@ class NeoPixels:
     def getPixelColor(self, strip_id, pixel_id):
         return self.strip.getPixelColor(self.v_strips[strip_id]["start"] + pixel_id)
 
+    def check_power_usage(self):
+        total_color = 0
+        for i in range(self.num_pixels):
+            pixel_color = self.strip.getPixelColor(i)
+            pixel_colors = self.get_color_seperate(pixel_color)
+            total_color += pixel_colors[0] + pixel_colors[1] + pixel_colors[2]
+        total_color = (total_color / 765) * 60
+        while total_color * (self.getBrightness() / 255) > MAX_MILLIAMPS:
+            self.setBrightness(self.getBrightness() - 1)
+
     def show(self):
+        self.check_power_usage()
         self.strip.show()
 
 
@@ -121,6 +149,19 @@ class Lights:
         lights_save = []
         for i in range(neopixels.numPixels(self.id)):
             lights_save.append(neopixels.getPixelColor(self.id, i))
+        return lights_save
+
+    def save_split(self):
+        """Return current color of strip"""
+        lights_save = []
+        for i in range(neopixels.numPixels(self.id)):
+            cur_color = neopixels.get_color_seperate(neopixels.getPixelColor(self.id, i))
+            lights_save.append({
+                "id": i,
+                "r": cur_color[0],
+                "g": cur_color[1],
+                "b": cur_color[2],
+            })
         return lights_save
 
     def set_all(self, r, g, b):
