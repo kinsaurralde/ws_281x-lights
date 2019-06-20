@@ -10,6 +10,9 @@ class LightStrip {
         this.pathLog = new Array();
         this.logPrintDiv = document.getElementById("info-log");
         this.logPrintDiv.innerHTML = "";
+        this.hostname = location.hostname;
+        this.port = location.port;
+        this.sender = new Sender();
 
         this.createPixels();
         this.createSendWindows();
@@ -35,6 +38,8 @@ class LightStrip {
         for (let i = 0; i < this.maxSendWindows; i++) {
             this.sendWindow[i] = document.getElementById("send-data-" + i);
         }
+        document.getElementById("settings-hostname").value = this.hostname;
+        document.getElementById("settings-port").value = this.port;
     }
 
     // Settings
@@ -52,6 +57,20 @@ class LightStrip {
         let brightness = document.getElementById("settings-brightness").value;
         let path = "settings/brightness=" + brightness;
         this.send(path, false);
+    }
+
+    updateHostname() {
+        this.hostname = document.getElementById("settings-hostname").value;
+        this.updateHost();
+    }
+
+    updatePort() {
+        this.port = document.getElementById("settings-port").value;
+        this.updateHost();
+    }
+
+    updateHost() {
+        document.getElementById("info-manual-urlbase").innerText = "http://"+this.hostname + ":" + this.port + "/";
     }
 
     // Other
@@ -303,9 +322,8 @@ class LightStrip {
     // Send
 
     send(path) {
-        console.log("Send Window:", this.currentSendWindow, "Sending:", path);
-        this.sendWindow[this.currentSendWindow].src = path;
-        this.currentSendWindow = (this.currentSendWindow + 1) % this.maxSendWindows;
+        let send_url = "http://" + this.hostname + ":" + this.port + "/" + path;
+        this.sender.send(send_url);
 	    this.updateLog(path);
     }
 

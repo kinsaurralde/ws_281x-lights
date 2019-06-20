@@ -4,7 +4,10 @@ from controller import *
 app = Flask(__name__)
 
 def create_response(data):
-    return app.response_class(response = json.dumps(data), status = 200, mimetype = 'application/json')
+    response = app.response_class(response = json.dumps(data), status = 200, mimetype = 'application/json')
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
+    
     
 @app.route('/')
 def index():

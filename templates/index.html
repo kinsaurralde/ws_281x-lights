@@ -5,6 +5,7 @@
     <link rel="stylesheet" type="text/css" href="../static/main.css">
     <script src="../static/writehtml.js"></script>
     <script src="../static/main.js"></script>
+    <script src="../static/sender.js"></script>
     <script src="../static/save.js"></script>
     <script src="../static/shift.js"></script>
     <script src="../static/preset.js"></script>
@@ -63,6 +64,19 @@
                 <div class="section-title-secondary">Fullscreen</div>
                 <div class="space-1"></div>
                 <input type="button" value="Toggle" onclick="toggleFullScreen()">
+            </div>
+            <div class="space-s-1"></div>
+            <div class="section-setting">
+                <div class="section-title-secondary">Lights Hostname:Port</div>
+                <div class="space-1"></div>
+                http:// <input type="text" value="" oninput="lights.updateHostname()"  class="width-10" id="settings-hostname"> : 
+                <input type="text" value="" oninput="lights.updatePort()"  class="width-5" id="settings-port">
+            </div>
+            <div class="space-s-1"></div>
+            <div class="section-setting">
+                <div class="section-title-secondary">Status</div>
+                <div class="space-1"></div>
+                <input type="button" value="OK" onclick="viewMessages()" id="settings-status">
             </div>
         </div>
         <div class="section"  id="settings-web-theme-expanded" style="display: none;">
@@ -239,6 +253,11 @@
             <textarea id="info-log" readonly>
             </textarea>
             <div class="divider"></div>
+            <div class="space-1"></div>
+            <div class="section-title-secondary">Messages</div>
+            <textarea id="info-messages" readonly>
+            </textarea>
+            <div class="divider"></div>
             <input type="button" value="View Code" onclick="openURL('https:\/\/github.com/kinsaurralde/ws_281x-lights')">
             <input type="button" value="View Docs" onclick="openURL('docs')">
             <input type="button" value="View Strip Status" onclick="openURL('get')">
@@ -290,6 +309,12 @@
 
         function openURL(url) {
             window.open(url, "_blank");
+        }
+
+        function viewMessages() {
+            let element = document.getElementById("info");
+            element.scrollIntoView({behavior: "smooth"});
+
         }
 
     </script>

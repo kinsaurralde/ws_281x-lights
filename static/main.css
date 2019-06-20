@@ -48,6 +48,7 @@ body {
     background: var(--body-background);
     color: var(--text-color);
     -webkit-user-select: none;
+    outline: 0vw solid red;
 }
 
 input, select {
@@ -221,7 +222,9 @@ select {
     border-radius: .25vw;
 }
 
-    
+#settings-status {
+    background-color: var(--color-green);
+}   
 
 .space-1 {
     margin-top: .5vh;
@@ -251,4 +254,12 @@ select {
     border-radius: 1vw;
     margin: .18vw;
     background-color: var(--text-color);
+}
+
+.width-10 {
+    width: 10vw !important; 
+}
+
+.width-5 {
+    width: 5vw !important; 
 }
