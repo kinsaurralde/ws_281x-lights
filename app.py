@@ -1,30 +1,87 @@
 from flask import Flask, render_template, redirect, url_for, json
-from controller import *
+from key import Keys
+from controller import Controller
+import json
 
 app = Flask(__name__)
+debug_exceptions = False # if true, exception will be sent to web
 
 def create_response(data):
-    response = app.response_class(response = json.dumps(data), status = 200, mimetype = 'application/json')
+    response = app.response_class(response=json.dumps(
+        data), status=200, mimetype='application/json')
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
-    
-    
+
+
+def error_response(message):
+    data = {
+        "error": True,
+        "message": message,
+    }
+    return create_response(data)
+
+def exception_handler(ex):
+    if debug_exceptions:
+        raise ex
+    try:
+        raise ex
+    except ValueError as e:
+        return error_response("Value Error: invalid parameter"+str(e))
+    except NameError as e:
+        return page_not_found("Invalid animate function: "+str(e))
+    except TypeError as e:
+        return error_response("Type Error: "+str(e))
+    except AssertionError:
+        return error_response("Assertion Error: invalid key")
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return error_response(str(e)), 404
+
+
 @app.route('/')
 def index():
     """Main control page"""
     return render_template('index.html')
 
-@app.route('/off')
-@app.route('/<strip_id>/off')
-def off(strip_id = 0):
-    controller_response = controller.off(int(strip_id))
+
+@app.route('/<key>/key/<function>')
+@app.route('/<key>/key/<function>/<param>')
+def key(key, function, param=None):
+    try:
+        params = []
+        if param != None:
+            params = param.split(',')
+        keys.check_key(key, -1)
+        if function == "web":
+            return render_template('keys.html')
+        elif function == "get":
+            return create_response(keys.get_keys(key))
+        elif function == "change":
+            keys.change_key(params[0], params[1])
+            return create_response(keys.get_keys(key))
+        return page_not_found("Invalid key function")
+    except Exception as e:
+        return exception_handler(e)
+
+
+@app.route('/<key>/off')
+@app.route('/<key>/<strip_id>/off')
+def off(key, strip_id=0):
+    try:
+        keys.check_key(key, strip_id)
+        controller_response = controller.off(int(strip_id))
+    except Exception as e:
+        return exception_handler(e)
     return create_response(controller_response)
 
-@app.route('/stopanimation')
-@app.route('/<strip_id>/stopanimation')
-def stopanimation(strip_id = 0):
+
+@app.route('/<key>/stopanimation')
+@app.route('/<key>/<strip_id>/stopanimation')
+def stopanimation(key, strip_id=0):
     controller_response = controller.stop(int(strip_id))
     return create_response(controller_response)
+
 
 @app.route('/settings/<param>')
 def change_settings(param):
@@ -40,47 +97,70 @@ def change_settings(param):
             controller.set_brightness(int(current[1]))
     return create_response({})
 
-@app.route('/run/<function>')
-@app.route('/run/<function>/<param>')
-@app.route('/<strip_id>/run/<function>/<param>')
-def run(function, param = None, strip_id = 0):
-    params = []
+
+@app.route('/<key>/<strip_id>/run/<function>')
+@app.route('/<key>/<strip_id>/run/<function>/<param>')
+def run(key, strip_id, function, param=None):
     try:
+        keys.check_key(key, strip_id)
+        params = []
+        try:
+            params = param.split(",")
+            params = list(map(int, params))
+        except:
+            if param == None:
+                params = None
+        controller.stop(int(strip_id))
+        controller_response = controller.run(int(strip_id), function, params)
+        return create_response(controller_response)
+    except Exception as e:
+        return exception_handler(e)
+
+
+@app.route('/<key>/<strip_id>/thread/<function>/<param>')
+def thread(key, strip_id, function, param):
+    try:
+        keys.check_key(key, strip_id)
         params = param.split(",")
-        params = list(map(int, params))
-    except:
-        if param == None:
-            params = None
-    controller.stop(int(strip_id))
-    controller_response = controller.run(int(strip_id), function, params)
-    return create_response(controller_response)
+        try:
+            params = list(map(int, params))
+        except ValueError:
+            pass
+        controller_response = controller.thread(
+            int(strip_id), function, params)
+        return create_response(controller_response)
+    except Exception as e:
+        return exception_handler(e)
 
-@app.route('/thread/<function>/<param>')
-@app.route('/<strip_id>/thread/<function>/<param>')
-def thread(function, param, strip_id = 0):
-    params = param.split(",")
-    try:
-        params = list(map(int, params))
-    except ValueError:
-        pass
-    controller_response = controller.thread(int(strip_id), function, params)
-    return create_response(controller_response)
 
-@app.route('/animate/<function>/<param>')
-@app.route('/animate/<function>/<param>/<delay>')
-@app.route('/<strip_id>/animate/<function>/<param>')
-@app.route('/<strip_id>/animate/<function>/<param>/<delay>')
-def animate(function, param, strip_id = 0, delay = 0):
-    params = param.split(",")
+@app.route('/<key>/<strip_id>/animate/<function>/<param>')
+@app.route('/<key>/<strip_id>/animate/<function>/<param>/<delay>')
+def animate(key, strip_id, function, param, delay=0):
     try:
-        params = list(map(int, params))
-    except ValueError:
-        pass
-    controller.stop(strip_id)
-    controller_response = controller.animate(int(strip_id), function, params, delay)
-    return create_response(controller_response)
+        keys.check_key(key, strip_id)
+        params = param.split(",")
+        try:
+            params = list(map(int, params))
+        except ValueError:
+            pass
+        controller.stop(int(strip_id))
+        controller_response = controller.animate(
+            int(strip_id), function, params, delay)
+        return create_response(controller_response)
+    except Exception as e:
+        return exception_handler(e)
+
 
 controller = Controller(0)
+
+config_file = open("config.json", "r")
+config_data = json.load(config_file)
+print("Config data:", config_data)
+
+keys = Keys(config_data)
+
+for strip in config_data["strips"]:
+    controller.create_strip(strip["start"], strip["end"])
 
 controller.run(0, "wipe", (255, 0, 0, 1, 1))
 controller.run(0, "wipe", (0, 255, 0, 1, 1))

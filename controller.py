@@ -13,12 +13,9 @@ class Controller:
 
         self.strips = []
         self.strip_data = []
-        self._create_strip(0, self.num_pixels - 1)
-        self._create_strip(0, 29)
-        self._create_strip(30, 59)
-        self._create_strip(20, 39)
+        self.create_strip(0, self.num_pixels - 1)
 
-    def _create_strip(self, start, end):
+    def create_strip(self, start, end):
         strip_id = len(self.strips)
         self.strips.append(Lights(strip_id))
         data = {
@@ -111,9 +108,11 @@ class Controller:
         }
         if name in run_functions:
             return run_functions[name]
+        else:
+            raise NameError
 
     def run(self, strip_id, function, arguments = None):
-        print("[    Run    ] ", "[", strip_id, "] ", function, arguments)
+        # print("[    Run    ] ", "[", strip_id, "] ", function, arguments)
         self.strips[strip_id].animation_id.increment()
         run_function = self._run_functions(function, self.strips[strip_id])
         if arguments == None:
@@ -125,7 +124,7 @@ class Controller:
         return self.response(function, False, None, True, strip_id)
 
     def thread(self, strip_id, function, arguments):
-        print("[  Threads  ] ", "[", strip_id, "] ", function, arguments)
+        # print("[  Threads  ] ", "[", strip_id, "] ", function, arguments)
         threading_function = self._run_functions(
             function, self.strips[strip_id])
         threading_thread = threading.Thread(
@@ -134,7 +133,7 @@ class Controller:
         return self.response(function, False, None, True, strip_id)
 
     def animate(self, strip_id, function, arguments, delay_between=0, dont_split=False):
-        print("[ Animation ] ", "[", strip_id, "] ", function, arguments, "Delay Between:",delay_between)
+        # print("[ Animation ] ", "[", strip_id, "] ", function, arguments, "Delay Between:",delay_between)
         self.strips[strip_id].animation_id.increment()
         this_id = self.strips[strip_id].animation_id.get()
         if function == "mix":

@@ -5,6 +5,8 @@ class LightStrip {
         this.numPixels = numPixels;
         this.direction = -1;
         this.currentColor = 1;
+        this.strip_id = 0;
+        this.key = 0;
         this.pixels = new Array(numPixels);
         this.sendWindow = new Array(numPixels);
         this.pathLog = new Array();
@@ -107,9 +109,9 @@ class LightStrip {
     }
 
     setMultiple() {
-        let start_num = document.getElementById("individual-pixels-multi-start").value;
-        let end_num = document.getElementById("individual-pixels-multi-end").value;
-        if (start_num >= 0 && end_num < this.numPixels) {
+        let start_num = parseInt(document.getElementById("individual-pixels-multi-start").value);
+        let end_num = parseInt(document.getElementById("individual-pixels-multi-end").value);
+        if (start_num >= 0 && end_num < parseInt(this.numPixels) && start_num <= end_num) {
             let color = getSaveColor(document.getElementById("individual-pixel-save-color").value);
             let r = color.r;
             let g = color.g;
@@ -126,7 +128,9 @@ class LightStrip {
                 i = this.applyDirection(i);
             }
             let path = "run/specific/" + params;
-            this.send(path, false);
+            this.send(path, true);
+        } else {
+            console.log("Error on set multiple start num or end num")
         }
     }
 
@@ -146,7 +150,7 @@ class LightStrip {
         }
         params = params.slice(0, -1)
         let path = "run/specific/" + params + "0";
-        this.send(path, false);
+        this.send(path, true);
     }
 
     updateColorDisplay(id) {
@@ -166,7 +170,7 @@ class LightStrip {
             }
         }
         let path = "run/specific/" + params;
-        this.send(path, false);
+        this.send(path, true);
     }
 
     manual(id, new_window) {
@@ -197,7 +201,7 @@ class LightStrip {
     wipe(r, g, b, dir, wait_ms) {
         dir *= this.direction;
         let path = "run/wipe/" + r + "," + g + "," + b + "," + dir + "," + wait_ms;     
-        this.send(path, false);
+        this.send(path, true);
     }
 
     chase(r, g, b, wait_ms, interval, dir) {
@@ -212,19 +216,19 @@ class LightStrip {
         if (type == "animate") {
             path +=  "/" + delay;
         }
-        this.send(path, false);
+        this.send(path, true);
     }
 
     shift(amount, post_delay) {
         amount *= this.direction;
         let path = "run/shift/" + amount + "," + post_delay;
-        this.send(path, false);
+        this.send(path, true);
     }
 
     animateShift(amount, post_delay) {
         amount *= this.direction;
         let path = "animate/shift/" + amount + "," + post_delay;
-        this.send(path, false);
+        this.send(path, true);
     }
 
     switch(wait_ms, instant, id, max_num, loop_start) {
@@ -244,7 +248,7 @@ class LightStrip {
             color_string += "," + color.r + "." + color.g + "." + color.b;
         }
         let path = "animate/mix/" + wait_ms + color_string;
-        this.send(path, false);
+        this.send(path, true);
     }
 
     rainbowChase(wait_ms) {
@@ -282,7 +286,7 @@ class LightStrip {
 
     reverseStrip() {
         let path = "run/reverse";
-        this.send(path, false);
+        this.send(path, true);
     }
 
     stopAnimation() {
@@ -321,16 +325,21 @@ class LightStrip {
 
     // Send
 
-    send(path) {
-        let send_url = "http://" + this.hostname + ":" + this.port + "/" + path;
+    send(path, send_id_key = true) {
+        let strip_id_key = "";
+        if (send_id_key) {
+            strip_id_key = this.key + "/" + this.strip_id + "/";
+        }
+        let send_url = "http://" + this.hostname + ":" + this.port + "/" + strip_id_key + path;
         this.sender.send(send_url);
 	    this.updateLog(path);
     }
 
     sendWindow(path) {
-        this.sendWindow[this.currentSendWindow].src = path;
-        this.currentSendWindow = (this.currentSendWindow + 1) % this.maxSendWindows;
-	    this.updateLog(path);
+        console.log("Dont use anymore");
+        //this.sendWindow[this.currentSendWindow].src = path;
+        //this.currentSendWindow = (this.currentSendWindow + 1) % this.maxSendWindows;
+	    //this.updateLog(path);
     }
 }
 
