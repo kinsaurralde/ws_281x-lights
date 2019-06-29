@@ -28,10 +28,10 @@ class LightStrip {
         }
         let section_flex = document.createElement("div");
         section_flex.className = "section-flex";
-        html.appendSetting(section_flex, "Color Save Number", html.createInputNumber(0, 3, 1,  "checkSaveNumber('individual-pixel-save-color')", "individual-pixel-save-color"));
+        html.appendSetting(section_flex, "Color Save Number", html.createInputNumber(0, 3, 1, "checkSaveNumber('individual-pixel-save-color')", "individual-pixel-save-color"));
         html.appendSetting(section_flex, "Live", html.createInputCheckBox("Live", "individual-pixels-live-check"));
         html.appendSetting(section_flex, "Resend", html.createButton("Send", "individual-pixels-resend", "lights.resendIndividual()"));
-        html.appendSetting(section_flex, "Multiple", [html.createInputNumber(0, 60, 0,  null, "individual-pixels-multi-start"), html.createInputNumber(0, 60, 29,  null, "individual-pixels-multi-end"),html.createButton("Send", "individual-pixels-multi-send", "lights.setMultiple()")], true);
+        html.appendSetting(section_flex, "Multiple", [html.createInputNumber(0, 60, 0, null, "individual-pixels-multi-start"), html.createInputNumber(0, 60, 29, null, "individual-pixels-multi-end"), html.createButton("Send", "individual-pixels-multi-send", "lights.setMultiple()")], true);
         document.getElementById("individual-pixels-settings").appendChild(section_flex);
     }
 
@@ -72,7 +72,17 @@ class LightStrip {
     }
 
     updateHost() {
-        document.getElementById("info-manual-urlbase").innerText = "http://"+this.hostname + ":" + this.port + "/";
+        document.getElementById("info-manual-urlbase").innerText = "http://" + this.hostname + ":" + this.port + "/" + this.strip_id + "/" + this.key + "/";
+    }
+
+    updateStripId() {
+        this.strip_id = document.getElementById("settings-strip-id").value;
+        this.updateHost();
+    }
+
+    updateKey() {
+        this.key = document.getElementById("settings-key").value;
+        this.updateHost();
     }
 
     // Other
@@ -176,10 +186,9 @@ class LightStrip {
     manual(id, new_window) {
         let path = document.getElementById(id).value;
         if (new_window) {
-            this.pathLog.push(path);
-            window.open(path, "_blank");
+            this.send(path, true, true);
         } else {
-            this.send(path);
+            this.send(path, true);
         }
     }
 
@@ -194,13 +203,13 @@ class LightStrip {
     }
 
     colorAll(r, g, b) {
-        let path = "run/color/" + r + "," + g + "," + b;    
+        let path = "run/color/" + r + "," + g + "," + b;
         this.send(path, true);
     }
 
     wipe(r, g, b, dir, wait_ms) {
         dir *= this.direction;
-        let path = "run/wipe/" + r + "," + g + "," + b + "," + dir + "," + wait_ms;     
+        let path = "run/wipe/" + r + "," + g + "," + b + "," + dir + "," + wait_ms;
         this.send(path, true);
     }
 
@@ -214,7 +223,7 @@ class LightStrip {
         dir *= this.direction;
         let path = type + "/pulse/" + r + "," + g + "," + b + "," + dir + "," + wait_ms + "," + length;
         if (type == "animate") {
-            path +=  "/" + delay;
+            path += "/" + delay;
         }
         this.send(path, true);
     }
@@ -266,7 +275,7 @@ class LightStrip {
     random(segment_size, wait_ms = 0, repeated = false) {
         let path = "";
         if (repeated) {
-            path = "animate/random/" + segment_size+ "," + wait_ms;
+            path = "animate/random/" + segment_size + "," + wait_ms;
         } else {
             path = "run/random/" + segment_size + "," + wait_ms;
         }
@@ -301,14 +310,12 @@ class LightStrip {
     }
 
 
-
-
     // Debug
 
     printLog() {
         console.log("Printing Log ...");
         for (let i = 0; i < this.pathLog.length; i++) {
-            console.log(i,this.pathLog[i]);
+            console.log(i, this.pathLog[i]);
         }
     }
 
@@ -325,21 +332,18 @@ class LightStrip {
 
     // Send
 
-    send(path, send_id_key = true) {
+    send(path, send_id_key = true, in_new_window = false) {
         let strip_id_key = "";
         if (send_id_key) {
             strip_id_key = this.key + "/" + this.strip_id + "/";
         }
         let send_url = "http://" + this.hostname + ":" + this.port + "/" + strip_id_key + path;
-        this.sender.send(send_url);
-	    this.updateLog(path);
-    }
-
-    sendWindow(path) {
-        console.log("Dont use anymore");
-        //this.sendWindow[this.currentSendWindow].src = path;
-        //this.currentSendWindow = (this.currentSendWindow + 1) % this.maxSendWindows;
-	    //this.updateLog(path);
+        if (in_new_window) {
+            window.open(send_url, "_blank");
+        } else {
+            this.sender.send(send_url);
+        }
+        this.updateLog(path);
     }
 }
 
@@ -357,11 +361,11 @@ class Pixel {
         let target = document.getElementById("pixel-holder");
         let div = document.createElement("div");
         div.className = "pixel-display";
-        div.id = "pixel-display-"+this.id;
-        let onoverfunc = "lights.setIndividual("+this.id+")";
+        div.id = "pixel-display-" + this.id;
+        let onoverfunc = "lights.setIndividual(" + this.id + ")";
         div.onmouseover = new Function(onoverfunc);
         target.appendChild(div);
-        this.display_div = document.getElementById("pixel-display-"+this.id); 
+        this.display_div = document.getElementById("pixel-display-" + this.id);
     }
 
     setPixel(r, g, b) {

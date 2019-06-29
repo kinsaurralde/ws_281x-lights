@@ -14,6 +14,11 @@ class Sender {
                 lights.sender.removeBorder();
                 let data = JSON.parse(this.response);
                 console.log("Recieved Data:",data);
+                if (data["error"]) {
+                    console.log("There was a warning");
+                    lights.sender.displayWarnBorder();
+                    lights.sender.sendWarning(data["message"]);
+                }
             } else {
                 console.log("There was an error");
                 lights.sender.displayBorder();
@@ -36,6 +41,14 @@ class Sender {
         body.style.outline = "1vw solid red";
     }
 
+    displayWarnBorder() {
+        let error_display = document.getElementById("settings-status");
+        error_display.style.backgroundColor = "var(--color-yellow)";
+        error_display.value = "Click to see warnings";
+        let body = document.getElementsByTagName("body")[0];
+        body.style.outline = "1vw solid yellow";
+    }
+
     removeBorder() {
         let error_display = document.getElementById("settings-status");
         error_display.style.backgroundColor = "var(--color-green)";
@@ -56,5 +69,10 @@ class Sender {
             default:
                 this.message_box.innerHTML += "Request recieved error: " + status_code + " with message: " + status_text + "\n";
         }
+    }
+
+    sendWarning(message) {
+        console.log("Request recieved warning with message:",message);
+        this.message_box.innerHTML += message + "\n";
     }
 }

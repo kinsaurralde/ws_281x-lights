@@ -46,8 +46,10 @@ def index():
 
 
 @app.route('/<key>/key/<function>')
+@app.route('/<key>/<strip_id>/key/<function>')
 @app.route('/<key>/key/<function>/<param>')
-def key(key, function, param=None):
+@app.route('/<key>/<strip_id>/key/<function>/<param>')
+def key(strip_id, key, function, param=None):
     try:
         params = []
         if param != None:
@@ -55,12 +57,8 @@ def key(key, function, param=None):
         keys.check_key(key, -1)
         if function == "web":
             return render_template('keys.html')
-        elif function == "get":
-            return create_response(keys.get_keys(key))
-        elif function == "change":
-            keys.change_key(params[0], params[1])
-            return create_response(keys.get_keys(key))
-        return page_not_found("Invalid key function")
+        keys.run_function(function, params)
+        return create_response(keys.get_keys(key))
     except Exception as e:
         return exception_handler(e)
 

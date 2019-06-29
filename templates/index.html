@@ -1,6 +1,7 @@
 <html>
 
 <head>
+    <title>Lights</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="../static/main.css">
     <script src="../static/writehtml.js"></script>
@@ -44,7 +45,19 @@
             <div class="section-setting">
                 <div class="section-title-secondary">Reverse</div>
                 <div class="space-1"></div>
-                <input type="checkbox" value="Send Color" checked id="settings-reversed" onclick="lights.settingReversed()">
+                <input type="checkbox" checked id="settings-reversed" onclick="lights.settingReversed()">
+            </div>
+            <div class="space-s-1"></div>
+            <div class="section-setting">
+                <div class="section-title-secondary">Strip id</div>
+                <div class="space-1"></div>
+                <input type="number" id="settings-strip-id" min="0" value="0" oninput="lights.updateStripId()">
+            </div>
+            <div class="space-s-1"></div>
+            <div class="section-setting">
+                <div class="section-title-secondary">Key</div>
+                <div class="space-1"></div>
+                <input type="number" id="settings-key" min="0" value="0" oninput="lights.updateKey()">
             </div>
             <div class="space-s-1"></div>
             <div class="section-setting">
@@ -228,17 +241,6 @@
             <input type="button" value="Send" onclick="lights.manual('manual-text', false)">
             <input type="button" value="Send in New Tab" onclick="lights.manual('manual-text', true)">
             <div class="divider"></div>
-            <!--<div class="space-1"></div>
-            <div class="section-title-secondary">Send Queue</div>
-            <textarea readonly>
-                queue
-            </textarea>
-            <div class="divider"></div>
-            <div class="space-1"></div>
-            <div class="section-title-secondary">Send Stack</div>
-            <textarea readonly>
-                test
-            </textarea>-->
         </div>
     </div>
 
