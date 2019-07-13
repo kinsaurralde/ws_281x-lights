@@ -7,7 +7,6 @@ class Keys:
         }
         if "keys" in config_data:
             for key in config_data["keys"]:
-                # self.data[key] = config_data["keys"][key]
                 self.add_key(key, config_data["keys"][key])
         print("Initial web key is", self.data["webkey"])
         self.add_key(self.data["webkey"], [-1, 0])

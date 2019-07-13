@@ -7,13 +7,25 @@ class Controller:
         # Settings
         self.brightness = 100
         neopixels.setBrightness(self.brightness)
-        self.num_pixels = LED_COUNT
+        self.num_pixels = neopixels.numMaxPixels()
         self.break_animation = True
         self.id = controller_id
 
         self.strips = []
         self.strip_data = []
         self.create_strip(0, self.num_pixels - 1)
+
+    def init_neopixels(self, data):
+        neopixels.init_neopixels(data["p_strip"])
+        self.num_pixels = neopixels.numMaxPixels()
+        if "settings" in data:
+            if "initial_brightness" in data["settings"]:
+                neopixels.setBrightness(data["settings"]["initial_brightness"])
+        self.strips = []
+        self.strip_data = []
+        self.create_strip(0, self.num_pixels - 1)
+        for strip in data["strips"]:
+            self.create_strip(strip["start"], strip["end"])
 
     def create_strip(self, start, end):
         strip_id = len(self.strips)
@@ -91,7 +103,7 @@ class Controller:
         return cur_settings
 
     def _run_functions(self, name, strip):
-        run_functions = {
+        run_functions = {   # all functions
             "color": strip.set_all,
             "random": strip.random_cycle,
             "wipe": strip.wipe,
@@ -111,6 +123,7 @@ class Controller:
         else:
             raise NameError
 
+
     def run(self, strip_id, function, arguments = None):
         # print("[    Run    ] ", "[", strip_id, "] ", function, arguments)
         self.strips[strip_id].animation_id.increment()
@@ -125,6 +138,7 @@ class Controller:
 
     def thread(self, strip_id, function, arguments):
         # print("[  Threads  ] ", "[", strip_id, "] ", function, arguments)
+        neopixels.update_pixel_owner(strip_id)
         threading_function = self._run_functions(
             function, self.strips[strip_id])
         threading_thread = threading.Thread(
@@ -136,6 +150,7 @@ class Controller:
         # print("[ Animation ] ", "[", strip_id, "] ", function, arguments, "Delay Between:",delay_between)
         self.strips[strip_id].animation_id.increment()
         this_id = self.strips[strip_id].animation_id.get()
+        neopixels.update_pixel_owner(strip_id)
         if function == "mix":
             dont_split = True
         animation_function = self._run_functions(

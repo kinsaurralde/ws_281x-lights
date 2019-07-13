@@ -1,35 +1,43 @@
-from random import randint
 from rpi_ws281x import *
-import math
-import time
-import threading
+import random, math, time, threading
 
-# LED strip configuration:
-LED_COUNT = 60      # Number of LED pixels.
+# Initial LED strip configuration:
+LED_COUNT = 0      # Number of LED pixels.
 LED_PIN = 18      # GPIO pin connected to the pixels (18 uses PWM!).
 LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA = 10      # DMA channel to use for generating signal (try 10)
-LED_BRIGHTNESS = 255     # Set to 0 for darkest and 255 for brightest
+LED_BRIGHTNESS = 0     # Set to 0 for darkest and 255 for brightest
 # True to invert the signal (when using NPN transistor level shift)
 LED_INVERT = False
 LED_CHANNEL = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
 PROVIDED_MILLIAMPS=10000
-POWER_MULTIPLIER=0.8
+POWER_MULTIPLIER=0.9
 MAX_MILLIAMPS=PROVIDED_MILLIAMPS*POWER_MULTIPLIER
 
 # Create NeoPixel object with appropriate configuration.
 # Intialize the library (must be called once before other functions).
 
-
 class NeoPixels:
     def __init__(self):
         self.num_pixels = LED_COUNT
-        self.strip = Adafruit_NeoPixel(
-            LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
-        self.strip.begin()
         self.v_strips = []
-        self.pixel_owner = [0] * LED_COUNT
+        self.pixel_owner = [0] * self.num_pixels
+        self.max_milliamps = MAX_MILLIAMPS
+        self.max_brightness = LED_BRIGHTNESS
+
+    def init_neopixels(self, data):
+        if "led_count" in data:
+            self.num_pixels = data["led_count"]
+        if "max_brightness" in data:
+            self.max_brightness = data["max_brightness"]
+        if "max_milliamps" in data:
+            self.max_milliamps = data["max_milliamps"]
+        self.pixel_owner = [0] * self.num_pixels
+        self.strip = Adafruit_NeoPixel(
+            self.num_pixels, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, self.max_brightness, LED_CHANNEL)
+        self.strip.begin()
+        
 
     def update(self, strip_data):
         self.v_strips = strip_data
@@ -68,20 +76,24 @@ class NeoPixels:
         r = 0
         g = 0
         b = 0
-        color_off = randint(0, 2)
+        color_off = random.randint(0, 2)
         if color_off != 0:
-            r = randint(0, 255)
+            r = random.randint(0, 255)
         if color_off != 1:
-            g = randint(0, 255)
+            g = random.randint(0, 255)
         if color_off != 2:
-            b = randint(0, 255)
+            b = random.randint(0, 255)
         return self.get_color(r, g, b)
 
     def numPixels(self, strip_id):
         return int(self.v_strips[strip_id]["end"] - self.v_strips[strip_id]["start"] + 1)
 
+    def numMaxPixels(self):
+        return self.num_pixels
+
     def setBrightness(self, value):
-        self.strip.setBrightness(value)
+        if value >= 0 and value <= self.max_brightness:
+            self.strip.setBrightness(value)
 
     def getBrightness(self):
         return self.strip.getBrightness()
@@ -106,7 +118,7 @@ class NeoPixels:
             pixel_colors = self.get_color_seperate(pixel_color)
             total_color += pixel_colors[0] + pixel_colors[1] + pixel_colors[2]
         total_color = (total_color / 765) * 60
-        while total_color * (self.getBrightness() / 255) > MAX_MILLIAMPS:
+        while total_color * (self.getBrightness() / 255) > self.max_milliamps:
             self.setBrightness(self.getBrightness() - 1)
 
     def show(self):
@@ -281,13 +293,13 @@ class Lights:
             for q in iter_range:
                 for i in range(0, neopixels.numPixels(self.id), interval):
                     saves.append(neopixels.getPixelColor(self.id, i))
-                    neopixels.update_pixel_owner(self.id, i)
+                    # neopixels.update_pixel_owner(self.id, i)
                     neopixels.setPixelColor(self.id, i + q, r, g, b)
                 neopixels.show()
                 if self.sleepListenForBreak(self.id, wait_ms, this_id):
                     return
                 for i in range(0, neopixels.numPixels(self.id), interval):
-                    neopixels.update_pixel_owner(self.id, i)
+                    # neopixels.update_pixel_owner(self.id, i)
                     neopixels.setPixelColor(
                         self.id, i + q, saves[int(i / interval)])
 
@@ -317,11 +329,11 @@ class Lights:
             if direction == -1:
                 i, j = j, i
             if i < max_pixels and i >= 0:
-                neopixels.update_pixel_owner(self.id, i)
+                # neopixels.update_pixel_owner(self.id, i)
                 previous.append(neopixels.getPixelColor(self.id, i))
                 neopixels.setPixelColor(self.id, i, r, g, b)
             if j < max_pixels and j >= 0:
-                neopixels.update_pixel_owner(self.id, j)
+                # neopixels.update_pixel_owner(self.id, j)
                 neopixels.setPixelColor(self.id, j, previous.pop(0))
             neopixels.show()
             if self.sleepListenForBreak(self.id, wait_ms, this_id):
@@ -340,7 +352,7 @@ class Lights:
         """
         this_id = self.animation_id.get()
         current_color = neopixels.get_random_color()
-        neopixels.update_pixel_owner(self.id)
+        # neopixels.update_pixel_owner(self.id)
         for i in range(iterations):
             for j in range(neopixels.numPixels(self.id)):
                 if j % each == 0:
@@ -405,7 +417,6 @@ class Lights:
                 for i in range(0, neopixels.numPixels(self.id), 3):
                     neopixels.setPixelColor(self.id, i +q, wheel((i+j) % 255))
                 neopixels.show()
-                #time.sleep(wait_ms/1000.0)
                 if self.sleepListenForBreak(self.id, wait_ms, this_id):
                     return
                 for i in range(0, neopixels.numPixels(self.id), 3):
@@ -425,6 +436,7 @@ class Lights:
 
                 this_id: break if this value does not equal global animation_id
         """
+        # neopixels.update_pixel_owner(self.id)
         this_id = self.animation_id.get()
         wait_ms = int(arguments[0])
         int_colors = []

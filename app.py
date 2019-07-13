@@ -45,9 +45,7 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/<key>/key/<function>')
 @app.route('/<key>/<strip_id>/key/<function>')
-@app.route('/<key>/key/<function>/<param>')
 @app.route('/<key>/<strip_id>/key/<function>/<param>')
 def key(strip_id, key, function, param=None):
     try:
@@ -154,11 +152,9 @@ controller = Controller(0)
 config_file = open("config.json", "r")
 config_data = json.load(config_file)
 print("Config data:", config_data)
+controller.init_neopixels(config_data)
 
 keys = Keys(config_data)
-
-for strip in config_data["strips"]:
-    controller.create_strip(strip["start"], strip["end"])
 
 controller.run(0, "wipe", (255, 0, 0, 1, 1))
 controller.run(0, "wipe", (0, 255, 0, 1, 1))
