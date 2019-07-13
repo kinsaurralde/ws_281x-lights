@@ -120,6 +120,13 @@ class NeoPixels:
         total_color = (total_color / 765) * 60
         while total_color * (self.getBrightness() / 255) > self.max_milliamps:
             self.setBrightness(self.getBrightness() - 1)
+        return math.ceil(total_color * (self.getBrightness() / 255))
+
+    def get_power_info(self):
+        return {
+            "max_milliamps": self.max_milliamps,
+            "now_milliamps": self.check_power_usage()
+        }
 
     def show(self):
         self.check_power_usage()

@@ -44,6 +44,11 @@ def index():
     """Main control page"""
     return render_template('index.html')
 
+@app.route('/info')
+def info():
+    data = []
+    data.append(controller.info())
+    return create_response(data)
 
 @app.route('/<key>/<strip_id>/key/<function>')
 @app.route('/<key>/<strip_id>/key/<function>/<param>')

@@ -38,11 +38,15 @@ class Controller:
         self.strip_data.append(data)
         neopixels.update(self.strip_data)
 
+    def info(self):
+        data = self.response("info", False, None, True)
+        data["power"] = neopixels.get_power_info()
+        return data
+
     def response(self, command_run, error, message, detailed=False, strip_id=None):
         data = {
             "controller_id": self.id,
             "command_run": command_run,
-            "brightness": neopixels.getBrightness(),
             "error": error,
             "message": message,
             "strip_info": self.strip_data,
@@ -95,6 +99,7 @@ class Controller:
         self.break_animation = value
 
     def get_all_settings(self):
+        self.brightness = neopixels.getBrightness()
         cur_settings = {
             "brightness": self.brightness,
             "break_animation": self.break_animation,
