@@ -44,11 +44,16 @@ def index():
     """Main control page"""
     return render_template('index.html')
 
-@app.route('/info')
-def info():
-    data = []
-    data.append(controller.info())
-    return create_response(data)
+@app.route('/info/<function>')
+def info(function):
+    if function == "web":
+        return render_template('info.html')
+    elif function == "get":
+        data = []
+        data.append(controller.info())
+        return create_response(data)
+    else: 
+        return page_not_found("Info function not found")
 
 @app.route('/<key>/<strip_id>/key/<function>')
 @app.route('/<key>/<strip_id>/key/<function>/<param>')
