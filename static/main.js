@@ -24,7 +24,7 @@ class LightStrip {
 
     createPixels() {
         for (let i = 0; i < this.numPixels; i++) {
-            this.pixels[i] = new Pixel(i, null);
+            this.pixels[i] = new Pixel(null, null, i);
             this.pixels[i].setupIndividual();
         }
         let section_flex = document.createElement("div");

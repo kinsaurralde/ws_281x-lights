@@ -3,7 +3,6 @@ class Info {
         this.location = document.getElementById("info-section");
         this.table = document.getElementById("info-table");
         this.controllers_div = document.getElementById("controllers");
-        this.data = [];
         this.pixels = [];
         this.isSetup = false;
         this.refresh();
@@ -28,10 +27,18 @@ class Info {
         if (this.isSetup == false) {
             this.setup(data);
         }
-        this.data = data;
         this.clearTable();
-        for (let i = 0; i < this.data.length; i++) {
+        if (data.length != this.pixels.length) {
+            location.reload();
+        }
+        for (let i = 0; i < this.pixels.length; i++) {
             this.appendRow(data[i]);
+            for (let j = 0; j < data[i]["strips"].length; j++) {
+                for (let k = 0; k < data[i]["strips"][j]["data"].length; k++) {
+                    let pixel_data = data[i]["strips"][j]["data"][k];
+                    this.pixels[i]["strips"][j][k].setPixel(pixel_data.r, pixel_data.g, pixel_data.b);               
+                }  
+            }
         }
     }
 
