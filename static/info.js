@@ -2,15 +2,32 @@ class Info {
     constructor() {
         this.location = document.getElementById("info-section");
         this.table = document.getElementById("info-table");
+        this.controllers_div = document.getElementById("controllers");
         this.data = [];
+        this.pixels = [];
+        this.isSetup = false;
         this.refresh();
+
+    }
+
+    setup(data) {
+        console.log("Setting up with:",data);
+        let controllers = [];
+        for (let i = 0; i < data.length; i++) {
+            controllers.push(this.addController(data[i], i));
+        } 
+        this.isSetup = true;
+        this.pixels = controllers;
     }
 
     refresh() {
-        this.send("/info");
+        this.send("/info/get");
     }
 
     recieveData(data) {
+        if (this.isSetup == false) {
+            this.setup(data);
+        }
         this.data = data;
         this.clearTable();
         for (let i = 0; i < this.data.length; i++) {
@@ -37,9 +54,42 @@ class Info {
         }
     }
 
+    addController(data, id) {
+        console.log("Add Controller: ", data);
+        let div = document.createElement("div");
+        div.innerHTML = "Controller: " + id;
+        let strips = [];
+        for (let i = 0; i < data["strips"].length; i++) {
+            let strips_div = document.createElement("div");
+            strips_div.className = "section-flex";
+            let strip_info = document.createElement("div");
+            strip_info.className = "text-1-25";
+            strip_info.innerHTML = i + ": ";
+            strips_div.appendChild(strip_info);
+            strips.push(this.addStrip(strips_div, data["strips"][i], id));
+            div.appendChild(strips_div);
+        }
+        this.controllers_div.appendChild(div);
+        let divider = document.createElement("div");
+        divider.className = "divider";
+        this.controllers_div.appendChild(divider);
+        return {
+            "id": id,
+            "strips": strips,
+        };
+    }
+
+    addStrip(div, data, controller_id) {
+        let pixels = [];
+        for (let i = 0; i < data["data"].length; i++) {
+            pixels.push(new Pixel(controller_id, data["strip_id"], i, div));
+            pixels[i].setupInfo();
+        }
+        return pixels;
+    }
+
     send(path) {
-        //let url = this.href + path;
-        let url = "http://pilaptop.kinsaurralde.com:200" + path;
+        let url = path;
         let request = new XMLHttpRequest();
         request.open('GET', url, true);
         request.onload = function() {

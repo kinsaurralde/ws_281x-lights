@@ -24,7 +24,8 @@ class LightStrip {
 
     createPixels() {
         for (let i = 0; i < this.numPixels; i++) {
-            this.pixels[i] = new Pixel(i);
+            this.pixels[i] = new Pixel(i, null);
+            this.pixels[i].setupIndividual();
         }
         let section_flex = document.createElement("div");
         section_flex.className = "section-flex";
@@ -347,6 +348,7 @@ class LightStrip {
     }
 }
 
+/*
 class Pixel {
     constructor(id) {
         this.id = id;
@@ -375,3 +377,4 @@ class Pixel {
         this.display_div.style.backgroundColor = "rgb(" + r + "," + g + "," + b + ")";
     }
 }
+*/
