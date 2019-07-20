@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, url_for, json
 from key import Keys
 from controller import Controller
-import json
+import json, sys
 
 app = Flask(__name__)
 debug_exceptions = False  # if true, exception will be sent to web
@@ -164,9 +164,16 @@ def animate(key, strip_id, function, param, delay=0):
 
 controller = Controller(0)
 
-config_file = open("config.json", "r")
+config_name = "config.json"
+if len(sys.argv) > 1:   # argv[0] is this file name
+    config_name = sys.argv[1]
+try:
+    config_file = open(config_name, "r")
+except FileNotFoundError:
+    print("Config file not found")
+    exit(1)
 config_data = json.load(config_file)
-print("Config data:", config_data)
+print("Config data read from", config_name, ":", config_data)
 controller.init_neopixels(config_data)
 
 keys = Keys(config_data)
