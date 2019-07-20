@@ -17,7 +17,6 @@ class LightStrip {
         this.sender = new Sender();
 
         this.createPixels();
-        this.createSendWindows();
     }
 
     // Setups
@@ -34,15 +33,6 @@ class LightStrip {
         html.appendSetting(section_flex, "Resend", html.createButton("Send", "individual-pixels-resend", "lights.resendIndividual()"));
         html.appendSetting(section_flex, "Multiple", [html.createInputNumber(0, 60, 0, null, "individual-pixels-multi-start"), html.createInputNumber(0, 60, 29, null, "individual-pixels-multi-end"), html.createButton("Send", "individual-pixels-multi-send", "lights.setMultiple()")], true);
         document.getElementById("individual-pixels-settings").appendChild(section_flex);
-    }
-
-
-    createSendWindows() {
-        for (let i = 0; i < this.maxSendWindows; i++) {
-            this.sendWindow[i] = document.getElementById("send-data-" + i);
-        }
-        document.getElementById("settings-hostname").value = this.hostname;
-        document.getElementById("settings-port").value = this.port;
     }
 
     // Settings
@@ -198,7 +188,6 @@ class LightStrip {
 
     sendPixel(id, r, g, b) {
         id = this.applyDirection(id);
-        //this.updatePixel(id, r, g, b);
         let path = "run/single/" + id + "," + r + "," + g + "," + b;
         this.send(path, true);
     }
@@ -263,13 +252,11 @@ class LightStrip {
 
     rainbowChase(wait_ms) {
         let path = "animate/rainbowChase/" + wait_ms;
-        //this.updateAllPixels(0, 0, 0);
         this.send(path, true);
     }
 
     rainbowCycle(wait_ms) {
         let path = "animate/rainbowCycle/" + wait_ms;
-        //this.updateAllPixels(0, 0, 0);
         this.send(path, true);
     }
 
@@ -290,7 +277,6 @@ class LightStrip {
         } else {
             path = "animate/randomCycle/false," + wait_ms;
         }
-        //this.updateAllPixels(0, 0, 0);
         this.send(path, true);
     }
 
@@ -306,7 +292,6 @@ class LightStrip {
 
     off() {
         let path = "off";
-        //this.updateAllPixels(0, 0, 0);
         this.send(path, true);
     }
 
@@ -347,34 +332,3 @@ class LightStrip {
         this.updateLog(path);
     }
 }
-
-/*
-class Pixel {
-    constructor(id) {
-        this.id = id;
-        this.r = 0;
-        this.g = 0;
-        this.b = 0;
-        this.display_div;
-        this.setup();
-    }
-
-    setup() {
-        let target = document.getElementById("pixel-holder");
-        let div = document.createElement("div");
-        div.className = "pixel-display";
-        div.id = "pixel-display-" + this.id;
-        let onoverfunc = "lights.setIndividual(" + this.id + ")";
-        div.onmouseover = new Function(onoverfunc);
-        target.appendChild(div);
-        this.display_div = document.getElementById("pixel-display-" + this.id);
-    }
-
-    setPixel(r, g, b) {
-        this.r = r;
-        this.g = g;
-        this.b = b;
-        this.display_div.style.backgroundColor = "rgb(" + r + "," + g + "," + b + ")";
-    }
-}
-*/

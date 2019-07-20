@@ -4,7 +4,8 @@ from controller import Controller
 import json
 
 app = Flask(__name__)
-debug_exceptions = False # if true, exception will be sent to web
+debug_exceptions = False  # if true, exception will be sent to web
+
 
 def create_response(data):
     response = app.response_class(response=json.dumps(
@@ -20,6 +21,7 @@ def error_response(message):
     }
     return create_response(data)
 
+
 def exception_handler(ex):
     if debug_exceptions:
         raise ex
@@ -34,6 +36,7 @@ def exception_handler(ex):
     except AssertionError:
         return error_response("Assertion Error: invalid key")
 
+
 @app.errorhandler(404)
 def page_not_found(e):
     return error_response(str(e)), 404
@@ -44,6 +47,7 @@ def index():
     """Main control page"""
     return render_template('index.html')
 
+
 @app.route('/info/<function>')
 def info(function):
     if function == "web":
@@ -52,8 +56,9 @@ def info(function):
         data = []
         data.append(controller.info())
         return create_response(data)
-    else: 
+    else:
         return page_not_found("Info function not found")
+
 
 @app.route('/<key>/<strip_id>/key/<function>')
 @app.route('/<key>/<strip_id>/key/<function>/<param>')

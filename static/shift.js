@@ -12,9 +12,9 @@ class Shift {
     create() {
         let section_flex = document.createElement("div");
         section_flex.className = "section-flex";
-        section_flex.id = "operations-shift-slot-"+this.id;
+        section_flex.id = "operations-shift-slot-" + this.id;
 
-        html.appendSetting(section_flex, "Amount", html.createInputNumber(1, 3, this.id % 3 +  1, null, "operations-shift-amount-" + this.id));
+        html.appendSetting(section_flex, "Amount", html.createInputNumber(1, 3, this.id % 3 + 1, null, "operations-shift-amount-" + this.id));
         html.appendSetting(section_flex, "Delay ms", html.createInputNumber(1, 100, 20, null, "operations-shift-delayms-" + this.id));
 
         html.appendSend(section_flex, "operations-shift-send-" + this.id, "shift[" + this.id + "].send()");
@@ -23,13 +23,13 @@ class Shift {
     }
 
     remove() {
-        let remove_div = document.getElementById("operations-shift-slot-"+this.id);
+        let remove_div = document.getElementById("operations-shift-slot-" + this.id);
         this.target.removeChild(remove_div);
     }
 
     send() {
-        this.amount = document.getElementById("operations-shift-amount-"+this.id).value;
-        this.delay = document.getElementById("operations-shift-delayms-"+this.id).value;
+        this.amount = document.getElementById("operations-shift-amount-" + this.id).value;
+        this.delay = document.getElementById("operations-shift-delayms-" + this.id).value;
         lights.animateShift(this.amount, this.delay);
     }
 }

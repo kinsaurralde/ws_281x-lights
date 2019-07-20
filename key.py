@@ -1,5 +1,6 @@
 import random
 
+
 class Keys:
     def __init__(self, config_data):
         self.data = {
@@ -26,7 +27,7 @@ class Keys:
             if str(params[0]) in self.data and -1 not in self.get_value(params[0]):
                 self.remove_key(params[0])
 
-    def add_key(self, key, values): 
+    def add_key(self, key, values):
         self.data[key] = values
 
     def remove_key(self, key):

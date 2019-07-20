@@ -2,6 +2,7 @@ from lights import *
 import threading
 import time
 
+
 class Controller:
     def __init__(self, controller_id):
         # Settings
@@ -62,9 +63,9 @@ class Controller:
                     })
             else:
                 data["strips"].append({
-                        "strip_id": strip_id,
-                        "data": self.strips[strip_id].save_split()
-                    })
+                    "strip_id": strip_id,
+                    "data": self.strips[strip_id].save_split()
+                })
         return data
 
     def stop(self, strip_id=None):
@@ -73,7 +74,7 @@ class Controller:
                 strip.stop_animation()
         else:
             self.strips[strip_id].stop_animation()
-        return self.response("stop",False, None, True, strip_id)
+        return self.response("stop", False, None, True, strip_id)
 
     def off(self, strip_id=None):
         if strip_id == None:
@@ -81,7 +82,7 @@ class Controller:
                 strip.off()
         else:
             self.strips[strip_id].off()
-        return self.response("off",False, None, True, strip_id)
+        return self.response("off", False, None, True, strip_id)
 
     def get_brightness(self):
         self.brightness = neopixels.getBrightness()
@@ -114,7 +115,7 @@ class Controller:
             "wipe": strip.wipe,
             "single": strip.set_pixel,
             "specific": strip.set_pixels,
-            "pulse" : strip.pulse,
+            "pulse": strip.pulse,
             "chase": strip.chase,
             "shift": strip.shift,
             "rainbowCycle": strip.rainbow_cycle,
@@ -128,9 +129,7 @@ class Controller:
         else:
             raise NameError
 
-
-    def run(self, strip_id, function, arguments = None):
-        # print("[    Run    ] ", "[", strip_id, "] ", function, arguments)
+    def run(self, strip_id, function, arguments=None):
         self.strips[strip_id].animation_id.increment()
         run_function = self._run_functions(function, self.strips[strip_id])
         if arguments == None:
@@ -142,7 +141,6 @@ class Controller:
         return self.response(function, False, None, True, strip_id)
 
     def thread(self, strip_id, function, arguments):
-        # print("[  Threads  ] ", "[", strip_id, "] ", function, arguments)
         neopixels.update_pixel_owner(strip_id)
         threading_function = self._run_functions(
             function, self.strips[strip_id])
@@ -152,7 +150,6 @@ class Controller:
         return self.response(function, False, None, True, strip_id)
 
     def animate(self, strip_id, function, arguments, delay_between=0, dont_split=False):
-        # print("[ Animation ] ", "[", strip_id, "] ", function, arguments, "Delay Between:",delay_between)
         self.strips[strip_id].animation_id.increment()
         this_id = self.strips[strip_id].animation_id.get()
         neopixels.update_pixel_owner(strip_id)
@@ -178,5 +175,6 @@ class Controller:
                     target=function, args=arguments)
                 threading_thread.start()
                 time.sleep(int(delay_between)/1000)
+
 
 print("controller.py loaded")

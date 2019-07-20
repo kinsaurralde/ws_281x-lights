@@ -7,8 +7,8 @@ class Chase {
     create() {
         let section_flex = document.createElement("div");
         section_flex.className = "section-flex";
-        section_flex.id = "chase-slot-"+this.id;
-        html.appendSetting(section_flex, "Color Save Number", html.createInputNumber(0, 3, (this.id + 1) % saves.length,  "checkSaveNumber('chase-save-color-" + this.id + "')", "chase-save-color-" + this.id));
+        section_flex.id = "chase-slot-" + this.id;
+        html.appendSetting(section_flex, "Color Save Number", html.createInputNumber(0, 3, (this.id + 1) % saves.length, "checkSaveNumber('chase-save-color-" + this.id + "')", "chase-save-color-" + this.id));
         html.appendSetting(section_flex, "Wait ms", html.createInputNumber(1, 100, 50, null, "chase-waitms-" + this.id));
         html.appendSetting(section_flex, "Interval", html.createInputNumber(1, 100, 5, null, "chase-interval-" + this.id));
         html.appendSetting(section_flex, "Direction", html.createInputSelect([{ "value": 1, "name": "Right" }, { "value": -1, "name": "Left" }], "chase-direction-" + this.id));
@@ -19,7 +19,7 @@ class Chase {
     }
 
     remove() {
-        let remove_div = document.getElementById("chase-slot-"+this.id);
+        let remove_div = document.getElementById("chase-slot-" + this.id);
         this.target.removeChild(remove_div);
     }
 

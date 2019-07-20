@@ -10,11 +10,11 @@ class Info {
     }
 
     setup(data) {
-        console.log("Setting up with:",data);
+        console.log("Setting up with:", data);
         let controllers = [];
         for (let i = 0; i < data.length; i++) {
             controllers.push(this.addController(data[i], i));
-        } 
+        }
         this.isSetup = true;
         this.pixels = controllers;
     }
@@ -36,8 +36,8 @@ class Info {
             for (let j = 0; j < data[i]["strips"].length; j++) {
                 for (let k = 0; k < data[i]["strips"][j]["data"].length; k++) {
                     let pixel_data = data[i]["strips"][j]["data"][k];
-                    this.pixels[i]["strips"][j][k].setPixel(pixel_data.r, pixel_data.g, pixel_data.b);               
-                }  
+                    this.pixels[i]["strips"][j][k].setPixel(pixel_data.r, pixel_data.g, pixel_data.b);
+                }
             }
         }
     }
@@ -45,7 +45,7 @@ class Info {
     appendRow(data) {
         let row = this.table.insertRow();
         for (let j = 0; j < 5; j++) {
-            row.insertCell();   
+            row.insertCell();
         }
         this.table.rows[this.table.rows.length - 1].cells[0].innerHTML = data["controller_id"];
         this.table.rows[this.table.rows.length - 1].cells[1].innerHTML = data["power"]["now_milliamps"];
@@ -99,20 +99,19 @@ class Info {
         let url = path;
         let request = new XMLHttpRequest();
         request.open('GET', url, true);
-        request.onload = function() {
+        request.onload = function () {
             console.log("Status code: ", this.status);
             if (this.status >= 200 && this.status < 400) {
                 let data = JSON.parse(this.response);
-                console.log("Recieved Data:",data);
+                console.log("Recieved Data:", data);
                 info.recieveData(data);
             } else {
                 console.log("There was an error");
             }
         };
-        request.onerror = function() {
+        request.onerror = function () {
             console.log("Connection Error: ", this.status, request);
         };
         request.send();
     }
 }
-

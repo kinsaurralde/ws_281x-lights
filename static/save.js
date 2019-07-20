@@ -3,7 +3,7 @@ class Save {
         this.id = id;
         this.live = false;
         this.live_checked = false;
-        this.color = {"r": 100, "g" : 100, "b" : 100};
+        this.color = { "r": 100, "g": 100, "b": 100 };
         this.target = document.getElementById("full-color-expanded");
     }
 
@@ -18,7 +18,7 @@ class Save {
 
         let section_flex = document.createElement("div");
         section_flex.className = "section-flex";
-        section_flex.id = "save-slot-"+this.id;
+        section_flex.id = "save-slot-" + this.id;
 
         this.appendColorSaveSliders(section_flex, this.id, r, g, b);
 
@@ -45,7 +45,7 @@ class Save {
 
         let section_flex = document.createElement("div");
         section_flex.className = "section-flex";
-        section_flex.id = "save-slot-"+this.id;
+        section_flex.id = "save-slot-" + this.id;
 
         this.appendColorSaveSliders(section_flex, this.id, this.color.r, this.color.g, this.color.b);
 
@@ -72,7 +72,7 @@ class Save {
     }
 
     remove() {
-        let remove_div = document.getElementById("save-slot-"+this.id);
+        let remove_div = document.getElementById("save-slot-" + this.id);
         this.target.removeChild(remove_div);
     }
 
@@ -82,9 +82,9 @@ class Save {
         this.color.b = document.getElementById("full-color-" + this.id + "-b").value;
         let sample = document.getElementById("full-color-sample-" + this.id);
         sample.style.backgroundColor = "rgb(" + this.color.r + "," + this.color.g + "," + this.color.b + ")";
-        let display_r = document.getElementById("full-color-"+this.id+"-values-r");
-        let display_g = document.getElementById("full-color-"+this.id+"-values-g");
-        let display_b = document.getElementById("full-color-"+this.id+"-values-b");
+        let display_r = document.getElementById("full-color-" + this.id + "-values-r");
+        let display_g = document.getElementById("full-color-" + this.id + "-values-g");
+        let display_b = document.getElementById("full-color-" + this.id + "-values-b");
         display_r.innerText = pad(this.color.r, 3);
         display_g.innerText = pad(this.color.g, 3);
         display_b.innerText = pad(this.color.b, 3);
@@ -101,16 +101,16 @@ class Save {
         lights.colorAll(this.color.r, this.color.g, this.color.b);
     }
 
-    
-    appendColorSaveSliders(target, num, r,g,b) {
+
+    appendColorSaveSliders(target, num, r, g, b) {
         let title = document.createElement("div");
         title.className = "section-title-secondary";
-        title.innerText = "Save "+num;
+        title.innerText = "Save " + num;
         target.appendChild(title);
         target.appendChild(html.createSpacerS1());
-        target.appendChild(html.createSlider(r, 0, 255, "full-color-"+num+"-r", "saves["+num+"].updateColor()"));
-        target.appendChild(html.createSlider(g, 0, 255, "full-color-"+num+"-g", "saves["+num+"].updateColor()"));
-        target.appendChild(html.createSlider(b, 0, 255, "full-color-"+num+"-b", "saves["+num+"].updateColor()"));
+        target.appendChild(html.createSlider(r, 0, 255, "full-color-" + num + "-r", "saves[" + num + "].updateColor()"));
+        target.appendChild(html.createSlider(g, 0, 255, "full-color-" + num + "-g", "saves[" + num + "].updateColor()"));
+        target.appendChild(html.createSlider(b, 0, 255, "full-color-" + num + "-b", "saves[" + num + "].updateColor()"));
         target.appendChild(html.createSpacerS1());
         html.appendColorDisplay(target, num);
         target.appendChild(html.createSpacerS1());
@@ -132,7 +132,7 @@ function checkSaveNumber(div_id) {
     let value = div.value;
     div.max = saves.length;
     if (value < 0 || value >= saves.length) {
-       div.value = 0; 
+        div.value = 0;
     }
 }
 
@@ -153,12 +153,11 @@ function removeSave() {
     }
 }
 
-var pad = function(n, length) {
+var pad = function (n, length) {
     length++;
     var str = "" + n;
-    if(str.length < length) {
+    if (str.length < length) {
         str = new Array(length - str.length).join("0") + str;
     }
     return str;
-};
-
+}

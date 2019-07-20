@@ -40,7 +40,8 @@
             <div class="section-setting">
                 <div class="section-title-secondary">Brightness</div>
                 <div class="space-1"></div>
-                <input type="range" value="25" min="1" max="255" id="settings-brightness" oninput="lights.setBrightness()">
+                <input type="range" value="25" min="1" max="255" id="settings-brightness"
+                    oninput="lights.setBrightness()">
             </div>
             <div class="space-s-1"></div>
             <div class="section-setting">
@@ -83,8 +84,9 @@
             <div class="section-setting">
                 <div class="section-title-secondary">Lights Hostname:Port</div>
                 <div class="space-1"></div>
-                http:// <input type="text" value="" oninput="lights.updateHostname()"  class="width-10" id="settings-hostname"> : 
-                <input type="text" value="" oninput="lights.updatePort()"  class="width-5" id="settings-port">
+                http:// <input type="text" value="" oninput="lights.updateHostname()" class="width-10"
+                    id="settings-hostname"> :
+                <input type="text" value="" oninput="lights.updatePort()" class="width-5" id="settings-port">
             </div>
             <div class="space-s-1"></div>
             <div class="section-setting">
@@ -93,7 +95,7 @@
                 <input type="button" value="OK" onclick="viewMessages()" id="settings-status">
             </div>
         </div>
-        <div class="section"  id="settings-web-theme-expanded" style="display: none;">
+        <div class="section" id="settings-web-theme-expanded" style="display: none;">
             <div class="section-title-secondary">Custom Web Theme</div>
             <div style="display: flex;" id="settings-web-custom-container">
             </div>
@@ -231,8 +233,8 @@
     </div>
 
     <div class="section" id="manualurl">
-        <div class="section-title">Manual URL<input type="button" class="expand-button" value="^"
-                style="width: 2vw;" onclick="expand('manualurl','block')"></div>
+        <div class="section-title">Manual URL<input type="button" class="expand-button" value="^" style="width: 2vw;"
+                onclick="expand('manualurl','block')"></div>
         <div class="space-1"></div>
         <div class="section-hidden" id="manualurl-expanded" style="display: block;">
             <div class="divider"></div>
@@ -261,9 +263,10 @@
             <textarea id="info-messages" readonly>
             </textarea>
             <div class="divider"></div>
-            <input type="button" value="View Code" onclick="openURL('https:\/\/github.com/kinsaurralde/ws_281x-lights')">
-            <input type="button" value="View Docs" onclick="openURL('docs')">
-            <input type="button" value="View Strip Status" onclick="openURL('get')">
+            <input type="button" value="View Code"
+                onclick="openURL('https:\/\/github.com/kinsaurralde/ws_281x-lights')">
+            <!--<input type="button" value="View Docs" onclick="openURL('docs')">-->
+            <input type="button" value="View Info" onclick="openURL('info/web')">
             <input type="button" value="kinsaurralde.com" onclick="openURL('https:\/\/kinsaurralde.com')">
             <div class="divider"></div>
         </div>
@@ -284,12 +287,12 @@
 
         function pageLoad() {
             addSaveLive();
-            addSave(255,0,0);
-            addSave(0,255,0);
-            addSave(0,0,255);
-            addSave(0,255,255);
-            addSave(255,0,255);
-            addSave(255,255,0);
+            addSave(255, 0, 0);
+            addSave(0, 255, 0);
+            addSave(0, 0, 255);
+            addSave(0, 255, 255);
+            addSave(255, 0, 255);
+            addSave(255, 255, 0);
             for (let i = 0; i < 3; i++) {
                 addWipe();
                 addPulse();
@@ -316,7 +319,7 @@
 
         function viewMessages() {
             let element = document.getElementById("info");
-            element.scrollIntoView({behavior: "smooth"});
+            element.scrollIntoView({ behavior: "smooth" });
 
         }
 

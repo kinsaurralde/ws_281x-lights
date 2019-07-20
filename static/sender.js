@@ -6,14 +6,14 @@ class Sender {
 
     send(url) {
         let request = new XMLHttpRequest();
-        console.log("Send URL: ",url);
+        console.log("Send URL: ", url);
         request.open('GET', url, true);
-        request.onload = function() {
+        request.onload = function () {
             console.log("Status code: ", this.status);
             if (this.status >= 200 && this.status < 400) {
                 lights.sender.removeBorder();
                 let data = JSON.parse(this.response);
-                console.log("Recieved Data:",data);
+                console.log("Recieved Data:", data);
                 if (data["error"]) {
                     console.log("There was a warning");
                     lights.sender.displayWarnBorder();
@@ -25,7 +25,7 @@ class Sender {
                 lights.sender.sendError(request.status, request.statusText);
             }
         };
-        request.onerror = function() {
+        request.onerror = function () {
             console.log("Connection Error: ", this.status, request);
             lights.sender.displayBorder();
             lights.sender.sendError(request.status, request.statusText);
@@ -58,21 +58,21 @@ class Sender {
     }
 
     sendError(status_code, status_text) {
-        console.log("Request recieved error:",status_code, status_text);
+        console.log("Request recieved error:", status_code, status_text);
         switch (status_code) {
             case 0:
-                    this.message_box.innerHTML += "Connection Refused\n";
-                    break;
+                this.message_box.innerHTML += "Connection Refused\n";
+                break;
             case 404:
                 this.message_box.innerHTML += "Command not found\n";
-                break;   
+                break;
             default:
                 this.message_box.innerHTML += "Request recieved error: " + status_code + " with message: " + status_text + "\n";
         }
     }
 
     sendWarning(message) {
-        console.log("Request recieved warning with message:",message);
+        console.log("Request recieved warning with message:", message);
         this.message_box.innerHTML += message + "\n";
     }
 }

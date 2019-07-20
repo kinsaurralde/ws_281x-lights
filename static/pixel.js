@@ -17,7 +17,6 @@ class Pixel {
         div.id = "pixel-display-" + this.controller_id + "-" + this.strip_id + "-" + this.id;
         this.parent_div.appendChild(div);
         this.display_div = document.getElementById("pixel-display-" + this.controller_id + "-" + this.strip_id + "-" + this.id);
-        //console.log("Setup: ",this.display_div, this.parent_div);
     }
 
     setupIndividual() {   // For sending individual pixels
@@ -35,7 +34,6 @@ class Pixel {
         this.r = r;
         this.g = g;
         this.b = b;
-        //console.log("Style: ",this.display_div);
         if (this.display_div == undefined) {
             document.getElementById("pixel-display-" + this.controller_id + "-" + this.strip_id + "-" + this.id).style.backgroundColor = "rgb(" + (r + this.adjust) + "," + (g + this.adjust) + "," + (b + this.adjust) + ")";
         } else {

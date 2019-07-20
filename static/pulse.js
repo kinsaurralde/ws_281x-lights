@@ -7,8 +7,8 @@ class Pulse {
     create() {
         let section_flex = document.createElement("div");
         section_flex.className = "section-flex";
-        section_flex.id = "pulse-slot-"+this.id;
-        html.appendSetting(section_flex, "Color Save Number", html.createInputNumber(0, 3, (this.id + 1) % saves.length,  "checkSaveNumber('pulse-save-color-" + this.id + "')", "pulse-save-color-" + this.id));
+        section_flex.id = "pulse-slot-" + this.id;
+        html.appendSetting(section_flex, "Color Save Number", html.createInputNumber(0, 3, (this.id + 1) % saves.length, "checkSaveNumber('pulse-save-color-" + this.id + "')", "pulse-save-color-" + this.id));
         html.appendSetting(section_flex, "Direction", html.createInputSelect([{ "value": 1, "name": "Right" }, { "value": -1, "name": "Left" }], "pulse-direction-" + this.id));
         html.appendSetting(section_flex, "Wait ms", html.createInputNumber(1, 100, 10, null, "pulse-waitms-" + this.id));
         html.appendSetting(section_flex, "Length", html.createInputNumber(1, 60, 5, null, "pulse-length-" + this.id));
@@ -21,7 +21,7 @@ class Pulse {
     }
 
     remove() {
-        let remove_div = document.getElementById("pulse-slot-"+this.id);
+        let remove_div = document.getElementById("pulse-slot-" + this.id);
         this.target.removeChild(remove_div);
     }
 
@@ -32,7 +32,7 @@ class Pulse {
         this.length = document.getElementById("pulse-length-" + this.id).value;
         this.delay = document.getElementById("pulse-delay-" + this.id).value;
         this.mode = "thread";
-        if (document.getElementById("pulse-repeated-"+this.id).checked) {
+        if (document.getElementById("pulse-repeated-" + this.id).checked) {
             this.mode = "animate";
         }
         let color = getSaveColor(this.colorSave, "pulse-save-color-" + this.id);
