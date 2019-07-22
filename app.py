@@ -174,7 +174,7 @@ except FileNotFoundError:
     exit(1)
 config_data = json.load(config_file)
 print("Config data read from", config_name, ":", config_data)
-controller.init_neopixels(config_data)
+controller.init_neopixels(config_data["controllers"][0])
 
 keys = Keys(config_data)
 

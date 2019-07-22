@@ -17,7 +17,7 @@ class Controller:
         self.create_strip(0, self.num_pixels - 1)
 
     def init_neopixels(self, data):
-        neopixels.init_neopixels(data["p_strip"])
+        neopixels.init_neopixels(data["neopixels"])
         self.num_pixels = neopixels.numMaxPixels()
         if "settings" in data:
             if "initial_brightness" in data["settings"]:

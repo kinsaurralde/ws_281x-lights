@@ -1,29 +1,37 @@
 {
-    "strips": [
-        {
-            "start": 0,
-            "end": 29
-        },{
-            "start": 30,
-            "end": 59
-        },{
-            "start": 20,
-            "end": 39
-        }
-    ],
-    "p_strip":
-    {
-        "led_count": 60,
-        "max_brightness": 255,
-        "max_milliamps": 9000
-    },
     "keys": {
         "webkey" : "123456",
         "0" : [0,1,2,3],
         "123456789" : [0,1,2,3],
         "987654321" : [3]
     },
-    "settings": {
-        "initial_brightness": 100
+    "controllers": [
+        {
+            "primary": true,
+            "remote": "",
+            "neopixels": {
+                "led_count": 60,
+                "max_brightness": 255,
+                "max_milliamps": 9000
+            },
+            "strips": [
+                {
+                    "start": 0,
+                    "end": 29
+                },{
+                    "start": 30,
+                    "end": 59
+                },{
+                    "start": 20,
+                    "end": 39
+                }
+            ],
+            "settings": {
+                "initial_brightness": 100
+            }
+        }
+    ],
+    "config": {
+        "date_generated": "2019-07-21"
     }
 }
