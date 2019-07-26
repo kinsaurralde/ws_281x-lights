@@ -192,6 +192,12 @@ class Lights:
         return lights_save
 
     def set_all(self, r, g, b):
+        """Set color of entire strip
+        
+                Parameters:
+
+                r, g, b: color
+        """
         neopixels.update_pixel_owner(self.id)
         for i in range(0, neopixels.numPixels(self.id)):
             neopixels.setPixelColor(self.id, i, r, g, b)
@@ -202,9 +208,9 @@ class Lights:
 
             Parameters:
 
-            pixel_id: which pixel to change
+                pixel_id: which pixel to change
 
-            r, g, b: color to change pixel to  
+                r, g, b: color to change pixel to  
         """
         neopixels.update_pixel_owner(self.id, pixel_id)
         neopixels.setPixelColor(self.id, pixel_id, r, g, b)
@@ -295,8 +301,6 @@ class Lights:
                     1: forward direction
                     -1: reverse direction
 
-                this_id: break if this value does not equal global animation_id
-
                 iterations: how many times to run (default: 1)
         """
         this_id = self.animation_id.get()
@@ -330,6 +334,10 @@ class Lights:
             wait_ms: how long before moving to next pixel (in ms)
 
             length: how many pixels in pulse
+
+            layer:
+                True: Keep previous color after pulse passes
+                False: Turn off pixel after pulse passes
         """
         this_id = self.animation_id.get()
         previous = []
@@ -346,7 +354,10 @@ class Lights:
                 previous.append(neopixels.getPixelColor(self.id, i))
                 no_own_count += neopixels.setPixelColor(self.id, i, r, g, b)
             if j < max_pixels and j >= 0:
-                neopixels.setPixelColor(self.id, j, previous.pop(0))
+                if layer:
+                    neopixels.setPixelColor(self.id, j, previous.pop(0))
+                else:
+                    neopixels.setPixelColor(self.id, j, 0)
             neopixels.show()
             if self.sleepListenForBreak(self.id, wait_ms, this_id):
                 return
@@ -366,7 +377,6 @@ class Lights:
         """
         this_id = self.animation_id.get()
         current_color = neopixels.get_random_color()
-        # neopixels.update_pixel_owner(self.id)
         for i in range(iterations):
             for j in range(neopixels.numPixels(self.id)):
                 if j % each == 0:
@@ -384,8 +394,6 @@ class Lights:
                 wait_ms: time between iterations (in ms)
 
                 iterations: number of times to repeat
-        
-                this_id: break if this value does not equal global animation_id
         """
         this_id = self.animation_id.get()
         for j in range(256*iterations):
@@ -402,9 +410,7 @@ class Lights:
 
                 wait_ms: how long before next frame (in ms)
 
-                iterations: how many times to run
-
-                this_id: break if this value does not equal global animation_id
+                iterations: how many times to run (default=1)
         """
         this_id = self.animation_id.get()
         for j in range(256*iterations):
@@ -421,8 +427,6 @@ class Lights:
             Parameters:
 
                 wait_ms: how long before next frame (in ms)
-
-                this_id: break if this value does not equal global animation_id
         """
         this_id = self.animation_id.get()
         for j in range(256):
@@ -439,14 +443,10 @@ class Lights:
         """Cycle fading between multiple colors
 
             Parameters:
-                
-                wait_ms: time between full colors
-                    < 0: instant change between colors
-                    >= 0: blend between colors
 
-                colors: list of colors to switch between
-
-                this_id: break if this value does not equal global animation_id
+                arguments:
+                    [0]: wait_ms (time between full colors)
+                    [1:]: colors
         """
         this_id = self.animation_id.get()
         wait_ms = int(arguments[0])
@@ -475,8 +475,6 @@ class Lights:
                 wait_ms: time between colors
 
                 colors: list of colors to split between
-
-                this_id: break if this value does not equal global animation_id
         """
         this_id = self.animation_id.get()
         for j in range(0, len(colors)):
@@ -493,8 +491,6 @@ class Lights:
             Parameters:
 
                 wait_ms: total sleep time (in ms)
-
-                this_id: break sleep if global animation_id does not equal this value    
         """
         while wait_ms > 0:
             if wait_ms <= 100:
