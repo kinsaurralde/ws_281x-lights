@@ -161,10 +161,17 @@ class AnimationID:
 class Lights:
     def __init__(self, id):
         self.id = id
+        self.layer = False
         self.animation_id = AnimationID()
 
     def stop_animation(self):
         self.animation_id.increment()
+
+    def set_owner(self):
+        neopixels.update_pixel_owner(self.id)
+
+    def set_layer(self,value):
+        self.layer = bool(value)
 
     def off(self):
         self.stop_animation()
@@ -484,6 +491,28 @@ class Lights:
             neopixels.show()
             if self.sleepListenForBreak(self.id, wait_ms, this_id):
                 return
+
+    def bounce(self, colors, wait_ms=50, length=5, direction=1):
+        """Bounce Pulse across strip
+
+            Parameters:
+
+                colors: list of colors to pulse
+
+                wait_ms: how long before next frame (in ms) (default=50)
+
+                length: how many pixels in pulse (default=5)
+
+                direction: initial direction
+                    1: forwards
+                    -1: backwards
+        """
+        this_id = self.animation_id.get()
+        for color in colors:
+            self.pulse(color["r"],color["g"],color["b"],direction, wait_ms, length, self.layer)
+            direction *= -1
+            if this_id != self.animation_id.get():
+                break
 
     def sleepListenForBreak(self, strip_id, wait_ms, this_id):
         """While sleeping check if global id has changed

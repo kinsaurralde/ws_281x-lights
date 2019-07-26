@@ -143,6 +143,32 @@ def thread(key, strip_id, function, param):
     except Exception as e:
         return exception_handler(e)
 
+@app.route('/test')
+def test():
+    args = {
+        "wait_ms": 25,
+        "length": 4,
+        "colors": [
+            {
+                "r": 255,
+                "g": 0,
+                "b": 255,
+            },
+            {
+                "r": 255,
+                "g": 255,
+                "b": 0,
+            },
+            {
+                "r": 255,
+                "g": 0,
+                "b": 0,
+            }
+        ],
+        "direction": -1
+    }
+    return create_response(controller.animate(0, "bounce", args, -1))
+
 
 @app.route('/<key>/<strip_id>/animate/<function>/<param>')
 @app.route('/<key>/<strip_id>/animate/<function>/<param>/<delay>')

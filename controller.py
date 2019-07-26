@@ -10,11 +10,13 @@ class Controller:
         neopixels.setBrightness(self.brightness)
         self.num_pixels = neopixels.numMaxPixels()
         self.break_animation = True
+        self.layer = False
         self.id = controller_id
 
         self.strips = []
         self.strip_data = []
         self.create_strip(0, self.num_pixels - 1)
+
 
     def init_neopixels(self, data):
         neopixels.init_neopixels(data["neopixels"])
@@ -93,6 +95,11 @@ class Controller:
         neopixels.setBrightness(value)
         neopixels.show()
 
+    def set_layer(self, value):
+        self.layer = bool(value)
+        for strip in self.strips:
+            strip.set_layer(self.layer)
+
     def get_break_animation(self):
         return self.break_animation
 
@@ -123,6 +130,7 @@ class Controller:
             "rainbowChase": strip.rainbow_chase,
             "mix": strip.mix_switch,
             "reverse": strip.reverse,
+            "bounce": strip.bounce,
         }
         if name in run_functions:
             return run_functions[name]
@@ -170,6 +178,8 @@ class Controller:
                 function(arguments)
             elif delay_between == 0:
                 function(*arguments)
+            elif delay_between == -1:   # Placeholder for dictonary arguement mode
+                function(**arguments)
             else:
                 threading_thread = threading.Thread(
                     target=function, args=arguments)
