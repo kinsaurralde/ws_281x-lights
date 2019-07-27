@@ -1,0 +1,63 @@
+[
+    {
+        "function": "bounce",
+        "type": "animate",
+        "strip_id": 0,
+        "arguments": {
+            "wait_ms": 25,
+            "length": 4,
+            "colors": [
+                {
+                    "r": 255,
+                    "g": 0,
+                    "b": 255
+                },
+                {
+                    "r": 255,
+                    "g": 255,
+                    "b": 0
+                },
+                {
+                    "r": 255,
+                    "g": 0,
+                    "b": 0
+                },
+                {
+                    "r": 0,
+                    "g": 0,
+                    "b": 255
+                }
+            ],
+            "direction": -1
+        }
+    },
+    {
+        "function": "wait",
+        "type": "command",
+        "arguments": {
+            "amount": 2000
+        }
+    },
+    {
+        "function": "bounce",
+        "type": "animate",
+        "strip_id": 3,
+        "arguments": {
+            "wait_ms": 10,
+            "length": 1,
+            "colors": [
+                {
+                    "r": 255,
+                    "g": 0,
+                    "b": 0
+                },
+                {
+                    "r": 0,
+                    "g": 255,
+                    "b": 0
+                }
+            ],
+            "direction": -1
+        }
+    }
+]

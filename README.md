@@ -48,6 +48,13 @@ Run
 * View controllers and their virtual strips
 * View current color of all LEDs on all strips
 
+## Tools
+
+* Config file generator
+* Send json to url
+
+[More Information](tools/README.md)
+
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
