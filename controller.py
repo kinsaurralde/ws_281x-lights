@@ -186,5 +186,13 @@ class Controller:
                 threading_thread.start()
                 time.sleep(int(delay_between)/1000)
 
+    def from_json(self, data):
+        for action in data:
+            if action["type"] == "command":
+                if action["function"] == "wait":
+                    time.sleep(int(action["arguments"]["amount"]) / 1000)
+            elif action["type"] == "animate":
+                self.animate(action["strip_id"], action["function"], action["arguments"], -1)
+
 
 print("controller.py loaded")
