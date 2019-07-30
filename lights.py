@@ -327,7 +327,7 @@ class Lights:
                     neopixels.setPixelColor(
                         self.id, i + q, saves[int(i / interval)])
 
-    def pulse(self, r, g, b, direction, wait_ms, length, layer=True):
+    def pulse(self, r, g, b, direction=1, wait_ms=50, length=5, layer=True):
         """Sends a pulse of color through strip
 
         Parameters:
@@ -521,7 +521,8 @@ class Lights:
 
                 wait_ms: total sleep time (in ms)
         """
-        while wait_ms > 0:
+        expected_end = time.time() + wait_ms/1000.0
+        while wait_ms > 0 and time.time() < expected_end:
             if wait_ms <= 100:
                 time.sleep(wait_ms/1000.0)
             else:

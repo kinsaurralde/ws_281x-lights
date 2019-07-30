@@ -137,23 +137,27 @@ class Controller:
         else:
             raise NameError
 
-    def run(self, strip_id, function, arguments=None):
+    def run(self, strip_id, function, arguments=None, is_dict=False):
         self.strips[strip_id].animation_id.increment()
         run_function = self._run_functions(function, self.strips[strip_id])
         if arguments == None:
             run_function()
+        elif is_dict:
+            run_function(**arguments)
         elif function == "specific" or function == "mix":
             run_function(arguments)
         else:
             run_function(*arguments)
         return self.response(function, False, None, True, strip_id)
 
-    def thread(self, strip_id, function, arguments):
+    def thread(self, strip_id, function, arguments, is_dict=False):
         neopixels.update_pixel_owner(strip_id)
         threading_function = self._run_functions(
             function, self.strips[strip_id])
-        threading_thread = threading.Thread(
-            target=threading_function, args=arguments)
+        if is_dict:
+            threading_thread = threading.Thread(target=threading_function, kwargs=arguments)
+        else:
+            threading_thread = threading.Thread(target=threading_function, args=arguments)
         threading_thread.start()
         return self.response(function, False, None, True, strip_id)
 
@@ -186,13 +190,21 @@ class Controller:
                 threading_thread.start()
                 time.sleep(int(delay_between)/1000)
 
+
     def from_json(self, data):
         for action in data:
             if action["type"] == "command":
                 if action["function"] == "wait":
                     time.sleep(int(action["arguments"]["amount"]) / 1000)
+                elif action["function"] == "stopanimation":
+                    self.stop(action.get("strip_id"))
+                elif action["function"] == "off":
+                    self.off(action.get("strip_id"))
             elif action["type"] == "animate":
                 self.animate(action["strip_id"], action["function"], action["arguments"], -1)
-
+            elif action["type"] == "run":
+                self.run(action["strip_id"], action["function"], action["arguments"], True)
+            elif action["type"] == "thread":
+                self.thread(action["strip_id"], action["function"], action["arguments"], True)
 
 print("controller.py loaded")
