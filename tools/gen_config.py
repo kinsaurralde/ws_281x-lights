@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-import sys, datetime, json, os
+import sys
+import datetime
+import json
+import os
 
 
 class Controller():
@@ -105,6 +108,7 @@ def ask_keys():
         more_keys = get_bool("Enter another key?")
     return data
 
+
 def print_secondary_controller(i, folder, controller_data, keys):
     data = {
         "date_generated": str(datetime.datetime.now()),
@@ -137,6 +141,8 @@ def create_new(file_name: str):
     for controller in data["controllers"][1:]:
         print_secondary_controller(i, folder_name, controller, data["keys"])
         i += 1
+    print("Secondary controllers placed in", folder_name)
+    print("To create folders for secondary controllers run ./secondary.py new", folder_name)
 
 
 if len(sys.argv) < 2:
