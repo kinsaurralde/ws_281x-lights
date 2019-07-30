@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import sys, datetime, json
+import sys, datetime, json, os
 
 
 class Controller():
@@ -105,6 +105,19 @@ def ask_keys():
         more_keys = get_bool("Enter another key?")
     return data
 
+def print_secondary_controller(i, folder, controller_data, keys):
+    data = {
+        "date_generated": str(datetime.datetime.now()),
+        "keys": keys,
+        "controllers": []
+    }
+    controller_data["primary"] = True
+    data["controllers"].append(controller_data)
+    config_file = open(folder + "/secondary_config_" + str(i) + ".json", "w")
+    config_file.write(json.dumps(data))
+    config_file.close()
+    return
+
 
 def create_new(file_name: str):
     print("Creating new config file with name:", file_name)
@@ -117,6 +130,13 @@ def create_new(file_name: str):
     config_file.write(json.dumps(data))
     config_file.close()
     print("Config file generated:", file_name)
+    folder_name = "secondary/" + file_name.split('.')[0]
+    if not os.path.exists(folder_name):
+        os.makedirs(folder_name)
+    i = 1
+    for controller in data["controllers"][1:]:
+        print_secondary_controller(i, folder_name, controller, data["keys"])
+        i += 1
 
 
 if len(sys.argv) < 2:
