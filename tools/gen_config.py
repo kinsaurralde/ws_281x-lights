@@ -97,7 +97,7 @@ def ask_keys():
     while web_key.isdecimal() == False:
         print("Web key must be a positive integer")
         web_key = input("Enter Web Key: ")
-    data["web_key"] = web_key
+    data["webkey"] = web_key
     more_keys = True
     while more_keys:
         cur_key = input("Enter New Key: ")
@@ -109,9 +109,9 @@ def ask_keys():
     return data
 
 
-def print_secondary_controller(i, folder, controller_data, keys):
+def print_secondary_controller(i, folder, controller_data, keys, info):
     data = {
-        "date_generated": str(datetime.datetime.now()),
+        "info": info,
         "keys": keys,
         "controllers": []
     }
@@ -126,7 +126,10 @@ def print_secondary_controller(i, folder, controller_data, keys):
 def create_new(file_name: str):
     print("Creating new config file with name:", file_name)
     data = {
-        "date_generated": str(datetime.datetime.now())
+        "info": {
+            "date_generated": str(datetime.datetime.now()),
+            "port": get_int("Enter port number: ", 80, 65535)
+        }
     }
     data["keys"] = ask_keys()
     data["controllers"] = ask_controllers()
@@ -139,14 +142,14 @@ def create_new(file_name: str):
         os.makedirs(folder_name)
     i = 1
     for controller in data["controllers"][1:]:
-        print_secondary_controller(i, folder_name, controller, data["keys"])
+        print_secondary_controller(i, folder_name, controller, data["keys"], data["info"])
         i += 1
     print("Secondary controllers placed in", folder_name)
     print("To create folders for secondary controllers run ./secondary.py new", folder_name)
 
 
 if len(sys.argv) < 2:
-    print("Usage: ./gen_config.py [mode] <filename>")
+    print("Usage: ./gen_config.py <mode> [filename]")
     exit(1)
 
 file_name = "config.json"
@@ -160,5 +163,6 @@ if file_name.split(".")[1] != "json":
 if sys.argv[1] == "new":
     create_new(file_name)
 else:
+    print("Usage: ./gen_config.py <mode> [filename]")
     print("Mode options are: new")
     exit(1)

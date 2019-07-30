@@ -31,7 +31,7 @@ def create_new(folder_name):
 
 
 if len(sys.argv) < 3:
-    print("Usage: ./secondary.py [mode] [path]")
+    print("Usage: ./secondary.py <mode> <path>")
     exit(1)
 
 folder_name = sys.argv[2]

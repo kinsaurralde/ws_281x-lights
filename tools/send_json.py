@@ -2,7 +2,7 @@
 import sys, json, requests
 
 if len(sys.argv) < 3:
-    print("Usage: ./send_json.py [file_name] [url]")
+    print("Usage: ./send_json.py <file_name> <url>")
     exit(1)
     
 try:

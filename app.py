@@ -169,7 +169,7 @@ def post_json():
 controller = Controller(0)
 
 config_name = "config.json"
-if len(sys.argv) > 1:   # argv[0] is this file name
+if len(sys.argv) > 1:   # argv[0] is this file name so one argument is length of 2
     config_name = sys.argv[1]
 try:
     config_file = open(config_name, "r")
@@ -187,5 +187,9 @@ controller.run(0, "wipe", (0, 255, 0, 1, 1))
 controller.run(0, "wipe", (0, 0, 255, 1, 1))
 controller.run(0, "wipe", (0, 0, 0, 1, 1))
 
+port = 200
+if "port" in config_data["info"]:
+    port = int(config_data["info"]["port"])
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=200, threaded=True)
+    app.run(debug=True, host='0.0.0.0', port=port, threaded=True)
