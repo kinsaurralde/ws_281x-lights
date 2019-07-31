@@ -1,7 +1,8 @@
-from flask import Flask, render_template, redirect, url_for, json, request
+from flask import Flask, render_template, json, request
 from key import Keys
 from controller import Controller
-import json, sys
+import json
+import sys
 
 app = Flask(__name__)
 debug_exceptions = False  # if true, exception will be sent to web

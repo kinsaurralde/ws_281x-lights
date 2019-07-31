@@ -1,4 +1,4 @@
-from rpi_ws281x import *
+from rpi_ws281x import Adafruit_NeoPixel
 import random
 import math
 import time

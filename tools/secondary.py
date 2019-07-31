@@ -7,7 +7,7 @@ import shutil
 def update(folder_name):
     if os.path.isdir(folder_name):
         print(folder_name)
-        shutil.copy("../app.py", folder_name + "app.py")
+        shutil.copy("../remote_app.py", folder_name + "app.py")
         shutil.copy("../key.py", folder_name + "key.py")
         shutil.copy("../controller.py", folder_name + "controller.py")
         shutil.copy("../lights.py", folder_name + "lights.py")
@@ -23,7 +23,7 @@ def create_new(folder_name):
         if not os.path.exists(cur_folder):
             os.makedirs(cur_folder)
         shutil.copy(folder_name + file, cur_folder + "config.json")
-        startup_script = "sudo screen -S rgb sudo python3 app.py config.json"
+        startup_script = "sudo screen -S secondary_rgb sudo python3 app.py config.json"
         with open(cur_folder + "startup.sh", "w") as startup_file:
             os.chmod(cur_folder + "startup.sh", 0o755)
             startup_file.write(startup_script)
