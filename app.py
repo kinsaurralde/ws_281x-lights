@@ -1,8 +1,10 @@
+import json
+import sys
+
 from flask import Flask, render_template, json, request
 from key import Keys
 from controller import Controller
-import json
-import sys
+from multicontroller import MultiController
 
 app = Flask(__name__)
 debug_exceptions = False  # if true, exception will be sent to web
@@ -54,8 +56,7 @@ def info(function):
     if function == "web":
         return render_template('info.html')
     elif function == "get":
-        data = []
-        data.append(controller.info())
+        data = mc.info()
         return create_response(data)
     else:
         return page_not_found("Info function not found")
@@ -82,7 +83,7 @@ def key(strip_id, key, function, param=None):
 def off(key, strip_id=0):
     try:
         keys.check_key(key, strip_id)
-        controller_response = controller.off(int(strip_id))
+        controller_response = mc.off(0, int(strip_id))
     except Exception as e:
         return exception_handler(e)
     return create_response(controller_response)
@@ -91,22 +92,24 @@ def off(key, strip_id=0):
 @app.route('/<key>/stopanimation')
 @app.route('/<key>/<strip_id>/stopanimation')
 def stopanimation(key, strip_id=0):
-    controller_response = controller.stop(int(strip_id))
+    controller_response = mc.stop(0, int(strip_id))
     return create_response(controller_response)
 
 
 @app.route('/settings/<param>')
 def change_settings(param):
     settings = param.split(",")
+    new_settings = {}
     for setting in settings:
         current = setting.split("=")
         if current[0] == "break":
             if current[1] == "true":
-                controller.set_break_animation(True)
+                new_settings["break_animation"] = True
             else:
-                controller.set_break_animation(False)
+                new_settings["break_animation"] = False
         if current[0] == "brightness":
-            controller.set_brightness(int(current[1]))
+            new_settings["brightness"] = int(current[1])
+    mc.change_settings(0, new_settings)
     return create_response({})
 
 
@@ -122,8 +125,8 @@ def run(key, strip_id, function, param=None):
         except:
             if param == None:
                 params = None
-        controller.stop(int(strip_id))
-        controller_response = controller.run(int(strip_id), function, params)
+        mc.stop(0, int(strip_id))
+        controller_response = mc.run([0], int(strip_id), function, params)
         return create_response(controller_response)
     except Exception as e:
         return exception_handler(e)
@@ -138,7 +141,7 @@ def thread(key, strip_id, function, param):
             params = list(map(int, params))
         except ValueError:
             pass
-        controller_response = controller.thread(
+        controller_response = mc.thread(0,
             int(strip_id), function, params)
         return create_response(controller_response)
     except Exception as e:
@@ -154,8 +157,8 @@ def animate(key, strip_id, function, param, delay=0):
             params = list(map(int, params))
         except ValueError:
             pass
-        controller.stop(int(strip_id))
-        controller_response = controller.animate(
+        mc.stop(0, int(strip_id))
+        controller_response = mc.animate(0, 
             int(strip_id), function, params, delay)
         return create_response(controller_response)
     except Exception as e:
@@ -164,10 +167,10 @@ def animate(key, strip_id, function, param, delay=0):
 @app.route('/json', methods=['GET', 'POST'])
 def post_json():
     data = request.get_json()
-    return create_response(controller.from_json(data))
+    return create_response(mc.json(data))
 
 
-controller = Controller(0)
+# controller = Controller(0)
 
 config_name = "config.json"
 if len(sys.argv) > 1:   # argv[0] is this file name so one argument is length of 2
@@ -179,14 +182,16 @@ except FileNotFoundError:
     exit(1)
 config_data = json.load(config_file)
 print("Config data read from", config_name, ":", config_data)
-controller.init_neopixels(config_data["controllers"][0])
+# controller.init_neopixels(config_data["controllers"][0])
+
+mc = MultiController(config_data)
 
 keys = Keys(config_data)
 
-controller.run(0, "wipe", (255, 0, 0, 1, 1))
-controller.run(0, "wipe", (0, 255, 0, 1, 1))
-controller.run(0, "wipe", (0, 0, 255, 1, 1))
-controller.run(0, "wipe", (0, 0, 0, 1, 1))
+# controller.run(0, "wipe", (255, 0, 0, 1, 1))
+# controller.run(0, "wipe", (0, 255, 0, 1, 1))
+# controller.run(0, "wipe", (0, 0, 255, 1, 1))
+# controller.run(0, "wipe", (0, 0, 0, 1, 1))
 
 port = 200
 if "port" in config_data["info"]:

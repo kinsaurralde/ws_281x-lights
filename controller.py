@@ -1,6 +1,7 @@
-from lights import *
 import threading
 import time
+
+from lights import *
 
 
 class Controller:
@@ -76,7 +77,7 @@ class Controller:
                 strip.stop_animation()
         else:
             self.strips[strip_id].stop_animation()
-        return self.response("stop", False, None, True, strip_id)
+        return self.response("stop", False, None, False, strip_id)
 
     def off(self, strip_id=None):
         if strip_id == None:
@@ -84,7 +85,7 @@ class Controller:
                 strip.off()
         else:
             self.strips[strip_id].off()
-        return self.response("off", False, None, True, strip_id)
+        return self.response("off", False, None, False, strip_id)
 
     def get_brightness(self):
         self.brightness = neopixels.getBrightness()
@@ -142,24 +143,24 @@ class Controller:
         run_function = self._run_functions(function, self.strips[strip_id])
         if arguments == None:
             run_function()
-        elif is_dict:
+        elif isinstance(arguments, dict):
             run_function(**arguments)
         elif function == "specific" or function == "mix":
             run_function(arguments)
         else:
             run_function(*arguments)
-        return self.response(function, False, None, True, strip_id)
+        return self.response(function, False, None, False, strip_id)
 
     def thread(self, strip_id, function, arguments, is_dict=False):
         neopixels.update_pixel_owner(strip_id)
         threading_function = self._run_functions(
             function, self.strips[strip_id])
-        if is_dict:
+        if isinstance(arguments, dict):
             threading_thread = threading.Thread(target=threading_function, kwargs=arguments)
         else:
             threading_thread = threading.Thread(target=threading_function, args=arguments)
         threading_thread.start()
-        return self.response(function, False, None, True, strip_id)
+        return self.response(function, False, None, False, strip_id)
 
     def animate(self, strip_id, function, arguments, delay_between=0, dont_split=False):
         self.strips[strip_id].animation_id.increment()
@@ -174,16 +175,16 @@ class Controller:
         animation_thread = threading.Thread(
             target=self._animate_run, args=animation_arguments)
         animation_thread.start()
-        return self.response(function, False, None, True, strip_id)
+        return self.response(function, False, None, False, strip_id)
 
     def _animate_run(self, strip_id, function, arguments, animation_id, delay_between, dont_split):
         while animation_id == self.strips[strip_id].animation_id.get():
             if dont_split:
                 function(arguments)
+            elif isinstance(arguments, dict):
+                function(**arguments)
             elif delay_between == 0:
                 function(*arguments)
-            elif delay_between == -1:   # Placeholder for dictonary arguement mode
-                function(**arguments)
             else:
                 threading_thread = threading.Thread(
                     target=function, args=arguments)
@@ -191,20 +192,20 @@ class Controller:
                 time.sleep(int(delay_between)/1000)
 
 
-    def from_json(self, data):
-        for action in data:
-            if action["type"] == "command":
-                if action["function"] == "wait":
-                    time.sleep(int(action["arguments"]["amount"]) / 1000)
-                elif action["function"] == "stopanimation":
-                    self.stop(action.get("strip_id"))
-                elif action["function"] == "off":
-                    self.off(action.get("strip_id"))
-            elif action["type"] == "animate":
-                self.animate(action["strip_id"], action["function"], action["arguments"], -1)
-            elif action["type"] == "run":
-                self.run(action["strip_id"], action["function"], action["arguments"], True)
-            elif action["type"] == "thread":
-                self.thread(action["strip_id"], action["function"], action["arguments"], True)
+    def from_json(self, action):
+        # for action in data:
+        if action["type"] == "command":
+            if action["function"] == "wait":
+                time.sleep(int(action["arguments"]["amount"]) / 1000)
+            elif action["function"] == "stopanimation":
+                self.stop(action.get("strip_id"))
+            elif action["function"] == "off":
+                self.off(action.get("strip_id"))
+        elif action["type"] == "animate":
+            self.animate(action["strip_id"], action["function"], action["arguments"])
+        elif action["type"] == "run":
+            self.run(action["strip_id"], action["function"], action["arguments"], True)
+        elif action["type"] == "thread":
+            self.thread(action["strip_id"], action["function"], action["arguments"], True)
 
 print("controller.py loaded")

@@ -1,0 +1,24 @@
+[
+    {
+        "function": "color",
+        "type": "run",
+        "controller_id": [0],
+        "strip_id": 0,
+        "arguments": [255,0,0]
+    },{
+        "type": "command",
+        "function": "wait",
+        "arguments": {
+            "amount": 1000
+        }
+    },{
+        "function": "color",
+        "type": "run",
+        "strip_id": 0,
+        "arguments": {
+            "r": 0,
+            "g": 255,
+            "b": 0
+        }
+    }
+]
