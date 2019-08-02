@@ -191,21 +191,21 @@ class Controller:
                 threading_thread.start()
                 time.sleep(int(delay_between)/1000)
 
-
-    def from_json(self, action):
-        # for action in data:
-        if action["type"] == "command":
-            if action["function"] == "wait":
-                time.sleep(int(action["arguments"]["amount"]) / 1000)
-            elif action["function"] == "stopanimation":
-                self.stop(action.get("strip_id"))
-            elif action["function"] == "off":
-                self.off(action.get("strip_id"))
-        elif action["type"] == "animate":
-            self.animate(action["strip_id"], action["function"], action["arguments"])
-        elif action["type"] == "run":
-            self.run(action["strip_id"], action["function"], action["arguments"], True)
-        elif action["type"] == "thread":
-            self.thread(action["strip_id"], action["function"], action["arguments"], True)
+    def execute_json(self, data):
+        for action in data:
+            if action["type"] == "command":
+                if action["function"] == "wait":
+                    time.sleep(int(action["arguments"]["amount"]) / 1000)
+                elif action["function"] == "stopanimation":
+                    self.stop(action.get("strip_id"))
+                elif action["function"] == "off":
+                    self.off(action.get("strip_id"))
+            elif action["type"] == "animate":
+                self.animate(action["strip_id"], action["function"], action["arguments"])
+            elif action["type"] == "run":
+                self.run(action["strip_id"], action["function"], action["arguments"], True)
+            elif action["type"] == "thread":
+                self.thread(action["strip_id"], action["function"], action["arguments"], True)
+        self.queue = []
 
 print("controller.py loaded")

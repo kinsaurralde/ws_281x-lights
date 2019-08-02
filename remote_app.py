@@ -31,7 +31,7 @@ def page_not_found(e):
 @app.route('/json', methods=['GET', 'POST'])
 def post_json():
     data = request.get_json()
-    return create_response(controller.from_json(data))
+    return create_response(controller.execute_json(data))
 
 
 controller = Controller(0)
