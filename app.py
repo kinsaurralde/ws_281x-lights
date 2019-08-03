@@ -40,6 +40,25 @@ def exception_handler(ex):
         return error_response("Assertion Error: invalid key")
 
 
+def split_key_ids(items):
+    split = items.split(':')
+    data = {
+        "key": 0,
+        "controller_id": 0,
+        "strip_id": 0
+    }
+    if len(split) > 0:
+        if split[0] != "":
+            data["key"] = int(split[0])
+    if len(split) > 1:
+        if split[1] != "":
+            data["controller_ids"] = split[1].split(',')
+    if len(split) > 2:
+        if split[2] != "":
+            data["strip_id"] = split[2]
+    return data
+
+
 @app.errorhandler(404)
 def page_not_found(e):
     return error_response(str(e)), 404
@@ -78,21 +97,23 @@ def key(strip_id, key, function, param=None):
         return exception_handler(e)
 
 
-@app.route('/<key>/off')
-@app.route('/<key>/<strip_id>/off')
-def off(key, strip_id=0):
+@app.route('/<key_ids>/off')
+def off(key_ids):
     try:
-        keys.check_key(key, strip_id)
-        controller_response = mc.off(0, int(strip_id))
+        data = split_key_ids(key_ids)
+        keys.check_key(data["key"], data["strip_id"])
+        controller_response = mc.off(
+            data["controller_ids"], int(data["strip_id"]))
     except Exception as e:
         return exception_handler(e)
     return create_response(controller_response)
 
 
-@app.route('/<key>/stopanimation')
-@app.route('/<key>/<strip_id>/stopanimation')
-def stopanimation(key, strip_id=0):
-    controller_response = mc.stop(0, int(strip_id))
+@app.route('/<key_ids>/stopanimation')
+def stopanimation(key_ids):
+    data = split_key_ids(key_ids)
+    controller_response = mc.stop(
+        data["controller_ids"], int(data["strip_id"]))
     return create_response(controller_response)
 
 
@@ -113,56 +134,50 @@ def change_settings(param):
     return create_response({})
 
 
-@app.route('/<key>/<strip_id>/run/<function>')
-@app.route('/<key>/<strip_id>/run/<function>/<param>')
-def run(key, strip_id, function, param=None):
+@app.route('/<key_ids>/run/<function>/<param>')
+def run(key_ids, function, param=None):
     try:
-        keys.check_key(key, strip_id)
-        params = []
-        try:
-            params = param.split(",")
-            params = list(map(int, params))
-        except:
-            if param == None:
-                params = None
-        mc.stop(0, int(strip_id))
-        controller_response = mc.run([0], int(strip_id), function, params)
+        data = split_key_ids(key_ids)
+        keys.check_key(data["key"], data["strip_id"])
+        params = param.split(',')
+        params = [int(x) for x in params if x.lstrip('-').isdigit()]
+        mc.stop(data["controller_ids"], int(data["strip_id"]))
+        controller_response = mc.run(data["controller_ids"], int(
+            data["strip_id"]), function, params)
         return create_response(controller_response)
     except Exception as e:
         return exception_handler(e)
 
 
-@app.route('/<key>/<strip_id>/thread/<function>/<param>')
-def thread(key, strip_id, function, param):
+@app.route('/<key_ids>/thread/<function>/<param>')
+def thread(key_ids, function, param):
     try:
-        keys.check_key(key, strip_id)
-        params = param.split(",")
-        try:
-            params = list(map(int, params))
-        except ValueError:
-            pass
-        controller_response = mc.thread(0,
-            int(strip_id), function, params)
+        data = split_key_ids(key_ids)
+        keys.check_key(data["key"], data["strip_id"])
+        params = param.split(',')
+        params = [int(x) for x in params if x.lstrip('-').isdigit()]
+        controller_response = mc.thread(
+            data["controller_ids"], int(data["strip_id"]), function, params)
         return create_response(controller_response)
     except Exception as e:
         return exception_handler(e)
 
-@app.route('/<key>/<strip_id>/animate/<function>/<param>')
-@app.route('/<key>/<strip_id>/animate/<function>/<param>/<delay>')
-def animate(key, strip_id, function, param, delay=0):
+
+@app.route('/<key_ids>/animate/<function>/<param>')
+@app.route('/<key_ids>/animate/<function>/<param>/<delay>')
+def animate(key_ids, function, param, delay=0):
     try:
-        keys.check_key(key, strip_id)
-        params = param.split(",")
-        try:
-            params = list(map(int, params))
-        except ValueError:
-            pass
-        mc.stop(0, int(strip_id))
-        controller_response = mc.animate(0, 
-            int(strip_id), function, params, delay)
+        data = split_key_ids(key_ids)
+        keys.check_key(data["key"], data["strip_id"])
+        params = param.split(',')
+        params = [int(x) for x in params if x.lstrip('-').isdigit()]
+        mc.stop(data["controller_ids"], int(data["strip_id"]))
+        controller_response = mc.animate(data["controller_ids"],
+                                         int(data["strip_id"]), function, params, delay)
         return create_response(controller_response)
     except Exception as e:
         return exception_handler(e)
+
 
 @app.route('/json', methods=['GET', 'POST'])
 def post_json():
@@ -170,10 +185,8 @@ def post_json():
     return create_response(mc.json(data))
 
 
-# controller = Controller(0)
-
 config_name = "config.json"
-if len(sys.argv) > 1:   # argv[0] is this file name so one argument is length of 2
+if len(sys.argv) > 1:
     config_name = sys.argv[1]
 try:
     config_file = open(config_name, "r")
@@ -182,16 +195,10 @@ except FileNotFoundError:
     exit(1)
 config_data = json.load(config_file)
 print("Config data read from", config_name, ":", config_data)
-# controller.init_neopixels(config_data["controllers"][0])
 
 mc = MultiController(config_data)
 
 keys = Keys(config_data)
-
-# controller.run(0, "wipe", (255, 0, 0, 1, 1))
-# controller.run(0, "wipe", (0, 255, 0, 1, 1))
-# controller.run(0, "wipe", (0, 0, 255, 1, 1))
-# controller.run(0, "wipe", (0, 0, 0, 1, 1))
 
 port = 200
 if "port" in config_data["info"]:

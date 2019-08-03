@@ -6,6 +6,7 @@ class LightStrip {
         this.direction = -1;
         this.currentColor = 1;
         this.strip_id = 0;
+        this.controllers = [0,1]
         this.key = 0;
         this.pixels = new Array(numPixels);
         this.sendWindow = new Array(numPixels);
@@ -321,9 +322,9 @@ class LightStrip {
     send(path, send_id_key = true, in_new_window = false) {
         let strip_id_key = "";
         if (send_id_key) {
-            strip_id_key = this.key + "/" + this.strip_id + "/";
+            strip_id_key = this.key + ":" + this.controllers + ":" + this.strip_id;
         }
-        let send_url = "http://" + this.hostname + ":" + this.port + "/" + strip_id_key + path;
+        let send_url = "http://" + this.hostname + ":" + this.port + "/" + strip_id_key + "/" + path;
         if (in_new_window) {
             window.open(send_url, "_blank");
         } else {

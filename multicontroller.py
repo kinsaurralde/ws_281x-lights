@@ -40,6 +40,7 @@ class MultiController():
             self.cur_controller_id = new_ids
         else:
             self.cur_controller_id = [new_ids]
+        self.cur_controller_id = [int(i) for i in self.cur_controller_id]
         if -1 in self.cur_controller_id:
             self.cur_controller_id = self._get_all_ids()
 
@@ -106,10 +107,8 @@ class MultiController():
 
     def info(self):
         response = []
-        self.controllers[1].send()
         for i in range(len(self.controllers)):
             response.append(self.controllers[i].info())
-            break   # temporary until RemoteController is done
         return response
 
 
@@ -117,7 +116,39 @@ class RemoteController():
     def __init__(self, controller_id, data):
         self.id = controller_id
         self.is_remote = True
-        self.remote = "http://" + data["remote"] + "/json"
+        self.remote = "http://" + data["remote"]
+
+    def _create_json(self, type, strip_id, function, arguments=None):
+        return {
+           "type": type,
+            "function": function,
+            "strip_id": strip_id,
+            "controller_id": 0,
+            "arguments": arguments 
+        }
 
     def execute_json(self, data):
-        requests.post(self.remote, json=data)
+        requests.post(self.remote + "/json", json=data)
+
+    def info(self):
+        r = requests.get(self.remote + "/info/get")
+        data = r.json()
+        data["controller_id"] = self.id
+        return data
+
+    def off(self, strip_id=None):
+        self.execute_json([self._create_json("command", strip_id, "off")])
+
+    def stop(self, strip_id=None):
+        self.execute_json([self._create_json("command", strip_id, "stopanimation")])
+
+    def run(self, strip_id, function, arguments=None):
+        self.execute_json([self._create_json("run", strip_id, function, arguments)])
+
+    def thread(self, strip_id, function, arguments=None):
+        self.execute_json([self._create_json("thread", strip_id, function, arguments)])
+
+    def animate(self, strip_id, function, arguments=None, delay_between=0):
+        data = self._create_json("animate", strip_id, function, arguments)
+        data["delay_between"] = delay_between
+        self.execute_json([data])

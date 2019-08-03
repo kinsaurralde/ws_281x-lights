@@ -1,8 +1,10 @@
+import json
+import sys
+
 from flask import Flask, json, request
 from key import Keys
 from controller import Controller
-import json
-import sys
+
 
 app = Flask(__name__)
 debug_exceptions = False  # if true, exception will be sent to web
@@ -26,6 +28,11 @@ def error_response(message):
 @app.errorhandler(404)
 def page_not_found(e):
     return error_response(str(e)), 404
+
+@app.route('/info/get')
+def info():
+    data = controller.info()
+    return create_response(data)
 
 
 @app.route('/json', methods=['GET', 'POST'])

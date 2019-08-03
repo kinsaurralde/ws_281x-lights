@@ -201,7 +201,7 @@ class Controller:
                 elif action["function"] == "off":
                     self.off(action.get("strip_id"))
             elif action["type"] == "animate":
-                self.animate(action["strip_id"], action["function"], action["arguments"])
+                self.animate(action["strip_id"], action["function"], action["arguments"], action.get("delay_between", 0))
             elif action["type"] == "run":
                 self.run(action["strip_id"], action["function"], action["arguments"], True)
             elif action["type"] == "thread":
