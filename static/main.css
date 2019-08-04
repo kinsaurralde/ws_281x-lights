@@ -175,6 +175,11 @@ select {
     flex-wrap: wrap;
 }
 
+.section-flex-no-border {
+    display: flex;
+    flex-wrap: wrap;
+}
+
 .section-hidden {
     display: flex;
 }

@@ -19,11 +19,6 @@
 </head>
 
 <body onload="pageLoad()">
-    <iframe id="send-data-0" class="send-data" src=""></iframe>
-    <iframe id="send-data-1" class="send-data" src=""></iframe>
-    <iframe id="send-data-2" class="send-data" src=""></iframe>
-    <iframe id="send-data-3" class="send-data" src=""></iframe>
-
     <div id="page-title">Lights</div>
 
 
@@ -33,9 +28,9 @@
 
     <div class="section" id="settings">
         <div class="section-title">Settings<input type="button" class="expand-button" value="^" style="width: 2vw;"
-                onclick="expand('settings','flex')"></div>
+                onclick="expand('settings','block')"></div>
         <div class="space-1"></div>
-        <div class="section-hidden" id="settings-expanded">
+        <div class="section-flex-no-border">
             <div class="divider"></div>
             <div class="section-setting">
                 <div class="section-title-secondary">Brightness</div>
@@ -48,6 +43,13 @@
                 <div class="section-title-secondary">Reverse</div>
                 <div class="space-1"></div>
                 <input type="checkbox" checked id="settings-reversed" onclick="lights.settingReversed()">
+            </div>
+            <div class="space-s-1"></div>
+            <div class="section-setting">
+                <div class="section-title-secondary">Controller ids</div>
+                <div class="space-1"></div>
+                <input type="text" value="0" oninput="lights.updateControllers()" class="width-5"
+                    id="settings-controllers">
             </div>
             <div class="space-s-1"></div>
             <div class="section-setting">
@@ -94,10 +96,15 @@
                 <div class="space-1"></div>
                 <input type="button" value="OK" onclick="viewMessages()" id="settings-status">
             </div>
-        </div>
-        <div class="section" id="settings-web-theme-expanded" style="display: none;">
-            <div class="section-title-secondary">Custom Web Theme</div>
-            <div style="display: flex;" id="settings-web-custom-container">
+            <div class="section" id="settings-web-theme-expanded" style="display: none;">
+                <div class="section-title-secondary">Custom Web Theme</div>
+                <div style="display: flex;" id="settings-web-custom-container">
+                </div>
+            </div>
+            <div class="section-hidden" id="settings-expanded" style="width: 100%; display: none">
+                <div id="settings-controllers-container" style="width: 100%;">
+
+                </div>
             </div>
         </div>
     </div>
@@ -116,9 +123,9 @@
             <input type="button" value="Blue" onclick="lights.colorAll(0,0,255)">
             <input type="button" value="White" onclick="lights.colorAll(255,255,255)">
             <input type="button" value="Black" onclick="lights.colorAll(0,0,0)">
-            <input type="button" value="#Red Wipe#" onclick="lights.wipe(255,0,0,-1,40)">
-            <input type="button" value="#Green Wipe#" onclick="lights.wipe(0,255,0,1,20)">
-            <input type="button" value="#Blue Wipe#" onclick="lights.wipe(0,0,255,-1,10)">
+            <input type="button" value="Red Wipe" onclick="lights.wipe(255,0,0,-1,40)">
+            <input type="button" value="Green Wipe" onclick="lights.wipe(0,255,0,1,20)">
+            <input type="button" value="Blue Wipe" onclick="lights.wipe(0,0,255,-1,10)">
             <div class="space-1"></div>
             <input type="button" value="Stop Animation" onclick="lights.stopAnimation()">
             <input type="button" value="*Red Chase*" onclick="lights.chase(255,0,0,50,3,1)">
@@ -132,11 +139,14 @@
             <input type="button" value="*Green Pulse*" onclick="lights.pulse('animate',0,255,0,0,10,4,250)">
             <input type="button" value="*Blue Pulse*" onclick="lights.pulse('animate',0,0,255,1,25,6,500)">
             <div class="space-1"></div>
-            <input type="button" value="Red Pulse" onclick="lights.pulse('thread',255,0,0,0,20,10)">
-            <input type="button" value="Green Pulse" onclick="lights.pulse('thread',0,255,0,0,10,4)">
-            <input type="button" value="Blue Pulse" onclick="lights.pulse('thread',0,0,255,1,25,6)">
+            <input type="button" value="#Red Pulse#" onclick="lights.pulse('thread',255,0,0,0,20,10)">
+            <input type="button" value="#Green Pulse#" onclick="lights.pulse('thread',0,255,0,0,10,4)">
+            <input type="button" value="#Blue Pulse#" onclick="lights.pulse('thread',0,0,255,1,25,6)">
             <input type="button" value="RCGMBY" onclick="preset.run(0)">
             <input type="button" value="RGB" onclick="preset.run(1)">
+            <input type="button" value="#Red Wipe#" onclick="lights.wipe(255,0,0,-1,40,'thread')">
+            <input type="button" value="#Green Wipe#" onclick="lights.wipe(0,255,0,1,20,'thread')">
+            <input type="button" value="#Blue Wipe#" onclick="lights.wipe(0,0,255,-1,10,'thread')">
         </div>
     </div>
 

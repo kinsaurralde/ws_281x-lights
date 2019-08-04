@@ -134,46 +134,45 @@ def change_settings(param):
     return create_response({})
 
 
-@app.route('/<key_ids>/run/<function>/<param>')
-def run(key_ids, function, param=None):
+@app.route('/<key_ids>/run/<function>')
+@app.route('/<key_ids>/run/<function>/<args>')
+def run(key_ids, function, args=None):
     try:
         data = split_key_ids(key_ids)
         keys.check_key(data["key"], data["strip_id"])
-        params = param.split(',')
-        params = [int(x) for x in params if x.lstrip('-').isdigit()]
+        if args is not None:
+            args = [int(x) if x.lstrip('-').isdigit() else str(x) for x in args.split(',')]
         mc.stop(data["controller_ids"], int(data["strip_id"]))
         controller_response = mc.run(data["controller_ids"], int(
-            data["strip_id"]), function, params)
+            data["strip_id"]), function, args)
         return create_response(controller_response)
     except Exception as e:
         return exception_handler(e)
 
 
-@app.route('/<key_ids>/thread/<function>/<param>')
-def thread(key_ids, function, param):
+@app.route('/<key_ids>/thread/<function>/<args>')
+def thread(key_ids, function, args):
     try:
         data = split_key_ids(key_ids)
         keys.check_key(data["key"], data["strip_id"])
-        params = param.split(',')
-        params = [int(x) for x in params if x.lstrip('-').isdigit()]
+        args = [int(x) if x.lstrip('-').isdigit() else str(x) for x in args.split(',')]
         controller_response = mc.thread(
-            data["controller_ids"], int(data["strip_id"]), function, params)
+            data["controller_ids"], int(data["strip_id"]), function, args)
         return create_response(controller_response)
     except Exception as e:
         return exception_handler(e)
 
 
-@app.route('/<key_ids>/animate/<function>/<param>')
-@app.route('/<key_ids>/animate/<function>/<param>/<delay>')
-def animate(key_ids, function, param, delay=0):
+@app.route('/<key_ids>/animate/<function>/<args>')
+@app.route('/<key_ids>/animate/<function>/<args>/<delay>')
+def animate(key_ids, function, args, delay=0):
     try:
         data = split_key_ids(key_ids)
         keys.check_key(data["key"], data["strip_id"])
-        params = param.split(',')
-        params = [int(x) for x in params if x.lstrip('-').isdigit()]
+        args = [int(x) if x.lstrip('-').isdigit() else str(x) for x in args.split(',')]
         mc.stop(data["controller_ids"], int(data["strip_id"]))
         controller_response = mc.animate(data["controller_ids"],
-                                         int(data["strip_id"]), function, params, delay)
+                                         int(data["strip_id"]), function, args, delay)
         return create_response(controller_response)
     except Exception as e:
         return exception_handler(e)

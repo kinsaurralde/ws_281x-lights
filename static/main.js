@@ -18,6 +18,7 @@ class LightStrip {
         this.sender = new Sender();
 
         this.createPixels();
+        this.getInfo();
     }
 
     // Setups
@@ -34,6 +35,24 @@ class LightStrip {
         html.appendSetting(section_flex, "Resend", html.createButton("Send", "individual-pixels-resend", "lights.resendIndividual()"));
         html.appendSetting(section_flex, "Multiple", [html.createInputNumber(0, 60, 0, null, "individual-pixels-multi-start"), html.createInputNumber(0, 60, 29, null, "individual-pixels-multi-end"), html.createButton("Send", "individual-pixels-multi-send", "lights.setMultiple()")], true);
         document.getElementById("individual-pixels-settings").appendChild(section_flex);
+    }
+
+    createControllerSettings(data) {    // for future use
+        // let div  = document.getElementById("settings-controllers-container");
+        // div.innerHTML = "";
+        // for(let i = 0; i < data.length; i++) {
+        //     let title_div = document.createElement("div");
+        //     title_div.innerText = "Controller " + data[i].controller_id;
+        //     let controller_div = document.createElement("div");
+        //     controller_div.className = "section-flex-no-border";
+        //     html.appendSetting(controller_div, "Active", html.createInputCheckBox("Live", "settings-controller-"+i+"active"))
+            
+        //     let divider = document.createElement("div");
+        //     divider.className = "divider";
+        //     div.appendChild(divider);
+        //     div.appendChild(title_div);
+        //     div.appendChild(controller_div);
+        // }
     }
 
     // Settings
@@ -75,6 +94,10 @@ class LightStrip {
     updateKey() {
         this.key = document.getElementById("settings-key").value;
         this.updateHost();
+    }
+
+    updateControllers() {
+        this.controllers = document.getElementById("settings-controllers").value;
     }
 
     // Other
@@ -198,9 +221,9 @@ class LightStrip {
         this.send(path, true);
     }
 
-    wipe(r, g, b, dir, wait_ms) {
+    wipe(r, g, b, dir, wait_ms, mode="run") {
         dir *= this.direction;
-        let path = "run/wipe/" + r + "," + g + "," + b + "," + dir + "," + wait_ms;
+        let path = mode + "/wipe/" + r + "," + g + "," + b + "," + dir + "," + wait_ms;
         this.send(path, true);
     }
 
@@ -322,14 +345,34 @@ class LightStrip {
     send(path, send_id_key = true, in_new_window = false) {
         let strip_id_key = "";
         if (send_id_key) {
-            strip_id_key = this.key + ":" + this.controllers + ":" + this.strip_id;
+            strip_id_key = this.key + ":" + this.controllers + ":" + this.strip_id + "/";
         }
-        let send_url = "http://" + this.hostname + ":" + this.port + "/" + strip_id_key + "/" + path;
+        let send_url = "http://" + this.hostname + ":" + this.port + "/" + strip_id_key + path;
         if (in_new_window) {
             window.open(send_url, "_blank");
         } else {
             this.sender.send(send_url);
         }
         this.updateLog(path);
+    }
+
+    getInfo() { // For future use
+        // let url = "http://" + this.hostname + ":" + this.port + "/info/get";
+        // let request = new XMLHttpRequest();
+        // request.open('GET', url, true);
+        // request.onload = function () {
+        //     console.log("Status code: ", this.status);
+        //     if (this.status >= 200 && this.status < 400) {
+        //         let data = JSON.parse(this.response);
+        //         console.log("Recieved Data:", data);
+        //         lights.createControllerSettings(data);
+        //     } else {
+        //         console.log("There was an error");
+        //     }
+        // };
+        // request.onerror = function () {
+        //     console.log("Connection Error: ", this.status, request);
+        // };
+        // request.send();
     }
 }
