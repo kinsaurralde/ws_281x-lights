@@ -1,0 +1,8 @@
+# Sample usage:
+# <path_ssh_key>,<username@hostname>,<remote_destination_path>,<local_source_path>
+# OR (to pull from full repository)
+# <path_ssh_key>,<username@hostname>,<remote_destination_path>,git
+
+~/.ssh/rpi0,pi@192.168.29.21,Files/ws_281x-lights,git
+~/.ssh/rpi0,pi@192.168.29.21,Files/rgb_secondary,secondary/test/secondary_config_1
+~/.ssh/rpi0,pi@192.168.29.21,Files/rgb_secondary_2,secondary/test/secondary_config_2
