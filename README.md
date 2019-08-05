@@ -22,8 +22,10 @@ Run
 
 ## Flask Server (app.py)
 
-* Receives requests to web routes, checks keys, and passes information to controllers (controllers.py)
+* Receives requests to web routes, checks keys, and passes information to controllers (controllers.py)]
 * Returns JSON message with strip and error status
+* multicontroller.py
+    * Forward requests to local or remote controller
 * controller.py
     * Calls given function with their arguments
     * Creates virtual strips and passes their information to neopixel class (lights.py)
@@ -52,6 +54,8 @@ Run
 
 * Config file generator
 * Send json to url
+* Update secondary controller files
+* Upload secondary controller files to another raspberry pi
 
 [More Information](tools/README.md)
 
