@@ -6,7 +6,7 @@ class LightStrip {
         this.direction = -1;
         this.currentColor = 1;
         this.strip_id = 0;
-        this.controllers = [0,1]
+        this.controllers = [0];
         this.key = 0;
         this.pixels = new Array(numPixels);
         this.sendWindow = new Array(numPixels);
@@ -68,7 +68,7 @@ class LightStrip {
 
     setBrightness() {
         let brightness = document.getElementById("settings-brightness").value;
-        let path = "settings/brightness=" + brightness;
+        let path = "settings/" + this.controllers + "/brightness=" + brightness;
         this.send(path, false);
     }
 

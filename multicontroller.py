@@ -136,6 +136,9 @@ class RemoteController():
         data["controller_id"] = self.id
         return data
 
+    def set_brightness(self, value):
+        self.execute_json([self._create_json("setting", None, "brightness", value)])
+
     def off(self, strip_id=None):
         self.execute_json([self._create_json("command", strip_id, "off")])
 

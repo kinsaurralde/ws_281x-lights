@@ -200,6 +200,9 @@ class Controller:
                     self.stop(action.get("strip_id"))
                 elif action["function"] == "off":
                     self.off(action.get("strip_id"))
+            elif action["type"] == "setting":
+                if action["function"] == "brightness":
+                    self.set_brightness(action.get("arguments"))
             elif action["type"] == "animate":
                 self.animate(action["strip_id"], action["function"], action["arguments"], action.get("delay_between", 0))
             elif action["type"] == "run":

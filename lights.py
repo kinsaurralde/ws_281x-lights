@@ -269,7 +269,7 @@ class Lights:
         neopixels.show()
         time.sleep(int(post_delay)/1000.0)
 
-    def wipe(self, r, g, b, direction, wait_ms):
+    def wipe(self, r, g, b, direction, wait_ms, wait_is_total=False):
         """New color wipes across strip
             
             Parameters:
@@ -286,11 +286,15 @@ class Lights:
         iter_range = range(neopixels.numPixels(self.id))
         if direction == -1:
             iter_range = reversed(iter_range)
+        if wait_is_total:
+            each_wait = wait_ms / neopixels.numPixels(self.id)
+        else:
+            each_wait = wait_ms
         for i in iter_range:
             neopixels.update_pixel_owner(self.id, i)
             neopixels.setPixelColor(self.id, i, neopixels.get_color(r, g, b))
             neopixels.show()
-            if self.sleepListenForBreak(self.id, wait_ms, this_id):
+            if self.sleepListenForBreak(self.id, each_wait, this_id):
                 return
 
     def chase(self, r, g, b, wait_ms, interval, direction, iterations=1):
@@ -371,6 +375,8 @@ class Lights:
             if no_own_count == neopixels.numPixels(self.id):    # stop animation if all pixels belong to others
                 self.animation_id.increment()
                 return
+
+
     def random_cycle(self, each, wait_ms, iterations=1):
         """Flashes random lights
             

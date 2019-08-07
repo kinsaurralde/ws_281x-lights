@@ -3,6 +3,7 @@
 import sys
 import os
 import shutil
+import subprocess
 
 
 def update(folder_name):
@@ -32,7 +33,7 @@ def create_new(folder_name):
 
 
 if len(sys.argv) < 3:
-    print("Usage: ./secondary.py <mode> <path>")
+    print("Usage: ./secondary.py <mode> <path> [sftp_path]")
     exit(1)
 
 folder_name = sys.argv[2]
@@ -47,6 +48,9 @@ elif sys.argv[1] == "update":
     for folder in folders:
         if os.path.isdir(folder_name + folder):
             update(folder_name + folder + "/")
+    if len(sys.argv) > 3:
+        subprocess.run(["./put_files.py", sys.argv[3]])
+
 else:
     print("Mode options are: new or update")
     exit(1)

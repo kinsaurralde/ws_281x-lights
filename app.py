@@ -119,9 +119,9 @@ def stopanimation(key_ids):
     return create_response(controller_response)
 
 
-@app.route('/settings/<param>')
-def change_settings(param):
-    settings = param.split(",")
+@app.route('/settings/<controller_ids>/<args>')
+def change_settings(controller_ids, args):
+    settings = args.split(",")
     new_settings = {}
     for setting in settings:
         current = setting.split("=")
@@ -132,7 +132,7 @@ def change_settings(param):
                 new_settings["break_animation"] = False
         if current[0] == "brightness":
             new_settings["brightness"] = int(current[1])
-    mc.change_settings(0, new_settings)
+    mc.change_settings(controller_ids.split(','), new_settings)
     return create_response({})
 
 
