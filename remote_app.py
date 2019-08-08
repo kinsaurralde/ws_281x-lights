@@ -59,14 +59,14 @@ controller.init_neopixels(config_data["controllers"][0])
 
 keys = Keys(config_data)
 
-controller.run(0, "wipe", (255, 0, 0, 1, 1, True))
-controller.run(0, "wipe", (0, 255, 0, 1, 1, True))
-controller.run(0, "wipe", (0, 0, 255, 1, 1, True))
-controller.run(0, "wipe", (0, 0, 0, 1, 1, True))
+# controller.run(0, "wipe", (255, 0, 0, 1, 1, True))
+# controller.run(0, "wipe", (0, 255, 0, 1, 1, True))
+# controller.run(0, "wipe", (0, 0, 255, 1, 1, True))
+# controller.run(0, "wipe", (0, 0, 0, 1, 1, True))
 # controller.run(0, "color", (255, 0, 0))
 # controller.run(0, "color", (0, 255, 0))
 # controller.run(0, "color", (0, 0, 255))
-# controller.run(0, "color", (0, 0, 0))
+controller.run(0, "color", (0, 0, 0))
 
 port = 200
 if "port" in config_data["info"]:

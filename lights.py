@@ -209,6 +209,7 @@ class Lights:
         for i in range(0, neopixels.numPixels(self.id)):
             neopixels.setPixelColor(self.id, i, r, g, b)
         neopixels.show()
+        print("Actual off:", time.time())
 
     def set_pixel(self, pixel_id, r, g, b):
         """Set specific pixel to color
@@ -282,6 +283,7 @@ class Lights:
 
                 wait_ms: how long before moving to next pixel (in ms)
         """
+        start_time = time.time()
         this_id = self.animation_id.get()
         iter_range = range(neopixels.numPixels(self.id))
         if direction == -1:
@@ -294,8 +296,15 @@ class Lights:
             neopixels.update_pixel_owner(self.id, i)
             neopixels.setPixelColor(self.id, i, neopixels.get_color(r, g, b))
             neopixels.show()
-            if self.sleepListenForBreak(self.id, each_wait, this_id):
-                return
+            #if self.sleepListenForBreak(self.id, each_wait, this_id):
+            #    return
+        expected_time = each_wait / 1000 * neopixels.numPixels(self.id)
+        actual_time = time.time() - start_time
+        # print("Start time:", start_time)
+        print("Actual time:", actual_time)
+        print("Expected time:", expected_time)
+        print("Difference:", actual_time - expected_time)
+
 
     def chase(self, r, g, b, wait_ms, interval, direction, iterations=1):
         """Movie theater light style chaser animation

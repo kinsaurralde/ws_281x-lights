@@ -1,5 +1,6 @@
 import threading
 import requests
+import time
 
 from controller import Controller
 
@@ -9,6 +10,8 @@ class MultiController():
         self.controllers = []
         self.queues = []
         self.cur_controller_id = [0]
+        self.start_time = 0
+        self.start_delay = .1
         if "controllers" not in config_data:
             raise KeyError
         for controller in config_data["controllers"]:
@@ -43,6 +46,26 @@ class MultiController():
         self.cur_controller_id = [int(i) for i in self.cur_controller_id]
         if -1 in self.cur_controller_id:
             self.cur_controller_id = self._get_all_ids()
+        self.start_time = time.time()
+        if len(self.cur_controller_id) > 1:
+            self.start_time += self.start_delay
+
+    def _create(self, type, strip_id, function, arguments=None):
+        data = [
+            {
+                "type": "command",
+                "function": "starttime",
+                "arguments":  {
+                    "amount": self.start_time
+                }
+            }, {
+                "type": type,
+                "function": function,
+                "strip_id": strip_id,
+                "arguments": arguments
+            }
+        ]
+        return data
 
     def json(self, data):
         for line in data:
@@ -58,41 +81,45 @@ class MultiController():
         return True
 
     def off(self, controller_id=None, strip_id=None):
-        response = []
         self._set_cur_ids(controller_id)
+        json = self._create("command", strip_id, "off")
         for i in self.cur_controller_id:
-            response.append(self.controllers[i].off(strip_id))
-        return response
+            execute = self.controllers[i].execute_json
+            thread = threading.Thread(target=execute, args=[json])
+            thread.start()
 
     def stop(self, controller_id=None, strip_id=None):
-        response = []
         self._set_cur_ids(controller_id)
+        json = self._create("command", strip_id, "stopanimation")
         for i in self.cur_controller_id:
-            response.append(self.controllers[i].stop(strip_id))
-        return response
+            execute = self.controllers[i].execute_json
+            thread = threading.Thread(target=execute, args=[json])
+            thread.start()
 
     def run(self, controller_id, strip_id, function, args):
-        response = []
         self._set_cur_ids(controller_id)
+        json = self._create("run", strip_id, function, args)
         for i in self.cur_controller_id:
-            response.append(self.controllers[i].run(strip_id, function, args))
-        return response
+            execute = self.controllers[i].execute_json
+            thread = threading.Thread(target=execute, args=[json])
+            thread.start()
 
     def thread(self, controller_id, strip_id, function, args):
-        response = []
         self._set_cur_ids(controller_id)
+        json = self._create("thread", strip_id, function, args)
         for i in self.cur_controller_id:
-            response.append(self.controllers[i].thread(
-                strip_id, function, args))
-        return response
+            execute = self.controllers[i].execute_json
+            thread = threading.Thread(target=execute, args=[json])
+            thread.start()
 
-    def animate(self, controller_id, strip_id, function, args, delay_between=0):
-        response = []
+    def animate(self, controller_id, strip_id, function, args, delay=0):
         self._set_cur_ids(controller_id)
+        json = self._create("animate", strip_id, function, args)
+        json[1]["delay_between"] = delay
         for i in self.cur_controller_id:
-            response.append(self.controllers[i].animate(
-                strip_id, function, args, delay_between))
-        return response
+            execute = self.controllers[i].execute_json
+            thread = threading.Thread(target=execute, args=[json])
+            thread.start()
 
     def change_settings(self, controller_id, new_settings):
         response = []
@@ -115,17 +142,18 @@ class MultiController():
 class RemoteController():
     def __init__(self, controller_id, data):
         self.id = controller_id
+        self.start_time = 0
         self.is_remote = True
         self.remote = "http://" + data["remote"]
 
     def _create_json(self, type, strip_id, function, arguments=None):
-        return {
-           "type": type,
+        return [{
+            "type": type,
             "function": function,
             "strip_id": strip_id,
             "controller_id": 0,
-            "arguments": arguments 
-        }
+            "arguments": arguments
+        }]
 
     def execute_json(self, data):
         requests.post(self.remote + "/json", json=data)
@@ -136,22 +164,9 @@ class RemoteController():
         data["controller_id"] = self.id
         return data
 
+    def delay_start_time(self, value):
+        self.start_time = value
+
     def set_brightness(self, value):
-        self.execute_json([self._create_json("setting", None, "brightness", value)])
-
-    def off(self, strip_id=None):
-        self.execute_json([self._create_json("command", strip_id, "off")])
-
-    def stop(self, strip_id=None):
-        self.execute_json([self._create_json("command", strip_id, "stopanimation")])
-
-    def run(self, strip_id, function, arguments=None):
-        self.execute_json([self._create_json("run", strip_id, function, arguments)])
-
-    def thread(self, strip_id, function, arguments=None):
-        self.execute_json([self._create_json("thread", strip_id, function, arguments)])
-
-    def animate(self, strip_id, function, arguments=None, delay_between=0):
-        data = self._create_json("animate", strip_id, function, arguments)
-        data["delay_between"] = delay_between
-        self.execute_json([data])
+        self.execute_json(self._create_json(
+            "setting", None, "brightness", value))

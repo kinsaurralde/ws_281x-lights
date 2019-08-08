@@ -192,10 +192,13 @@ class Controller:
                 time.sleep(int(delay_between)/1000)
 
     def execute_json(self, data):
+        t = Timer(self.num_pixels)
         for action in data:
             if action["type"] == "command":
                 if action["function"] == "wait":
                     time.sleep(int(action["arguments"]["amount"]) / 1000)
+                if action["function"] == "starttime":
+                    t.set_start(action["arguments"]["amount"])
                 elif action["function"] == "stopanimation":
                     self.stop(action.get("strip_id"))
                 elif action["function"] == "off":
@@ -209,6 +212,25 @@ class Controller:
                 self.run(action["strip_id"], action["function"], action["arguments"], True)
             elif action["type"] == "thread":
                 self.thread(action["strip_id"], action["function"], action["arguments"], True)
-        self.queue = []
+
+
+class Timer:
+    def __init__(self, num_pixels):
+        self.start_time = time.time()
+        self.sleep_count = 0
+        self.early = num_pixels * .00004
+
+    def set_start(self, value):
+        self.start_time = value
+        print("New start time:",self.start_time, time.time())
+        while time.time() < (self.start_time - self.early):
+            pass
+        self.sleep_count = 0
+        print("Actual start time:", time.time())
+
+    def sleep(self, value):
+        self.sleep_count += value
+        while time.time() < self.start_time + self.sleep_count:
+            time.sleep(.001)
 
 print("controller.py loaded")
