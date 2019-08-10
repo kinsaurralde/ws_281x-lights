@@ -4,3 +4,4 @@ __pycache__/
 !/config.json
 !sample_*.json
 tools/secondary/*
+tools/data/
