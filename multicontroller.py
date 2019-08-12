@@ -22,10 +22,10 @@ class MultiController():
         if data["primary"] == True:
             self.controllers.append(Controller(cur_id))
             self.controllers[cur_id].init_neopixels(data)
-            self.controllers[cur_id].run(0, "wipe", (255, 0, 0, 1, 1))
-            self.controllers[cur_id].run(0, "wipe", (0, 255, 0, 1, 1))
-            self.controllers[cur_id].run(0, "wipe", (0, 0, 255, 1, 1))
-            self.controllers[cur_id].run(0, "wipe", (0, 0, 0, 1, 1))
+            self.controllers[cur_id].run(0, "wipe", (255, 0, 0, 1, 250, True))
+            self.controllers[cur_id].run(0, "wipe", (0, 255, 0, 1, 250, True))
+            self.controllers[cur_id].run(0, "wipe", (0, 0, 255, 1, 250, True))
+            self.controllers[cur_id].run(0, "wipe", (0, 0, 0, 1, 250, True))
         else:
             self.controllers.append(RemoteController(cur_id, data))
         self.queues.append([])
@@ -50,7 +50,7 @@ class MultiController():
         if len(self.cur_controller_id) > 1:
             self.start_time += self.start_delay
 
-    def _create(self, type, strip_id, function, arguments=None):
+    def _create(self, type, strip_id, function, arguments=None, stop=False):
         data = [
             {
                 "type": "command",
@@ -65,6 +65,12 @@ class MultiController():
                 "arguments": arguments
             }
         ]
+        if stop:
+            data.insert(1, {
+                "type": "command",
+                "function": "stopanimation",
+                "strip_id": strip_id
+            })
         return data
 
     def json(self, data):
@@ -98,7 +104,7 @@ class MultiController():
 
     def run(self, controller_id, strip_id, function, args):
         self._set_cur_ids(controller_id)
-        json = self._create("run", strip_id, function, args)
+        json = self._create("run", strip_id, function, args, True)
         for i in self.cur_controller_id:
             execute = self.controllers[i].execute_json
             thread = threading.Thread(target=execute, args=[json])
@@ -114,8 +120,8 @@ class MultiController():
 
     def animate(self, controller_id, strip_id, function, args, delay=0):
         self._set_cur_ids(controller_id)
-        json = self._create("animate", strip_id, function, args)
-        json[1]["delay_between"] = delay
+        json = self._create("animate", strip_id, function, args, True)
+        json[2]["delay_between"] = delay
         for i in self.cur_controller_id:
             execute = self.controllers[i].execute_json
             thread = threading.Thread(target=execute, args=[json])

@@ -61,6 +61,13 @@ def split_key_ids(items):
     return data
 
 
+def make_list(arg):
+    arg = str(arg)
+    if ';' in arg:
+        arg = [x.split('.') for x in arg.split(';')]
+    return arg
+
+
 @app.errorhandler(404)
 def page_not_found(e):
     return error_response(str(e)), 404
@@ -143,8 +150,7 @@ def run(key_ids, function, args=None):
         data = split_key_ids(key_ids)
         keys.check_key(data["key"], data["strip_id"])
         if args is not None:
-            args = [int(x) if x.lstrip('-').isdigit() else str(x) for x in args.split(',')]
-        mc.stop(data["controller_ids"], int(data["strip_id"]))
+            args = [int(x) if x.lstrip('-').isdigit() else make_list(x) for x in args.split(',')]
         controller_response = mc.run(data["controller_ids"], int(
             data["strip_id"]), function, args)
         return create_response(controller_response)
@@ -157,7 +163,7 @@ def thread(key_ids, function, args):
     try:
         data = split_key_ids(key_ids)
         keys.check_key(data["key"], data["strip_id"])
-        args = [int(x) if x.lstrip('-').isdigit() else str(x) for x in args.split(',')]
+        args = [int(x) if x.lstrip('-').isdigit() else make_list(x) for x in args.split(',')]
         controller_response = mc.thread(
             data["controller_ids"], int(data["strip_id"]), function, args)
         return create_response(controller_response)
@@ -171,8 +177,7 @@ def animate(key_ids, function, args, delay=0):
     try:
         data = split_key_ids(key_ids)
         keys.check_key(data["key"], data["strip_id"])
-        args = [int(x) if x.lstrip('-').isdigit() else str(x) for x in args.split(',')]
-        mc.stop(data["controller_ids"], int(data["strip_id"]))
+        args = [int(x) if x.lstrip('-').isdigit() else make_list(x) for x in args.split(',')]
         controller_response = mc.animate(data["controller_ids"],
                                          int(data["strip_id"]), function, args, delay)
         return create_response(controller_response)

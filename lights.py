@@ -29,6 +29,7 @@ class NeoPixels:
         self.pixel_owner = [0] * self.num_pixels
         self.max_milliamps = MAX_MILLIAMPS
         self.max_brightness = LED_BRIGHTNESS
+        self.last_show = 0
 
     def init_neopixels(self, data):
         if "led_count" in data:
@@ -135,9 +136,11 @@ class NeoPixels:
             "now_milliamps": self.check_power_usage()
         }
 
-    def show(self):
-        self.check_power_usage()
-        self.strip.show()
+    def show(self, limit=0):
+        if time.time() >= self.last_show + (limit / 1000) or limit == 0:
+            self.check_power_usage()
+            self.strip.show()
+            self.last_show = time.time()
 
 
 neopixels = NeoPixels()
@@ -295,15 +298,13 @@ class Lights:
         for i in iter_range:
             neopixels.update_pixel_owner(self.id, i)
             neopixels.setPixelColor(self.id, i, neopixels.get_color(r, g, b))
-            neopixels.show()
-            #if self.sleepListenForBreak(self.id, each_wait, this_id):
-            #    return
+            neopixels.show(15)
+            if self.sleepListenForBreak(self.id, each_wait, this_id):
+                print("Break")
+                return
         expected_time = each_wait / 1000 * neopixels.numPixels(self.id)
         actual_time = time.time() - start_time
-        # print("Start time:", start_time)
-        print("Actual time:", actual_time)
-        print("Expected time:", expected_time)
-        print("Difference:", actual_time - expected_time)
+        neopixels.show()
 
 
     def chase(self, r, g, b, wait_ms, interval, direction, iterations=1):
@@ -378,12 +379,13 @@ class Lights:
                     neopixels.setPixelColor(self.id, j, previous.pop(0))
                 else:
                     neopixels.setPixelColor(self.id, j, 0)
-            neopixels.show()
+            neopixels.show(15)
             if self.sleepListenForBreak(self.id, wait_ms, this_id):
                 return
             if no_own_count == neopixels.numPixels(self.id):    # stop animation if all pixels belong to others
                 self.animation_id.increment()
                 return
+        neopixels.show()
 
 
     def random_cycle(self, each, wait_ms, iterations=1):
@@ -524,7 +526,10 @@ class Lights:
         """
         this_id = self.animation_id.get()
         for color in colors:
-            self.pulse(color["r"],color["g"],color["b"],direction, wait_ms, length, self.layer)
+            if "r" in color and "g" in color and "b" in color:
+                self.pulse(color["r"],color["g"],color["b"],direction, wait_ms, length, self.layer)
+            else:
+                self.pulse(color[0],color[1],color[2],direction, wait_ms, length, self.layer)
             direction *= -1
             if this_id != self.animation_id.get():
                 break

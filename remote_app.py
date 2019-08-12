@@ -40,6 +40,7 @@ def info():
 @app.route('/json', methods=['GET', 'POST'])
 def post_json():
     data = request.get_json()
+    print("Data:", data)
     return create_response(controller.execute_json(data))
 
 
@@ -59,14 +60,10 @@ controller.init_neopixels(config_data["controllers"][0])
 
 keys = Keys(config_data)
 
-# controller.run(0, "wipe", (255, 0, 0, 1, 1, True))
-# controller.run(0, "wipe", (0, 255, 0, 1, 1, True))
-# controller.run(0, "wipe", (0, 0, 255, 1, 1, True))
-# controller.run(0, "wipe", (0, 0, 0, 1, 1, True))
-# controller.run(0, "color", (255, 0, 0))
-# controller.run(0, "color", (0, 255, 0))
-# controller.run(0, "color", (0, 0, 255))
-controller.run(0, "color", (0, 0, 0))
+controller.run(0, "wipe", (255, 0, 0, 1, 250, True))
+controller.run(0, "wipe", (0, 255, 0, 1, 250, True))
+controller.run(0, "wipe", (0, 0, 255, 1, 250, True))
+controller.run(0, "wipe", (0, 0, 0, 1, 250, True))
 
 port = 200
 if "port" in config_data["info"]:
