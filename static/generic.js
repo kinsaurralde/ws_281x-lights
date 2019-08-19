@@ -246,7 +246,7 @@ class GenericRow {
                 lights.rainbowChase(data["wait_ms"], data["key_ids"]);
                 break;
             case "mix":
-                lights._switch(data["type"], data["colors"], data["wait_ms"], data["wait_mode"], data["option"], data["key_ids"]);
+                lights.switch(data["type"], data["colors"], data["wait_ms"], data["wait_mode"], data["option"], data["key_ids"]);
                 break;
             case "reverse":
                 lights.reverseStrip(data["key_ids"]);

@@ -122,11 +122,11 @@ class Preset {
 
     web_create_custom() {
         let target = document.getElementById("settings-web-custom-container");
-        html.appendSetting(target, "Background Color", html.createInputNumber(0, 6, 3, "checkSaveNumber('settings-web-custom-color-background')", "settings-web-custom-color-background"));
-        html.appendSetting(target, "Text Color", html.createInputNumber(0, 6, 5, "checkSaveNumber('settings-web-custom-color-text')", "settings-web-custom-color-text"));
-        html.appendSetting(target, "Input Borders", html.createInputNumber(0, 6, 1, "checkSaveNumber('settings-web-custom-color-input-border')", "settings-web-custom-color-input-border"));
-        html.appendSetting(target, "Input Backgrounds", html.createInputNumber(0, 6, 4, "checkSaveNumber('settings-web-custom-color-input-background')", "settings-web-custom-color-input-background"));
-        html.appendSetting(target, "Section Border Colors", html.createInputNumber(0, 6, 6, "checkSaveNumber('settings-web-custom-color-border')", "settings-web-custom-color-border"));
+        html.appendSetting(target, "Background Color", html.createNumber(3, "settings-web-custom-color-background", "checkSaveNumber('settings-web-custom-color-background')"));
+        html.appendSetting(target, "Text Color", html.createNumber(5, "settings-web-custom-color-text", "checkSaveNumber('settings-web-custom-color-text')"));
+        html.appendSetting(target, "Input Borders", html.createNumber(1, "settings-web-custom-color-input-border", "checkSaveNumber('settings-web-custom-color-input-border')"));
+        html.appendSetting(target, "Input Backgrounds", html.createNumber(4, "settings-web-custom-color-input-background", "checkSaveNumber('settings-web-custom-color-input-background')"));
+        html.appendSetting(target, "Section Border Colors", html.createNumber(6, "settings-web-custom-color-border", "checkSaveNumber('settings-web-custom-color-border')"));
         target.appendChild(html.createButton("Apply", "settings-web-custom-apply", "preset.webApplyCustom()"));
     }
 

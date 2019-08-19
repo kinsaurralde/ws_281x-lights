@@ -1,16 +1,12 @@
 class LightStrip {
     constructor(numPixels) {
-        this.currentSendWindow = 0;
-        this.maxSendWindows = 4;
         this.numPixels = numPixels;
         this.direction = -1;
-        this.currentColor = 1;
         this.strip_id = 0;
         this.controllers = [0];
         this.controller_data = [];
         this.key = 0;
         this.pixels = new Array(numPixels);
-        this.sendWindow = new Array(numPixels);
         this.pathLog = new Array();
         this.logPrintDiv = document.getElementById("info-log");
         this.logPrintDiv.innerHTML = "";
@@ -18,8 +14,6 @@ class LightStrip {
         this.port = location.port;
         this.sender = new Sender();
 
-        //this.updateHostname();
-        //this.updatePort();
         this.createPixels();
         this.getInfo();
     }
@@ -33,10 +27,10 @@ class LightStrip {
         }
         let section_flex = document.createElement("div");
         section_flex.className = "section-flex";
-        html.appendSetting(section_flex, "Color Save Number", html.createInputNumber(0, 3, 1, "checkSaveNumber('individual-pixel-save-color')", "individual-pixel-save-color"));
+        html.appendSetting(section_flex, "Color Save Number", html.createNumber(1, "individual-pixel-save-color", "checkSaveNumber('individual-pixel-save-color')"));
         html.appendSetting(section_flex, "Live", html.createInputCheckBox("Live", "individual-pixels-live-check"));
         html.appendSetting(section_flex, "Resend", html.createButton("Send", "individual-pixels-resend", "lights.resendIndividual()"));
-        html.appendSetting(section_flex, "Multiple", [html.createInputNumber(0, 60, 0, null, "individual-pixels-multi-start"), html.createInputNumber(0, 60, 29, null, "individual-pixels-multi-end"), html.createButton("Send", "individual-pixels-multi-send", "lights.setMultiple()")], true);
+        html.appendSetting(section_flex, "Multiple", [html.createNumber(0, "individual-pixels-multi-start"), html.createNumber(29, "individual-pixels-multi-end"), html.createButton("Send", "individual-pixels-multi-send", "lights.setMultiple()")], true);
         document.getElementById("individual-pixels-settings").appendChild(section_flex);
     }
 
@@ -96,13 +90,8 @@ class LightStrip {
     }
 
     updatePixel(id, r, g, b) {
+        console.log("REMOVE updatePixels")
         this.pixels[id].setPixel(r, g, b);
-    }
-
-    updateAllPixels(r, g, b) {
-        for (let i = 0; i < this.numPixels; i++) {
-            this.updatePixel(i, r, g, b);
-        }
     }
 
     setIndividual(id) {
@@ -237,33 +226,7 @@ class LightStrip {
         this.send(path, ids);
     }
 
-    animateShift(amount, post_delay, ids=null) {
-        amount *= this.direction;
-        let path = "animate/shift/" + amount + "," + post_delay;
-        this.send(path, ids);
-    }
-
-    switch(wait_ms, instant, id, max_num, loop_start, ids=null) {
-        if (instant) {
-            wait_ms *= -1;
-        }
-        let color_string = "";
-        for (let i = 0; i < max_num; i++) {
-            color_string += ",";
-            let current_color_save = document.getElementById(id + i).value;
-            let color = getSaveColor(current_color_save, id + i);
-            color_string += color.r + "." + color.g + "." + color.b;
-        }
-        if (loop_start || max_num < 2) {
-            let current_color_save = document.getElementById(id + 0).value;
-            let color = getSaveColor(current_color_save);
-            color_string += "," + color.r + "." + color.g + "." + color.b;
-        }
-        let path = "animate/mix/" + wait_ms + color_string;
-        this.send(path, ids);
-    }
-
-    _switch(type, colors, wait_ms, instant, loop_start, ids=null) {
+    switch(type, colors, wait_ms, instant, loop_start, ids=null) {
         if (loop_start == "True") {
             colors += ";" + colors.split(';')[0];
         }
@@ -283,12 +246,9 @@ class LightStrip {
 
     random(segment_size, wait_ms = 0, repeated = false, ids=null) {
         let path = "";
-        console.log(repeated);
         if (repeated === true) {
-            console.log("true");
             path = "animate/random/";
         } else if (repeated === false) {
-            console.log("false");
             path = "run/random/"
         } else {
             path = repeated + "/random/"
@@ -299,16 +259,6 @@ class LightStrip {
     bounce(type, colors, wait_ms, length, direction, wait_mode, ids=null) {
         direction *= this.direction;
         let path = type + "/bounce/" + colors + "," + wait_ms + "," + length + "," + direction + "," + wait_mode;
-        this.send(path, ids);
-    }
-
-    randomCycle(each, wait_ms, ids=null) {
-        let path = "";
-        if (each) {
-            path = "animate/randomCycle/true," + wait_ms;
-        } else {
-            path = "animate/randomCycle/false," + wait_ms;
-        }
         this.send(path, ids);
     }
 
@@ -371,26 +321,11 @@ class LightStrip {
         document.getElementById("settings-hostname").value = this.hostname;
         document.getElementById("settings-port").value = this.port;
         this.updateHost();
-        let request = new XMLHttpRequest();
-        request.open('GET', url, true);
-        request.onload = function () {
-            console.log("Status code: ", this.status);
-            if (this.status >= 200 && this.status < 400) {
-                let data = JSON.parse(this.response);
-                console.log("Recieved Data:", data);
-                lights.recieveData(data);
-            } else {
-                console.log("There was an error");
-            }
-        };
-        request.onerror = function () {
-            console.log("Connection Error: ", this.status, request);
-        };
-        request.send();
+        this.sender.send(url, this.recieveData);
     }
 
     recieveData(data) {
-        this.controller_data = data;
+        lights.controller_data = data;
         generic.recreateAll();
     }
 }

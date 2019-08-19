@@ -4,29 +4,28 @@ class Sender {
         this.message_box.innerHTML = "";
     }
 
-    send(url) {
+    send(url, success_func=null) {
         let request = new XMLHttpRequest();
         console.log("Send URL: ", url);
         request.open('GET', url, true);
         request.onload = function () {
-            console.log("Status code: ", this.status);
             if (this.status >= 200 && this.status < 400) {
                 lights.sender.removeBorder();
                 let data = JSON.parse(this.response);
                 console.log("Recieved Data:", data);
-                if (data["error"]) {
-                    console.log("There was a warning");
+                if (success_func != null) {
+                    success_func(data);
+                }
+                if (data.hasOwnProperty("error") && data["error"].toLowerCase() == "true") {
                     lights.sender.displayWarnBorder();
                     lights.sender.sendWarning(data["message"]);
                 }
             } else {
-                console.log("There was an error");
                 lights.sender.displayBorder();
                 lights.sender.sendError(request.status, request.statusText);
             }
         };
         request.onerror = function () {
-            console.log("Connection Error: ", this.status, request);
             lights.sender.displayBorder();
             lights.sender.sendError(request.status, request.statusText);
         };

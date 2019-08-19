@@ -73,6 +73,12 @@ class MultiController():
             })
         return data
 
+    def _response(self):
+        return {
+            "error": "false",
+            "message": "Threads started"
+        }
+
     def json(self, data):
         for line in data:
             if "controller_id" in line:
@@ -93,6 +99,7 @@ class MultiController():
             execute = self.controllers[i].execute_json
             thread = threading.Thread(target=execute, args=[json])
             thread.start()
+        return self._response()
 
     def stop(self, controller_id=None, strip_id=None):
         self._set_cur_ids(controller_id)
@@ -101,6 +108,7 @@ class MultiController():
             execute = self.controllers[i].execute_json
             thread = threading.Thread(target=execute, args=[json])
             thread.start()
+        return self._response()
 
     def run(self, controller_id, strip_id, function, args):
         self._set_cur_ids(controller_id)
@@ -109,6 +117,7 @@ class MultiController():
             execute = self.controllers[i].execute_json
             thread = threading.Thread(target=execute, args=[json])
             thread.start()
+        return self._response()
 
     def thread(self, controller_id, strip_id, function, args):
         self._set_cur_ids(controller_id)
@@ -117,6 +126,7 @@ class MultiController():
             execute = self.controllers[i].execute_json
             thread = threading.Thread(target=execute, args=[json])
             thread.start()
+        return self._response()
 
     def animate(self, controller_id, strip_id, function, args, delay=0):
         self._set_cur_ids(controller_id)
@@ -126,6 +136,7 @@ class MultiController():
             execute = self.controllers[i].execute_json
             thread = threading.Thread(target=execute, args=[json])
             thread.start()
+        return self._response()
 
     def change_settings(self, controller_id, new_settings):
         response = []

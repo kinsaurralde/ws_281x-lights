@@ -11,13 +11,7 @@
     <script src="../static/pixel.js"></script>
     <script src="../static/sender.js"></script>
     <script src="../static/save.js"></script>
-    <script src="../static/shift.js"></script>
     <script src="../static/preset.js"></script>
-    <script src="../static/wipe.js"></script>
-    <script src="../static/pulse.js"></script>
-    <script src="../static/switch.js"></script>
-    <script src="../static/random.js"></script>
-    <script src="../static/chase.js"></script>
 </head>
 
 <body onload="pageLoad()">
@@ -163,7 +157,7 @@
     </div>
 
     <div class="section" id="generic">
-        <div class="section-title">Generic<input type="button" class="expand-button" value="^" style="width: 2vw;"
+        <div class="section-title">Functions<input type="button" class="expand-button" value="^" style="width: 2vw;"
                 onclick="expand('generic','block')"><input type="button" class="expand-button" value="+"
                 style="width: 2vw;" onclick="addGeneric()"><input type="button" class="expand-button" value="-"
                 style="width: 2vw;" onclick="removeGeneric()"></div>
@@ -186,74 +180,6 @@
                     <th>Send</th>
                 </tr>
             </table>
-        </div>
-    </div>
-
-    <div class="section" id="operations">
-        <div class="section-title">Operations<input type="button" class="expand-button" value="^" style="width: 2vw;"
-                onclick="expand('operations','block')"><input type="button" class="expand-button" value="+"
-                style="width: 2vw;" onclick="addShift()"><input type="button" class="expand-button" value="-"
-                style="width: 2vw;" onclick="removeShift()"></div>
-        <div class="space-1"></div>
-        <div class="section-hidden" id="operations-expanded" style="display: block;">
-            <div class="divider"></div>
-            <input type="button" value="Flip" onclick="lights.reverseStrip()">
-            <input type="button" value="Shift Left" onclick="lights.shift(-1,0)">
-            <input type="button" value="Shift Right" onclick="lights.shift(1,0)">
-            <div class="divider"></div>
-        </div>
-    </div>
-
-    <div class="section" id="switch">
-        <div class="section-title">Switch<input type="button" class="expand-button" value="^" style="width: 2vw;"
-                onclick="expand('switch','block')"></div>
-        <div class="space-1"></div>
-        <div class="section-hidden" id="switch-expanded" style="display: block;">
-            <div class="divider"></div>
-        </div>
-    </div>
-
-    <div class="section" id="pulse">
-        <div class="section-title">Pulse<input type="button" class="expand-button" value="^" style="width: 2vw;"
-                onclick="expand('pulse','block')"><input type="button" class="expand-button" value="+"
-                style="width: 2vw;" onclick="addPulse()"><input type="button" class="expand-button" value="-"
-                style="width: 2vw;" onclick="removePulse()"></div>
-        <div class="space-1"></div>
-        <div class="section-hidden" id="pulse-expanded" style="display: block;">
-            <div class="divider"></div>
-        </div>
-    </div>
-
-    <div class="section" id="chase">
-        <div class="section-title">Chase<input type="button" class="expand-button" value="^" style="width: 2vw;"
-                onclick="expand('chase','block')"><input type="button" class="expand-button" value="+"
-                style="width: 2vw;" onclick="addChase()"><input type="button" class="expand-button" value="-"
-                style="width: 2vw;" onclick="removeChase()"></div>
-        <div class="space-1"></div>
-        <div class="section-hidden" id="chase-expanded" style="display: block;">
-            <div class="divider"></div>
-        </div>
-    </div>
-
-    <div class="section" id="wipe">
-        <div class="section-title">Wipe<input type="button" class="expand-button" value="^" style="width: 2vw;"
-                onclick="expand('wipe','block')"><input type="button" class="expand-button" value="+"
-                style="width: 2vw;" onclick="addWipe()"><input type="button" class="expand-button" value="-"
-                style="width: 2vw;" onclick="removeWipe()"></div>
-        <div class="space-1"></div>
-        <div class="section-hidden" id="wipe-expanded" style="display: block;">
-            <div class="divider"></div>
-        </div>
-    </div>
-
-    <div class="section" id="random">
-        <div class="section-title">Random<input type="button" class="expand-button" value="^" style="width: 2vw;"
-                onclick="expand('random','block')"><input type="button" class="expand-button" value="+"
-                style="width: 2vw;" onclick="addRandom()"><input type="button" class="expand-button" value="-"
-                style="width: 2vw;" onclick="removeRandom()"></div>
-        <div class="space-1"></div>
-        <div class="section-hidden" id="random-expanded" style="display: block;">
-            <div class="divider"></div>
         </div>
     </div>
 
@@ -315,13 +241,7 @@
         var html = new HTMLWriter();
         var lights = new LightStrip(60);
         var saves = new Array();
-        var wipes = new Array();
-        var shift = new Array();
         var preset = new Preset();
-        var pulse = new Array();
-        var chase = new Array();
-        var random = new Array();
-        var lswitch = new LSwitch();
         var generic = new Generic();
 
         function pageLoad() {
@@ -332,17 +252,18 @@
             addSave(0, 255, 255);
             addSave(255, 0, 255);
             addSave(255, 255, 0);
-            for (let i = 0; i < 3; i++) {
-                addWipe();
-                addPulse();
-                addShift();
-                addRandom();
-                addChase();
-            }
-            lswitch.create();
             generic.add_row("bounce");
             generic.add_row("color");
+            generic.add_row("mix");
             generic.add_row("pulse");
+            generic.add_row("wipe");
+            generic.add_row("chase");
+            generic.add_row("rainbowCycle");
+            generic.add_row("shift");
+            generic.add_row("reverse");
+            generic.add_row("random");
+            generic.add_row("single");
+            generic.add_row("rainbowChase");
         }
 
         function expand(id, displayType) {

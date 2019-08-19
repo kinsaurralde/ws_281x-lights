@@ -41,7 +41,7 @@ let generic_functions = {
             "default": [4],
             "mode": "single"
         },
-        "wait_ms": [50],
+        "wait_ms": [25],
         "num_value": {
             "label": "Length",
             "default": [5]
@@ -113,7 +113,7 @@ let generic_functions = {
             "default": [[1,1]],
             "mode": "multi"
         },
-        "wait_ms": [50],
+        "wait_ms": [20],
         "wait_mode": ["each", "full"],
         "direction": ["left", "right"],
         "num_value": {
