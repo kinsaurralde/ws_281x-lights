@@ -4,8 +4,10 @@
     <title>Lights</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="../static/main.css">
+    <script src="../static/functions.js"></script>
     <script src="../static/writehtml.js"></script>
     <script src="../static/main.js"></script>
+    <script src="../static/generic.js"></script>
     <script src="../static/pixel.js"></script>
     <script src="../static/sender.js"></script>
     <script src="../static/save.js"></script>
@@ -103,7 +105,6 @@
             </div>
             <div class="section-hidden" id="settings-expanded" style="width: 100%; display: none">
                 <div id="settings-controllers-container" style="width: 100%;">
-
                 </div>
             </div>
         </div>
@@ -158,6 +159,33 @@
         <div class="space-1"></div>
         <div class="section-hidden" id="full-color-expanded" style="display: block;">
             <div class="divider"></div>
+        </div>
+    </div>
+
+    <div class="section" id="generic">
+        <div class="section-title">Generic<input type="button" class="expand-button" value="^" style="width: 2vw;"
+                onclick="expand('generic','block')"><input type="button" class="expand-button" value="+"
+                style="width: 2vw;" onclick="addGeneric()"><input type="button" class="expand-button" value="-"
+                style="width: 2vw;" onclick="removeGeneric()"></div>
+        <div class="space-1"></div>
+        <div class="section-hidden" id="generic-expanded" style="display: block;">
+            <div class="divider"></div>
+            <table id="generic-table">
+                <tr>
+                    <th>Controllers</th>
+                    <th>Strip id</th>
+                    <th>Type</th>
+                    <th>Function</th>
+                    <th>Color</th>
+                    <th>Wait ms</th>
+                    <th>Wait mode</th>
+                    <th>Direction</th>
+                    <th>Value</th>
+                    <th>Option</th>
+                    <th>Misc</th>
+                    <th>Send</th>
+                </tr>
+            </table>
         </div>
     </div>
 
@@ -294,6 +322,7 @@
         var chase = new Array();
         var random = new Array();
         var lswitch = new LSwitch();
+        var generic = new Generic();
 
         function pageLoad() {
             addSaveLive();
@@ -311,7 +340,9 @@
                 addChase();
             }
             lswitch.create();
-            document.getElementById("info-manual-urlbase").innerText = location.href;
+            generic.add_row("bounce");
+            generic.add_row("color");
+            generic.add_row("pulse");
         }
 
         function expand(id, displayType) {

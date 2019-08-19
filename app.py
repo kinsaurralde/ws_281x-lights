@@ -64,7 +64,11 @@ def split_key_ids(items):
 def make_list(arg):
     arg = str(arg)
     if ';' in arg:
-        arg = [x.split('.') for x in arg.split(';')]
+        arg = [[int(y) for y in x.split('.')] for x in arg.split(';')]
+    elif arg in ["false", "False"]:
+        arg = False
+    elif arg in ["true", "True"]:
+        arg = True
     return arg
 
 

@@ -3,6 +3,8 @@ class HTMLWriter {
 
     }
 
+
+
     createSpacerS1() {
         let spacer = document.createElement("div");
         spacer.className = "space-s-1";
@@ -118,6 +120,46 @@ class HTMLWriter {
         slider.id = id;
         slider.oninput = new Function(oninput);
         return slider;
+    }
+
+    createText5(value, id, oninput) {
+        let text = document.createElement("input");
+        text.type = "text";
+        text.value = value;
+        text.id = id;
+        text.className = "width-5";
+        text.oninput = new Function(oninput);
+        return text;
+    }
+
+    createNumber(value, id, oninput) {
+        let text = document.createElement("input");
+        text.type = "number";
+        text.value = value;
+        text.id = id;
+        text.oninput = new Function(oninput);
+        return text;
+    }
+
+    createSelect(value, id, options, onchange) {
+        let select = document.createElement("select");
+        select.id = id;
+        for (let i = 0; i < options.length; i++) {
+            let opt = document.createElement("option");
+            opt.appendChild(document.createTextNode(options[i]));
+            opt.value = options[i];
+            select.appendChild(opt);
+        }
+        select.value = value;
+        select.onchange = new Function(onchange);
+        return select;
+    }
+
+    createNONE(id) {
+        let div = document.createElement("div");
+        div.id = id;
+        div.innerHTML = "---";
+        return div;
     }
 
     createWritableTitle(title, id) {

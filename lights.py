@@ -341,7 +341,7 @@ class Lights:
                     neopixels.setPixelColor(
                         self.id, i + q, saves[int(i / interval)])
 
-    def pulse(self, r, g, b, direction=1, wait_ms=50, length=5, layer=True):
+    def pulse(self, r, g, b, direction=1, wait_ms=50, length=5, layer=False):
         """Sends a pulse of color through strip
 
         Parameters:
@@ -463,29 +463,27 @@ class Lights:
                 for i in range(0, neopixels.numPixels(self.id), 3):
                     neopixels.setPixelColor(self.id, i + q, 0)
 
-    def mix_switch(self, arguments):
+    def mix_switch(self, colors, wait_ms=2000, instant=False):
         """Cycle fading between multiple colors
 
             Parameters:
 
-                arguments:
-                    [0]: wait_ms (time between full colors)
-                    [1:]: colors
+                colors: list of colors to split between
+
+                wait_ms: time between full colors
+
+                instant: dont calculate difference
         """
         this_id = self.animation_id.get()
-        wait_ms = int(arguments[0])
-        int_colors = []
-        for colors in arguments[1:]:
-            int_colors.append(list(map(int, colors.split('.'))))
-        if wait_ms < 0:
-            self.mix_switch_instant(abs(wait_ms), int_colors)
+        if instant:
+            self.mix_switch_instant(abs(wait_ms), colors)
             return
-        for k in range(0, len(int_colors) - 1):
+        for k in range(0, len(colors) - 1):
             percent = 0
             for j in range(100):
                 for i in range(0, neopixels.numPixels(self.id)):
                     neopixels.setPixelColor(self.id, i, get_mix(
-                        int_colors[k], int_colors[k+1], percent))
+                        colors[k], colors[k+1], percent))
                 neopixels.show()
                 percent += 1
                 if self.sleepListenForBreak(self.id, wait_ms/100.0, this_id):
@@ -509,7 +507,7 @@ class Lights:
             if self.sleepListenForBreak(self.id, wait_ms, this_id):
                 return
 
-    def bounce(self, colors, wait_ms=50, length=5, direction=1):
+    def bounce(self, colors, wait_ms=50, length=5, direction=1, wait_is_total=False):
         """Bounce Pulse across strip
 
             Parameters:
@@ -523,6 +521,8 @@ class Lights:
                 direction: initial direction
                     1: forwards
                     -1: backwards
+
+                wait_is_total: true if wait_ms is total time of each pulse
         """
         this_id = self.animation_id.get()
         for color in colors:

@@ -7,6 +7,7 @@ class LightStrip {
         this.currentColor = 1;
         this.strip_id = 0;
         this.controllers = [0];
+        this.controller_data = [];
         this.key = 0;
         this.pixels = new Array(numPixels);
         this.sendWindow = new Array(numPixels);
@@ -17,6 +18,8 @@ class LightStrip {
         this.port = location.port;
         this.sender = new Sender();
 
+        //this.updateHostname();
+        //this.updatePort();
         this.createPixels();
         this.getInfo();
     }
@@ -35,24 +38,6 @@ class LightStrip {
         html.appendSetting(section_flex, "Resend", html.createButton("Send", "individual-pixels-resend", "lights.resendIndividual()"));
         html.appendSetting(section_flex, "Multiple", [html.createInputNumber(0, 60, 0, null, "individual-pixels-multi-start"), html.createInputNumber(0, 60, 29, null, "individual-pixels-multi-end"), html.createButton("Send", "individual-pixels-multi-send", "lights.setMultiple()")], true);
         document.getElementById("individual-pixels-settings").appendChild(section_flex);
-    }
-
-    createControllerSettings(data) {    // for future use
-        // let div  = document.getElementById("settings-controllers-container");
-        // div.innerHTML = "";
-        // for(let i = 0; i < data.length; i++) {
-        //     let title_div = document.createElement("div");
-        //     title_div.innerText = "Controller " + data[i].controller_id;
-        //     let controller_div = document.createElement("div");
-        //     controller_div.className = "section-flex-no-border";
-        //     html.appendSetting(controller_div, "Active", html.createInputCheckBox("Live", "settings-controller-"+i+"active"))
-            
-        //     let divider = document.createElement("div");
-        //     divider.className = "divider";
-        //     div.appendChild(divider);
-        //     div.appendChild(title_div);
-        //     div.appendChild(controller_div);
-        // }
     }
 
     // Settings
@@ -83,7 +68,7 @@ class LightStrip {
     }
 
     updateHost() {
-        document.getElementById("info-manual-urlbase").innerText = "http://" + this.hostname + ":" + this.port + "/" + this.strip_id + "/" + this.key + "/";
+        document.getElementById("info-manual-urlbase").innerText = "http://" + this.hostname + ":" + this.port + "/" + this.key + ":" + this.controllers + ":" + this.strip_id + "/";
     }
 
     updateStripId() {
@@ -210,51 +195,55 @@ class LightStrip {
 
     // Set Paths
 
-    sendPixel(id, r, g, b) {
+    sendPixel(id, r, g, b, ids=null) {
         id = this.applyDirection(id);
         let path = "run/single/" + id + "," + r + "," + g + "," + b;
-        this.send(path, true);
+        this.send(path, ids);
     }
 
-    colorAll(r, g, b) {
+    colorAll(r, g, b, ids=null) {
         let path = "run/color/" + r + "," + g + "," + b;
-        this.send(path, true);
+        if (ids == null) {
+            this.send(path, true);
+        } else {
+            this.send(ids + "/" + path, false);
+        }
     }
 
-    wipe(r, g, b, dir, wait_ms, mode="run") {
+    wipe(r, g, b, dir, wait_ms, mode="run", wait_mode=false, ids = null) {
         dir *= this.direction;
-        let path = mode + "/wipe/" + r + "," + g + "," + b + "," + dir + "," + wait_ms;
-        this.send(path, true);
+        let path = mode + "/wipe/" + r + "," + g + "," + b + "," + dir + "," + wait_ms + "," + wait_mode;
+        this.send(path, ids);
     }
 
-    chase(r, g, b, wait_ms, interval, dir) {
+    chase(r, g, b, wait_ms, interval, dir, ids=null) {
         dir *= this.direction;
         let path = "animate/chase/" + r + "," + g + "," + b + "," + wait_ms + "," + interval + "," + dir;
-        this.send(path, true);
+        this.send(path, ids);
     }
 
-    pulse(type, r, g, b, dir, wait_ms, length, delay) {
+    pulse(type, r, g, b, dir, wait_ms, length, delay, ids=null) {
         dir *= this.direction;
         let path = type + "/pulse/" + r + "," + g + "," + b + "," + dir + "," + wait_ms + "," + length;
         if (type == "animate") {
             path += "/" + delay;
         }
-        this.send(path, true);
+        this.send(path, ids);
     }
 
-    shift(amount, post_delay) {
+    shift(amount, post_delay, type="run", ids=null) {
         amount *= this.direction;
-        let path = "run/shift/" + amount + "," + post_delay;
-        this.send(path, true);
+        let path = type + "/shift/" + amount + "," + post_delay;
+        this.send(path, ids);
     }
 
-    animateShift(amount, post_delay) {
+    animateShift(amount, post_delay, ids=null) {
         amount *= this.direction;
         let path = "animate/shift/" + amount + "," + post_delay;
-        this.send(path, true);
+        this.send(path, ids);
     }
 
-    switch(wait_ms, instant, id, max_num, loop_start) {
+    switch(wait_ms, instant, id, max_num, loop_start, ids=null) {
         if (instant) {
             wait_ms *= -1;
         }
@@ -271,42 +260,61 @@ class LightStrip {
             color_string += "," + color.r + "." + color.g + "." + color.b;
         }
         let path = "animate/mix/" + wait_ms + color_string;
-        this.send(path, true);
+        this.send(path, ids);
     }
 
-    rainbowChase(wait_ms) {
-        let path = "animate/rainbowChase/" + wait_ms;
-        this.send(path, true);
-    }
-
-    rainbowCycle(wait_ms) {
-        let path = "animate/rainbowCycle/" + wait_ms;
-        this.send(path, true);
-    }
-
-    random(segment_size, wait_ms = 0, repeated = false) {
-        let path = "";
-        if (repeated) {
-            path = "animate/random/" + segment_size + "," + wait_ms;
-        } else {
-            path = "run/random/" + segment_size + "," + wait_ms;
+    _switch(type, colors, wait_ms, instant, loop_start, ids=null) {
+        if (loop_start == "True") {
+            colors += ";" + colors.split(';')[0];
         }
-        this.send(path, true);
+        let path = type + "/mix/" + colors + "," + wait_ms + "," + instant;
+        this.send(path, ids);
     }
 
-    randomCycle(each, wait_ms) {
+    rainbowChase(wait_ms, ids=null) {
+        let path = "animate/rainbowChase/" + wait_ms;
+        this.send(path, ids);
+    }
+
+    rainbowCycle(wait_ms, ids=null) {
+        let path = "animate/rainbowCycle/" + wait_ms;
+        this.send(path, ids);
+    }
+
+    random(segment_size, wait_ms = 0, repeated = false, ids=null) {
+        let path = "";
+        console.log(repeated);
+        if (repeated === true) {
+            console.log("true");
+            path = "animate/random/";
+        } else if (repeated === false) {
+            console.log("false");
+            path = "run/random/"
+        } else {
+            path = repeated + "/random/"
+        }
+        this.send(path + segment_size + "," + wait_ms, ids);
+    }
+
+    bounce(type, colors, wait_ms, length, direction, wait_mode, ids=null) {
+        direction *= this.direction;
+        let path = type + "/bounce/" + colors + "," + wait_ms + "," + length + "," + direction + "," + wait_mode;
+        this.send(path, ids);
+    }
+
+    randomCycle(each, wait_ms, ids=null) {
         let path = "";
         if (each) {
             path = "animate/randomCycle/true," + wait_ms;
         } else {
             path = "animate/randomCycle/false," + wait_ms;
         }
-        this.send(path, true);
+        this.send(path, ids);
     }
 
-    reverseStrip() {
+    reverseStrip(ids=null) {
         let path = "run/reverse";
-        this.send(path, true);
+        this.send(path, ids);
     }
 
     stopAnimation() {
@@ -342,10 +350,12 @@ class LightStrip {
 
     // Send
 
-    send(path, send_id_key = true, in_new_window = false) {
+    send(path, send_id_key = null, in_new_window = false) {
         let strip_id_key = "";
-        if (send_id_key) {
+        if (send_id_key == null || send_id_key == true) {
             strip_id_key = this.key + ":" + this.controllers + ":" + this.strip_id + "/";
+        } else if (send_id_key != false) {       
+            strip_id_key = send_id_key + "/";
         }
         let send_url = "http://" + this.hostname + ":" + this.port + "/" + strip_id_key + path;
         if (in_new_window) {
@@ -356,23 +366,31 @@ class LightStrip {
         this.updateLog(path);
     }
 
-    getInfo() { // For future use
-        // let url = "http://" + this.hostname + ":" + this.port + "/info/get";
-        // let request = new XMLHttpRequest();
-        // request.open('GET', url, true);
-        // request.onload = function () {
-        //     console.log("Status code: ", this.status);
-        //     if (this.status >= 200 && this.status < 400) {
-        //         let data = JSON.parse(this.response);
-        //         console.log("Recieved Data:", data);
-        //         lights.createControllerSettings(data);
-        //     } else {
-        //         console.log("There was an error");
-        //     }
-        // };
-        // request.onerror = function () {
-        //     console.log("Connection Error: ", this.status, request);
-        // };
-        // request.send();
+    getInfo() {
+        let url = "http://" + this.hostname + ":" + this.port + "/info/get";
+        document.getElementById("settings-hostname").value = this.hostname;
+        document.getElementById("settings-port").value = this.port;
+        this.updateHost();
+        let request = new XMLHttpRequest();
+        request.open('GET', url, true);
+        request.onload = function () {
+            console.log("Status code: ", this.status);
+            if (this.status >= 200 && this.status < 400) {
+                let data = JSON.parse(this.response);
+                console.log("Recieved Data:", data);
+                lights.recieveData(data);
+            } else {
+                console.log("There was an error");
+            }
+        };
+        request.onerror = function () {
+            console.log("Connection Error: ", this.status, request);
+        };
+        request.send();
+    }
+
+    recieveData(data) {
+        this.controller_data = data;
+        generic.recreateAll();
     }
 }

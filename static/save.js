@@ -117,6 +117,27 @@ class Save {
     }
 }
 
+function colorsToStr(colors) {
+    console.log(colors);
+    let string = ""
+    for (let i = 0; i < colors.length; i++) {
+        string += colors[i].r + "." + colors[i].g + "." + colors[i].b;
+        if (i < colors.length - 1) {
+            string += ";";
+        }
+    }
+    return string;
+}
+
+function getSaveColors(div_id) {
+    let values = document.getElementById(div_id).value.split(',');
+    let colors = [];
+    for (let i = 0; i < values.length; i++) {
+        colors.push(getSaveColor(values[i], div_id));
+    }
+    return colors;
+}
+
 function getSaveColor(id, div_id) {
     if (id >= 0 && id < saves.length) {
         return saves[id].getColor();

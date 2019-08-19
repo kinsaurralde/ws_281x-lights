@@ -145,7 +145,7 @@ class Controller:
             run_function()
         elif isinstance(arguments, dict):
             run_function(**arguments)
-        elif function == "specific" or function == "mix":
+        elif function == "specific":
             run_function(arguments)
         else:
             run_function(*arguments)
@@ -166,8 +166,6 @@ class Controller:
         self.strips[strip_id].animation_id.increment()
         this_id = self.strips[strip_id].animation_id.get()
         neopixels.update_pixel_owner(strip_id)
-        if function == "mix":
-            dont_split = True
         animation_function = self._run_functions(
             function, self.strips[strip_id])
         animation_arguments = (
