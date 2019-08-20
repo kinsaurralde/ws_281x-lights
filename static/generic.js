@@ -208,6 +208,10 @@ class GenericRow {
         if (this.data["option"] != null) {
             value["option"] = this.data["option"];
         }
+        value["iterations"] = 1;
+        if (value["type"] == "run") {
+            value["iterations"] = 0;
+        }
         value["wait_ms"] = this.data["wait_ms"];
         value["num_value"] = this.data["num_value"];
         value["type"] = this.data["type"];
@@ -231,19 +235,19 @@ class GenericRow {
                 lights.sendPixel(data["num_value"], data["r"], data["g"], data["b"], data["key_ids"]);
                 break;
             case "pulse":
-                lights.pulse(data["type"], data["r"], data["g"], data["b"], data["dir"], data["wait_ms"], data["num_value"], 0, data["key_ids"]);
+                lights.pulse(data["type"], data["r"], data["g"], data["b"], data["dir"], data["wait_ms"], data["num_value"], data["option"], data["wait_mode"],0, data["key_ids"]);
                 break;
             case "chase":
-                lights.chase(data["r"], data["g"], data["b"], data["wait_ms"], data["num_value"], data["dir"], data["key_ids"]);
+                lights.chase(data["r"], data["g"], data["b"], data["wait_ms"], data["num_value"], data["dir"], data["option"], data["key_ids"]);
                 break;
             case "shift":
                 lights.shift(data["num_value"] * data["dir"], data["wait_ms"], data["type"], data["key_ids"]);
                 break;
             case "rainbowCycle":
-                lights.rainbowCycle(data["wait_ms"], data["key_ids"]);
+                lights.rainbowCycle(data["type"], data["wait_ms"], data["dir"], data["wait_mode"], data["iterations"], data["key_ids"]);
                 break;
             case "rainbowChase":
-                lights.rainbowChase(data["wait_ms"], data["key_ids"]);
+                lights.rainbowChase(data["type"], data["wait_ms"], data["dir"], data["iterations"], data["key_ids"]);
                 break;
             case "mix":
                 lights.switch(data["type"], data["colors"], data["wait_ms"], data["wait_mode"], data["option"], data["key_ids"]);
@@ -252,7 +256,7 @@ class GenericRow {
                 lights.reverseStrip(data["key_ids"]);
                 break;
             case "bounce":
-                lights.bounce(data["type"], data["colors"], data["wait_ms"], data["num_value"], data["dir"], data["wait_mode"], data["key_ids"]);
+                lights.bounce(data["type"], data["colors"], data["wait_ms"], data["num_value"], data["dir"], data["option"], data["wait_mode"], data["key_ids"]);
                 break;
         }
     }

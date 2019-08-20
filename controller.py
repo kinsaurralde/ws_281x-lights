@@ -127,7 +127,7 @@ class Controller:
             "chase": strip.chase,
             "shift": strip.shift,
             "rainbowCycle": strip.rainbow_cycle,
-            "rainbow": strip.rainbow,
+            "rainbow": strip.rainbow_cycle,
             "rainbowChase": strip.rainbow_chase,
             "mix": strip.mix_switch,
             "reverse": strip.reverse,

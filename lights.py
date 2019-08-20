@@ -252,7 +252,7 @@ class Lights:
             neopixels.setPixelColor(self.id, i, lights_save.pop())
         neopixels.show()
 
-    def shift(self, amount, post_delay=0):
+    def shift(self, amount, post_delay=0, show_delay=0):
         """Shift each pixel by amount
         
             Parameters:
@@ -270,10 +270,10 @@ class Lights:
                 new_i += neopixels.numPixels(self.id)
             new_i = new_i % neopixels.numPixels(self.id)
             neopixels.setPixelColor(self.id, new_i, lights_save[i])
-        neopixels.show()
+        neopixels.show(show_delay)
         time.sleep(int(post_delay)/1000.0)
 
-    def wipe(self, r, g, b, direction, wait_ms, wait_is_total=False):
+    def wipe(self, r, g, b, direction, wait_ms, wait_total=False):
         """New color wipes across strip
             
             Parameters:
@@ -291,10 +291,9 @@ class Lights:
         iter_range = range(neopixels.numPixels(self.id))
         if direction == -1:
             iter_range = reversed(iter_range)
-        if wait_is_total:
+        each_wait = wait_ms
+        if wait_total:
             each_wait = wait_ms / neopixels.numPixels(self.id)
-        else:
-            each_wait = wait_ms
         for i in iter_range:
             neopixels.update_pixel_owner(self.id, i)
             neopixels.setPixelColor(self.id, i, neopixels.get_color(r, g, b))
@@ -307,7 +306,7 @@ class Lights:
         neopixels.show()
 
 
-    def chase(self, r, g, b, wait_ms, interval, direction, iterations=1):
+    def chase(self, r, g, b, wait_ms, interval, direction, layer=False, iterations=1):
         """Movie theater light style chaser animation
 
             Parameters:
@@ -338,10 +337,13 @@ class Lights:
                 if self.sleepListenForBreak(self.id, wait_ms, this_id):
                     return
                 for i in range(0, neopixels.numPixels(self.id), interval):
-                    neopixels.setPixelColor(
-                        self.id, i + q, saves[int(i / interval)])
+                    if layer:
+                        neopixels.setPixelColor(self.id, i + q, saves[int(i / interval)])
+                    else:
+                        neopixels.setPixelColor(self.id, i + q, 0)
 
-    def pulse(self, r, g, b, direction=1, wait_ms=50, length=5, layer=False):
+
+    def pulse(self, r, g, b, direction=1, wait_ms=50, length=5, layer=False, wait_total=False):
         """Sends a pulse of color through strip
 
         Parameters:
@@ -360,12 +362,16 @@ class Lights:
                 True: Keep previous color after pulse passes
                 False: Turn off pixel after pulse passes
         """
+        print(wait_total, layer)
         this_id = self.animation_id.get()
         previous = []
         max_pixels = neopixels.numPixels(self.id)
         iter_range = range(max_pixels + length)
         if direction == -1:
             iter_range = reversed(iter_range)
+        each_wait = wait_ms
+        if wait_total:
+            each_wait = wait_ms / neopixels.numPixels(self.id)
         no_own_count = 0
         for i in iter_range:
             j = i - length
@@ -380,7 +386,7 @@ class Lights:
                 else:
                     neopixels.setPixelColor(self.id, j, 0)
             neopixels.show(15)
-            if self.sleepListenForBreak(self.id, wait_ms, this_id):
+            if self.sleepListenForBreak(self.id, each_wait, this_id):
                 return
             if no_own_count == neopixels.numPixels(self.id):    # stop animation if all pixels belong to others
                 self.animation_id.increment()
@@ -410,7 +416,7 @@ class Lights:
             if self.sleepListenForBreak(self.id, wait_ms, this_id):
                 return
 
-    def rainbow(self, wait_ms, iterations):
+    def rainbow_cycle(self, wait_ms, direction, wait_total, iterations):
         """Draw rainbow that fades across all pixels at once
 
             Parameters:
@@ -420,32 +426,18 @@ class Lights:
                 iterations: number of times to repeat
         """
         this_id = self.animation_id.get()
-        for j in range(256*iterations):
-            for i in range(neopixels.numPixels(self.id)):
-                neopixels.setPixelColor(self.id, i, wheel((i+j) & 255))
-            neopixels.show()
-            if self.sleepListenForBreak(self.id, wait_ms, this_id):
+        each_wait = wait_ms
+        if wait_total:
+            each_wait = wait_ms / neopixels.numPixels(self.id)
+        for i in range(neopixels.numPixels(self.id)):
+            neopixels.setPixelColor(self.id, i, wheel(int(i / neopixels.numPixels(self.id) * 255)))
+        neopixels.show()
+        for i in range(iterations * neopixels.numPixels(self.id)):
+            self.shift(direction, 0, 15)
+            if self.sleepListenForBreak(self.id, each_wait, this_id):
                 return
 
-    def rainbow_cycle(self, wait_ms, iterations=1):
-        """Draw rainbow that uniformly distributes itself across all pixels
-
-            Parameters:
-
-                wait_ms: how long before next frame (in ms)
-
-                iterations: how many times to run (default=1)
-        """
-        this_id = self.animation_id.get()
-        for j in range(256*iterations):
-            for i in range(neopixels.numPixels(self.id)):
-                neopixels.setPixelColor(self.id,
-                                        i, wheel((int(i * 256 // neopixels.numPixels(self.id)) + j) & 255))
-            neopixels.show()
-            if self.sleepListenForBreak(self.id, wait_ms, this_id):
-                    return
-
-    def rainbow_chase(self, wait_ms):
+    def rainbow_chase(self, wait_ms, direction, iterations):
         """Rainbow movie theater light style chaser animation
 
             Parameters:
@@ -453,15 +445,18 @@ class Lights:
                 wait_ms: how long before next frame (in ms)
         """
         this_id = self.animation_id.get()
-        for j in range(256):
-            for q in range(3):
+        iter_range = range(3)
+        if direction == -1:
+            iter_range = reversed(iter_range)
+        for k in range(iterations):
+            for j in iter_range:
                 for i in range(0, neopixels.numPixels(self.id), 3):
-                    neopixels.setPixelColor(self.id, i + q, wheel((i+j) % 255))
+                    neopixels.setPixelColor(self.id, i + j, wheel(int((i) / neopixels.numPixels(self.id) * 255)))
                 neopixels.show()
                 if self.sleepListenForBreak(self.id, wait_ms, this_id):
                     return
                 for i in range(0, neopixels.numPixels(self.id), 3):
-                    neopixels.setPixelColor(self.id, i + q, 0)
+                    neopixels.setPixelColor(self.id, i + j, 0)
 
     def mix_switch(self, colors, wait_ms=2000, instant=False):
         """Cycle fading between multiple colors
@@ -507,7 +502,7 @@ class Lights:
             if self.sleepListenForBreak(self.id, wait_ms, this_id):
                 return
 
-    def bounce(self, colors, wait_ms=50, length=5, direction=1, wait_is_total=False):
+    def bounce(self, colors, wait_ms=50, length=5, direction=1, layer=False, wait_total=False):
         """Bounce Pulse across strip
 
             Parameters:
@@ -522,14 +517,14 @@ class Lights:
                     1: forwards
                     -1: backwards
 
-                wait_is_total: true if wait_ms is total time of each pulse
+                wait_total: true if wait_ms is total time of each pulse
         """
         this_id = self.animation_id.get()
         for color in colors:
             if "r" in color and "g" in color and "b" in color:
-                self.pulse(color["r"],color["g"],color["b"],direction, wait_ms, length, self.layer)
+                self.pulse(color["r"],color["g"],color["b"],direction, wait_ms, length, layer, wait_total)
             else:
-                self.pulse(color[0],color[1],color[2],direction, wait_ms, length, self.layer)
+                self.pulse(color[0],color[1],color[2],direction, wait_ms, length, layer, wait_total)
             direction *= -1
             if this_id != self.animation_id.get():
                 break

@@ -15,7 +15,9 @@ class LightStrip {
         this.sender = new Sender();
 
         this.createPixels();
-        this.getInfo();
+        if (this.hostname != "kinsaurralde.com") {
+            this.getInfo();
+        }
     }
 
     // Setups
@@ -205,15 +207,15 @@ class LightStrip {
         this.send(path, ids);
     }
 
-    chase(r, g, b, wait_ms, interval, dir, ids=null) {
+    chase(r, g, b, wait_ms, interval, dir, layer=false, ids=null) {
         dir *= this.direction;
-        let path = "animate/chase/" + r + "," + g + "," + b + "," + wait_ms + "," + interval + "," + dir;
+        let path = "animate/chase/" + r + "," + g + "," + b + "," + wait_ms + "," + interval + "," + dir + "," + layer;
         this.send(path, ids);
     }
 
-    pulse(type, r, g, b, dir, wait_ms, length, delay, ids=null) {
+    pulse(type, r, g, b, dir, wait_ms, length, layer, wait_total, delay, ids=null) {
         dir *= this.direction;
-        let path = type + "/pulse/" + r + "," + g + "," + b + "," + dir + "," + wait_ms + "," + length;
+        let path = type + "/pulse/" + r + "," + g + "," + b + "," + dir + "," + wait_ms + "," + length + "," + layer + "," + wait_total;
         if (type == "animate") {
             path += "/" + delay;
         }
@@ -234,13 +236,15 @@ class LightStrip {
         this.send(path, ids);
     }
 
-    rainbowChase(wait_ms, ids=null) {
-        let path = "animate/rainbowChase/" + wait_ms;
+    rainbowChase(type, wait_ms, direction=1, iterations=1, ids=null) {
+        direction *= this.direction;
+        let path = type + "/rainbowChase/" + wait_ms + "," + direction + "," + iterations;
         this.send(path, ids);
     }
 
-    rainbowCycle(wait_ms, ids=null) {
-        let path = "animate/rainbowCycle/" + wait_ms;
+    rainbowCycle(type, wait_ms, direction=1, wait_total=false, iterations=1,  ids=null) {
+        direction *= this.direction;
+        let path = type + "/rainbowCycle/" + wait_ms + "," + direction + "," + wait_total + "," + iterations;
         this.send(path, ids);
     }
 
@@ -256,9 +260,9 @@ class LightStrip {
         this.send(path + segment_size + "," + wait_ms, ids);
     }
 
-    bounce(type, colors, wait_ms, length, direction, wait_mode, ids=null) {
+    bounce(type, colors, wait_ms, length, direction, layer, wait_mode, ids=null) {
         direction *= this.direction;
-        let path = type + "/bounce/" + colors + "," + wait_ms + "," + length + "," + direction + "," + wait_mode;
+        let path = type + "/bounce/" + colors + "," + wait_ms + "," + length + "," + direction + "," + layer + "," + wait_mode;
         this.send(path, ids);
     }
 

@@ -80,15 +80,14 @@ let generic_functions = {
         }
     },
     "rainbowCycle": {
-        "types": ["animate"],
+        "types": ["animate", "run"],
         "wait_ms": [50],
         "wait_mode": ["each", "full"],
         "direction": ["left", "right"]
     },
     "rainbowChase": {
-        "types": ["animate"],
+        "types": ["animate", "run"],
         "wait_ms": [50],
-        "wait_mode": ["each", "full"],
         "direction": ["left", "right"]
     },
     "mix": {
@@ -119,6 +118,10 @@ let generic_functions = {
         "num_value": {
             "default": [5],
             "label": "Length"
+        },
+        "option": {
+            "label": "Layer",
+            "default": ["True", "False"]
         }
     }
 };
