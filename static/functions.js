@@ -123,5 +123,21 @@ let generic_functions = {
             "label": "Layer",
             "default": ["True", "False"]
         }
+    },
+    "pattern": {
+        "types": ["run"],
+        "color": {
+            "default": [[1,2,3]],
+            "mode": "multi"
+        },
+        "option": {
+            "label": "Blend",
+            "default": ["False", "True"]
+        },
+        "num_value": {
+            "label": "Interval",
+            "default": [3]
+        },
+        "wait_mode": [ "fraction", "interval"],
     }
 };

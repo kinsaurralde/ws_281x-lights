@@ -266,6 +266,11 @@ class LightStrip {
         this.send(path, ids);
     }
 
+    pattern(colors, interval, fraction, blend, ids) {
+        let path = "run/pattern/" + colors + "," + interval + "," + fraction + "," + blend;
+        this.send(path, ids);
+    }
+
     reverseStrip(ids=null) {
         let path = "run/reverse";
         this.send(path, ids);

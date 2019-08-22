@@ -212,7 +212,6 @@ class Lights:
         for i in range(0, neopixels.numPixels(self.id)):
             neopixels.setPixelColor(self.id, i, r, g, b)
         neopixels.show()
-        print("Actual off:", time.time())
 
     def set_pixel(self, pixel_id, r, g, b):
         """Set specific pixel to color
@@ -260,6 +259,8 @@ class Lights:
                 amount: number of pixels to shift by
 
                 post_delay: number of ms to sleep after shift (default = 0)
+
+                show_delay: number of ms to pass to show() (default = 0)
         """
         if amount == 0:
             return
@@ -273,18 +274,20 @@ class Lights:
         neopixels.show(show_delay)
         time.sleep(int(post_delay)/1000.0)
 
-    def wipe(self, r, g, b, direction, wait_ms, wait_total=False):
+    def wipe(self, r, g, b, direction=1, wait_ms=50, wait_total=False):
         """New color wipes across strip
             
             Parameters:
 
                 r, g, b: color
 
-                direction:
+                direction: (default: 1)
                     1: forward direction
                     -1: reverse direction
 
-                wait_ms: how long before moving to next pixel (in ms)
+                wait_ms: how long before moving to next pixel (in ms) (default: 50)
+
+                wait_total: if true, wait_ms is total time of each pulse (default: False)
         """
         start_time = time.time()
         this_id = self.animation_id.get()
@@ -299,27 +302,28 @@ class Lights:
             neopixels.setPixelColor(self.id, i, neopixels.get_color(r, g, b))
             neopixels.show(15)
             if self.sleepListenForBreak(self.id, each_wait, this_id):
-                print("Break")
                 return
         expected_time = each_wait / 1000 * neopixels.numPixels(self.id)
         actual_time = time.time() - start_time
         neopixels.show()
 
 
-    def chase(self, r, g, b, wait_ms, interval, direction, layer=False, iterations=1):
+    def chase(self, r, g, b, wait_ms=50, interval=5, direction=1, layer=False, iterations=1):
         """Movie theater light style chaser animation
 
             Parameters:
             
                 r, g, b: color
 
-                wait_ms: how long before next frame (in ms)
+                wait_ms: how long before next frame (in ms) (default: 50)
 
-                interval: step amount from pixel to next
+                interval: step amount from pixel to next (default: 5)
 
-                direction:
+                direction: (default: 1)
                     1: forward direction
                     -1: reverse direction
+
+                layer: if true, save pixel color before pulse (default: False)
 
                 iterations: how many times to run (default: 1)
         """
@@ -350,19 +354,20 @@ class Lights:
 
             r, g, g: color of pulse
 
-            direction:
+            direction: (default: 1)
                 1: forward direction
                 -1: reverse direction
 
-            wait_ms: how long before moving to next pixel (in ms)
+            wait_ms: how long before moving to next pixel (in ms) (default: 50)
 
-            length: how many pixels in pulse
+            length: how many pixels in pulse (default: 5)
 
-            layer:
+            layer: (default: False)
                 True: Keep previous color after pulse passes
                 False: Turn off pixel after pulse passes
+
+            wait_total: if true, wait_ms is total time of each pulse (default: False)
         """
-        print(wait_total, layer)
         this_id = self.animation_id.get()
         previous = []
         max_pixels = neopixels.numPixels(self.id)
@@ -394,14 +399,14 @@ class Lights:
         neopixels.show()
 
 
-    def random_cycle(self, each, wait_ms, iterations=1):
+    def random_cycle(self, each, wait_ms=250, iterations=1):
         """Flashes random lights
             
             Parameters:
                 
                 each: number of pixels before new color is selected
 
-                wait_ms: time between color changes (in ms)
+                wait_ms: time between color changes (in ms) (default: 250)
 
                 iterations: number of time to change (default: 1)
         """
@@ -416,14 +421,20 @@ class Lights:
             if self.sleepListenForBreak(self.id, wait_ms, this_id):
                 return
 
-    def rainbow_cycle(self, wait_ms, direction, wait_total, iterations):
+    def rainbow_cycle(self, wait_ms, direction=1, wait_total=False, iterations=1):
         """Draw rainbow that fades across all pixels at once
 
             Parameters:
 
                 wait_ms: time between iterations (in ms)
 
-                iterations: number of times to repeat
+                direction: initial direction (default: 1)
+                    1: forwards
+                    -1: backwards
+
+                wait_total: if true, wait_ms is total time of each pulse (default: False)
+
+                iterations: how many times to repeat (default: 1)
         """
         this_id = self.animation_id.get()
         each_wait = wait_ms
@@ -437,12 +448,18 @@ class Lights:
             if self.sleepListenForBreak(self.id, each_wait, this_id):
                 return
 
-    def rainbow_chase(self, wait_ms, direction, iterations):
+    def rainbow_chase(self, wait_ms, direction=1, iterations=1):
         """Rainbow movie theater light style chaser animation
 
             Parameters:
 
                 wait_ms: how long before next frame (in ms)
+
+                direction: initial direction (default: 1)
+                    1: forwards
+                    -1: backwards
+
+                iterations: how many times to repeat (default: 1)
         """
         this_id = self.animation_id.get()
         iter_range = range(3)
@@ -465,9 +482,9 @@ class Lights:
 
                 colors: list of colors to split between
 
-                wait_ms: time between full colors
+                wait_ms: time between full colors (default: 2000)
 
-                instant: dont calculate difference
+                instant: if true, dont calculate difference (default: False)
         """
         this_id = self.animation_id.get()
         if instant:
@@ -509,15 +526,17 @@ class Lights:
 
                 colors: list of colors to pulse
 
-                wait_ms: how long before next frame (in ms) (default=50)
+                wait_ms: how long before next frame (in ms) (default: 50)
 
-                length: how many pixels in pulse (default=5)
+                length: how many pixels in pulse (default: 5)
 
-                direction: initial direction
+                direction: initial direction (default: 1)
                     1: forwards
                     -1: backwards
 
-                wait_total: true if wait_ms is total time of each pulse
+                layer: if true, save pixel color before pulse (default: False)
+
+                wait_total: if true, wait_ms is total time of each pulse (default: False)
         """
         this_id = self.animation_id.get()
         for color in colors:
@@ -529,12 +548,44 @@ class Lights:
             if this_id != self.animation_id.get():
                 break
 
+    def pattern(self, colors, interval=3, fraction=True, blend=False):
+        """Repeat colors across strip
+        
+            Parameters:
+
+                colors: list of colors
+
+                interval: how to divide pixels (default: 3)
+
+                fraction: (default: True)
+                    True: interval is number of sections
+                    False: interval is num pixels for each color
+
+                blend: true if colors are mixed (default: False)
+        """
+        this_id = self.animation_id.get()
+        if fraction:
+            interval = self.get_fraction(interval)
+        color = 0
+        for i in range(0, neopixels.numPixels(self.id), interval):
+            for j in range(interval):
+                if blend:
+                    cur_color = get_mix(colors[color], colors[(color + 1) % len(colors)], (j / interval) * 100)
+                    neopixels.setPixelColor(self.id, i + j, cur_color)
+                else:
+                    if i + j < neopixels.numPixels(self.id):
+                        neopixels.setPixelColor(self.id, i + j, *colors[color])
+            color = (color + 1) % len(colors)
+        neopixels.show()
+
     def sleepListenForBreak(self, strip_id, wait_ms, this_id):
         """While sleeping check if global id has changed
 
             Parameters:
 
                 wait_ms: total sleep time (in ms)
+
+                this_id: value to compare animation id against
         """
         expected_end = time.time() + wait_ms/1000.0
         while wait_ms > 0 and time.time() < expected_end:
@@ -547,8 +598,29 @@ class Lights:
             wait_ms -= 100
         return False
 
-# Utilities
+    def get_fraction(self, num):
+        return round(neopixels.numPixels(self.id) / int(num))
 
+
+class Timer:
+    def __init__(self, num_pixels):
+        self.start_time = time.time()
+        self.sleep_count = 0
+        self.early = num_pixels * .00004
+
+    def set_start(self, value):
+        self.start_time = value
+        while time.time() < (self.start_time - self.early):
+            pass
+        self.sleep_count = 0
+
+    def sleep(self, value):
+        self.sleep_count += value
+        while time.time() < self.start_time + self.sleep_count:
+            time.sleep(.001)
+
+
+# Utilities
 
 def wheel(pos):
     """Generate rainbow colors across 0-255 positions.
@@ -565,7 +637,6 @@ def wheel(pos):
     else:
         pos -= 170
         return neopixels.get_color(0, pos * 3, 255 - pos * 3)
-
 
 def get_mix(color_1, color_2, percent):
     """Get the mixed color between 2 colors
@@ -584,6 +655,5 @@ def get_mix(color_1, color_2, percent):
     g = color_1[1] + (g_diff * percent/100.0)
     b = color_1[2] + (b_diff * percent/100.0)
     return neopixels.get_color(r, g, b)
-
 
 print("lights.py loaded")

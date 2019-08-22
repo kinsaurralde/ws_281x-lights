@@ -200,7 +200,8 @@ class GenericRow {
         }
         value["wait_mode"] = "false";
         if (this.data["wait_mode"] != null) {
-            if (this.data["wait_mode"] == "full" || this.data["wait_mode"] == "Instant") {
+            let accept = ["full", "Full", "Instant", "fraction"];
+            if (accept.includes(this.data["wait_mode"])) {
                 value["wait_mode"] = "true";
             }
         }
@@ -257,6 +258,9 @@ class GenericRow {
                 break;
             case "bounce":
                 lights.bounce(data["type"], data["colors"], data["wait_ms"], data["num_value"], data["dir"], data["option"], data["wait_mode"], data["key_ids"]);
+                break;
+            case "pattern":
+                lights.pattern(data["colors"], data["num_value"], data["wait_mode"], data["option"]);
                 break;
         }
     }

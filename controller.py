@@ -132,6 +132,7 @@ class Controller:
             "mix": strip.mix_switch,
             "reverse": strip.reverse,
             "bounce": strip.bounce,
+            "pattern": strip.pattern
         }
         if name in run_functions:
             return run_functions[name]
@@ -162,24 +163,22 @@ class Controller:
         threading_thread.start()
         return self.response(function, False, None, False, strip_id)
 
-    def animate(self, strip_id, function, arguments, delay_between=0, dont_split=False):
+    def animate(self, strip_id, function, arguments, delay_between=0):
         self.strips[strip_id].animation_id.increment()
         this_id = self.strips[strip_id].animation_id.get()
         neopixels.update_pixel_owner(strip_id)
         animation_function = self._run_functions(
             function, self.strips[strip_id])
         animation_arguments = (
-            strip_id, animation_function, arguments, this_id, delay_between, dont_split)
+            strip_id, animation_function, arguments, this_id, delay_between)
         animation_thread = threading.Thread(
             target=self._animate_run, args=animation_arguments)
         animation_thread.start()
         return self.response(function, False, None, False, strip_id)
 
-    def _animate_run(self, strip_id, function, arguments, animation_id, delay_between, dont_split):
+    def _animate_run(self, strip_id, function, arguments, animation_id, delay_between):
         while animation_id == self.strips[strip_id].animation_id.get():
-            if dont_split:
-                function(arguments)
-            elif isinstance(arguments, dict):
+            if isinstance(arguments, dict):
                 function(**arguments)
             elif delay_between == 0:
                 function(*arguments)
@@ -210,25 +209,5 @@ class Controller:
                 self.run(action["strip_id"], action["function"], action["arguments"], True)
             elif action["type"] == "thread":
                 self.thread(action["strip_id"], action["function"], action["arguments"], True)
-
-
-class Timer:
-    def __init__(self, num_pixels):
-        self.start_time = time.time()
-        self.sleep_count = 0
-        self.early = num_pixels * .00004
-
-    def set_start(self, value):
-        self.start_time = value
-        print("New start time:",self.start_time, time.time())
-        while time.time() < (self.start_time - self.early):
-            pass
-        self.sleep_count = 0
-        print("Actual start time:", time.time())
-
-    def sleep(self, value):
-        self.sleep_count += value
-        while time.time() < self.start_time + self.sleep_count:
-            time.sleep(.001)
 
 print("controller.py loaded")

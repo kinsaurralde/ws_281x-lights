@@ -137,13 +137,13 @@
             <input type="button" value="#Red Pulse#" onclick="lights.pulse('thread',255,0,0,0,2000,10, false, true)">
             <input type="button" value="#Green Pulse#" onclick="lights.pulse('thread',0,255,0,0,10,4, false, false)">
             <input type="button" value="#Blue Pulse#" onclick="lights.pulse('thread',0,0,255,1,25,6, false, false)">
-            <input type="button" value="RCGMBY" onclick="preset.run(0)">
-            <input type="button" value="RGB" onclick="preset.run(1)">
             <input type="button" value="#Red Wipe#" onclick="lights.wipe(255,0,0,-1,40,'thread')">
             <input type="button" value="#Green Wipe#" onclick="lights.wipe(0,255,0,1,20,'thread')">
             <input type="button" value="#Blue Wipe#" onclick="lights.wipe(0,0,255,-1,10,'thread')">
             <input type="button" value="*Mix*" onclick="lights.send('animate/mix/255.0.0;0.255.0;0.0.255;255.0.0,500,false')">
             <input type="button" value="*Bounce*" onclick="lights.send('animate/bounce/0.255.255;0.255.255,1000,5,1,True,true')">
+            <input type="button" value="RCGMBY" onclick="lights.send('run/pattern/255.0.0;0.255.255;0.255.0;255.0.255;0.0.255;255.255.0,6,true,false')">
+            <input type="button" value="RGB" onclick="lights.send('run/pattern/255.0.0;0.255.0;0.0.255,3,true,false')">
         </div>
     </div>
 
@@ -174,7 +174,7 @@
                     <th>Function</th>
                     <th>Color</th>
                     <th>Wait ms</th>
-                    <th>Wait mode</th>
+                    <th>(Wait) Mode</th>
                     <th>Direction</th>
                     <th>Value</th>
                     <th>Option</th>
@@ -231,7 +231,6 @@
             <div class="divider"></div>
             <input type="button" value="View Code"
                 onclick="openURL('https:\/\/github.com/kinsaurralde/ws_281x-lights')">
-            <!--<input type="button" value="View Docs" onclick="openURL('docs')">-->
             <input type="button" value="View Info" onclick="openURL('info/web')">
             <input type="button" value="kinsaurralde.com" onclick="openURL('https:\/\/kinsaurralde.com')">
             <div class="divider"></div>
@@ -259,6 +258,7 @@
             generic.add_row("mix");
             generic.add_row("pulse");
             generic.add_row("wipe");
+            generic.add_row("pattern");
             generic.add_row("chase");
             generic.add_row("rainbowCycle");
             generic.add_row("shift");
