@@ -47,6 +47,9 @@ class Controller:
         data["power"] = neopixels.get_power_info()
         return data
 
+    def ping(self):
+        return time.time()
+
     def response(self, command_run, error, message, detailed=False, strip_id=None):
         data = {
             "controller_id": self.id,
@@ -139,7 +142,7 @@ class Controller:
         else:
             raise NameError
 
-    def run(self, strip_id, function, arguments=None, is_dict=False):
+    def run(self, strip_id, function, arguments=None, start_time=time.time()):
         self.strips[strip_id].animation_id.increment()
         run_function = self._run_functions(function, self.strips[strip_id])
         if arguments == None:
@@ -152,10 +155,11 @@ class Controller:
             run_function(*arguments)
         return self.response(function, False, None, False, strip_id)
 
-    def thread(self, strip_id, function, arguments, is_dict=False):
+    def thread(self, strip_id, function, arguments, start_time=time.time()):
         neopixels.update_pixel_owner(strip_id)
         threading_function = self._run_functions(
             function, self.strips[strip_id])
+        self.strips[strip_id].start_time = start_time
         if isinstance(arguments, dict):
             threading_thread = threading.Thread(target=threading_function, kwargs=arguments)
         else:
@@ -163,30 +167,36 @@ class Controller:
         threading_thread.start()
         return self.response(function, False, None, False, strip_id)
 
-    def animate(self, strip_id, function, arguments, delay_between=0):
+    def animate(self, strip_id, function, arguments, delay_between=0, start_time=time.time()):
         self.strips[strip_id].animation_id.increment()
         this_id = self.strips[strip_id].animation_id.get()
         neopixels.update_pixel_owner(strip_id)
         animation_function = self._run_functions(
             function, self.strips[strip_id])
         animation_arguments = (
-            strip_id, animation_function, arguments, this_id, delay_between)
+            strip_id, animation_function, arguments, this_id, delay_between, start_time)
         animation_thread = threading.Thread(
             target=self._animate_run, args=animation_arguments)
         animation_thread.start()
         return self.response(function, False, None, False, strip_id)
 
-    def _animate_run(self, strip_id, function, arguments, animation_id, delay_between):
+    def _animate_run(self, strip_id, function, arguments, animation_id, delay_between, start_time):
+        t = Timer(self.num_pixels, start_time)
+        total_time = 0
+        self.strips[strip_id].start_time = start_time
+        delay = int(delay_between)
         while animation_id == self.strips[strip_id].animation_id.get():
+            self.strips[strip_id].start_time = start_time + (total_time / 1000)
             if isinstance(arguments, dict):
-                function(**arguments)
+                total_time += function(**arguments)
             elif delay_between == 0:
-                function(*arguments)
+                total_time += function(*arguments)
             else:
                 threading_thread = threading.Thread(
                     target=function, args=arguments)
                 threading_thread.start()
-                time.sleep(int(delay_between)/1000)
+                t.sleep(delay/1000)
+                total_time += delay
 
     def execute_json(self, data):
         t = Timer(self.num_pixels)
@@ -195,7 +205,9 @@ class Controller:
                 if action["function"] == "wait":
                     time.sleep(int(action["arguments"]["amount"]) / 1000)
                 if action["function"] == "starttime":
-                    t.set_start(action["arguments"]["amount"])
+                    time_start = action["arguments"]["amount"]
+                    t.set_start(time_start)
+                    pass
                 elif action["function"] == "stopanimation":
                     self.stop(action.get("strip_id"))
                 elif action["function"] == "off":
@@ -204,10 +216,10 @@ class Controller:
                 if action["function"] == "brightness":
                     self.set_brightness(action.get("arguments"))
             elif action["type"] == "animate":
-                self.animate(action["strip_id"], action["function"], action["arguments"], action.get("delay_between", 0))
+                self.animate(action["strip_id"], action["function"], action["arguments"], action.get("delay_between", 0), time_start)
             elif action["type"] == "run":
-                self.run(action["strip_id"], action["function"], action["arguments"], True)
+                self.run(action["strip_id"], action["function"], action["arguments"], time_start)
             elif action["type"] == "thread":
-                self.thread(action["strip_id"], action["function"], action["arguments"], True)
+                self.thread(action["strip_id"], action["function"], action["arguments"], time_start)
 
 print("controller.py loaded")

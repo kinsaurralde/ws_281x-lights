@@ -2,6 +2,7 @@
 
 import json
 import sys
+import time
 
 from flask import Flask, json, request
 from key import Keys
@@ -31,6 +32,7 @@ def error_response(message):
 def page_not_found(e):
     return error_response(str(e)), 404
 
+
 @app.route('/info/get')
 def info():
     data = controller.info()
@@ -42,6 +44,11 @@ def post_json():
     data = request.get_json()
     print("Data:", data)
     return create_response(controller.execute_json(data))
+
+
+@app.route('/ping')
+def ping():
+    return create_response(time.time())
 
 
 controller = Controller(0)

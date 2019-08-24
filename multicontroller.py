@@ -155,6 +155,13 @@ class MultiController():
             response.append(self.controllers[i].info())
         return response
 
+    def ping(self):
+        data = []
+        for i in self.controllers:
+            start_time = time.time()
+            data.append((i.ping() - start_time) * 1000)
+        return data
+
 
 class RemoteController():
     def __init__(self, controller_id, data):
@@ -174,6 +181,9 @@ class RemoteController():
 
     def execute_json(self, data):
         requests.post(self.remote + "/json", json=data)
+
+    def ping(self):
+        return requests.get(self.remote + "/ping").json()
 
     def info(self):
         r = requests.get(self.remote + "/info/get")

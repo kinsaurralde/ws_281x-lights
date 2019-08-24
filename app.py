@@ -2,6 +2,7 @@
 
 import json
 import sys
+import time
 
 from flask import Flask, render_template, json, request
 from key import Keys
@@ -193,6 +194,13 @@ def animate(key_ids, function, args, delay=0):
 def post_json():
     data = request.get_json()
     return create_response(mc.json(data))
+
+
+@app.route('/ping')
+def ping():
+    data = mc.ping()
+    print("Ping Data:", data)
+    return create_response(data)
 
 
 config_name = "config.json"
