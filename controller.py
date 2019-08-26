@@ -199,15 +199,13 @@ class Controller:
                 total_time += delay
 
     def execute_json(self, data):
-        t = Timer(self.num_pixels)
+        t = Timer(self.num_pixels, time.time())
         for action in data:
             if action["type"] == "command":
                 if action["function"] == "wait":
-                    time.sleep(int(action["arguments"]["amount"]) / 1000)
+                    t.sleep(int(action["arguments"]["amount"]))
                 if action["function"] == "starttime":
-                    time_start = action["arguments"]["amount"]
-                    t.set_start(time_start)
-                    pass
+                    t.set_start(action["arguments"]["amount"])
                 elif action["function"] == "stopanimation":
                     self.stop(action.get("strip_id"))
                 elif action["function"] == "off":
@@ -216,10 +214,10 @@ class Controller:
                 if action["function"] == "brightness":
                     self.set_brightness(action.get("arguments"))
             elif action["type"] == "animate":
-                self.animate(action["strip_id"], action["function"], action["arguments"], action.get("delay_between", 0), time_start)
+                self.animate(action.get("strip_id", 0), action["function"], action["arguments"], action.get("delay_between", 0), t.get_time())
             elif action["type"] == "run":
-                self.run(action["strip_id"], action["function"], action["arguments"], time_start)
+                self.run(action.get("strip_id", 0), action["function"], action["arguments"], t.get_time())
             elif action["type"] == "thread":
-                self.thread(action["strip_id"], action["function"], action["arguments"], time_start)
+                self.thread(action.get("strip_id", 0), action["function"], action["arguments"], t.get_time())
 
 print("controller.py loaded")

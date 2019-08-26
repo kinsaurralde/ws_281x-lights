@@ -10,6 +10,13 @@
         }
     },
     {
+        "function": "wait",
+        "type": "command",
+        "arguments": {
+            "amount": 1000
+        }
+    },
+    {
         "function": "pulse",
         "type": "thread",
         "strip_id": 0,

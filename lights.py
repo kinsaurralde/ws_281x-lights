@@ -18,6 +18,7 @@ PROVIDED_MILLIAMPS = 10000
 POWER_MULTIPLIER = 0.9
 MAX_MILLIAMPS = PROVIDED_MILLIAMPS*POWER_MULTIPLIER
 
+
 def time_func(func):
     def wrapper(*args, **kwargs):
         s_time = time.time()
@@ -36,6 +37,7 @@ class Timer:
         self.start_time = start_time
         self.sleep_count = 0
         self.early = num_pixels * .00004
+       #  print("TImer created:", self.start_time, time.time())
 
     def set_start(self, value):
         self.start_time = value
@@ -43,14 +45,17 @@ class Timer:
             pass
         self.sleep_count = 0
 
+    def get_time(self):
+        return self.start_time + self.sleep_count
+
     def sleep(self, value):
-        self.sleep_count += value
-        while time.time() < self.start_time + self.sleep_count:
+        self.sleep_count += (value/1000)
+        while time.time() < self.start_time + self.sleep_count - self.early:
             time.sleep(.001)
 
     def sleepBreak(self, id_function, this_id, value):
         self.sleep_count += (value/1000)
-        while time.time() < self.start_time + self.sleep_count:
+        while time.time() < self.start_time + self.sleep_count - self.early:
             time.sleep(.001)
             if this_id != id_function():
                 return True
@@ -533,6 +538,7 @@ class Lights:
                     neopixels.setPixelColor(self.id, i + j, 0)
         return 0
 
+    # @time_func
     def mix_switch(self, colors, wait_ms=2000, instant=False):
         """Cycle fading between multiple colors
 

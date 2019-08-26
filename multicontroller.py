@@ -50,15 +50,18 @@ class MultiController():
         if len(self.cur_controller_id) > 1:
             self.start_time += self.start_delay
 
-    def _create(self, type, strip_id, function, arguments=None, stop=False):
-        data = [
-            {
+    def _starttime(self):
+        return {
                 "type": "command",
                 "function": "starttime",
                 "arguments":  {
                     "amount": self.start_time
                 }
-            }, {
+            }
+
+    def _create(self, type, strip_id, function, arguments=None, stop=False):
+        data = [
+            {
                 "type": type,
                 "function": function,
                 "strip_id": strip_id,
@@ -66,11 +69,12 @@ class MultiController():
             }
         ]
         if stop:
-            data.insert(1, {
+            data = [{
                 "type": "command",
                 "function": "stopanimation",
                 "strip_id": strip_id
-            })
+            }] + data
+        data = [self._starttime()] + data
         return data
 
     def _response(self):
@@ -80,6 +84,7 @@ class MultiController():
         }
 
     def json(self, data):
+        self._set_cur_ids("-1")
         for line in data:
             if "controller_id" in line:
                 self._set_cur_ids(line["controller_id"])
