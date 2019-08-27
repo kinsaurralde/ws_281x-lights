@@ -44,14 +44,16 @@ class Info {
 
     appendRow(data) {
         let row = this.table.insertRow();
-        for (let j = 0; j < 5; j++) {
+        for (let j = 0; j < 7; j++) {
             row.insertCell();
         }
         this.table.rows[this.table.rows.length - 1].cells[0].innerHTML = data["controller_id"];
-        this.table.rows[this.table.rows.length - 1].cells[1].innerHTML = data["power"]["now_milliamps"];
-        this.table.rows[this.table.rows.length - 1].cells[2].innerHTML = data["settings"]["brightness"];
-        this.table.rows[this.table.rows.length - 1].cells[3].innerHTML = data["settings"]["num_pixels"];
-        this.table.rows[this.table.rows.length - 1].cells[4].innerHTML = data["strip_info"].length;
+        this.table.rows[this.table.rows.length - 1].cells[1].innerHTML = data["power"]["now_watts"].toFixed(3) + " / " + data["power"]["strip_max"];
+        this.table.rows[this.table.rows.length - 1].cells[2].innerHTML = data["power"]["max_watts"];
+        this.table.rows[this.table.rows.length - 1].cells[3].innerHTML = data["settings"]["brightness"];
+        this.table.rows[this.table.rows.length - 1].cells[4].innerHTML = data["settings"]["num_pixels"];
+        this.table.rows[this.table.rows.length - 1].cells[5].innerHTML = data["strip_info"].length;
+        this.table.rows[this.table.rows.length - 1].cells[6].innerHTML = data["ping"].toFixed(3);
     }
 
     clearTable() {

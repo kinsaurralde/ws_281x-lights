@@ -156,8 +156,10 @@ class MultiController():
 
     def info(self):
         response = []
+        ping_data = self.ping()
         for i in range(len(self.controllers)):
             response.append(self.controllers[i].info())
+            response[len(response) - 1]["ping"] = ping_data[i]
         return response
 
     def ping(self):

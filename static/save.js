@@ -39,9 +39,9 @@ class Save {
     }
 
     createLive() {
-        this.color.r = 100;
-        this.color.g = 100;
-        this.color.g = 100;
+        this.color.r = 0;
+        this.color.g = 0;
+        this.color.b = 0;
 
         let section_flex = document.createElement("div");
         section_flex.className = "section-flex";

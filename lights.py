@@ -18,6 +18,9 @@ PROVIDED_MILLIAMPS = 10000
 POWER_MULTIPLIER = 0.9
 MAX_MILLIAMPS = PROVIDED_MILLIAMPS*POWER_MULTIPLIER
 
+PROVIDED_WATTS = 1
+VOLTAGE = 5
+
 
 def time_func(func):
     def wrapper(*args, **kwargs):
@@ -73,8 +76,10 @@ class NeoPixels:
         self.num_pixels = LED_COUNT
         self.v_strips = []
         self.pixel_owner = [0] * self.num_pixels
-        self.max_milliamps = MAX_MILLIAMPS
+        # self.max_milliamps = MAX_MILLIAMPS
         self.max_brightness = LED_BRIGHTNESS
+        self.max_watts = PROVIDED_WATTS
+        self.voltage = VOLTAGE
         self.last_show = 0
 
     def init_neopixels(self, data):
@@ -82,8 +87,10 @@ class NeoPixels:
             self.num_pixels = data["led_count"]
         if "max_brightness" in data:
             self.max_brightness = data["max_brightness"]
-        if "max_milliamps" in data:
-            self.max_milliamps = data["max_milliamps"]
+        if "max_watts" in data:
+            self.max_watts = data["max_watts"]
+        if "volts" in data:
+            self.voltage = data["volts"]
         self.pixel_owner = [0] * self.num_pixels
         self.strip = Adafruit_NeoPixel(
             self.num_pixels, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, self.max_brightness, LED_CHANNEL)
@@ -171,15 +178,16 @@ class NeoPixels:
             pixel_color = self.strip.getPixelColor(i)
             pixel_colors = self.get_color_seperate(pixel_color)
             total_color += pixel_colors[0] + pixel_colors[1] + pixel_colors[2]
-        total_color = (total_color / 765) * 60
-        while total_color * (self.getBrightness() / 255) > self.max_milliamps:
+        total_color = (total_color / 765) * 18 / 60
+        while total_color * (self.getBrightness() / 255) > self.max_watts:
             self.setBrightness(self.getBrightness() - 1)
-        return math.ceil(total_color * (self.getBrightness() / 255))
+        return total_color * (self.getBrightness() / 255)
 
     def get_power_info(self):
         return {
-            "max_milliamps": self.max_milliamps,
-            "now_milliamps": self.check_power_usage()
+            "max_watts": self.max_watts,
+            "strip_max": self.num_pixels * 18 / 60,
+            "now_watts": self.check_power_usage()
         }
 
     def show(self, limit=0):

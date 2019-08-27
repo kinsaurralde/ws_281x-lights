@@ -25,13 +25,13 @@ class Controller():
         led_count = get_int("Enter number of LEDs on strip: ", 0, 1000)
         max_brightness = get_int(
             "Enter maximum brightness (0 - 255): ", 0, 255)
-        max_milliamps = get_int(
-            "Enter maximum milliamps entire strip can use: ", 0, 100000)
+        max_watts = get_int(
+            "Enter maximum watts entire strip can use: ", 0, 100000)
         volts = get_int("Enter voltage of power supply (5 or 12): ", 5, 12)
         self.data["neopixels"] = {
             "led_count": led_count,
             "max_brightness": max_brightness,
-            "max_milliamps": max_milliamps,
+            "max_watts": max_watts,
             "volts": volts
         }
 
