@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
-
-import json
+import json as js
 import sys
 import time
 
 from flask import Flask, json, request
+from flask_socketio import SocketIO
 from key import Keys
 from controller import Controller
 
-
 app = Flask(__name__)
+socketio = SocketIO(app)
+
 debug_exceptions = False  # if true, exception will be sent to web
 
 
 def create_response(data):
-    response = app.response_class(response=json.dumps(
+    response = app.response_class(response=js.dumps(
         data), status=200, mimetype='application/json')
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
@@ -37,19 +38,6 @@ def page_not_found(e):
 def info():
     data = controller.info()
     return create_response(data)
-
-
-@app.route('/json', methods=['GET', 'POST'])
-def post_json():
-    data = request.get_json()
-    print("Data:", data)
-    return create_response(controller.execute_json(data))
-
-
-@app.route('/ping')
-def ping():
-    return create_response(time.time())
-
 
 controller = Controller(0)
 
@@ -76,5 +64,22 @@ port = 200
 if "port" in config_data["info"]:
     port = int(config_data["info"]["port"])
 
+@socketio.on('ping')
+def ping(methods=['GET']):
+    socketio.emit('ping_response', time.time())
+
+@socketio.on('json')
+def json(data, methods=['POST']):
+    controller.execute_json(data)
+
+@socketio.on('connect')
+def test_connect():
+    print("Connected")
+    socketio.emit('response', {'data': 'Connected'})
+
+@socketio.on('disconnect')
+def test_disconnect():
+    print('Client disconnected')
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=port, threaded=True)
+    socketio.run(app, debug=True, host='0.0.0.0', port=port)

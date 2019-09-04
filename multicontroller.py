@@ -1,6 +1,7 @@
 import threading
 import requests
 import time
+import socketio
 
 from controller import Controller
 
@@ -11,7 +12,7 @@ class MultiController():
         self.queues = []
         self.cur_controller_id = [0]
         self.start_time = 0
-        self.start_delay = .1
+        self.start_delay = .05
         if "controllers" not in config_data:
             raise KeyError
         for controller in config_data["controllers"]:
@@ -176,6 +177,18 @@ class RemoteController():
         self.start_time = 0
         self.is_remote = True
         self.remote = "http://" + data["remote"]
+        self.sio = socketio.Client()
+        self._connect()
+
+    def _connect(self):
+        self.sio.connect(self.remote)
+        self.sio.on('ping_response', self._ping_response)
+        self.sio.emit('ping')
+
+    def _ping_response(self, data):
+        print("ping called back", data)
+        self.ping_data = data
+        self.waiting_ping = False
 
     def _create_json(self, type, strip_id, function, arguments=None):
         return [{
@@ -187,10 +200,17 @@ class RemoteController():
         }]
 
     def execute_json(self, data):
-        requests.post(self.remote + "/json", json=data)
+        self.sio.emit('json', data)
+
+    def ping_callback(self, data):
+        pass
 
     def ping(self):
-        return requests.get(self.remote + "/ping").json()
+        self.sio.emit('ping')
+        self.waiting_ping = True
+        while self.waiting_ping:
+            pass
+        return self.ping_data
 
     def info(self):
         r = requests.get(self.remote + "/info/get")
@@ -202,5 +222,4 @@ class RemoteController():
         self.start_time = value
 
     def set_brightness(self, value):
-        self.execute_json(self._create_json(
-            "setting", None, "brightness", value))
+        self.execute_json(self._create_json("setting", None, "brightness", value))

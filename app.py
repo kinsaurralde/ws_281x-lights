@@ -223,4 +223,4 @@ if "port" in config_data["info"]:
     port = int(config_data["info"]["port"])
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=port, threaded=True)
+    app.run(debug=False, host='0.0.0.0', port=port, threaded=True)
