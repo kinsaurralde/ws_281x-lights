@@ -47,7 +47,7 @@ def split_key_ids(items):
     split = items.split(':')
     data = {
         "key": 0,
-        "controller_id": 0,
+        "controller_ids": 0,
         "strip_id": 0
     }
     if len(split) > 0:
@@ -153,7 +153,7 @@ def change_settings(controller_ids, args):
 def run(key_ids, function, args=None):
     try:
         data = split_key_ids(key_ids)
-        keys.check_key(data["key"], data["strip_id"])
+        keys.check_keys(data["key"], data["controller_ids"])
         if args is not None:
             args = [int(x) if x.lstrip('-').isdigit() else make_list(x) for x in args.split(',')]
         controller_response = mc.run(data["controller_ids"], int(
@@ -223,4 +223,4 @@ if "port" in config_data["info"]:
     port = int(config_data["info"]["port"])
 
 if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0', port=port, threaded=True)
+    app.run(debug=False, host='0.0.0.0', port=port, threaded=True) 

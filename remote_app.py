@@ -35,7 +35,7 @@ def page_not_found(e):
 
 
 @app.route('/info/get')
-def info():
+def info_get():
     data = controller.info()
     return create_response(data)
 
@@ -71,6 +71,11 @@ def ping(methods=['GET']):
 @socketio.on('json')
 def json(data, methods=['POST']):
     controller.execute_json(data)
+
+@socketio.on('info')
+def info(methods=['GET']):
+    data = controller.info()
+    socketio.emit('info_response', data)
 
 @socketio.on('connect')
 def test_connect():

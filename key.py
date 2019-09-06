@@ -10,7 +10,8 @@ class Keys:
             for key in config_data["keys"]:
                 self.add_key(key, config_data["keys"][key])
         print("Initial web key is", self.data["webkey"])
-        self.add_key(self.data["webkey"], [-1, 0])
+        self.max_controllers = len(config_data["controllers"])
+        self.add_key(self.data["webkey"], [-1] + list(range(self.max_controllers)))
         self.remove_key("webkey")
 
     def run_function(self, function, params):
@@ -57,6 +58,15 @@ class Keys:
         else:
             raise AssertionError()
         return True
+
+    def check_keys(self, key_to_check, controller_ids):
+        if '-1' in controller_ids:
+            controller_ids = list(range(self.max_controllers))
+        for control_id in controller_ids:
+            if str(key_to_check) in self.data and key_to_check != "webkey":
+                assert self.data[str(key_to_check)].count(int(control_id)) > 0 
+            else:
+                raise AssertionError 
 
     def get_keys(self, key):
         self.check_key(key, -1)

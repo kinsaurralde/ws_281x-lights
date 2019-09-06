@@ -183,12 +183,17 @@ class RemoteController():
     def _connect(self):
         self.sio.connect(self.remote)
         self.sio.on('ping_response', self._ping_response)
+        self.sio.on('info_response', self._info_response)
         self.sio.emit('ping')
 
     def _ping_response(self, data):
         print("ping called back", data)
         self.ping_data = data
         self.waiting_ping = False
+
+    def _info_response(self, data):
+        self.info_data = data
+        self.waiting_info = False
 
     def _create_json(self, type, strip_id, function, arguments=None):
         return [{
@@ -202,9 +207,6 @@ class RemoteController():
     def execute_json(self, data):
         self.sio.emit('json', data)
 
-    def ping_callback(self, data):
-        pass
-
     def ping(self):
         self.sio.emit('ping')
         self.waiting_ping = True
@@ -213,10 +215,11 @@ class RemoteController():
         return self.ping_data
 
     def info(self):
-        r = requests.get(self.remote + "/info/get")
-        data = r.json()
-        data["controller_id"] = self.id
-        return data
+        self.sio.emit('info')
+        self.waiting_info = True
+        while self.waiting_info:
+            pass
+        return self.info_data
 
     def delay_start_time(self, value):
         self.start_time = value

@@ -8,7 +8,7 @@ import subprocess
 
 def update(folder_name):
     if os.path.isdir(folder_name):
-        print(folder_name)
+        shutil.copy("../remote_setup.sh", folder_name + "setup.sh")
         shutil.copy("../remote_app.py", folder_name + "app.py")
         shutil.copy("../key.py", folder_name + "key.py")
         shutil.copy("../controller.py", folder_name + "controller.py")
