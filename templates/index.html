@@ -144,6 +144,7 @@
             <input type="button" value="*Bounce*" onclick="lights.send('animate/bounce/0.255.255;0.255.255,1000,5,1,True,true')">
             <input type="button" value="RCGMBY" onclick="lights.send('run/pattern/255.0.0;0.255.255;0.255.0;255.0.255;0.0.255;255.255.0,6,true,false')">
             <input type="button" value="RGB" onclick="lights.send('run/pattern/255.0.0;0.255.0;0.0.255,3,true,false')">
+            <input type="button" value="Blend" onclick="lights.send('run/blend/3,100,20')">
         </div>
     </div>
 
@@ -257,6 +258,7 @@
             generic.add_row("color");
             generic.add_row("mix");
             generic.add_row("pulse");
+            generic.add_row("blend");
             generic.add_row("wipe");
             generic.add_row("pattern");
             generic.add_row("chase");

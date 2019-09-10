@@ -135,7 +135,8 @@ class Controller:
             "mix": strip.mix_switch,
             "reverse": strip.reverse,
             "bounce": strip.bounce,
-            "pattern": strip.pattern
+            "pattern": strip.pattern,
+            "blend": strip.blend
         }
         if name in run_functions:
             return run_functions[name]
@@ -145,6 +146,7 @@ class Controller:
     def run(self, strip_id, function, arguments=None, start_time=time.time()):
         self.strips[strip_id].animation_id.increment()
         run_function = self._run_functions(function, self.strips[strip_id])
+        self.strips[strip_id].start_time = start_time
         if arguments == None:
             run_function()
         elif isinstance(arguments, dict):

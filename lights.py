@@ -253,9 +253,9 @@ class Lights:
                 neopixels.getPixelColor(self.id, i))
             lights_save.append({
                 "id": i,
-                "r": cur_color[0],
-                "g": cur_color[1],
-                "b": cur_color[2],
+                "r": int(cur_color[0]),
+                "g": int(cur_color[1]),
+                "b": int(cur_color[2]),
             })
         return lights_save
 
@@ -659,6 +659,45 @@ class Lights:
             color = (color + 1) % len(colors)
         neopixels.show()
         return 0
+
+    def blend(self, radius=5, wait_ms=0, iterations=1):
+        """Average pixel color with neighboors
+
+            Parameters:
+
+                radius: amount of neighboors on each side (default: 5)
+
+                wait_ms: amount of time between iterations (default: 0)
+
+                iterations: number of times to blend (default: 1)
+        """
+        t = Timer(neopixels.numMaxPixels(), self.start_time)
+        this_id = self.animation_id.get()
+        num_pixels = neopixels.numPixels(self.id)
+        amount = .5
+        radius += 1
+        sides = (1 - float(amount)) / 2
+        for i in range(iterations):
+            saved = self.save_split()
+            for j in range(num_pixels):
+                r, g, b = 0, 0, 0
+                for k in range(radius):
+                    r += saved[(j - k + num_pixels) % num_pixels]["r"]
+                    r += saved[(j + k + num_pixels) % num_pixels]["r"]
+                    g += saved[(j - k + num_pixels) % num_pixels]["g"]
+                    g += saved[(j + k + num_pixels) % num_pixels]["g"]
+                    b += saved[(j - k + num_pixels) % num_pixels]["b"]
+                    b += saved[(j + k + num_pixels) % num_pixels]["b"]
+                r /= radius * 2
+                g /= radius * 2
+                b /= radius * 2
+                neopixels.setPixelColor(self.id, j, r, g, b)
+            if wait_ms > 0:
+                neopixels.show(15)
+                if t.sleepBreak(self.animation_id.get, this_id, wait_ms):
+                    return 0
+        neopixels.show()
+        return wait_ms * iterations
 
     def sleepListenForBreak(self, strip_id, wait_ms, this_id):
         """While sleeping check if global id has changed

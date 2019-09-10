@@ -139,5 +139,18 @@ let generic_functions = {
             "default": [3]
         },
         "wait_mode": [ "fraction", "interval"],
+    },
+    "blend": {
+        "types": ["run"],
+        "wait_ms": [100],
+        "num_value": {
+            "label": "Radius",
+            "default": [3]
+        },
+        "option": {
+            "label": "Iterations",
+            "default": [10],
+            "mode": "number"
+        },
     }
 };

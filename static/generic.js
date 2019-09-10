@@ -104,7 +104,13 @@ class GenericRow {
         if (func_data.hasOwnProperty("option")) {
             cell.innerHTML = func_data["option"]["label"];
             cell.innerHTML += ": ";
-            cell.appendChild(html.createSelect(this.getValue("option"), id + "option", func_data["option"]["default"]));
+            if (func_data["option"].hasOwnProperty("mode")) {
+                if (func_data["option"]["mode"] == "number") {
+                    cell.appendChild(html.createNumber(this.getValue("option"), id + "option", null))
+                }
+            } else {
+                cell.appendChild(html.createSelect(this.getValue("option"), id + "option", func_data["option"]["default"]));
+            }
         } else {
             cell.appendChild(html.createNONE(id + "option"))
         }
@@ -260,7 +266,10 @@ class GenericRow {
                 lights.bounce(data["type"], data["colors"], data["wait_ms"], data["num_value"], data["dir"], data["option"], data["wait_mode"], data["key_ids"]);
                 break;
             case "pattern":
-                lights.pattern(data["colors"], data["num_value"], data["wait_mode"], data["option"]);
+                lights.pattern(data["colors"], data["num_value"], data["wait_mode"], data["option"], data["key_ids"]);
+                break;
+            case "blend":
+                lights.blend(data["num_value"], data["wait_ms"], data["option"], data["key_ids"])
                 break;
         }
     }

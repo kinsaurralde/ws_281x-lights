@@ -271,6 +271,11 @@ class LightStrip {
         this.send(path, ids);
     }
 
+    blend(radius, wait_ms, iterations, ids) {
+        let path = "run/blend/" + radius + "," + wait_ms + "," + iterations;
+        this.send(path, ids)
+    }
+
     reverseStrip(ids=null) {
         let path = "run/reverse";
         this.send(path, ids);
