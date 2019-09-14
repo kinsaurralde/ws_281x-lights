@@ -136,7 +136,8 @@ class Controller:
             "reverse": strip.reverse,
             "bounce": strip.bounce,
             "pattern": strip.pattern,
-            "blend": strip.blend
+            "blend": strip.blend,
+            "fade": strip.fade
         }
         if name in run_functions:
             return run_functions[name]

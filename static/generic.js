@@ -271,6 +271,9 @@ class GenericRow {
             case "blend":
                 lights.blend(data["num_value"], data["wait_ms"], data["option"], data["key_ids"])
                 break;
+            case "fade":
+                lights.fade(data["num_value"], data["wait_ms"], data["option"], 100, data["key_ids"]);
+                break;
         }
     }
 

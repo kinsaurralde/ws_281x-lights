@@ -266,13 +266,18 @@ class LightStrip {
         this.send(path, ids);
     }
 
-    pattern(colors, interval, fraction, blend, ids) {
+    pattern(colors, interval, fraction, blend, ids=null) {
         let path = "run/pattern/" + colors + "," + interval + "," + fraction + "," + blend;
         this.send(path, ids);
     }
 
-    blend(radius, wait_ms, iterations, ids) {
+    blend(radius, wait_ms, iterations, ids=null) {
         let path = "run/blend/" + radius + "," + wait_ms + "," + iterations;
+        this.send(path, ids)
+    }
+
+    fade(target, wait_ms, restore_mode, steps=100, ids=null) {
+        let path = "run/fade/" + target + "," + wait_ms + "," + restore_mode + "," + steps;
         this.send(path, ids)
     }
 

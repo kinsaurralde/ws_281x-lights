@@ -480,6 +480,8 @@ class Lights:
         """
         this_id = self.animation_id.get()
         current_color = neopixels.get_random_color()
+        if each == -1:
+            each = neopixels.numPixels(self.id)
         for i in range(iterations):
             for j in range(neopixels.numPixels(self.id)):
                 if j % each == 0:
@@ -546,7 +548,6 @@ class Lights:
                     neopixels.setPixelColor(self.id, i + j, 0)
         return 0
 
-    # @time_func
     def mix_switch(self, colors, wait_ms=2000, instant=False):
         """Cycle fading between multiple colors
 
@@ -698,6 +699,40 @@ class Lights:
                     return 0
         neopixels.show()
         return wait_ms * iterations
+
+    def fade(self, target=0, wait_ms=1000, restore_mode="off", steps=100):
+        """Set brightness to target in steps
+
+            Parameters:
+
+                target: final brightness (default: 0)
+        
+                wait_ms: total time before target brightness is reached (default: 1000)
+
+                restore_mode: set brightness after (default: off)
+                    "off": set pixels to off then restore brightness to original
+                    "brightnesss": set pixels to original brightness
+                    Anything Else: keep brightness at target brightness and color original
+        """
+        t = Timer(neopixels.numMaxPixels(), self.start_time)
+        this_id = self.animation_id.get()
+        brightness = neopixels.getBrightness()
+        change = (target - brightness) / steps
+        wait = wait_ms / steps
+        original = brightness
+        for i in range(steps):
+            brightness += change
+            neopixels.setBrightness(int(brightness))
+            neopixels.show(15)
+            if t.sleepBreak(self.animation_id.get, this_id, wait):
+                return 0
+        if restore_mode == "off":
+            self.set_all(0,0,0)
+            neopixels.setBrightness(original)
+        elif restore_mode == "brightness":
+            neopixels.setBrightness(original)
+        neopixels.show()
+        return wait_ms
 
     def sleepListenForBreak(self, strip_id, wait_ms, this_id):
         """While sleeping check if global id has changed

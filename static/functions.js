@@ -152,5 +152,17 @@ let generic_functions = {
             "default": [10],
             "mode": "number"
         },
+    },
+    "fade": {
+        "types": ["run"],
+        "wait_ms": [1000],
+        "num_value": {
+            "label": "Target",
+            "default": [0]
+        },
+        "option": {
+            "label": "Restore Mode",
+            "default": ["off", "brightness", "none"],
+        },
     }
 };

@@ -111,13 +111,13 @@
         <div class="section-hidden" id="quick-expanded" style="display: block;">
             <div class="divider"></div>
             <input type="button" value="Off" onclick="lights.off()">
+            <input type="button" value="Fade" onclick="lights.send('run/fade/0,200,off')">
             <input type="button" value="Random Each" onclick="lights.random(1)">
-            <input type="button" value="Random" onclick="lights.random(60)">
+            <input type="button" value="Random" onclick="lights.random(-1)">
             <input type="button" value="Red" onclick="lights.colorAll(255,0,0)">
             <input type="button" value="Green" onclick="lights.colorAll(0,255,0)">
             <input type="button" value="Blue" onclick="lights.colorAll(0,0,255)">
             <input type="button" value="White" onclick="lights.colorAll(255,255,255)">
-            <input type="button" value="Black" onclick="lights.colorAll(0,0,0)">
             <input type="button" value="Red Wipe" onclick="lights.wipe(255,0,0,-1,40)">
             <input type="button" value="Green Wipe" onclick="lights.wipe(0,255,0,1,20)">
             <input type="button" value="Blue Wipe" onclick="lights.wipe(0,0,255,-1,10)">
@@ -129,7 +129,7 @@
             <input type="button" value="*Rainbow Chase*" onclick="lights.rainbowChase('animate', 50)">
             <input type="button" value="*Rainbow Cycle*" onclick="lights.rainbowCycle('animate', 50)">
             <input type="button" value="*Random Each*" onclick="lights.random(1, 150, true)">
-            <input type="button" value="*Random*" onclick="lights.random(60, 200, true)">
+            <input type="button" value="*Random*" onclick="lights.random(-1, 250, true)">
             <input type="button" value="*Red Pulse*" onclick="lights.pulse('animate',255,0,0,0,2000,10, false, true, 1000)">
             <input type="button" value="*Green Pulse*" onclick="lights.pulse('animate',0,255,0,0,10,4, false, false, 500)">
             <input type="button" value="*Blue Pulse*" onclick="lights.pulse('animate',0,0,255,1,25,5, true, false, 750)">
@@ -262,12 +262,10 @@
             generic.add_row("wipe");
             generic.add_row("pattern");
             generic.add_row("chase");
-            generic.add_row("rainbowCycle");
+            generic.add_row("fade");
             generic.add_row("shift");
             generic.add_row("reverse");
             generic.add_row("random");
-            generic.add_row("single");
-            generic.add_row("rainbowChase");
         }
 
         function expand(id, displayType) {
