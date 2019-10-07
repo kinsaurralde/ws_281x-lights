@@ -206,6 +206,9 @@ def ping():
 config_name = "config.json"
 if len(sys.argv) > 1:
     config_name = sys.argv[1]
+debug_mode = False
+if len(sys.argv) > 2:
+    debug_mode = bool(sys.argv[2])
 try:
     config_file = open(config_name, "r")
 except FileNotFoundError:
@@ -223,4 +226,4 @@ if "port" in config_data["info"]:
     port = int(config_data["info"]["port"])
 
 if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0', port=port, threaded=True) 
+    app.run(debug = debug_mode, host = '0.0.0.0', port = port, threaded = True) 

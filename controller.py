@@ -13,6 +13,7 @@ class Controller:
         self.break_animation = True
         self.layer = False
         self.id = controller_id
+        self.json_id = AnimationID()
 
         self.strips = []
         self.strip_data = []
@@ -201,26 +202,49 @@ class Controller:
                 t.sleep(delay/1000)
                 total_time += delay
 
+    def _loop(self, t, animation_id, action):
+        amount = action["arguments"]["amount"]
+        if amount == "forever":
+            amount = -1
+        amount = int(amount)
+        while amount != 0 and self.json_id.get() == animation_id:
+            amount -= 1
+            for sub_action in action["loop"]:
+                self._execute(t, animation_id, sub_action)
+
+    def _execute(self, t, animation_id, action):
+        if action["type"] == "command":
+            if action["function"] == "wait":
+                t.sleep(int(action["arguments"]["amount"]))
+            elif action["function"] == "starttime":
+                t.set_start(action["arguments"]["amount"])
+            elif action["function"] == "stopanimation":
+                self.stop(action.get("strip_id"))
+            elif action["function"] == "off":
+                self.off(action.get("strip_id"))
+        elif action["type"] == "control":
+            if action["function"] == "wait":
+                t.sleep(int(action["arguments"]["amount"]))
+            elif action["function"] == "loop":
+                self._loop(t, animation_id, action)
+        elif action["type"] == "setting":
+            if action["function"] == "brightness":
+                self.set_brightness(action.get("arguments"))
+        elif action["type"] == "animate":
+            self.animate(action.get("strip_id", 0), action["function"], action["arguments"], action.get("delay_between", 0), t.get_time())
+        elif action["type"] == "run":
+            self.run(action.get("strip_id", 0), action["function"], action["arguments"], t.get_time())
+        elif action["type"] == "thread":
+            self.thread(action.get("strip_id", 0), action["function"], action["arguments"], t.get_time())
+
     def execute_json(self, data):
+        self.json_id.increment()
+        animation_id = self.json_id.get()
         t = Timer(self.num_pixels, time.time())
         for action in data:
-            if action["type"] == "command":
-                if action["function"] == "wait":
-                    t.sleep(int(action["arguments"]["amount"]))
-                if action["function"] == "starttime":
-                    t.set_start(action["arguments"]["amount"])
-                elif action["function"] == "stopanimation":
-                    self.stop(action.get("strip_id"))
-                elif action["function"] == "off":
-                    self.off(action.get("strip_id"))
-            elif action["type"] == "setting":
-                if action["function"] == "brightness":
-                    self.set_brightness(action.get("arguments"))
-            elif action["type"] == "animate":
-                self.animate(action.get("strip_id", 0), action["function"], action["arguments"], action.get("delay_between", 0), t.get_time())
-            elif action["type"] == "run":
-                self.run(action.get("strip_id", 0), action["function"], action["arguments"], t.get_time())
-            elif action["type"] == "thread":
-                self.thread(action.get("strip_id", 0), action["function"], action["arguments"], t.get_time())
+            self._execute(t, animation_id, action)
+            if self.json_id.get() != animation_id:
+                break
+            
 
 print("controller.py loaded")
