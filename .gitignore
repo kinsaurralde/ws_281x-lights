@@ -3,5 +3,6 @@ __pycache__/
 *.json
 !/config.json
 !sample_*.json
+!/saves/animations/*.json
 tools/secondary/*
 tools/data/

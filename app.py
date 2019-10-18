@@ -8,6 +8,7 @@ from flask import Flask, render_template, json, request
 from key import Keys
 from controller import Controller
 from multicontroller import MultiController
+from saves import Saves
 
 app = Flask(__name__)
 debug_exceptions = False  # if true, exception will be sent to web
@@ -195,6 +196,17 @@ def post_json():
     data = request.get_json()
     return create_response(mc.json(data))
 
+@app.route('/saved/<folder>/<function>/<path>')
+@app.route('/saved/<folder>/<function>/<path>/<data>', methods=['GET', 'POST'])
+def saved(folder, function, path, data = None):
+    return_data = {}
+    if function == "run":
+        file_data = saves.get(folder, path, data)
+        return_data = create_response(mc.json(file_data))
+    elif function == "write":
+        saves.write(folder, path, data)
+    return return_data
+
 
 @app.route('/ping')
 def ping():
@@ -220,6 +232,8 @@ print("Config data read from", config_name, ":", config_data)
 mc = MultiController(config_data)
 
 keys = Keys(config_data)
+
+saves = Saves()
 
 port = 200
 if "port" in config_data["info"]:
