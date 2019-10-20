@@ -37,6 +37,27 @@ html {
     overflow-x: hidden;
 }
 
+/* Acutal Use Variables */
+@media (prefers-color-scheme: dark) {
+    html {
+        --body-background: var(--dark-body-background);
+        --text-color: var(--dark-text-color);
+        --input-border: var(--dark-input-border);
+        --input-background: var(--dark-input-background);
+        --border-color: var(--dark-border-color);
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    html {
+        --body-background: var(--light-body-background);
+        --text-color: var(--light-text-color);
+        --input-border: var(--light-input-border);
+        --input-background: var(--light-input-background);
+        --border-color: var(--light-border-color);
+    }
+}
+
 ::-webkit-scrollbar {
     width: 0px;  /* Remove scrollbar space */
     background: transparent;  /* Optional: just make scrollbar invisible */
