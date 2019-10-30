@@ -42,6 +42,8 @@ def exception_handler(ex):
         return error_response("Type Error: "+str(e))
     except AssertionError:
         return error_response("Assertion Error: invalid key")
+    except FileNotFoundError:
+        return error_response("Invalid File name or path" + str(e))
 
 
 def split_key_ids(items):
@@ -196,16 +198,18 @@ def post_json():
     data = request.get_json()
     return create_response(mc.json(data))
 
+@app.route('/saved/<folder>/<function>')
 @app.route('/saved/<folder>/<function>/<path>')
 @app.route('/saved/<folder>/<function>/<path>/<data>', methods=['GET', 'POST'])
-def saved(folder, function, path, data = None):
-    return_data = {}
-    if function == "run":
-        file_data = saves.get(folder, path, data)
-        return_data = create_response(mc.json(file_data))
-    elif function == "write":
-        saves.write(folder, path, data)
-    return return_data
+def saved(folder, function, path = None, data = None):
+    try:
+        return_data = {}
+        data = saves.run_function(function, folder, path, data)
+        if function == "run":
+            return create_response(mc.json(data))
+        return create_response(data)
+    except Exception as e:
+        return exception_handler(e)
 
 
 @app.route('/ping')

@@ -4,7 +4,7 @@
     <title>Lights</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="../static/main.css">
-    <script src="../static/functions.js"></script>
+    <script src="../static/generic_functions.js"></script>
     <script src="../static/writehtml.js"></script>
     <script src="../static/main.js"></script>
     <script src="../static/generic.js"></script>
@@ -12,6 +12,7 @@
     <script src="../static/sender.js"></script>
     <script src="../static/save.js"></script>
     <script src="../static/preset.js"></script>
+    <script src="../static/functions.js"></script>
 </head>
 
 <body onload="pageLoad()">
@@ -105,6 +106,18 @@
         </div>
     </div>
 
+    <div class="section" id="functions">
+        <div class="section-title">Functions
+            <input type="button" class="expand-button" value="^" style="width: 2vw;" onclick="expand('functions','block')">
+            <input type="button" value="Refresh" onclick="func.list()">
+        </div>
+        <div class="space-1"></div>
+        <div class="section-hidden" id="functions-expanded" style="display: block;">
+            <div class="divider"></div>
+            <div id="functions-buttons" style="display: flex;"></div>
+        </div>
+    </div>
+
     <div class="section" id="quick">
         <div class="section-title">Quick Buttons<input type="button" class="expand-button" value="^" style="width: 2vw;"
                 onclick="expand('quick','block')"></div>
@@ -161,7 +174,7 @@
     </div>
 
     <div class="section" id="generic">
-        <div class="section-title">Functions<input type="button" class="expand-button" value="^" style="width: 2vw;"
+        <div class="section-title">Generic Functions<input type="button" class="expand-button" value="^" style="width: 2vw;"
                 onclick="expand('generic','block')"><input type="button" class="expand-button" value="+"
                 style="width: 2vw;" onclick="addGeneric()"><input type="button" class="expand-button" value="-"
                 style="width: 2vw;" onclick="removeGeneric()"></div>
@@ -246,6 +259,7 @@
         var saves = new Array();
         var preset = new Preset();
         var generic = new Generic();
+        var func = new Functions();
 
         function pageLoad() {
             addSaveLive();
@@ -267,6 +281,8 @@
             generic.add_row("shift");
             generic.add_row("reverse");
             generic.add_row("random");
+
+            func.list();
         }
 
         function expand(id, displayType) {
