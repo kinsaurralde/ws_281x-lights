@@ -2,6 +2,7 @@ import threading
 import time
 
 from lights import *
+from variables import Variables
 
 
 class Controller:
@@ -18,6 +19,7 @@ class Controller:
         self.strips = []
         self.strip_data = []
         self.create_strip(0, self.num_pixels - 1)
+        self.v = Variables()
 
 
     def init_neopixels(self, data):
@@ -213,6 +215,7 @@ class Controller:
                 self._execute(t, animation_id, sub_action)
 
     def _execute(self, t, animation_id, action):
+        action = self.v.p_values(action)
         if action["type"] == "command":
             if action["function"] == "wait":
                 t.sleep(int(action["arguments"]["amount"]))
@@ -227,6 +230,16 @@ class Controller:
                 t.sleep(int(action["arguments"]["amount"]))
             elif action["function"] == "loop":
                 self._loop(t, animation_id, action)
+            elif action["function"] == "execute":
+                for a in action["value"]:
+                    self._execute(t, animation_id, a)
+        elif action["type"] == "variable":
+            if action["function"] == "set_value":
+                self.v.add(action["name"], action["value"], action.get("v_type"))
+            elif action["function"] == "set_function":
+                self.v.add(action["name"], action["value"], "function")
+            elif action["function"] == "list_all":
+                self.v.list_all()
         elif action["type"] == "setting":
             if action["function"] == "brightness":
                 self.set_brightness(action.get("arguments"))

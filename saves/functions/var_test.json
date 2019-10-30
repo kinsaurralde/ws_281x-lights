@@ -1,0 +1,32 @@
+[
+    {
+        "function": "set_value",
+        "type": "variable",
+        "name": "a",
+        "value": 7
+    },
+    {
+        "function": "set_value",
+        "type": "variable",
+        "name": "b",
+        "value": -7
+    },{
+        "function": "set_value",
+        "type": "variable",
+        "name": "c",
+        "value": 47
+    },{
+        "function": "set_value",
+        "type": "variable",
+        "name": "a",
+        "value": 2
+    },{
+        "function": "set_value",
+        "type": "variable",
+        "name": "d",
+        "value": 57
+    },{
+        "function": "list_all",
+        "type": "variable"
+    }
+]

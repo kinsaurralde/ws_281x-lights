@@ -1,0 +1,108 @@
+[   
+    {
+        "type": "requirement",
+        "key": false,
+        "write": "no"
+    },{
+        "function": "set_value",
+        "type": "variable",
+        "name": "green",
+        "value": [0, 255, 0],
+        "v_type": "color"
+    },{
+        "function": "set_value",
+        "type": "variable",
+        "name": "red",
+        "value": [255, 0, 0],
+        "v_type": "color"
+    },{
+        "function": "set_value",
+        "type": "variable",
+        "name": "off",
+        "value": [0, 0, 0],
+        "v_type": "color"
+    },{
+        "function": "set_function",
+        "type": "variable",
+        "name": "redalert",
+        "value": [{
+            "function": "loop",
+            "type": "control",
+            "arguments": {
+                "amount": "forever"
+            },
+            "loop": [
+                {
+                    "function": "color",
+                    "type": "run",
+                    "strip_id": 0,
+                    "arguments": {
+                        "color": "$off"
+                    }
+                },
+                {
+                    "function": "wipe",
+                    "type": "thread",
+                    "strip_id": 1,
+                    "arguments": {
+                        "color": "$red",
+                        "direction": 1,
+                        "wait_ms": 200,
+                        "wait_total": true
+                    }
+                },
+                {
+                    "function": "wipe",
+                    "type": "thread",
+                    "strip_id": 2,
+                    "arguments": {
+                        "color": "$red",
+                        "direction": -1,
+                        "wait_ms": 200,
+                        "wait_total": true
+                    }
+                },
+                {
+                    "function": "wait",
+                    "type": "command",
+                    "arguments": {
+                        "amount": 1000
+                    }
+                },
+                {
+                    "function": "wipe",
+                    "type": "thread",
+                    "strip_id": 1,
+                    "arguments": {
+                        "color": "$off",
+                        "direction": -1,
+                        "wait_ms": 200,
+                        "wait_total": true
+                    }
+                },
+                {
+                    "function": "wipe",
+                    "type": "thread",
+                    "strip_id": 2,
+                    "arguments": {
+                        "color": "$off",
+                        "direction": 1,
+                        "wait_ms": 200,
+                        "wait_total": true
+                    }
+                },
+                {
+                    "function": "wait",
+                    "type": "command",
+                    "arguments": {
+                        "amount": 1000
+                    }
+                }
+            ]
+        }]
+    },{
+        "function": "execute",
+        "type": "control",
+        "value": "$redalert"
+    }
+]

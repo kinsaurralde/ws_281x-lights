@@ -181,10 +181,13 @@ class RemoteController():
         self._connect()
 
     def _connect(self):
-        self.sio.connect(self.remote)
-        self.sio.on('ping_response', self._ping_response)
-        self.sio.on('info_response', self._info_response)
-        self.sio.emit('ping')
+        try:
+            self.sio.connect(self.remote)
+            self.sio.on('ping_response', self._ping_response)
+            self.sio.on('info_response', self._info_response)
+            self.sio.emit('ping')
+        except:
+            print("Connection Failed")
 
     def _ping_response(self, data):
         print("ping called back", data)
