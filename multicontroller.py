@@ -96,7 +96,7 @@ class MultiController():
                 target=self.controllers[i].execute_json, args=[self.queues[i]])
             threading_thread.start()
             self.queues[i] = []
-        return True
+        return self._response()
 
     def off(self, controller_id=None, strip_id=None):
         self._set_cur_ids(controller_id)

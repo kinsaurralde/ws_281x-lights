@@ -5,6 +5,7 @@ class Info {
         this.controllers_div = document.getElementById("controllers");
         this.pixels = [];
         this.isSetup = false;
+        this.data = [];
         this.refresh();
 
     }
@@ -24,6 +25,7 @@ class Info {
     }
 
     recieveData(data) {
+        this.data = data;
         if (this.isSetup == false) {
             this.setup(data);
         }

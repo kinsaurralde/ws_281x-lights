@@ -1,6 +1,8 @@
 class Functions {
-    constructor() {
+    constructor(self) {
         this.sender = new Sender();
+        this.data = [];
+        this.self = self;
     }
 
     create_buttons(data) {
@@ -16,13 +18,24 @@ class Functions {
         }
     }
 
+    disp_vars(data) {
+        window.open().document.write("<pre>" + JSON.stringify(data[0]["variables"], null, 2) + "</pre>")
+    }
+
     list() {
         let send_url = "http://" + lights.hostname + ":" + lights.port + "/saved/functions/list";
         this.sender.send(send_url, func.create_buttons);
     }
 
+    list_vars() {
+        let send_url = "http://" + lights.hostname + ":" + lights.port + "/info/get";
+        this.sender.send(send_url, func.disp_vars);
+    }
+
     run(name) {
-        let send_url = "http://" + lights.hostname + ":" + lights.port + "/saved/functions/run/" + name;
+        let path = "saved/functions/run/" + name;
+        let send_url = "http://" + lights.hostname + ":" + lights.port + "/" + path;
         this.sender.send(send_url);
+        lights.updateLog(path);
     }
 }

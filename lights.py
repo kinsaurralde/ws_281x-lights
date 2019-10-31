@@ -649,6 +649,7 @@ class Lights:
         if fraction:
             interval = self.get_fraction(interval)
         color = 0
+        neopixels.update_pixel_owner(self.id)
         for i in range(0, neopixels.numPixels(self.id), interval):
             for j in range(interval):
                 if blend:

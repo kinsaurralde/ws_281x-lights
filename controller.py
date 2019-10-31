@@ -48,6 +48,7 @@ class Controller:
     def info(self):
         data = self.response("info", False, None, True)
         data["power"] = neopixels.get_power_info()
+        data["variables"] = self.v.info()
         return data
 
     def ping(self):
@@ -92,6 +93,16 @@ class Controller:
         else:
             self.strips[strip_id].off()
         return self.response("off", False, None, False, strip_id)
+
+    def increment_animation_id(self, strip_id):
+        self.strips[strip_id].animation_id.increment()
+        s = self.strip_data[strip_id]["start"]
+        e = self.strip_data[strip_id]["end"]
+        for i in self.strip_data:
+            i_start = i["start"]
+            i_end = i["end"]
+            if i_start >= s or i_start <= e or i_end >= s or i_end <= e:
+                self.strips[i["id"]].animation_id.increment()
 
     def get_brightness(self):
         self.brightness = neopixels.getBrightness()
@@ -148,7 +159,8 @@ class Controller:
             raise NameError
 
     def run(self, strip_id, function, arguments=None, start_time=time.time()):
-        self.strips[strip_id].animation_id.increment()
+        # self.strips[strip_id].animation_id.increment()
+        self.increment_animation_id(strip_id)
         run_function = self._run_functions(function, self.strips[strip_id])
         self.strips[strip_id].start_time = start_time
         if arguments == None:
@@ -174,7 +186,8 @@ class Controller:
         return self.response(function, False, None, False, strip_id)
 
     def animate(self, strip_id, function, arguments, delay_between=0, start_time=time.time()):
-        self.strips[strip_id].animation_id.increment()
+        # self.strips[strip_id].animation_id.increment()
+        self.increment_animation_id(strip_id)
         this_id = self.strips[strip_id].animation_id.get()
         neopixels.update_pixel_owner(strip_id)
         animation_function = self._run_functions(
@@ -212,6 +225,8 @@ class Controller:
         while amount != 0 and self.json_id.get() == animation_id:
             amount -= 1
             for sub_action in action["loop"]:
+                if self.json_id.get() != animation_id:
+                    break
                 self._execute(t, animation_id, sub_action)
 
     def _execute(self, t, animation_id, action):

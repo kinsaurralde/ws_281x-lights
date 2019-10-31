@@ -41,6 +41,9 @@ class Variables:
             print(c["name"], c["type"], c["value"])
         return self.data
 
+    def info(self):
+        return self.data
+
     def p_values(self, data):
         if not isinstance(data, dict):
             return data

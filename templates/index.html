@@ -110,6 +110,7 @@
         <div class="section-title">Functions
             <input type="button" class="expand-button" value="^" style="width: 2vw;" onclick="expand('functions','block')">
             <input type="button" value="Refresh" onclick="func.list()">
+            <input type="button" value="Variables" onclick="func.list_vars()">
         </div>
         <div class="space-1"></div>
         <div class="section-hidden" id="functions-expanded" style="display: block;">
@@ -259,7 +260,7 @@
         var saves = new Array();
         var preset = new Preset();
         var generic = new Generic();
-        var func = new Functions();
+        var func = new Functions(func);
 
         function pageLoad() {
             addSaveLive();
