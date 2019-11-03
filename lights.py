@@ -12,7 +12,7 @@ LED_DMA = 10      # DMA channel to use for generating signal (try 10)
 LED_BRIGHTNESS = 0     # Set to 0 for darkest and 255 for brightest
 # True to invert the signal (when using NPN transistor level shift)
 LED_INVERT = False
-LED_CHANNEL = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
+# LED_CHANNEL = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
 PROVIDED_MILLIAMPS = 10000
 POWER_MULTIPLIER = 0.9
@@ -72,7 +72,8 @@ class Timer:
 
 
 class NeoPixels:
-    def __init__(self):
+    def __init__(self, controller_id):
+        self.id = controller_id
         self.num_pixels = LED_COUNT
         self.v_strips = []
         self.pixel_owner = [0] * self.num_pixels
@@ -81,6 +82,8 @@ class NeoPixels:
         self.max_watts = PROVIDED_WATTS
         self.voltage = VOLTAGE
         self.last_show = 0
+        self.pin = LED_PIN
+        self.grb = False
 
     def init_neopixels(self, data):
         if "led_count" in data:
@@ -91,10 +94,18 @@ class NeoPixels:
             self.max_watts = data["max_watts"]
         if "volts" in data:
             self.voltage = data["volts"]
+        if "pin" in data:
+            self.pin = data["pin"]
+        if "grb" in data:
+            self.grb = data["grb"]
+        led_channel = 0
+        if self.pin in [13, 19, 41, 45, 53]:
+            led_channel = 1
         self.pixel_owner = [0] * self.num_pixels
         self.strip = Adafruit_NeoPixel(
-            self.num_pixels, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, self.max_brightness, LED_CHANNEL)
+            self.num_pixels, self.pin, LED_FREQ_HZ, LED_DMA, LED_INVERT, self.max_brightness, led_channel)
         self.strip.begin()
+        print("Neopixel [", self.id ,"] created with values:", self.num_pixels, self.pin, LED_FREQ_HZ, LED_DMA, LED_INVERT, self.max_brightness, led_channel, self.grb)
 
     def update(self, strip_data):
         self.v_strips = strip_data
@@ -106,8 +117,8 @@ class NeoPixels:
         else:
             real_pixel_id = self.v_strips[strip_id]["start"] + pixel_id
             if real_pixel_id < 0 or real_pixel_id >= self.num_pixels:
-                raise IndexError("Pixel does not exist:",
-                                 real_pixel_id, pixel_id)
+                print("Pixel does not exist:", real_pixel_id, pixel_id)
+                return
             self.pixel_owner[real_pixel_id] = strip_id
 
     def get_color(self, r, g, b):
@@ -117,6 +128,8 @@ class NeoPixels:
 
                 r, g, b: color
         """
+        if self.grb:
+            return ((int(g) * 65536) + (int(r) * 256) + int(b))
         return ((int(r) * 65536) + (int(g) * 256) + int(b))
 
     def get_color_seperate(self, value):
@@ -127,6 +140,8 @@ class NeoPixels:
         r = (value >> 16) & 0xFF
         g = (value >> 8) & 0xFF
         b = value & 0xFF
+        if self.grb:
+            return (g, r, b)
         return (r, g, b)
 
     def get_random_color(self):
@@ -159,8 +174,8 @@ class NeoPixels:
     def setPixelColor(self, strip_id, pixel_id, r, g=None, b=None):
         real_pixel_id = self.v_strips[strip_id]["start"] + pixel_id
         if real_pixel_id >= self.num_pixels:
-            raise IndexError("Pixel does not exist:", real_pixel_id,
-                             pixel_id, self.v_strips[strip_id]["start"])
+            print("Pixel does not exist:", real_pixel_id, pixel_id, self.v_strips[strip_id]["start"])
+            return 1
         color = r
         if g is not None:
             color = self.get_color(r, g, b)
@@ -197,7 +212,7 @@ class NeoPixels:
             self.last_show = time.time()
 
 
-neopixels = NeoPixels()
+# self.neo = NeoPixels()
 
 
 class AnimationID:
@@ -216,7 +231,8 @@ class AnimationID:
 
 
 class Lights:
-    def __init__(self, id):
+    def __init__(self, neopixels, id):
+        self.neo = neopixels
         self.id = id
         self.start_time = time.time()
         self.layer = False
@@ -229,7 +245,7 @@ class Lights:
         self.start_time += value / 1000
 
     def set_owner(self):
-        neopixels.update_pixel_owner(self.id)
+        self.neo.update_pixel_owner(self.id)
 
     def set_layer(self,value):
         self.layer = bool(value)
@@ -241,16 +257,16 @@ class Lights:
     def save(self):
         """Return current color of strip"""
         lights_save = []
-        for i in range(neopixels.numPixels(self.id)):
-            lights_save.append(neopixels.getPixelColor(self.id, i))
+        for i in range(self.neo.numPixels(self.id)):
+            lights_save.append(self.neo.getPixelColor(self.id, i))
         return lights_save
 
     def save_split(self):
         """Return current color of strip"""
         lights_save = []
-        for i in range(neopixels.numPixels(self.id)):
-            cur_color = neopixels.get_color_seperate(
-                neopixels.getPixelColor(self.id, i))
+        for i in range(self.neo.numPixels(self.id)):
+            cur_color = self.neo.get_color_seperate(
+                self.neo.getPixelColor(self.id, i))
             lights_save.append({
                 "id": i,
                 "r": int(cur_color[0]),
@@ -266,10 +282,10 @@ class Lights:
 
                 r, g, b: color
         """
-        neopixels.update_pixel_owner(self.id)
-        for i in range(0, neopixels.numPixels(self.id)):
-            neopixels.setPixelColor(self.id, i, r, g, b)
-        neopixels.show()
+        self.neo.update_pixel_owner(self.id)
+        for i in range(0, self.neo.numPixels(self.id)):
+            self.neo.setPixelColor(self.id, i, r, g, b)
+        self.neo.show()
         return 0
 
     def set_pixel(self, pixel_id, r, g, b):
@@ -281,9 +297,9 @@ class Lights:
 
                 r, g, b: color to change pixel to  
         """
-        neopixels.update_pixel_owner(self.id, pixel_id)
-        neopixels.setPixelColor(self.id, pixel_id, r, g, b)
-        neopixels.show()
+        self.neo.update_pixel_owner(self.id, pixel_id)
+        self.neo.setPixelColor(self.id, pixel_id, r, g, b)
+        self.neo.show()
         return 0
 
     def set_pixels(self, pixels):
@@ -299,18 +315,18 @@ class Lights:
         """
         for pixel in pixels:
             data = pixel.split(".")
-            neopixels.update_pixel_owner(self.id, int(data[0]))
-            neopixels.setPixelColor(self.id, int(data[0]), int(
+            self.neo.update_pixel_owner(self.id, int(data[0]))
+            self.neo.setPixelColor(self.id, int(data[0]), int(
                 data[1]), int(data[2]), int(data[3]))
-        neopixels.show()
+        self.neo.show()
         return 0
 
     def reverse(self):
         """Reverse order of lights on strip"""
         lights_save = self.save()
-        for i in range(neopixels.numPixels(self.id)):
-            neopixels.setPixelColor(self.id, i, lights_save.pop())
-        neopixels.show()
+        for i in range(self.neo.numPixels(self.id)):
+            self.neo.setPixelColor(self.id, i, lights_save.pop())
+        self.neo.show()
         return 0
 
     def shift(self, amount, post_delay=0, show_delay=0):
@@ -327,13 +343,13 @@ class Lights:
         if amount == 0:
             return 0
         lights_save = self.save()
-        for i in range(neopixels.numPixels(self.id)):
+        for i in range(self.neo.numPixels(self.id)):
             new_i = i + amount
             if (new_i < 0):
-                new_i += neopixels.numPixels(self.id)
-            new_i = new_i % neopixels.numPixels(self.id)
-            neopixels.setPixelColor(self.id, new_i, lights_save[i])
-        neopixels.show(show_delay)
+                new_i += self.neo.numPixels(self.id)
+            new_i = new_i % self.neo.numPixels(self.id)
+            self.neo.setPixelColor(self.id, new_i, lights_save[i])
+        self.neo.show(show_delay)
         time.sleep(int(post_delay)/1000.0)
         return int(post_delay)/1000.0
 
@@ -354,21 +370,21 @@ class Lights:
         """
         start_time = time.time()
         this_id = self.animation_id.get()
-        iter_range = range(neopixels.numPixels(self.id))
+        iter_range = range(self.neo.numPixels(self.id))
         if direction == -1:
             iter_range = reversed(iter_range)
         each_wait = wait_ms
         if wait_total:
-            each_wait = wait_ms / neopixels.numPixels(self.id)
+            each_wait = wait_ms / self.neo.numPixels(self.id)
         for i in iter_range:
-            neopixels.update_pixel_owner(self.id, i)
-            neopixels.setPixelColor(self.id, i, neopixels.get_color(r, g, b))
-            neopixels.show(15)
+            self.neo.update_pixel_owner(self.id, i)
+            self.neo.setPixelColor(self.id, i, self.neo.get_color(r, g, b))
+            self.neo.show(15)
             if self.sleepListenForBreak(self.id, each_wait, this_id):
                 return 0
-        expected_time = each_wait / 1000 * neopixels.numPixels(self.id)
+        expected_time = each_wait / 1000 * self.neo.numPixels(self.id)
         actual_time = time.time() - start_time
-        neopixels.show()
+        self.neo.show()
         return 0
 
 
@@ -398,17 +414,21 @@ class Lights:
         for j in range(iterations):
             saves = []
             for q in iter_range:
-                for i in range(0, neopixels.numPixels(self.id), interval):
-                    saves.append(neopixels.getPixelColor(self.id, i))
-                    neopixels.setPixelColor(self.id, i + q, r, g, b)
-                neopixels.show()
+                for i in range(0, self.neo.numPixels(self.id), interval):
+                    if i + q >= self.neo.numPixels(self.id):
+                        break
+                    saves.append(self.neo.getPixelColor(self.id, i))
+                    self.neo.setPixelColor(self.id, i + q, r, g, b)
+                self.neo.show()
                 if self.sleepListenForBreak(self.id, wait_ms, this_id):
                     return 0
-                for i in range(0, neopixels.numPixels(self.id), interval):
+                for i in range(0, self.neo.numPixels(self.id), interval):
+                    if i + q >= self.neo.numPixels(self.id):
+                        break
                     if layer:
-                        neopixels.setPixelColor(self.id, i + q, saves[int(i / interval)])
+                        self.neo.setPixelColor(self.id, i + q, saves[int(i / interval)])
                     else:
-                        neopixels.setPixelColor(self.id, i + q, 0)
+                        self.neo.setPixelColor(self.id, i + q, 0)
         return 0
 
 
@@ -433,17 +453,17 @@ class Lights:
 
             wait_total: if true, wait_ms is total time of each pulse (default: False)
         """
-        t = Timer(neopixels.numMaxPixels(), self.start_time)
+        t = Timer(self.neo.numMaxPixels(), self.start_time)
         this_id = self.animation_id.get()
         previous = []
-        max_pixels = neopixels.numPixels(self.id)
+        max_pixels = self.neo.numPixels(self.id)
         iter_range = range(max_pixels + length)
         if direction == -1:
             iter_range = reversed(iter_range)
         each_wait = wait_ms
-        total_wait = each_wait * (neopixels.numPixels(self.id) + length)
+        total_wait = each_wait * (self.neo.numPixels(self.id) + length)
         if wait_total:
-            each_wait = wait_ms / (neopixels.numPixels(self.id) + length)
+            each_wait = wait_ms / (self.neo.numPixels(self.id) + length)
             total_wait = wait_ms
         no_own_count = 0
         for i in iter_range:
@@ -451,20 +471,20 @@ class Lights:
             if direction == -1:
                 i, j = j, i
             if i < max_pixels and i >= 0:
-                previous.append(neopixels.getPixelColor(self.id, i))
-                no_own_count += neopixels.setPixelColor(self.id, i, r, g, b)
+                previous.append(self.neo.getPixelColor(self.id, i))
+                no_own_count += self.neo.setPixelColor(self.id, i, r, g, b)
             if j < max_pixels and j >= 0:
                 if layer:
-                    neopixels.setPixelColor(self.id, j, previous.pop(0))
+                    self.neo.setPixelColor(self.id, j, previous.pop(0))
                 else:
-                    neopixels.setPixelColor(self.id, j, 0)
-            neopixels.show(15)
+                    self.neo.setPixelColor(self.id, j, 0)
+            self.neo.show(15)
             if t.sleepBreak(self.animation_id.get, this_id, each_wait):
                 return 0
-            if no_own_count == neopixels.numPixels(self.id):    # stop animation if all pixels belong to others
+            if no_own_count == self.neo.numPixels(self.id):    # stop animation if all pixels belong to others
                 self.animation_id.increment()
                 return 0
-        neopixels.show()
+        self.neo.show()
         return total_wait
 
     def random_cycle(self, each, wait_ms=250, iterations=1):
@@ -479,15 +499,15 @@ class Lights:
                 iterations: number of time to change (default: 1)
         """
         this_id = self.animation_id.get()
-        current_color = neopixels.get_random_color()
+        current_color = self.neo.get_random_color()
         if each == -1:
-            each = neopixels.numPixels(self.id)
+            each = self.neo.numPixels(self.id)
         for i in range(iterations):
-            for j in range(neopixels.numPixels(self.id)):
+            for j in range(self.neo.numPixels(self.id)):
                 if j % each == 0:
-                        current_color = neopixels.get_random_color()
-                neopixels.setPixelColor(self.id, j, current_color)
-            neopixels.show()
+                        current_color = self.neo.get_random_color()
+                self.neo.setPixelColor(self.id, j, current_color)
+            self.neo.show()
             if self.sleepListenForBreak(self.id, wait_ms, this_id):
                 return 0
         return 0
@@ -510,11 +530,11 @@ class Lights:
         this_id = self.animation_id.get()
         each_wait = wait_ms
         if wait_total:
-            each_wait = wait_ms / neopixels.numPixels(self.id)
-        for i in range(neopixels.numPixels(self.id)):
-            neopixels.setPixelColor(self.id, i, wheel(int(i / neopixels.numPixels(self.id) * 255)))
-        neopixels.show()
-        for i in range(iterations * neopixels.numPixels(self.id)):
+            each_wait = wait_ms / self.neo.numPixels(self.id)
+        for i in range(self.neo.numPixels(self.id)):
+            self.neo.setPixelColor(self.id, i, self.wheel(int(i / self.neo.numPixels(self.id) * 255)))
+        self.neo.show()
+        for i in range(iterations * self.neo.numPixels(self.id)):
             self.shift(direction, 0, 15)
             if self.sleepListenForBreak(self.id, each_wait, this_id):
                 return 0
@@ -539,13 +559,13 @@ class Lights:
             iter_range = reversed(iter_range)
         for k in range(iterations):
             for j in iter_range:
-                for i in range(0, neopixels.numPixels(self.id), 3):
-                    neopixels.setPixelColor(self.id, i + j, wheel(int((i) / neopixels.numPixels(self.id) * 255)))
-                neopixels.show()
+                for i in range(0, self.neo.numPixels(self.id), 3):
+                    self.neo.setPixelColor(self.id, i + j, self.wheel(int((i) / self.neo.numPixels(self.id) * 255)))
+                self.neo.show()
                 if self.sleepListenForBreak(self.id, wait_ms, this_id):
                     return 0
-                for i in range(0, neopixels.numPixels(self.id), 3):
-                    neopixels.setPixelColor(self.id, i + j, 0)
+                for i in range(0, self.neo.numPixels(self.id), 3):
+                    self.neo.setPixelColor(self.id, i + j, 0)
         return 0
 
     def mix_switch(self, colors, wait_ms=2000, instant=False):
@@ -559,7 +579,7 @@ class Lights:
 
                 instant: if true, dont calculate difference (default: False)
         """
-        t = Timer(neopixels.numMaxPixels(), self.start_time)
+        t = Timer(self.neo.numMaxPixels(), self.start_time)
         this_id = self.animation_id.get()
         if instant:
             self.mix_switch_instant(abs(wait_ms), colors, t)
@@ -567,14 +587,14 @@ class Lights:
         for k in range(0, len(colors) - 1):
             percent = 0
             for j in range(100):
-                for i in range(0, neopixels.numPixels(self.id)):
-                    neopixels.setPixelColor(self.id, i, get_mix(
+                for i in range(0, self.neo.numPixels(self.id)):
+                    self.neo.setPixelColor(self.id, i, self.get_mix(
                         colors[k], colors[k+1], percent))
-                neopixels.show(15)
+                self.neo.show(15)
                 percent += 1
                 if t.sleepBreak(self.animation_id.get, this_id, wait_ms/100.0):
                     return 0
-        neopixels.show()
+        self.neo.show()
         return wait_ms * (len(colors) - 1)
 
     def mix_switch_instant(self, wait_ms, colors, t):
@@ -588,10 +608,10 @@ class Lights:
         """
         this_id = self.animation_id.get()
         for j in range(0, len(colors)):
-            for i in range(0, neopixels.numPixels(self.id)):
-                neopixels.setPixelColor(self.id, i, get_mix(
+            for i in range(0, self.neo.numPixels(self.id)):
+                self.neo.setPixelColor(self.id, i, self.get_mix(
                     colors[j], colors[j], 100))
-            neopixels.show()
+            self.neo.show()
             if t.sleepBreak(self.animation_id.get, this_id, wait_ms):
                 return 0
 
@@ -649,17 +669,17 @@ class Lights:
         if fraction:
             interval = self.get_fraction(interval)
         color = 0
-        neopixels.update_pixel_owner(self.id)
-        for i in range(0, neopixels.numPixels(self.id), interval):
+        self.neo.update_pixel_owner(self.id)
+        for i in range(0, self.neo.numPixels(self.id), interval):
             for j in range(interval):
                 if blend:
-                    cur_color = get_mix(colors[color], colors[(color + 1) % len(colors)], (j / interval) * 100)
-                    neopixels.setPixelColor(self.id, i + j, cur_color)
+                    cur_color = self.get_mix(colors[color], colors[(color + 1) % len(colors)], (j / interval) * 100)
+                    self.neo.setPixelColor(self.id, i + j, cur_color)
                 else:
-                    if i + j < neopixels.numPixels(self.id):
-                        neopixels.setPixelColor(self.id, i + j, *colors[color])
+                    if i + j < self.neo.numPixels(self.id):
+                        self.neo.setPixelColor(self.id, i + j, *colors[color])
             color = (color + 1) % len(colors)
-        neopixels.show()
+        self.neo.show()
         return 0
 
     def blend(self, radius=5, wait_ms=0, iterations=1):
@@ -673,9 +693,9 @@ class Lights:
 
                 iterations: number of times to blend (default: 1)
         """
-        t = Timer(neopixels.numMaxPixels(), self.start_time)
+        t = Timer(self.neo.numMaxPixels(), self.start_time)
         this_id = self.animation_id.get()
-        num_pixels = neopixels.numPixels(self.id)
+        num_pixels = self.neo.numPixels(self.id)
         amount = .5
         radius += 1
         sides = (1 - float(amount)) / 2
@@ -693,12 +713,12 @@ class Lights:
                 r /= radius * 2
                 g /= radius * 2
                 b /= radius * 2
-                neopixels.setPixelColor(self.id, j, r, g, b)
+                self.neo.setPixelColor(self.id, j, r, g, b)
             if wait_ms > 0:
-                neopixels.show(15)
+                self.neo.show(15)
                 if t.sleepBreak(self.animation_id.get, this_id, wait_ms):
                     return 0
-        neopixels.show()
+        self.neo.show()
         return wait_ms * iterations
 
     def fade(self, target=0, wait_ms=1000, restore_mode="off", steps=100):
@@ -715,24 +735,24 @@ class Lights:
                     "brightnesss": set pixels to original brightness
                     Anything Else: keep brightness at target brightness and color original
         """
-        t = Timer(neopixels.numMaxPixels(), self.start_time)
+        t = Timer(self.neo.numMaxPixels(), self.start_time)
         this_id = self.animation_id.get()
-        brightness = neopixels.getBrightness()
+        brightness = self.neo.getBrightness()
         change = (target - brightness) / steps
         wait = wait_ms / steps
         original = brightness
         for i in range(steps):
             brightness += change
-            neopixels.setBrightness(int(brightness))
-            neopixels.show(15)
+            self.neo.setBrightness(int(brightness))
+            self.neo.show(15)
             if t.sleepBreak(self.animation_id.get, this_id, wait):
                 return 0
         if restore_mode == "off":
             self.set_all(0,0,0)
-            neopixels.setBrightness(original)
+            self.neo.setBrightness(original)
         elif restore_mode == "brightness":
-            neopixels.setBrightness(original)
-        neopixels.show()
+            self.neo.setBrightness(original)
+        self.neo.show()
         return wait_ms
 
     def sleepListenForBreak(self, strip_id, wait_ms, this_id):
@@ -759,43 +779,40 @@ class Lights:
         self.t.sleep(wait_ms/1000)
 
     def get_fraction(self, num):
-        return round(neopixels.numPixels(self.id) / int(num))
+        return round(self.neo.numPixels(self.id) / int(num))
 
+    def wheel(self, pos):
+        """Generate rainbow colors across 0-255 positions.
+        
+            Parameters:
 
-# Utilities
+                pos: current pixel
+        """
+        if pos < 85:
+            return self.neo.get_color(pos * 3, 255 - pos * 3, 0)
+        elif pos < 170:
+            pos -= 85
+            return self.neo.get_color(255 - pos * 3, 0, pos * 3)
+        else:
+            pos -= 170
+            return self.neo.get_color(0, pos * 3, 255 - pos * 3)
 
-def wheel(pos):
-    """Generate rainbow colors across 0-255 positions.
-    
-        Parameters:
+    def get_mix(self, color_1, color_2, percent):
+        """Get the mixed color between 2 colors
+        
+            Parameters:
+                
+                color_1, color_2: two colors to mix
 
-            pos: current pixel
-    """
-    if pos < 85:
-        return neopixels.get_color(pos * 3, 255 - pos * 3, 0)
-    elif pos < 170:
-        pos -= 85
-        return neopixels.get_color(255 - pos * 3, 0, pos * 3)
-    else:
-        pos -= 170
-        return neopixels.get_color(0, pos * 3, 255 - pos * 3)
-
-def get_mix(color_1, color_2, percent):
-    """Get the mixed color between 2 colors
-    
-        Parameters:
-            
-            color_1, color_2: two colors to mix
-
-            percent: how far towards color 2 from color 1
-    
-    """
-    r_diff = color_2[0] - color_1[0]
-    g_diff = color_2[1] - color_1[1]
-    b_diff = color_2[2] - color_1[2]
-    r = color_1[0] + (r_diff * percent/100.0)
-    g = color_1[1] + (g_diff * percent/100.0)
-    b = color_1[2] + (b_diff * percent/100.0)
-    return neopixels.get_color(r, g, b)
+                percent: how far towards color 2 from color 1
+        
+        """
+        r_diff = color_2[0] - color_1[0]
+        g_diff = color_2[1] - color_1[1]
+        b_diff = color_2[2] - color_1[2]
+        r = color_1[0] + (r_diff * percent/100.0)
+        g = color_1[1] + (g_diff * percent/100.0)
+        b = color_1[2] + (b_diff * percent/100.0)
+        return self.neo.get_color(r, g, b)
 
 print("lights.py loaded")

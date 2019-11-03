@@ -219,7 +219,7 @@ def ping():
     return create_response(data)
 
 
-config_name = "config.json"
+config_name = "sample_config.json"
 if len(sys.argv) > 1:
     config_name = sys.argv[1]
 debug_mode = False
@@ -231,7 +231,7 @@ except FileNotFoundError:
     print("Config file not found")
     exit(1)
 config_data = json.load(config_file)
-print("Config data read from", config_name, ":", config_data)
+print("Config data read from", config_name, ":\n", config_data)
 
 mc = MultiController(config_data)
 

@@ -7,10 +7,12 @@ from variables import Variables
 
 class Controller:
     def __init__(self, controller_id):
+        self.neo = NeoPixels(controller_id)
+
         # Settings
         self.brightness = 100
-        neopixels.setBrightness(self.brightness)
-        self.num_pixels = neopixels.numMaxPixels()
+        self.neo.setBrightness(self.brightness)
+        self.num_pixels = self.neo.numMaxPixels()
         self.break_animation = True
         self.layer = False
         self.id = controller_id
@@ -23,11 +25,11 @@ class Controller:
 
 
     def init_neopixels(self, data):
-        neopixels.init_neopixels(data["neopixels"])
-        self.num_pixels = neopixels.numMaxPixels()
+        self.neo.init_neopixels(data["neopixels"])
+        self.num_pixels = self.neo.numMaxPixels()
         if "settings" in data:
             if "initial_brightness" in data["settings"]:
-                neopixels.setBrightness(data["settings"]["initial_brightness"])
+                self.neo.setBrightness(data["settings"]["initial_brightness"])
         self.strips = []
         self.strip_data = []
         self.create_strip(0, self.num_pixels - 1)
@@ -36,18 +38,18 @@ class Controller:
 
     def create_strip(self, start, end):
         strip_id = len(self.strips)
-        self.strips.append(Lights(strip_id))
+        self.strips.append(Lights(self.neo, strip_id))
         data = {
             "id": strip_id,
             "start": start,
             "end": end,
         }
         self.strip_data.append(data)
-        neopixels.update(self.strip_data)
+        self.neo.update(self.strip_data)
 
     def info(self):
         data = self.response("info", False, None, True)
-        data["power"] = neopixels.get_power_info()
+        data["power"] = self.neo.get_power_info()
         data["variables"] = self.v.info()
         return data
 
@@ -105,13 +107,13 @@ class Controller:
                 self.strips[i["id"]].animation_id.increment()
 
     def get_brightness(self):
-        self.brightness = neopixels.getBrightness()
+        self.brightness = self.neo.getBrightness()
         return self.brightness
 
     def set_brightness(self, value):
         self.brightness = value
-        neopixels.setBrightness(value)
-        neopixels.show()
+        self.neo.setBrightness(value)
+        self.neo.show()
 
     def set_layer(self, value):
         self.layer = bool(value)
@@ -125,7 +127,7 @@ class Controller:
         self.break_animation = value
 
     def get_all_settings(self):
-        self.brightness = neopixels.getBrightness()
+        self.brightness = self.neo.getBrightness()
         cur_settings = {
             "brightness": self.brightness,
             "break_animation": self.break_animation,
@@ -174,7 +176,7 @@ class Controller:
         return self.response(function, False, None, False, strip_id)
 
     def thread(self, strip_id, function, arguments, start_time=time.time()):
-        neopixels.update_pixel_owner(strip_id)
+        self.neo.update_pixel_owner(strip_id)
         threading_function = self._run_functions(
             function, self.strips[strip_id])
         self.strips[strip_id].start_time = start_time
@@ -189,7 +191,7 @@ class Controller:
         # self.strips[strip_id].animation_id.increment()
         self.increment_animation_id(strip_id)
         this_id = self.strips[strip_id].animation_id.get()
-        neopixels.update_pixel_owner(strip_id)
+        self.neo.update_pixel_owner(strip_id)
         animation_function = self._run_functions(
             function, self.strips[strip_id])
         animation_arguments = (
@@ -273,6 +275,6 @@ class Controller:
             self._execute(t, animation_id, action)
             if self.json_id.get() != animation_id:
                 break
-            
+
 
 print("controller.py loaded")

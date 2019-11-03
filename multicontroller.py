@@ -27,6 +27,7 @@ class MultiController():
             self.controllers[cur_id].run(0, "wipe", (0, 255, 0, 1, 250, True))
             self.controllers[cur_id].run(0, "wipe", (0, 0, 255, 1, 250, True))
             self.controllers[cur_id].run(0, "wipe", (0, 0, 0, 1, 250, True))
+            time.sleep(.1)
         else:
             self.controllers.append(RemoteController(cur_id, data))
         self.queues.append([])
@@ -121,6 +122,7 @@ class MultiController():
         json = self._create("run", strip_id, function, args, True)
         for i in self.cur_controller_id:
             execute = self.controllers[i].execute_json
+            print("Controller", i, self.controllers[i].num_pixels, self.controllers[i].neo.pin)
             thread = threading.Thread(target=execute, args=[json])
             thread.start()
         return self._response()
