@@ -368,6 +368,7 @@ class Lights:
 
                 wait_total: if true, wait_ms is total time of each pulse (default: False)
         """
+        t = Timer(self.neo.numMaxPixels(), self.start_time)
         start_time = time.time()
         this_id = self.animation_id.get()
         iter_range = range(self.neo.numPixels(self.id))
@@ -380,12 +381,14 @@ class Lights:
             self.neo.update_pixel_owner(self.id, i)
             self.neo.setPixelColor(self.id, i, self.neo.get_color(r, g, b))
             self.neo.show(15)
-            if self.sleepListenForBreak(self.id, each_wait, this_id):
+            # if self.sleepListenForBreak(self.id, each_wait, this_id):
+            #     return 0
+            if t.sleepBreak(self.animation_id.get, this_id, each_wait):
                 return 0
         expected_time = each_wait / 1000 * self.neo.numPixels(self.id)
         actual_time = time.time() - start_time
         self.neo.show()
-        return 0
+        return each_wait * self.neo.numPixels(self.id)
 
 
     def chase(self, r, g, b, wait_ms=50, interval=5, direction=1, layer=False, iterations=1):
@@ -407,6 +410,7 @@ class Lights:
 
                 iterations: how many times to run (default: 1)
         """
+        t = Timer(self.neo.numMaxPixels(), self.start_time)
         this_id = self.animation_id.get()
         iter_range = range(interval)
         if direction == -1:
@@ -420,7 +424,9 @@ class Lights:
                     saves.append(self.neo.getPixelColor(self.id, i))
                     self.neo.setPixelColor(self.id, i + q, r, g, b)
                 self.neo.show()
-                if self.sleepListenForBreak(self.id, wait_ms, this_id):
+                # if self.sleepListenForBreak(self.id, wait_ms, this_id):
+                #     return 0
+                if t.sleepBreak(self.animation_id.get, this_id, wait_ms):
                     return 0
                 for i in range(0, self.neo.numPixels(self.id), interval):
                     if i + q >= self.neo.numPixels(self.id):
@@ -429,7 +435,7 @@ class Lights:
                         self.neo.setPixelColor(self.id, i + q, saves[int(i / interval)])
                     else:
                         self.neo.setPixelColor(self.id, i + q, 0)
-        return 0
+        return wait_ms * interval
 
 
     def pulse(self, r, g, b, direction=1, wait_ms=50, length=5, layer=False, wait_total=False):
@@ -498,6 +504,7 @@ class Lights:
 
                 iterations: number of time to change (default: 1)
         """
+        t = Timer(self.neo.numMaxPixels(), self.start_time)
         this_id = self.animation_id.get()
         current_color = self.neo.get_random_color()
         if each == -1:
@@ -508,9 +515,9 @@ class Lights:
                         current_color = self.neo.get_random_color()
                 self.neo.setPixelColor(self.id, j, current_color)
             self.neo.show()
-            if self.sleepListenForBreak(self.id, wait_ms, this_id):
+            if t.sleepBreak(self.animation_id.get, this_id, wait_ms):
                 return 0
-        return 0
+        return wait_ms * iterations
 
     def rainbow_cycle(self, wait_ms, direction=1, wait_total=False, iterations=1):
         """Draw rainbow that fades across all pixels at once
@@ -754,6 +761,31 @@ class Lights:
             self.neo.setBrightness(original)
         self.neo.show()
         return wait_ms
+
+    def pulse_pattern(self, colors, length=5, wait_ms=50, wait_total=False, spacing=3, direction=0):
+        t = Timer(self.neo.numMaxPixels(), self.start_time)
+        this_id = self.animation_id.get()
+        sep_color = [0, 0, 0]
+        if len(colors) > 1:
+            sep_color = colors[0]
+            colors = colors[1:]
+        p_colors = []
+        for i in colors:
+            p_colors.append(i)
+            for j in range(spacing):
+                p_colors.append(sep_color)
+        self.pattern(p_colors, length, fraction=False, blend=False)
+        s_amount = 1
+        if direction == -1:
+            s_amount = -1
+        each_wait = wait_ms
+        if wait_total:
+            each_wait = wait_ms / self.neo.numPixels(self.id)
+        for i in range(self.neo.numPixels(self.id)):
+            self.shift(s_amount, 0, 15)
+            if t.sleepBreak(self.animation_id.get, this_id, each_wait):
+                return 0
+        return each_wait * self.neo.numMaxPixels()
 
     def sleepListenForBreak(self, strip_id, wait_ms, this_id):
         """While sleeping check if global id has changed

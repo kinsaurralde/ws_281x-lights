@@ -164,5 +164,24 @@ let generic_functions = {
             "label": "Restore Mode",
             "default": ["off", "brightness", "none"],
         },
+    },
+    "Pulse Pattern": {
+        "types": ["animate"],
+        "wait_ms": [100],
+        "color": {
+            "default": [[1]],
+            "mode": "multi"
+        },
+        "num_value": {
+            "label": "Length",
+            "default": [6]
+        },
+        "option": {
+            "label": "Spacing",
+            "default": [3],
+            "mode": "number"
+        },
+        "wait_mode": [ "each", "full"],
+        "direction": ["left", "right"],
     }
 };

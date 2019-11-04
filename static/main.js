@@ -266,6 +266,12 @@ class LightStrip {
         this.send(path, ids);
     }
 
+    pulse_pattern(type, colors, wait_ms, length, direction, spacing, wait_mode, ids=null) {
+        direction *= this.direction;
+        let path = type + "/pulse_pattern/" + colors + "," + length + "," + wait_ms + "," + wait_mode + "," + spacing + "," + direction;
+        this.send(path, ids);
+    }
+
     pattern(colors, interval, fraction, blend, ids=null) {
         let path = "run/pattern/" + colors + "," + interval + "," + fraction + "," + blend;
         this.send(path, ids);

@@ -153,7 +153,8 @@ class Controller:
             "bounce": strip.bounce,
             "pattern": strip.pattern,
             "blend": strip.blend,
-            "fade": strip.fade
+            "fade": strip.fade,
+            "pulse_pattern": strip.pulse_pattern
         }
         if name in run_functions:
             return run_functions[name]
@@ -161,7 +162,6 @@ class Controller:
             raise NameError
 
     def run(self, strip_id, function, arguments=None, start_time=time.time()):
-        # self.strips[strip_id].animation_id.increment()
         self.increment_animation_id(strip_id)
         run_function = self._run_functions(function, self.strips[strip_id])
         self.strips[strip_id].start_time = start_time
@@ -188,7 +188,6 @@ class Controller:
         return self.response(function, False, None, False, strip_id)
 
     def animate(self, strip_id, function, arguments, delay_between=0, start_time=time.time()):
-        # self.strips[strip_id].animation_id.increment()
         self.increment_animation_id(strip_id)
         this_id = self.strips[strip_id].animation_id.get()
         self.neo.update_pixel_owner(strip_id)
