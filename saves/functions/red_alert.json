@@ -25,6 +25,13 @@
         "function": "set_function",
         "type": "variable",
         "name": "redalert",
+        "arguments": [
+            {
+                "name": "time",
+                "type": "int",
+                "default": 1000
+            }
+        ],
         "value": [{
             "function": "loop",
             "type": "control",

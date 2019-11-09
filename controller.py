@@ -253,7 +253,7 @@ class Controller:
             if action["function"] == "set_value":
                 self.v.add(action["name"], action["value"], action.get("v_type"))
             elif action["function"] == "set_function":
-                self.v.add(action["name"], action["value"], "function")
+                self.v.add(action["name"], [action["arguments"], action["value"]], "function")
             elif action["function"] == "list_all":
                 self.v.list_all()
         elif action["type"] == "setting":

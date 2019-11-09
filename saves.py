@@ -22,9 +22,21 @@ class Saves():
 
     def run_function(self, function, folder, path=None, data=None):
         if function == "list":
-            return os.listdir(self.dir + folder + '/')
+            path = self.dir + folder + '/'
+            return [x for x in os.listdir(path) if os.path.isfile(path + x)]
         elif function == "run":
             file_data = self._get_json(folder, path, data)
+            if data is not None:
+                args = data.split(',')
+                for arg in args:
+                    kv = arg.split('=')
+                    set_var = {
+                        "function": "set_value",
+                        "type": "variable",
+                        "name": path + "_" + str(kv[0]),
+                        "value": str(kv[1])
+                    }
+                    file_data.insert(0, set_var)
             return file_data
         elif function == "write":
             self._write_json(folder, path, data)

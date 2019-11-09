@@ -24,7 +24,16 @@ class Variables:
         return False
 
     def add(self, name, value, v_type = None):
-        self.data[name] = self._create(name, value, v_type)
+        if v_type == "function":
+            self.data[name] = self._create(name, value[1], v_type)
+            for arg in value[0]:
+                arg_name = name + "_" + arg["name"]
+                if arg_name in self.data:
+                    self.data[arg_name]["type"] = arg["type"]
+                else:
+                    self.add(arg_name, arg["default"], arg["type"])
+        else:
+            self.data[name] = self._create(name, value, v_type)
 
     def get(self, name):
         if self.exists(name):
@@ -61,6 +70,9 @@ class Variables:
                     c_type = self.data[name]["type"]
                     if c_type == "int":
                         c[k] = int(self.data[name]["value"])
+                    elif c_type == "list":
+                        index = int(str(data[k]).split('[')[1])
+                        c[k] = list(self.data[name]["value"])[index]
                     elif c_type == "color":
                         c["r"] = int(self.data[name]["value"][0])
                         c["g"] = int(self.data[name]["value"][1])

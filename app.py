@@ -241,6 +241,9 @@ keys = Keys(config_data)
 
 saves = Saves()
 
+init_vars = saves.run_function("run", "functions/default", "default_vars")
+mc.json(init_vars)
+
 port = 200
 if "port" in config_data["info"]:
     port = int(config_data["info"]["port"])

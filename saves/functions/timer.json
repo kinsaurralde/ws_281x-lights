@@ -1,0 +1,52 @@
+[   
+    {
+        "type": "requirement",
+        "key": false,
+        "write": "no"
+    },{
+        "function": "set_function",
+        "type": "variable",
+        "name": "timer",
+        "arguments": [
+            {
+                "name": "time",
+                "type": "int",
+                "default": 1000
+            }
+        ],
+        "value": [
+            {
+                "function": "color",
+                "type": "run",
+                "strip_id": 0,
+                "arguments": {
+                    "color": "$off"
+                }
+            },{
+                "function": "wipe",
+                "type": "thread",
+                "strip_id": 2,
+                "arguments": {
+                    "color": "$blue",
+                    "direction": -1,
+                    "wait_ms": "$timer_time",
+                    "wait_total": true
+                }
+            },{
+                "function": "wipe",
+                "type": "thread",
+                "strip_id": 1,
+                "arguments": {
+                    "color": "$blue",
+                    "direction": 1,
+                    "wait_ms": "$timer_time",
+                    "wait_total": true
+                }
+            }
+        ]
+    },{
+        "function": "execute",
+        "type": "control",
+        "value": "$timer"
+    }
+]
