@@ -28,11 +28,15 @@ class Controller():
         max_watts = get_int(
             "Enter maximum watts entire strip can use: ", 0, 100000)
         volts = get_int("Enter voltage of power supply (5 or 12): ", 5, 12)
+        pin = get_int("Enter GPIO pin number (probably 18)", 0, 40)
+        grb = get_bool("Is strip wired GRB")
         self.data["neopixels"] = {
             "led_count": led_count,
             "max_brightness": max_brightness,
             "max_watts": max_watts,
-            "volts": volts
+            "volts": volts,
+            "pin": pin,
+            "grb": grb
         }
 
     def settings(self):

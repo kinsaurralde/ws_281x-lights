@@ -13,6 +13,7 @@ def update(folder_name):
         shutil.copy("../key.py", folder_name + "key.py")
         shutil.copy("../controller.py", folder_name + "controller.py")
         shutil.copy("../lights.py", folder_name + "lights.py")
+        shutil.copy("../variables.py", folder_name + "variables.py")
 
 
 def create_new(folder_name):
