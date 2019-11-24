@@ -247,7 +247,6 @@ class RemoteController():
         self.waiting_info = False
 
     def _emit(self, message, data = None):
-        print(self.remote, "is connected:", self.connected)
         if self.attempt_connect is False:
             print("Connection setting is off for", self.remote)
             return
@@ -285,7 +284,7 @@ class RemoteController():
             self._connect()
 
     def execute_json(self, data):
-        self.sio.emit('json', data)
+        self._emit('json', data)
 
     def ping(self):
         self._emit('ping')

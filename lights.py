@@ -321,6 +321,12 @@ class Lights:
         self.neo.show()
         return 0
 
+    def _set_save(self, pixels):
+        self.neo.update_pixel_owner(self.id)
+        for i, pixel in enumerate(pixels[:self.neo.numPixels(self.id)]):
+            self.neo.setPixelColor(self.id, i, pixel)
+        return 0
+
     def reverse(self):
         """Reverse order of lights on strip"""
         lights_save = self.save()
@@ -329,7 +335,7 @@ class Lights:
         self.neo.show()
         return 0
 
-    def shift(self, amount, post_delay=0, show_delay=0):
+    def shift(self, amount, post_delay=0, iterations=None, pixels=None):
         """Shift each pixel by amount
         
             Parameters:
@@ -340,18 +346,27 @@ class Lights:
 
                 show_delay: number of ms to pass to show() (default = 0)
         """
-        if amount == 0:
-            return 0
-        lights_save = self.save()
-        for i in range(self.neo.numPixels(self.id)):
-            new_i = i + amount
-            if (new_i < 0):
-                new_i += self.neo.numPixels(self.id)
-            new_i = new_i % self.neo.numPixels(self.id)
-            self.neo.setPixelColor(self.id, new_i, lights_save[i])
-        self.neo.show(show_delay)
-        time.sleep(int(post_delay)/1000.0)
-        return int(post_delay)/1000.0
+        t = Timer(self.neo.numMaxPixels(), self.start_time)
+        start_time = time.time()
+        this_id = self.animation_id.get()
+        if pixels is None:
+            pixels = self.save()
+        num_pixels = len(pixels)
+        if iterations is None:
+            iterations = num_pixels
+        cur_start = 0
+        interval = 1
+        if post_delay != 0:
+            interval = int(15 / post_delay)
+        for k in range(iterations):
+            if post_delay >= 15 or k % interval == 0:
+                self._set_save(pixels[cur_start:] + pixels[:cur_start])
+            cur_start = (cur_start + 1) % num_pixels
+            self.neo.show(15)
+            asd = time.time()
+            if t.sleepBreak(self.animation_id.get, this_id, post_delay):
+                return 0
+        return post_delay * iterations
 
     def wipe(self, r, g, b, direction=1, wait_ms=50, wait_total=False):
         """New color wipes across strip
@@ -381,8 +396,6 @@ class Lights:
             self.neo.update_pixel_owner(self.id, i)
             self.neo.setPixelColor(self.id, i, self.neo.get_color(r, g, b))
             self.neo.show(15)
-            # if self.sleepListenForBreak(self.id, each_wait, this_id):
-            #     return 0
             if t.sleepBreak(self.animation_id.get, this_id, each_wait):
                 return 0
         expected_time = each_wait / 1000 * self.neo.numPixels(self.id)
@@ -424,8 +437,6 @@ class Lights:
                     saves.append(self.neo.getPixelColor(self.id, i))
                     self.neo.setPixelColor(self.id, i + q, r, g, b)
                 self.neo.show()
-                # if self.sleepListenForBreak(self.id, wait_ms, this_id):
-                #     return 0
                 if t.sleepBreak(self.animation_id.get, this_id, wait_ms):
                     return 0
                 for i in range(0, self.neo.numPixels(self.id), interval):
@@ -657,6 +668,25 @@ class Lights:
                 break
         return total_time
 
+    def _get_pattern(self, colors, interval=3, fraction=True, blend=False):
+        if fraction:
+            interval = self.get_fraction(interval)
+        color = 0
+        save = [0] * self.neo.numPixels(self.id)
+        i = 0
+        while i < self.neo.numPixels(self.id) or color != 0:
+            if i + interval >= len(save):
+                save.extend([0] * (i + interval - len(save) + 1))
+            for j in range(interval):
+                if blend:
+                    cur_color = self.get_mix(colors[color], colors[(color + 1) % len(colors)], (j / interval) * 100)
+                    save[i + j] = cur_color
+                else:
+                    save[i + j] = self.neo.get_color(*colors[color])
+            color = (color + 1) % len(colors)
+            i += interval
+        return save
+
     def pattern(self, colors, interval=3, fraction=True, blend=False):
         """Repeat colors across strip
         
@@ -672,20 +702,8 @@ class Lights:
 
                 blend: true if colors are mixed (default: False)
         """
-        this_id = self.animation_id.get()
-        if fraction:
-            interval = self.get_fraction(interval)
-        color = 0
         self.neo.update_pixel_owner(self.id)
-        for i in range(0, self.neo.numPixels(self.id), interval):
-            for j in range(interval):
-                if blend:
-                    cur_color = self.get_mix(colors[color], colors[(color + 1) % len(colors)], (j / interval) * 100)
-                    self.neo.setPixelColor(self.id, i + j, cur_color)
-                else:
-                    if i + j < self.neo.numPixels(self.id):
-                        self.neo.setPixelColor(self.id, i + j, *colors[color])
-            color = (color + 1) % len(colors)
+        self._set_save(self._get_pattern(colors, interval, fraction, blend))
         self.neo.show()
         return 0
 
@@ -774,18 +792,15 @@ class Lights:
             p_colors.append(i)
             for j in range(spacing):
                 p_colors.append(sep_color)
-        self.pattern(p_colors, length, fraction=False, blend=False)
+        pixels = self._get_pattern(p_colors, length, False, False)
         s_amount = 1
         if direction == -1:
             s_amount = -1
         each_wait = wait_ms
         if wait_total:
             each_wait = wait_ms / self.neo.numPixels(self.id)
-        for i in range(self.neo.numPixels(self.id)):
-            self.shift(s_amount, 0, 15)
-            if t.sleepBreak(self.animation_id.get, this_id, each_wait):
-                return 0
-        return each_wait * self.neo.numMaxPixels()
+        self.shift(s_amount, each_wait, len(pixels), pixels)
+        return each_wait * len(pixels)
 
     def sleepListenForBreak(self, strip_id, wait_ms, this_id):
         """While sleeping check if global id has changed
