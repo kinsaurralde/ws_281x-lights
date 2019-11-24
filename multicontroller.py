@@ -85,6 +85,13 @@ class MultiController():
             "message": "Threads started"
         }
 
+    def valid_id(self, i):
+        if not isinstance(i, int):
+            return False
+        if i < 0 or i > len(self.controllers):
+            return False
+        return True
+
     def json(self, data):
         self._set_cur_ids("-1")
         for line in data:
@@ -156,19 +163,41 @@ class MultiController():
                 self.controllers[i].set_brightness(new_settings["brightness"])
         return response
 
+    def controller_functions(self, function, data = None):
+        if function == "status":
+            result = []
+            for i in range(len(self.controllers)):
+                result.append([self.controllers[i].is_enabled(), self.controllers[i].is_connected()])
+            return result
+        elif function == "enable":
+            if self.valid_id(int(data)):
+                self.controllers[int(data)].toggle_enable(True)
+                return self.info()
+        elif function == "disable":
+            if self.valid_id(int(data)):
+                self.controllers[int(data)].toggle_enable(False)
+                return self.info()
+        return None
+
     def info(self):
         response = []
         ping_data = self.ping()
+        controller_status = self.controller_functions("status")
         for i in range(len(self.controllers)):
             response.append(self.controllers[i].info())
             response[len(response) - 1]["ping"] = ping_data[i]
+            response[len(response) - 1]["enabled"] = controller_status[i]
         return response
 
     def ping(self):
         data = []
         for i in self.controllers:
             start_time = time.time()
-            data.append((i.ping() - start_time) * 1000)
+            ping_time = i.ping()
+            if ping_time != "Error" and ping_time != "Disabled":
+                data.append((ping_time - start_time) * 1000)
+            else:
+                data.append(-1)
         return data
 
 
@@ -176,28 +205,60 @@ class RemoteController():
     def __init__(self, controller_id, data):
         self.id = controller_id
         self.start_time = 0
+        self.response_timeout = .250
         self.is_remote = True
         self.remote = "http://" + data["remote"]
         self.sio = socketio.Client()
+        self.connected = False
+        self.attempt_connect = True
         self._connect()
 
     def _connect(self):
+        self._disconnect()
+        if self.attempt_connect is False:
+            print("Connection setting is off for", self.remote)
+            return False
         try:
             self.sio.connect(self.remote)
             self.sio.on('ping_response', self._ping_response)
             self.sio.on('info_response', self._info_response)
             self.sio.emit('ping')
+            self.connected = True
+            print("Connection Suceeded for", self.remote)
+            return True
         except:
-            print("Connection Failed")
+            print("Connection Failed for", self.remote)
+            self.connected = False
+            return False
+
+    def _disconnect(self):
+        self.sio.disconnect()
+        self.connected = False
+        print("Disconnected from", self.remote)
 
     def _ping_response(self, data):
-        print("ping called back", data)
+        print("ping called back", data, "from", self.remote)
         self.ping_data = data
         self.waiting_ping = False
 
     def _info_response(self, data):
+        print("Info called back from", self.remote)
         self.info_data = data
         self.waiting_info = False
+
+    def _emit(self, message, data = None):
+        print(self.remote, "is connected:", self.connected)
+        if self.attempt_connect is False:
+            print("Connection setting is off for", self.remote)
+            return
+        if self.connected:
+            self.sio.emit(message, data)
+        else:
+            print("Attempting to reconnect", self.remote)
+            if self._connect():
+                self.sio.emit(message, data)
+            else:
+                self.connected = False
 
     def _create_json(self, type, strip_id, function, arguments=None):
         return [{
@@ -208,21 +269,48 @@ class RemoteController():
             "arguments": arguments
         }]
 
+    def is_enabled(self):
+        return self.attempt_connect
+
+    def is_connected(self):
+        return self.connected
+
+    def toggle_enable(self, value):
+        self._disconnect()
+        if value is None:
+            self.attempt_connect = not self.attempt_connect
+        else:
+            self.attempt_connect = bool(value)
+        if self.attempt_connect is True:
+            self._connect()
+
     def execute_json(self, data):
         self.sio.emit('json', data)
 
     def ping(self):
-        self.sio.emit('ping')
+        self._emit('ping')
         self.waiting_ping = True
+        send_time = time.time()
+        if self.attempt_connect is False:
+            return "Disabled"
         while self.waiting_ping:
-            pass
+            if time.time() - send_time > self.response_timeout or not self.attempt_connect:
+                print(self.remote, "did not respond in time or was disabled")
+                return "Error"
+            time.sleep(.01)
         return self.ping_data
 
     def info(self):
-        self.sio.emit('info')
+        self._emit('info')
         self.waiting_info = True
+        send_time = time.time()
         while self.waiting_info:
-            pass
+            if time.time() - send_time > self.response_timeout or not self.attempt_connect:
+                return {
+                    "error": True
+                }
+            time.sleep(.01)
+        self.info_data["error"] = False
         return self.info_data
 
     def delay_start_time(self, value):

@@ -22,6 +22,7 @@ class Controller:
         self.strip_data = []
         self.create_strip(0, self.num_pixels - 1)
         self.v = Variables()
+        self.enable = True
 
 
     def init_neopixels(self, data):
@@ -53,6 +54,18 @@ class Controller:
         data["variables"] = self.v.info()
         return data
 
+    def toggle_enable(self, value):
+        if value is None:
+            self.enable = not self.enable
+        else:
+            self.enable = value
+
+    def is_enabled(self):
+        return self.enable
+
+    def is_connected(self):
+        return True
+
     def ping(self):
         return time.time()
 
@@ -63,6 +76,7 @@ class Controller:
             "error": error,
             "message": message,
             "strip_info": self.strip_data,
+            "error": False
         }
         if detailed:
             data["settings"] = self.get_all_settings()

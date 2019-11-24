@@ -39,6 +39,11 @@ def info_get():
     data = controller.info()
     return create_response(data)
 
+@app.route('/off')
+def off():
+    data = controller.off()
+    return create_response(data)
+
 controller = Controller(0)
 
 config_name = "config.json"
@@ -50,15 +55,15 @@ except FileNotFoundError:
     print("Config file not found")
     exit(1)
 config_data = json.load(config_file)
-print("Config data read from", config_name, ":", config_data)
+
 controller.init_neopixels(config_data["controllers"][0])
 
 keys = Keys(config_data)
 
-controller.run(0, "wipe", (255, 0, 0, 1, 250, True))
-controller.run(0, "wipe", (0, 255, 0, 1, 250, True))
-controller.run(0, "wipe", (0, 0, 255, 1, 250, True))
-controller.run(0, "wipe", (0, 0, 0, 1, 250, True))
+controller.run(0, "wipe", (255, 0, 0, 1, 250, True), time.time())
+controller.run(0, "wipe", (0, 255, 0, 1, 250, True), time.time())
+controller.run(0, "wipe", (0, 0, 255, 1, 250, True), time.time())
+controller.run(0, "wipe", (0, 0, 0, 1, 250, True), time.time())
 
 port = 200
 if "port" in config_data["info"]:
@@ -66,14 +71,17 @@ if "port" in config_data["info"]:
 
 @socketio.on('ping')
 def ping(methods=['GET']):
+    print("Current time is:", time.time())
     socketio.emit('ping_response', time.time())
 
 @socketio.on('json')
 def json(data, methods=['POST']):
+    print("Recieved JSON")
     controller.execute_json(data)
 
 @socketio.on('info')
 def info(methods=['GET']):
+    print("Info Requested")
     data = controller.info()
     socketio.emit('info_response', data)
 

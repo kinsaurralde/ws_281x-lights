@@ -220,6 +220,15 @@ def ping():
     print("Ping Data:", data)
     return create_response(data)
 
+@app.route('/<key>/controllers/<function>')
+@app.route('/<key>/controllers/<function>/<data>')
+def controllers(key, function, data = None):
+    try:
+        keys.check_key(key, -1)
+        data = mc.controller_functions(function, data)
+        return create_response(data)
+    except Exception as e:
+        return exception_handler(e)
 
 config_name = "sample_config.json"
 if len(sys.argv) > 1:
@@ -233,7 +242,6 @@ except FileNotFoundError:
     print("Config file not found")
     exit(1)
 config_data = json.load(config_file)
-print("Config data read from", config_name, ":\n", config_data)
 
 mc = MultiController(config_data)
 

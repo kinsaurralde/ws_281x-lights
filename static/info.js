@@ -34,28 +34,48 @@ class Info {
             location.reload();
         }
         for (let i = 0; i < this.pixels.length; i++) {
-            this.appendRow(data[i]);
-            for (let j = 0; j < data[i]["strips"].length; j++) {
-                for (let k = 0; k < data[i]["strips"][j]["data"].length; k++) {
-                    let pixel_data = data[i]["strips"][j]["data"][k];
-                    this.pixels[i]["strips"][j][k].setPixel(pixel_data.r, pixel_data.g, pixel_data.b);
+            this.appendRow(data[i], i);
+            if (data[i]["error"] == false) {
+                for (let j = 0; j < data[i]["strips"].length; j++) {
+                    for (let k = 0; k < data[i]["strips"][j]["data"].length; k++) {
+                        let pixel_data = data[i]["strips"][j]["data"][k];
+                        this.pixels[i]["strips"][j][k].setPixel(pixel_data.r, pixel_data.g, pixel_data.b);
+                    }
                 }
             }
         }
     }
 
-    appendRow(data) {
+    appendRow(data, i) {
+        console.log("Data:", data, i);
         let row = this.table.insertRow();
-        for (let j = 0; j < 7; j++) {
+        for (let j = 0; j < 10; j++) {
             row.insertCell();
         }
-        this.table.rows[this.table.rows.length - 1].cells[0].innerHTML = data["controller_id"];
-        this.table.rows[this.table.rows.length - 1].cells[1].innerHTML = data["power"]["now_watts"].toFixed(3) + " / " + data["power"]["strip_max"];
-        this.table.rows[this.table.rows.length - 1].cells[2].innerHTML = data["power"]["max_watts"];
-        this.table.rows[this.table.rows.length - 1].cells[3].innerHTML = data["settings"]["brightness"];
-        this.table.rows[this.table.rows.length - 1].cells[4].innerHTML = data["settings"]["num_pixels"];
-        this.table.rows[this.table.rows.length - 1].cells[5].innerHTML = data["strip_info"].length;
-        this.table.rows[this.table.rows.length - 1].cells[6].innerHTML = data["ping"].toFixed(3);
+        if (data["error"] == false) {
+            this.table.rows[this.table.rows.length - 1].cells[0].innerHTML = i;
+            this.table.rows[this.table.rows.length - 1].cells[1].innerHTML = data["power"]["now_watts"].toFixed(3) + " / " + data["power"]["strip_max"];
+            this.table.rows[this.table.rows.length - 1].cells[2].innerHTML = data["power"]["max_watts"];
+            this.table.rows[this.table.rows.length - 1].cells[3].innerHTML = data["settings"]["brightness"];
+            this.table.rows[this.table.rows.length - 1].cells[4].innerHTML = data["settings"]["num_pixels"];
+            this.table.rows[this.table.rows.length - 1].cells[5].innerHTML = data["strip_info"].length;
+            this.table.rows[this.table.rows.length - 1].cells[6].innerHTML = data["ping"].toFixed(3);
+        } else {
+            for (let i = 0; i < this.table.rows[this.table.rows.length - 1].cells.length - 2; i++) {
+                this.table.rows[this.table.rows.length - 1].cells[i].innerHTML = " --- ";
+            }
+        }
+        this.table.rows[this.table.rows.length - 1].cells[7].innerHTML = data["enabled"][0] + " / " + data["enabled"][1];
+        let button_e = document.createElement("input");
+        button_e.type = "button";
+        button_e.value = "Enable";
+        button_e.onclick = new Function("info.toggle_enable(" + i + ", true)");
+        this.table.rows[this.table.rows.length - 1].cells[8].appendChild(button_e);
+        let button_d = document.createElement("input");
+        button_d.type = "button";
+        button_d.value = "Disable";
+        button_d.onclick = new Function("info.toggle_enable(" + i + ", false)");
+        this.table.rows[this.table.rows.length - 1].cells[9].appendChild(button_d);
     }
 
     clearTable() {
@@ -69,6 +89,9 @@ class Info {
         console.log("Add Controller: ", data);
         let div = document.createElement("div");
         div.innerHTML = "Controller: " + id;
+        if (data["error"] == true) {
+            return
+        }
         let strips = [];
         for (let i = 0; i < data["strips"].length; i++) {
             let strips_div = document.createElement("div");
@@ -99,9 +122,19 @@ class Info {
         return pixels;
     }
 
+    toggle_enable(controller_id, enable) {
+        let key = document.getElementById("webkey-value").value; 
+        if (enable) {
+            this.send("/" + key + "/controllers/enable/" + controller_id);
+        } else {
+            this.send("/" + key + "/controllers/disable/" + controller_id);
+        }
+    }
+
     send(path) {
         let url = path;
         let request = new XMLHttpRequest();
+        console.log("Sending:", url)
         request.open('GET', url, true);
         request.onload = function () {
             console.log("Status code: ", this.status);
