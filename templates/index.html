@@ -133,9 +133,9 @@
             <input type="button" value="Green" onclick="lights.colorAll(0,255,0)">
             <input type="button" value="Blue" onclick="lights.colorAll(0,0,255)">
             <input type="button" value="White" onclick="lights.colorAll(255,255,255)">
-            <input type="button" value="Red Wipe" onclick="lights.wipe(255,0,0,-1,40)">
-            <input type="button" value="Green Wipe" onclick="lights.wipe(0,255,0,1,20)">
-            <input type="button" value="Blue Wipe" onclick="lights.wipe(0,0,255,-1,10)">
+            <input type="button" value="*Pattern 1*" onclick="lights.send('animate/pulse_pattern/0.0.255;255.255.255,24,50,false,1,1')">
+            <input type="button" value="*Pattern 2*" onclick="lights.send('animate/pulse_pattern/255.0.0;0.255.0,30,25,false,1,1')">
+            <input type="button" value="*Bounce 1*" onclick="lights.send('animate/bounce/255.0.0;255.255.0;0.255.0;0.255.255;255.0.255;0.0.255,2000,16,1,False,true')">
             <div class="space-1"></div>
             <input type="button" value="Stop Animation" onclick="lights.stopAnimation()">
             <input type="button" value="*Red Chase*" onclick="lights.chase(255,0,0,50,3,1)">
@@ -145,9 +145,9 @@
             <input type="button" value="*Rainbow Cycle*" onclick="lights.rainbowCycle('animate', 50)">
             <input type="button" value="*Random Each*" onclick="lights.random(1, 150, true)">
             <input type="button" value="*Random*" onclick="lights.random(-1, 250, true)">
-            <input type="button" value="*Red Pulse*" onclick="lights.pulse('animate',255,0,0,0,2000,10, false, true, 1000)">
-            <input type="button" value="*Green Pulse*" onclick="lights.pulse('animate',0,255,0,0,10,4, false, false, 500)">
-            <input type="button" value="*Blue Pulse*" onclick="lights.pulse('animate',0,0,255,1,25,5, true, false, 750)">
+            <input type="button" value="*Red Pulse*" onclick="lights.send('animate/pulse_pattern/255.0.0,6,50,false,3,1')">
+            <input type="button" value="*Green Pulse*" onclick="lights.send('animate/pulse_pattern/0.255.0,6,50,false,3,1')">
+            <input type="button" value="*Blue Pulse*" onclick="lights.send('animate/pulse_pattern/0.0.255,6,50,false,3,1')">
             <div class="space-1"></div>
             <input type="button" value="#Red Pulse#" onclick="lights.pulse('thread',255,0,0,0,2000,10, false, true)">
             <input type="button" value="#Green Pulse#" onclick="lights.pulse('thread',0,255,0,0,10,4, false, false)">
@@ -156,7 +156,7 @@
             <input type="button" value="#Green Wipe#" onclick="lights.wipe(0,255,0,1,20,'thread')">
             <input type="button" value="#Blue Wipe#" onclick="lights.wipe(0,0,255,-1,10,'thread')">
             <input type="button" value="*Mix*" onclick="lights.send('animate/mix/255.0.0;0.255.0;0.0.255;255.0.0,2000,false')">
-            <input type="button" value="*Bounce*" onclick="lights.send('animate/bounce/0.255.255;0.255.255,1000,5,1,True,true')">
+            <input type="button" value="*Bounce 2*" onclick="lights.send('animate/bounce/0.255.255;0.255.255,1000,5,1,True,true')">
             <input type="button" value="RCGMBY" onclick="lights.send('run/pattern/255.0.0;0.255.255;0.255.0;255.0.255;0.0.255;255.255.0,6,true,false')">
             <input type="button" value="RGB" onclick="lights.send('run/pattern/255.0.0;0.255.0;0.0.255,3,true,false')">
             <input type="button" value="Blend" onclick="lights.send('run/blend/3,100,20')">
@@ -270,6 +270,8 @@
             addSave(0, 255, 255);
             addSave(255, 0, 255);
             addSave(255, 255, 0);
+            addSave(255, 255, 255);
+            addSave(0, 0, 0);
             generic.add_row("bounce");
             generic.add_row("Pulse Pattern");
             generic.add_row("mix");

@@ -23,7 +23,7 @@ class Functions {
     }
 
     list() {
-        let send_url = "http://" + lights.hostname + ":" + lights.port + "/saved/functions/list";
+        let send_url = "http://" + lights.hostname + ":" + lights.port + "/0/saved/functions/list";
         this.sender.send(send_url, func.create_buttons);
     }
 
@@ -33,7 +33,7 @@ class Functions {
     }
 
     run(name) {
-        let path = "saved/functions/run/" + name;
+        let path = lights.getKeyIds() + "/saved/functions/run/" + name;
         let send_url = "http://" + lights.hostname + ":" + lights.port + "/" + path;
         this.sender.send(send_url);
         lights.updateLog(path);

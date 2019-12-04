@@ -200,15 +200,16 @@ def post_json():
     data = request.get_json()
     return create_response(mc.json(data))
 
-@app.route('/saved/<folder>/<function>')
-@app.route('/saved/<folder>/<function>/<path>')
-@app.route('/saved/<folder>/<function>/<path>/<data>', methods=['GET', 'POST'])
-def saved(folder, function, path = None, data = None):
+@app.route('/<key_ids>/saved/<folder>/<function>')
+@app.route('/<key_ids>/saved/<folder>/<function>/<path>')
+@app.route('/<key_ids>/saved/<folder>/<function>/<path>/<data>', methods=['GET', 'POST'])
+def saved(key_ids, folder, function, path = None, data = None):
     try:
+        key_ids = split_key_ids(key_ids)
         return_data = {}
         data = saves.run_function(function, folder, path, data)
         if function == "run":
-            return create_response(mc.json(data))
+            return create_response(mc.json(data, key_ids["controller_ids"]))
         return create_response(data)
     except Exception as e:
         return exception_handler(e)

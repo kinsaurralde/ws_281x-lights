@@ -302,6 +302,10 @@ class LightStrip {
         this.send(path, true);
     }
 
+    getKeyIds() {
+        return this.key + ":" + this.controllers + ":" + this.strip_id
+    }
+
 
     // Debug
 

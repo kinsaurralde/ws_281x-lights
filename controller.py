@@ -280,7 +280,7 @@ class Controller:
         elif action["type"] == "thread":
             self.thread(action.get("strip_id", 0), action["function"], action["arguments"], t.get_time())
 
-    def execute_json(self, data):
+    def _execute_json(self, data):
         self.json_id.increment()
         animation_id = self.json_id.get()
         t = Timer(self.num_pixels, time.time())
@@ -288,6 +288,11 @@ class Controller:
             self._execute(t, animation_id, action)
             if self.json_id.get() != animation_id:
                 break
+
+    def execute_json(self, data):
+        execute = self._execute_json
+        thread = threading.Thread(target=execute, args=[data])
+        thread.start()
 
 
 print("controller.py loaded")

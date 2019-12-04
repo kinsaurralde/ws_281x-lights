@@ -1,4 +1,3 @@
-import threading
 import requests
 import time
 import socketio
@@ -92,17 +91,16 @@ class MultiController():
             return False
         return True
 
-    def json(self, data):
+    def json(self, data, controller_id=None):
         self._set_cur_ids("-1")
+        self._set_cur_ids(controller_id)
         for line in data:
             if "controller_id" in line:
                 self._set_cur_ids(line["controller_id"])
             for i in self.cur_controller_id:
                 self.queues[i].append(line)
         for i in range(len(self.controllers)):
-            threading_thread = threading.Thread(
-                target=self.controllers[i].execute_json, args=[self.queues[i]])
-            threading_thread.start()
+            self.controllers[i].execute_json(self.queues[i])
             self.queues[i] = []
         return self._response()
 
@@ -110,36 +108,28 @@ class MultiController():
         self._set_cur_ids(controller_id)
         json = self._create("command", strip_id, "off")
         for i in self.cur_controller_id:
-            execute = self.controllers[i].execute_json
-            thread = threading.Thread(target=execute, args=[json])
-            thread.start()
+            self.controllers[i].execute_json(json)
         return self._response()
 
     def stop(self, controller_id=None, strip_id=None):
         self._set_cur_ids(controller_id)
         json = self._create("command", strip_id, "stopanimation")
         for i in self.cur_controller_id:
-            execute = self.controllers[i].execute_json
-            thread = threading.Thread(target=execute, args=[json])
-            thread.start()
+            self.controllers[i].execute_json(json)
         return self._response()
 
     def run(self, controller_id, strip_id, function, args):
         self._set_cur_ids(controller_id)
         json = self._create("run", strip_id, function, args, True)
         for i in self.cur_controller_id:
-            execute = self.controllers[i].execute_json
-            thread = threading.Thread(target=execute, args=[json])
-            thread.start()
+            self.controllers[i].execute_json(json)
         return self._response()
 
     def thread(self, controller_id, strip_id, function, args):
         self._set_cur_ids(controller_id)
         json = self._create("thread", strip_id, function, args)
         for i in self.cur_controller_id:
-            execute = self.controllers[i].execute_json
-            thread = threading.Thread(target=execute, args=[json])
-            thread.start()
+            self.controllers[i].execute_json(json)
         return self._response()
 
     def animate(self, controller_id, strip_id, function, args, delay=0):
@@ -147,9 +137,7 @@ class MultiController():
         json = self._create("animate", strip_id, function, args, True)
         json[2]["delay_between"] = delay
         for i in self.cur_controller_id:
-            execute = self.controllers[i].execute_json
-            thread = threading.Thread(target=execute, args=[json])
-            thread.start()
+            self.controllers[i].execute_json(json)
         return self._response()
 
     def change_settings(self, controller_id, new_settings):
@@ -232,7 +220,10 @@ class RemoteController():
             return False
 
     def _disconnect(self):
-        self.sio.disconnect()
+        try:
+            self.sio.disconnect()
+        except:
+            print("An error occured when disconnecting", self.remote)
         self.connected = False
         print("Disconnected from", self.remote)
 
