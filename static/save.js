@@ -47,6 +47,8 @@ class Save {
         section_flex.className = "section-flex";
         section_flex.id = "save-slot-" + this.id;
 
+        let live_target = document.getElementById("full-color-live");
+
         this.appendColorSaveSliders(section_flex, this.id, this.color.r, this.color.g, this.color.b);
 
         section_flex.appendChild(html.createSecondaryTitle("Live"));
@@ -64,7 +66,7 @@ class Save {
         section_flex.appendChild(html.createSpacerS1());
         section_flex.appendChild(html.createWritableTitle(this.color.b, "full-color-" + this.id + "-values-b"));
 
-        this.target.appendChild(section_flex);
+        live_target.appendChild(section_flex);
 
         this.updateColor();
 

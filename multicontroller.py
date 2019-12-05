@@ -100,7 +100,7 @@ class MultiController():
             for i in self.cur_controller_id:
                 self.queues[i].append(line)
         for i in range(len(self.controllers)):
-            self.controllers[i].execute_json(self.queues[i])
+            self.controllers[i].execute_json([self._starttime()] + self.queues[i])
             self.queues[i] = []
         return self._response()
 

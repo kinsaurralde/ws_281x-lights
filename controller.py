@@ -168,6 +168,7 @@ class Controller:
             "pattern": strip.pattern,
             "blend": strip.blend,
             "fade": strip.fade,
+            "fade_alt": strip.fade_alt,
             "pulse_pattern": strip.pulse_pattern
         }
         if name in run_functions:

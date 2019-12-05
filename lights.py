@@ -275,7 +275,7 @@ class Lights:
             })
         return lights_save
 
-    def set_all(self, r, g, b):
+    def set_all(self, r, g, b, color=None):
         """Set color of entire strip
         
                 Parameters:
@@ -778,6 +778,20 @@ class Lights:
         elif restore_mode == "brightness":
             self.neo.setBrightness(original)
         self.neo.show()
+        return wait_ms
+
+    def fade_alt(self, target=0, wait_ms=1000, steps=100, color=None):
+        original = self.neo.getBrightness()
+        self.fade(target, int(wait_ms / 2), "none", steps)
+        if color == "random":
+            c = self.neo.get_color_seperate(self.neo.get_random_color())
+            self.set_all(c[0], c[1], c[2])
+        elif color is not None:
+            c = self.neo.get_color_seperate(int(color))
+            self.set_all(c[0], c[1], c[2])
+
+        print("Original:", original, int(wait_ms / 2))
+        self.fade(original, int(wait_ms / 2), "none", steps)
         return wait_ms
 
     def pulse_pattern(self, colors, length=5, wait_ms=50, wait_total=False, spacing=3, direction=0):

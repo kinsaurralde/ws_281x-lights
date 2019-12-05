@@ -126,7 +126,7 @@
         <div class="section-hidden" id="quick-expanded" style="display: block;">
             <div class="divider"></div>
             <input type="button" value="Off" onclick="lights.off()">
-            <input type="button" value="Fade" onclick="lights.send('run/fade/0,200,off')">
+            <input type="button" value="Fade" onclick="lights.send('thread/fade/0,200,off')">
             <input type="button" value="Random Each" onclick="lights.random(1)">
             <input type="button" value="Random" onclick="lights.random(-1)">
             <input type="button" value="Red" onclick="lights.colorAll(255,0,0)">
@@ -169,7 +169,12 @@
                 style="width: 2vw;" onclick="addSave()"><input type="button" class="expand-button" value="-"
                 style="width: 2vw;" onclick="removeSave()"></div>
         <div class="space-1"></div>
-        <div class="section-hidden" id="full-color-expanded" style="display: block;">
+        <div class="divider"></div>
+        <div class="section-hidden" id="full-color-live" style="display: block;">
+
+        </div>
+        <div class="space-1"></div>
+        <div class="section-hidden" id="full-color-expanded" style="display: none;">
             <div class="divider"></div>
         </div>
     </div>

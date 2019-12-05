@@ -154,7 +154,7 @@ let generic_functions = {
         },
     },
     "fade": {
-        "types": ["run"],
+        "types": ["thread"],
         "wait_ms": [1000],
         "num_value": {
             "label": "Target",

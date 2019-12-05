@@ -13,6 +13,7 @@ socketio = SocketIO(app)
 
 debug_exceptions = False  # if true, exception will be sent to web
 
+VERBOSE = False
 
 def create_response(data):
     response = app.response_class(response=js.dumps(
@@ -76,7 +77,9 @@ def ping(methods=['GET']):
 
 @socketio.on('json')
 def json(data, methods=['POST']):
-    print("Recieved JSON")
+    print("Recieved JSON:")
+    if VERBOSE:
+        print(data)
     controller.execute_json(data)
 
 @socketio.on('info')

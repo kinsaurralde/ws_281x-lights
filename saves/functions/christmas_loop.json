@@ -9,13 +9,6 @@
         "name": "christmas_loop",
         "arguments": {},
         "value": [{
-            "function": "color",
-            "type": "run",
-            "strip_id": 0,
-            "arguments": {
-                "color": "$off"
-            }
-        },{
             "function": "loop",
             "type": "control",
             "arguments": {
@@ -23,21 +16,29 @@
             },
             "loop": [
                 {
-                    "function": "random",
-                    "type": "animate",
-                    "controller_id": -1,
-                    "strip_id": 0,
+                    "function": "loop",
+                    "type": "control",
                     "arguments": {
-                        "each": -1,
-                        "wait_ms": 1000
-                    }
-                },{
-                    "function": "wait",
-                    "type": "command",
-                    "controller_id": -1,
-                    "arguments": {
-                        "amount": 10000
-                    }
+                        "amount": 15
+                    },
+                    "loop": [
+                        {
+                            "type": "run",
+                            "function": "fade_alt",
+                            "arguments": {
+                                "target": 0,
+                                "wait_ms": 1250,
+                                "steps": 100,
+                                "color": "random"
+                            }
+                        },{
+                            "function": "wait",
+                            "type": "command",
+                            "arguments": {
+                                "amount": 1500
+                            }
+                        }
+                    ]
                 },{
                     "function": "loop",
                     "type": "control",
