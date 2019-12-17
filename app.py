@@ -248,14 +248,13 @@ except FileNotFoundError:
     exit(1)
 config_data = json.load(config_file)
 
-mc = MultiController(config_data)
-
 keys = Keys(config_data)
 
 saves = Saves()
 
 init_vars = saves.run_function("run", "functions/default", "default_vars")
-mc.default_vars(init_vars)
+
+mc = MultiController(config_data, init_vars)
 
 port = 200
 if "port" in config_data["info"]:

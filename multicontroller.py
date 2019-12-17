@@ -6,16 +6,18 @@ from controller import Controller
 
 
 class MultiController():
-    def __init__(self, config_data):
+    def __init__(self, config_data, default_vars):
         self.controllers = []
         self.queues = []
         self.cur_controller_id = [0]
         self.start_time = 0
         self.start_delay = .05
+        self.default_vars = default_vars
         if "controllers" not in config_data:
             raise KeyError
         for controller in config_data["controllers"]:
             self._add_controller(controller)
+        self.json(self.default_vars)
 
     def _add_controller(self, data):
         cur_id = len(self.controllers)
@@ -28,7 +30,7 @@ class MultiController():
             self.controllers[cur_id].run(0, "wipe", (0, 0, 0, 1, 250, True), time.time())
             time.sleep(.1)
         else:
-            self.controllers.append(RemoteController(cur_id, data))
+            self.controllers.append(RemoteController(cur_id, data, self.default_vars))
         self.queues.append([])
 
     def _get_all_ids(self):
@@ -90,10 +92,6 @@ class MultiController():
         if i < 0 or i > len(self.controllers):
             return False
         return True
-
-    def default_vars(self, default_vars):
-        self.default_vars = default_vars
-        self.json(self.default_vars)
 
     def json(self, data, controller_id=None):
         self._set_cur_ids("-1")
@@ -212,10 +210,10 @@ class RemoteController():
             print("Connection setting is off for", self.remote)
             return False
         try:
-            self.sio.connect(self.remote)
             self.sio.on('connected', self._connect_response)
             self.sio.on('ping_response', self._ping_response)
             self.sio.on('info_response', self._info_response)
+            self.sio.connect(self.remote)
             self.sio.emit('ping')
             self.connected = True
             print("Connection Suceeded for", self.remote)
@@ -234,7 +232,7 @@ class RemoteController():
         print("Disconnected from", self.remote)
 
     def _connect_response(self, data):
-        if data["needs_defaults"]:
+        if data["needs_default"]:
             self.execute_json(self.default_vars)
 
     def _ping_response(self, data):
