@@ -26,7 +26,7 @@ def create_new(folder_name):
         if not os.path.exists(cur_folder):
             os.makedirs(cur_folder)
         shutil.copy(folder_name + file, cur_folder + "config.json")
-        startup_script = "sudo screen -S secondary_rgb sudo python3 app.py config.json\n"
+        startup_script = "sudo screen -dmS secondary_rgb sudo python3 app.py config.json\n"
         with open(cur_folder + "startup.sh", "w") as startup_file:
             os.chmod(cur_folder + "startup.sh", 0o755)
             startup_file.write(startup_script)

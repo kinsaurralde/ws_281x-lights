@@ -69,6 +69,8 @@ def make_list(arg):
     arg = str(arg)
     if ';' in arg:
         arg = [[int(y) for y in x.split('.')] for x in arg.split(';')]
+    elif '!' in arg:
+        arg = float(arg[1:])
     elif '.' in arg:
         arg = [[int(x) for x in arg.split('.')]]
     elif arg in ["false", "False"]:
@@ -167,27 +169,29 @@ def run(key_ids, function, args=None):
     except Exception as e:
         return exception_handler(e)
 
-
+@app.route('/<key_ids>/thread/<function>')
 @app.route('/<key_ids>/thread/<function>/<args>')
-def thread(key_ids, function, args):
+def thread(key_ids, function, args=None):
     try:
         data = split_key_ids(key_ids)
         keys.check_key(data["key"], data["strip_id"])
-        args = [int(x) if x.lstrip('-').isdigit() else make_list(x) for x in args.split(',')]
+        if args is not None:
+            args = [int(x) if x.lstrip('-').isdigit() else make_list(x) for x in args.split(',')]
         controller_response = mc.thread(
             data["controller_ids"], int(data["strip_id"]), function, args)
         return create_response(controller_response)
     except Exception as e:
         return exception_handler(e)
 
-
+@app.route('/<key_ids>/animate/<function>')
 @app.route('/<key_ids>/animate/<function>/<args>')
-@app.route('/<key_ids>/animate/<function>/<args>/<delay>')
-def animate(key_ids, function, args, delay=0):
+#b@app.route('/<key_ids>/animate/<function>/<args>/<delay>')
+def animate(key_ids, function, args=None, delay=0):
     try:
         data = split_key_ids(key_ids)
         keys.check_key(data["key"], data["strip_id"])
-        args = [int(x) if x.lstrip('-').isdigit() else make_list(x) for x in args.split(',')]
+        if args is not None:
+            args = [int(x) if x.lstrip('-').isdigit() else make_list(x) for x in args.split(',')]
         controller_response = mc.animate(data["controller_ids"],
                                          int(data["strip_id"]), function, args, delay)
         return create_response(controller_response)
@@ -251,7 +255,7 @@ keys = Keys(config_data)
 saves = Saves()
 
 init_vars = saves.run_function("run", "functions/default", "default_vars")
-mc.json(init_vars)
+mc.default_vars(init_vars)
 
 port = 200
 if "port" in config_data["info"]:

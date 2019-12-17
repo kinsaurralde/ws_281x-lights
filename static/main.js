@@ -287,6 +287,11 @@ class LightStrip {
         this.send(path, ids)
     }
 
+    twinkle(type, wait_ms, interval, ids=null) {
+        let path = type + "/twinkle/" + wait_ms + "," + interval;
+        this.send(path, ids);
+    }
+
     reverseStrip(ids=null) {
         let path = "run/reverse";
         this.send(path, ids);

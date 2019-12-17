@@ -169,6 +169,7 @@ class Controller:
             "blend": strip.blend,
             "fade": strip.fade,
             "fade_alt": strip.fade_alt,
+            "twinkle": strip.twinkle,
             "pulse_pattern": strip.pulse_pattern
         }
         if name in run_functions:
@@ -195,7 +196,9 @@ class Controller:
         threading_function = self._run_functions(
             function, self.strips[strip_id])
         self.strips[strip_id].start_time = start_time
-        if isinstance(arguments, dict):
+        if arguments == None:
+            threading_thread = threading.Thread(target=threading_function)
+        elif isinstance(arguments, dict):
             threading_thread = threading.Thread(target=threading_function, kwargs=arguments)
         else:
             threading_thread = threading.Thread(target=threading_function, args=arguments)
@@ -222,7 +225,9 @@ class Controller:
         delay = int(delay_between)
         while animation_id == self.strips[strip_id].animation_id.get():
             self.strips[strip_id].start_time = start_time + (total_time / 1000)
-            if isinstance(arguments, dict):
+            if arguments is None:
+                total_time += function()
+            elif isinstance(arguments, dict):
                 total_time += function(**arguments)
             elif delay_between == 0:
                 total_time += function(*arguments)

@@ -91,6 +91,10 @@ class MultiController():
             return False
         return True
 
+    def default_vars(self, default_vars):
+        self.default_vars = default_vars
+        self.json(self.default_vars)
+
     def json(self, data, controller_id=None):
         self._set_cur_ids("-1")
         self._set_cur_ids(controller_id)
@@ -190,7 +194,7 @@ class MultiController():
 
 
 class RemoteController():
-    def __init__(self, controller_id, data):
+    def __init__(self, controller_id, data, default_vars):
         self.id = controller_id
         self.start_time = 0
         self.response_timeout = .250
@@ -200,6 +204,7 @@ class RemoteController():
         self.connected = False
         self.attempt_connect = True
         self._connect()
+        self.default_vars = default_vars
 
     def _connect(self):
         self._disconnect()
@@ -208,6 +213,7 @@ class RemoteController():
             return False
         try:
             self.sio.connect(self.remote)
+            self.sio.on('connected', self._connect_response)
             self.sio.on('ping_response', self._ping_response)
             self.sio.on('info_response', self._info_response)
             self.sio.emit('ping')
@@ -226,6 +232,10 @@ class RemoteController():
             print("An error occured when disconnecting", self.remote)
         self.connected = False
         print("Disconnected from", self.remote)
+
+    def _connect_response(self, data):
+        if data["needs_defaults"]:
+            self.execute_json(self.default_vars)
 
     def _ping_response(self, data):
         print("ping called back", data, "from", self.remote)

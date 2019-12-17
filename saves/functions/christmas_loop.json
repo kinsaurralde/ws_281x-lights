@@ -19,7 +19,7 @@
                     "function": "loop",
                     "type": "control",
                     "arguments": {
-                        "amount": 15
+                        "amount": 6
                     },
                     "loop": [
                         {
@@ -105,7 +105,7 @@
                     "function": "pulse_pattern",
                     "strip_id": 0,
                     "arguments": {
-                        "colors": [[255,255,255], [0,0,255]],
+                        "colors": [[0,0,0], [0,0,255]],
                         "length": 24,
                         "wait_ms": 50,
                         "wait_total": false,

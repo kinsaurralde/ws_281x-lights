@@ -277,11 +277,12 @@ class GenericRow {
             case "Pulse Pattern":
                 lights.pulse_pattern(data["type"], data["colors"], data["wait_ms"], data["num_value"], data["dir"], data["option"], data["wait_mode"], data["key_ids"]);
                 break;
+            case "twinkle":
+                lights.twinkle(data["type"], data["wait_ms"], data["iterations"], data["key_ids"]);
         }
     }
 
     getValue(property) {
-        console.log(property)
         if (Array.isArray(this.generic.functions[this.data["function"]][property])) {
             return this.generic.functions[this.data["function"]][property][0];
         }

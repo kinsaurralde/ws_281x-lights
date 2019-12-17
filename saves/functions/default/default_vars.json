@@ -1,0 +1,57 @@
+[
+    {
+        "function": "set_value",
+        "type": "variable",
+        "name": "green",
+        "value": [0, 255, 0],
+        "v_type": "color"
+    },{
+        "function": "set_value",
+        "type": "variable",
+        "name": "red",
+        "value": [255, 0, 0],
+        "v_type": "color"
+    },{
+        "function": "set_value",
+        "type": "variable",
+        "name": "blue",
+        "value": [0, 0, 255],
+        "v_type": "color"
+    },{
+        "function": "set_value",
+        "type": "variable",
+        "name": "cyan",
+        "value": [0, 255, 255],
+        "v_type": "color"
+    },{
+        "function": "set_value",
+        "type": "variable",
+        "name": "magenta",
+        "value": [0, 255, 255],
+        "v_type": "color"
+    },{
+        "function": "set_value",
+        "type": "variable",
+        "name": "yellow",
+        "value": [255, 255, 0],
+        "v_type": "color"
+    },{
+        "function": "set_value",
+        "type": "variable",
+        "name": "white",
+        "value": [255, 255, 255],
+        "v_type": "color"
+    },{
+        "function": "set_value",
+        "type": "variable",
+        "name": "black",
+        "value": [0, 0, 0],
+        "v_type": "color"
+    },{
+        "function": "set_value",
+        "type": "variable",
+        "name": "off",
+        "value": [0, 0, 0],
+        "v_type": "color"
+    }
+]

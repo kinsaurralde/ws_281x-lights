@@ -66,6 +66,8 @@ controller.run(0, "wipe", (0, 255, 0, 1, 250, True), time.time())
 controller.run(0, "wipe", (0, 0, 255, 1, 250, True), time.time())
 controller.run(0, "wipe", (0, 0, 0, 1, 250, True), time.time())
 
+needs_default = True
+
 port = 200
 if "port" in config_data["info"]:
     port = int(config_data["info"]["port"])
@@ -90,8 +92,10 @@ def info(methods=['GET']):
 
 @socketio.on('connect')
 def test_connect():
+    global needs_default
     print("Connected")
-    socketio.emit('response', {'data': 'Connected'})
+    socketio.emit('connected', {'needs_default': needs_default})
+    needs_default = False
 
 @socketio.on('disconnect')
 def test_disconnect():

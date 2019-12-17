@@ -775,6 +775,7 @@ class Lights:
         if restore_mode == "off":
             self.set_all(0,0,0)
             self.neo.setBrightness(original)
+            self.animation_id.increment()
         elif restore_mode == "brightness":
             self.neo.setBrightness(original)
         self.neo.show()
@@ -789,8 +790,6 @@ class Lights:
         elif color is not None:
             c = self.neo.get_color_seperate(int(color))
             self.set_all(c[0], c[1], c[2])
-
-        print("Original:", original, int(wait_ms / 2))
         self.fade(original, int(wait_ms / 2), "none", steps)
         return wait_ms
 
@@ -815,6 +814,32 @@ class Lights:
             each_wait = wait_ms / self.neo.numPixels(self.id)
         self.shift(s_amount, each_wait, len(pixels), pixels)
         return each_wait * len(pixels)
+
+    def twinkle(self, wait_ms=250, iterations=10, l=0.05, u=1, restore=True):
+        t = Timer(self.neo.numMaxPixels(), self.start_time)
+        this_id = self.animation_id.get()
+        mx = 255
+        mn = 0
+        lights_save = self.save_split()
+        ls = self.save()
+        for itr in range(iterations):
+            for v in lights_save:
+                br = random.uniform(l, u)
+                nr = int(v["r"] * br)
+                ng = int(v["g"] * br)
+                nb = int(v["b"] * br)
+                new = [nr, ng, nb]
+                if nr > mx or nb > mx or ng > mx or nr < mn or ng < mn or nb < mn:
+                    new = [v["r"], v["g"], v["b"]]
+                pr, pg, pb = new[0], new[1], new[2]
+                self.neo.setPixelColor(self.id, v["id"], pr, pg, pb)
+            self.neo.show(15)
+            if t.sleepBreak(self.animation_id.get, this_id, wait_ms):
+                return 0
+        if restore:
+            self._set_save(ls)
+        return wait_ms * iterations
+
 
     def sleepListenForBreak(self, strip_id, wait_ms, this_id):
         """While sleeping check if global id has changed

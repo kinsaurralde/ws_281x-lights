@@ -183,5 +183,14 @@ let generic_functions = {
         },
         "wait_mode": [ "each", "full"],
         "direction": ["left", "right"],
+    },
+    "twinkle": {
+        "types": ["animate", "thread"],
+        "wait_ms": [100],
+        "option": {
+            "label": "Iterations",
+            "default": [10],
+            "mode": "number"
+        }
     }
 };
