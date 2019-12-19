@@ -40,7 +40,6 @@ class Timer:
         self.start_time = start_time
         self.sleep_count = 0
         self.early = num_pixels * .00004
-       #  print("TImer created:", self.start_time, time.time())
 
     def set_start(self, value):
         self.start_time = value
@@ -77,7 +76,6 @@ class NeoPixels:
         self.num_pixels = LED_COUNT
         self.v_strips = []
         self.pixel_owner = [0] * self.num_pixels
-        # self.max_milliamps = MAX_MILLIAMPS
         self.max_brightness = LED_BRIGHTNESS
         self.max_watts = PROVIDED_WATTS
         self.voltage = VOLTAGE
@@ -322,6 +320,12 @@ class Lights:
         return 0
 
     def _set_save(self, pixels):
+        """Set pixels to save
+
+            Parameters:
+
+                pixels: array of pixels from self.save()
+        """
         self.neo.update_pixel_owner(self.id)
         for i, pixel in enumerate(pixels[:self.neo.numPixels(self.id)]):
             self.neo.setPixelColor(self.id, i, pixel)
@@ -342,9 +346,13 @@ class Lights:
 
                 amount: number of pixels to shift by
 
-                post_delay: number of ms to sleep after shift (default = 0)
+                post_delay: number of ms to sleep after shift (default: 0)
 
-                show_delay: number of ms to pass to show() (default = 0)
+                iterations: number of times to shift (default: num_pixels)
+
+                pixels: (default: None)
+                    None: shift current pixels
+                    Save array: shift given pixel array
         """
         t = Timer(self.neo.numMaxPixels(), self.start_time)
         start_time = time.time()
@@ -600,7 +608,7 @@ class Lights:
         t = Timer(self.neo.numMaxPixels(), self.start_time)
         this_id = self.animation_id.get()
         if instant:
-            self.mix_switch_instant(abs(wait_ms), colors, t)
+            self._mix_switch_instant(abs(wait_ms), colors, t)
             return wait_ms * len(colors)
         for k in range(0, len(colors) - 1):
             percent = 0
@@ -615,7 +623,7 @@ class Lights:
         self.neo.show()
         return wait_ms * (len(colors) - 1)
 
-    def mix_switch_instant(self, wait_ms, colors, t):
+    def _mix_switch_instant(self, wait_ms, colors, t):
         """Switch to next color after wait_ms
 
             Parameters:
@@ -623,6 +631,8 @@ class Lights:
                 wait_ms: time between colors
 
                 colors: list of colors to split between
+
+                t: timer
         """
         this_id = self.animation_id.get()
         for j in range(0, len(colors)):
@@ -669,6 +679,20 @@ class Lights:
         return total_time
 
     def _get_pattern(self, colors, interval=3, fraction=True, blend=False):
+        """Return pattern
+
+            Parameters:
+
+                    colors: list of colors
+
+                    interval: how to divide pixels (default: 3)
+
+                    fraction: (default: True)
+                        True: interval is number of sections
+                        False: interval is num pixels for each color
+
+                    blend: true if colors are mixed (default: False)
+        """
         if fraction:
             interval = self.get_fraction(interval)
         color = 0
@@ -758,7 +782,9 @@ class Lights:
                 restore_mode: set brightness after (default: off)
                     "off": set pixels to off then restore brightness to original
                     "brightnesss": set pixels to original brightness
-                    Anything Else: keep brightness at target brightness and color original
+                    *: keep brightness at target brightness and color original
+
+                steps: number of brightness changes before target (default: 100)
         """
         t = Timer(self.neo.numMaxPixels(), self.start_time)
         this_id = self.animation_id.get()
@@ -782,6 +808,21 @@ class Lights:
         return wait_ms
 
     def fade_alt(self, target=0, wait_ms=1000, steps=100, color=None):
+        """Similar to fade but switches all pixels to color at target brightness
+
+            Parameters:
+
+                target: final brightness (default: 0)
+        
+                wait_ms: total time before target brightness is reached (default: 1000)
+
+                steps: number of brightness changes before target (default: 100)
+
+                color: (default: None)
+                    None: use current color
+                    random: change to random color
+                    Anything else: use given color
+        """
         original = self.neo.getBrightness()
         self.fade(target, int(wait_ms / 2), "none", steps)
         if color == "random":
@@ -794,6 +835,24 @@ class Lights:
         return wait_ms
 
     def pulse_pattern(self, colors, length=5, wait_ms=50, wait_total=False, spacing=3, direction=0):
+        """Shift pattern across shift
+
+            Parameters:
+
+                colors: list of colors (1st is background color if multiple given)
+
+                length: how many pixels per color (default: 5)
+
+                wait_ms: delay between shifts (default: 50)
+
+                wait_total: if true, wait_ms is total time of each pulse (default: False)
+
+                spacing: how many background color in between each color (default: 3)
+
+                direction: initial direction (default: 0)
+                    -1: backwards
+                    *: forwards
+        """
         t = Timer(self.neo.numMaxPixels(), self.start_time)
         this_id = self.animation_id.get()
         sep_color = [0, 0, 0]
@@ -816,6 +875,20 @@ class Lights:
         return each_wait * len(pixels)
 
     def twinkle(self, wait_ms=250, iterations=10, l=0.05, u=1, restore=True):
+        """Cause individual pixels to flicker
+
+            Parameters:
+
+                wait_ms: time between changes in ms (default: 250)
+
+                iterations: number of times to repeat (default: 10)
+
+                l: lower bound of possible brightnesses (default: 0.05)
+
+                u: upper bound of possible brightnesses (default: 1)
+
+                restore: undo changes when done (default: True)
+        """
         t = Timer(self.neo.numMaxPixels(), self.start_time)
         this_id = self.animation_id.get()
         mx = 255
@@ -861,10 +934,8 @@ class Lights:
             wait_ms -= 100
         return False
 
-    def sleep(self, wait_ms, this_id):
-        self.t.sleep(wait_ms/1000)
-
     def get_fraction(self, num):
+        """Returns rounded fraction"""
         return round(self.neo.numPixels(self.id) / int(num))
 
     def wheel(self, pos):

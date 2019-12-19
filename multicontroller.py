@@ -212,6 +212,7 @@ class MultiController():
 
 class RemoteController():
     def __init__(self, controller_id, data, default_vars):
+        self.default_vars = default_vars
         self.id = controller_id
         self.start_time = 0
         self.response_timeout = .250
@@ -221,7 +222,6 @@ class RemoteController():
         self.connected = False
         self.attempt_connect = True
         self._connect()
-        self.default_vars = default_vars
 
     def _connect(self):
         self._disconnect()
