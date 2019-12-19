@@ -40,6 +40,10 @@ def info_get():
     data = controller.info()
     return create_response(data)
 
+@app.route('/info/active')
+def info_active():
+    return create_response(current_json)
+
 @app.route('/off')
 def off():
     data = controller.off()
@@ -68,6 +72,8 @@ controller.run(0, "wipe", (0, 0, 0, 1, 250, True), time.time())
 
 needs_default = True
 
+current_json = {}
+
 port = 200
 if "port" in config_data["info"]:
     port = int(config_data["info"]["port"])
@@ -79,9 +85,10 @@ def ping(methods=['GET']):
 
 @socketio.on('json')
 def json(data, methods=['POST']):
-    print("Recieved JSON:")
+    global current_json
     if VERBOSE:
-        print(data)
+        print("Recieved JSON:", data)
+    current_json = data
     controller.execute_json(data)
 
 @socketio.on('info')

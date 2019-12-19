@@ -131,7 +131,16 @@ class Info {
         }
     }
 
-    send(path) {
+    disp_history(data) {
+        window.open().document.write("<pre>" + JSON.stringify(data, null, 2) + "</pre>")
+    }
+
+    get_history() {
+        let send_url = "/info/history";
+        this.send(send_url, "history");
+    }
+
+    send(path, mode=null) {
         let url = path;
         let request = new XMLHttpRequest();
         console.log("Sending:", url)
@@ -141,7 +150,11 @@ class Info {
             if (this.status >= 200 && this.status < 400) {
                 let data = JSON.parse(this.response);
                 console.log("Recieved Data:", data);
-                info.recieveData(data);
+                if (mode == null) {
+                    info.recieveData(data);
+                } else if (mode == "history") {
+                    info.disp_history(data);
+                }
             } else {
                 console.log("There was an error");
             }

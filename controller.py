@@ -269,6 +269,11 @@ class Controller:
             elif action["function"] == "execute":
                 for a in action["value"]:
                     self._execute(t, animation_id, a)
+        elif action["type"] == "debug":
+            if action["function"] == "time":
+                print("Current time:", time.time())
+            elif action["function"] == "print":
+                print("Message:", action["message"])
         elif action["type"] == "variable":
             if action["function"] == "set_value":
                 self.v.add(action["name"], action["value"], action.get("v_type"))

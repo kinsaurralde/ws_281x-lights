@@ -98,6 +98,9 @@ def info(function):
     elif function == "get":
         data = mc.info()
         return create_response(data)
+    elif function == "history":
+        data = mc.get_history()
+        return create_response(data)
     else:
         return page_not_found("Info function not found")
 
@@ -217,7 +220,6 @@ def saved(key_ids, folder, function, path = None, data = None):
         return create_response(data)
     except Exception as e:
         return exception_handler(e)
-
 
 @app.route('/ping')
 def ping():

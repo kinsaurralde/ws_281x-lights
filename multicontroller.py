@@ -9,6 +9,8 @@ class MultiController():
     def __init__(self, config_data, default_vars):
         self.controllers = []
         self.queues = []
+        self.history = []
+        self.history_length = 5
         self.cur_controller_id = [0]
         self.start_time = 0
         self.start_delay = .05
@@ -32,6 +34,11 @@ class MultiController():
         else:
             self.controllers.append(RemoteController(cur_id, data, self.default_vars))
         self.queues.append([])
+        self.history.append({
+            "pos": -1,
+            "data": [{}] * self.history_length
+        })
+
 
     def _get_all_ids(self):
         out = []
@@ -86,6 +93,16 @@ class MultiController():
             "message": "Threads started"
         }
 
+    def _update_history(self, id, data):
+        self.history[id]["pos"] += 1
+        if self.history[id]["pos"] >= self.history_length:
+            self.history[id]["pos"] = 0
+        self.history[id]["data"][self.history[id]["pos"]] = data
+
+
+    def get_history(self):
+        return self.history
+
     def valid_id(self, i):
         if not isinstance(i, int):
             return False
@@ -102,7 +119,9 @@ class MultiController():
             for i in self.cur_controller_id:
                 self.queues[i].append(line)
         for i in range(len(self.controllers)):
-            self.controllers[i].execute_json([self._starttime()] + self.queues[i])
+            data = [self._starttime()] + self.queues[i]
+            self.controllers[i].execute_json(data)
+            self._update_history(i, data)
             self.queues[i] = []
         return self._response()
 

@@ -1,0 +1,50 @@
+[   
+    {
+        "type": "requirement",
+        "key": false,
+        "write": "no"
+    },{
+        "function": "set_function",
+        "type": "variable",
+        "name": "random_colors",
+        "arguments": {},
+        "value": [
+            {
+                "function": "print",
+                "type": "debug",
+                "message": "Starting Random Colors"
+            },{
+                "function": "time",
+                "type": "debug"
+            },{
+                "function": "loop",
+                "type": "control",
+                "arguments": {
+                    "amount": "forever"
+                },
+                "loop": [
+                    {
+                        "type": "run",
+                        "function": "fade_alt",
+                        "arguments": {
+                            "target": 0,
+                            "wait_ms": 1250,
+                            "steps": 100,
+                            "color": "random"
+                        }
+                    },{
+                        "function": "wait",
+                        "type": "command",
+                        "arguments": {
+                            "amount": 1500
+                        }
+                    }
+                ]
+            }
+        ]
+    },{
+        "function": "execute",
+        "type": "control",
+        "value": "$random_colors"
+    }
+]
