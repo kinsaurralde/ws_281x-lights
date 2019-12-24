@@ -258,9 +258,9 @@ class Controller:
             elif action["function"] == "starttime":
                 t.set_start(action["arguments"]["amount"])
             elif action["function"] == "stopanimation":
-                self.stop(action.get("strip_id"))
+                self.stop(action.get("strip_id", 0))
             elif action["function"] == "off":
-                self.off(action.get("strip_id"))
+                self.off(action.get("strip_id", 0))
         elif action["type"] == "control":
             if action["function"] == "wait":
                 t.sleep(int(action["arguments"]["amount"]))

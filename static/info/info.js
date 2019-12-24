@@ -1,7 +1,15 @@
+DEBUG = true
+DEBUG_HOST = "rpi0.kinsaurralde.com"
+
 class Info {
     constructor() {
         this.display = new Display("controllers")
         this.display.setup(init_data());
+        this.url = "http://" + location.host;
+
+        if (DEBUG) {
+            this.url = DEBUG_HOST;
+        }
     }
 }
 

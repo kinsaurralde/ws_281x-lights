@@ -3,7 +3,7 @@ import json as js
 import sys
 import time
 
-from flask import Flask, json, request
+from flask import Flask, json, request, render_template_string
 from flask_socketio import SocketIO
 from key import Keys
 from controller import Controller
@@ -34,6 +34,10 @@ def error_response(message):
 def page_not_found(e):
     return error_response(str(e)), 404
 
+
+@app.route('/')
+def index():
+    return render_template_string('<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js" integrity="sha256-bQmrZe4yPnQrLTY+1gYylfNMBuGfnT/HKsCGX+9Xuqo=" crossorigin="anonymous"></script>')
 
 @app.route('/info/get')
 def info_get():
@@ -77,6 +81,11 @@ current_json = {}
 port = 200
 if "port" in config_data["info"]:
     port = int(config_data["info"]["port"])
+
+@socketio.on('test')
+def test():
+    print("Testing")
+    
 
 @socketio.on('ping')
 def ping(methods=['GET']):
