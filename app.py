@@ -3,6 +3,7 @@
 import json
 import sys
 import time
+import argparse
 
 from flask import Flask, render_template, json, request
 from key import Keys
@@ -201,7 +202,6 @@ def animate(key_ids, function, args=None, delay=0):
     except Exception as e:
         return exception_handler(e)
 
-
 @app.route('/json', methods=['GET', 'POST'])
 def post_json():
     data = request.get_json()
@@ -237,30 +237,27 @@ def controllers(key, function, data = None):
     except Exception as e:
         return exception_handler(e)
 
-config_name = "sample_config.json"
-if len(sys.argv) > 1:
-    config_name = sys.argv[1]
-debug_mode = False
-if len(sys.argv) > 2:
-    debug_mode = bool(sys.argv[2])
+parser = argparse.ArgumentParser()
+parser.add_argument('-d', '--debug', action='store_true', help='Debug mode', default=False)
+parser.add_argument('-t', '--test', action='store_true', help='Testing mode (for non pi devices)', default=False)
+parser.add_argument('-c', '--config', type=str, help='Path to config file', default="sample_config.json")
+args = parser.parse_args()
+
 try:
-    config_file = open(config_name, "r")
+    config_file = open(args.config, "r")
 except FileNotFoundError:
     print("Config file not found")
     exit(1)
 config_data = json.load(config_file)
 
 keys = Keys(config_data)
-
 saves = Saves()
-
 init_vars = saves.run_function("run", "functions/default", "default_vars")
-
-mc = MultiController(config_data, init_vars)
+mc = MultiController(config_data, init_vars, args.test)
 
 port = 200
 if "port" in config_data["info"]:
     port = int(config_data["info"]["port"])
 
 if __name__ == '__main__':
-    app.run(debug = debug_mode, host = '0.0.0.0', port = port, threaded = True) 
+    app.run(debug = args.debug, host = '0.0.0.0', port = port, threaded = True) 

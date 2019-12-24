@@ -71,7 +71,8 @@ class Timer:
 
 
 class NeoPixels:
-    def __init__(self, controller_id):
+    def __init__(self, controller_id, testing = False):
+        self.testing = testing
         self.id = controller_id
         self.num_pixels = LED_COUNT
         self.v_strips = []
@@ -102,9 +103,13 @@ class NeoPixels:
         self.pixel_owner = [0] * self.num_pixels
         self.strip = Adafruit_NeoPixel(
             self.num_pixels, self.pin, LED_FREQ_HZ, LED_DMA, LED_INVERT, self.max_brightness, led_channel)
+        if self.testing:
+            print("Testing Mode")
+            return
         self.strip.begin()
         print("Neopixel [", self.id ,"] created with values:", self.num_pixels, self.pin, LED_FREQ_HZ, LED_DMA, LED_INVERT, self.max_brightness, led_channel, self.grb)
-
+    
+    
     def update(self, strip_data):
         self.v_strips = strip_data
 
@@ -163,13 +168,19 @@ class NeoPixels:
         return self.num_pixels
 
     def setBrightness(self, value):
+        if self.testing:
+            return 0
         if value >= 0 and value <= self.max_brightness:
             self.strip.setBrightness(value)
 
     def getBrightness(self):
+        if self.testing:
+            return 0
         return self.strip.getBrightness()
 
     def setPixelColor(self, strip_id, pixel_id, r, g=None, b=None):
+        if self.testing:
+            return 0
         real_pixel_id = self.v_strips[strip_id]["start"] + pixel_id
         if real_pixel_id >= self.num_pixels:
             print("Pixel does not exist:", real_pixel_id, pixel_id, self.v_strips[strip_id]["start"])
@@ -183,9 +194,13 @@ class NeoPixels:
         return 1    # used to count if all pixels off
 
     def getPixelColor(self, strip_id, pixel_id):
+        if self.testing:
+            return 0
         return self.strip.getPixelColor(self.v_strips[strip_id]["start"] + pixel_id)
 
     def check_power_usage(self):
+        if self.testing:
+            return 0
         total_color = 0
         for i in range(self.num_pixels):
             pixel_color = self.strip.getPixelColor(i)
@@ -204,14 +219,12 @@ class NeoPixels:
         }
 
     def show(self, limit=0):
+        if self.testing:
+            return
         if time.time() >= self.last_show + (limit / 1000) or limit == 0:
             self.check_power_usage()
             self.strip.show()
             self.last_show = time.time()
-
-
-# self.neo = NeoPixels()
-
 
 class AnimationID:
     """Holds the current animation_id used globally"""
@@ -971,5 +984,3 @@ class Lights:
         g = color_1[1] + (g_diff * percent/100.0)
         b = color_1[2] + (b_diff * percent/100.0)
         return self.neo.get_color(r, g, b)
-
-print("lights.py loaded")

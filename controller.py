@@ -6,8 +6,8 @@ from variables import Variables
 
 
 class Controller:
-    def __init__(self, controller_id):
-        self.neo = NeoPixels(controller_id)
+    def __init__(self, controller_id, testing = False):
+        self.neo = NeoPixels(controller_id, testing)
 
         # Settings
         self.brightness = 100
@@ -304,6 +304,3 @@ class Controller:
         execute = self._execute_json
         thread = threading.Thread(target=execute, args=[data])
         thread.start()
-
-
-print("controller.py loaded")

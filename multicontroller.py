@@ -6,7 +6,8 @@ from controller import Controller
 
 
 class MultiController():
-    def __init__(self, config_data, default_vars):
+    def __init__(self, config_data, default_vars, testing = False):
+        self.testing = testing
         self.controllers = []
         self.queues = []
         self.history = []
@@ -24,7 +25,7 @@ class MultiController():
     def _add_controller(self, data):
         cur_id = len(self.controllers)
         if data["primary"] == True:
-            self.controllers.append(Controller(cur_id))
+            self.controllers.append(Controller(cur_id, self.testing))
             self.controllers[cur_id].init_neopixels(data)
             self.controllers[cur_id].run(0, "wipe", (255, 0, 0, 1, 250, True), time.time())
             self.controllers[cur_id].run(0, "wipe", (0, 255, 0, 1, 250, True), time.time())

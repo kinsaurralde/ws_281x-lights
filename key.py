@@ -71,6 +71,3 @@ class Keys:
     def get_keys(self, key):
         self.check_key(key, -1)
         return self.data
-
-
-print("key.py loaded")
