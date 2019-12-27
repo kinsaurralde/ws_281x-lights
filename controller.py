@@ -51,7 +51,14 @@ class Controller:
     def info(self):
         data = self.response("info", False, None, True)
         data["power"] = self.neo.get_power_info()
-        data["variables"] = self.v.info()
+        return data
+
+    def pixel_info(self):
+        data = {
+            "controller_id": self.id,
+            "strip_info": self.strip_data,
+            "pixels": self.strips[0].save_split()
+        }
         return data
 
     def toggle_enable(self, value):
@@ -76,22 +83,24 @@ class Controller:
             "error": error,
             "message": message,
             "strip_info": self.strip_data,
-            "error": False
+            "error": False,
+            "strips": [{
+                "strip_id": 0,
+                "data": self.strips[0].save_split()
+            }]
         }
         if detailed:
+            data["variables"] = self.v.info()
             data["settings"] = self.get_all_settings()
-            data["strips"] = []
-            if strip_id == None:
-                for i in range(len(self.strips)):
-                    data["strips"].append({
-                        "strip_id": i,
-                        "data": self.strips[i].save_split()
-                    })
-            else:
+            for i in range(1, len(self.strips)):
+                if strip_id is not None:
+                    i = strip_id
                 data["strips"].append({
-                    "strip_id": strip_id,
-                    "data": self.strips[strip_id].save_split()
+                    "strip_id": i,
+                    "data": self.strips[i].save_split()
                 })
+                if strip_id is not None:
+                    break
         return data
 
     def stop(self, strip_id=None):

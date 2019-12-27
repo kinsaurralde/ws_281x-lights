@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
-
 import json
 import sys
 import time
 import argparse
 
 from flask import Flask, render_template, json, request
+from flask_socketio import SocketIO
 from key import Keys
 from controller import Controller
 from multicontroller import MultiController
 from saves import Saves
 
 app = Flask(__name__)
+socketio = SocketIO(app)
 debug_exceptions = False  # if true, exception will be sent to web
 
 
@@ -96,6 +97,8 @@ def index():
 def info(function):
     if function == "web":
         return render_template('info.html')
+    elif function == "new_web":
+        return render_template('new_info.html')
     elif function == "get":
         data = mc.info()
         return create_response(data)
@@ -237,6 +240,25 @@ def controllers(key, function, data = None):
     except Exception as e:
         return exception_handler(e)
 
+@socketio.on('connect')
+def connect():
+    print("Client Connected")
+    socketio.emit('connection_response')
+
+@socketio.on('disconnect')
+def disconnect():
+    print('Client Disconnected')
+
+
+info_active = True
+@socketio.on('info')
+def socket_info():
+    global info_active
+    while info_active:
+        socketio.emit('info_response', mc.pixel_info())
+        socketio.sleep(.015)
+    
+
 parser = argparse.ArgumentParser()
 parser.add_argument('-d', '--debug', action='store_true', help='Debug mode', default=False)
 parser.add_argument('-t', '--test', action='store_true', help='Testing mode (for non pi devices)', default=False)
@@ -260,4 +282,4 @@ if "port" in config_data["info"]:
     port = int(config_data["info"]["port"])
 
 if __name__ == '__main__':
-    app.run(debug = args.debug, host = '0.0.0.0', port = port, threaded = True) 
+    socketio.run(app, debug = args.debug, host = '0.0.0.0', port = port) 

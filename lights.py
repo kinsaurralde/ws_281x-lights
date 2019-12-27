@@ -83,6 +83,7 @@ class NeoPixels:
         self.last_show = 0
         self.pin = LED_PIN
         self.grb = False
+        self.test_strip = [] * self.num_pixels
 
     def init_neopixels(self, data):
         if "led_count" in data:
@@ -101,6 +102,7 @@ class NeoPixels:
         if self.pin in [13, 19, 41, 45, 53]:
             led_channel = 1
         self.pixel_owner = [0] * self.num_pixels
+        self.test_strip = [0] * self.num_pixels
         self.strip = Adafruit_NeoPixel(
             self.num_pixels, self.pin, LED_FREQ_HZ, LED_DMA, LED_INVERT, self.max_brightness, led_channel)
         if self.testing:
@@ -179,8 +181,6 @@ class NeoPixels:
         return self.strip.getBrightness()
 
     def setPixelColor(self, strip_id, pixel_id, r, g=None, b=None):
-        if self.testing:
-            return 0
         real_pixel_id = self.v_strips[strip_id]["start"] + pixel_id
         if real_pixel_id >= self.num_pixels:
             print("Pixel does not exist:", real_pixel_id, pixel_id, self.v_strips[strip_id]["start"])
@@ -189,14 +189,18 @@ class NeoPixels:
         if g is not None:
             color = self.get_color(r, g, b)
         if pixel_id <= self.v_strips[strip_id]["end"] and self.pixel_owner[real_pixel_id] == strip_id:
-            self.strip.setPixelColor(real_pixel_id, color)
+            if self.testing:
+                self.test_strip[real_pixel_id] = color
+            else:
+                self.strip.setPixelColor(real_pixel_id, color)
             return 0
         return 1    # used to count if all pixels off
 
     def getPixelColor(self, strip_id, pixel_id):
+        real_id = self.v_strips[strip_id]["start"] + pixel_id
         if self.testing:
-            return 0
-        return self.strip.getPixelColor(self.v_strips[strip_id]["start"] + pixel_id)
+            return self.test_strip[real_id]
+        return self.strip.getPixelColor(real_id)
 
     def check_power_usage(self):
         if self.testing:

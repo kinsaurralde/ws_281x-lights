@@ -199,6 +199,9 @@ class MultiController():
             response[len(response) - 1]["enabled"] = controller_status[i]
         return response
 
+    def pixel_info(self):
+        return self.controllers[0].pixel_info()
+
     def ping(self):
         data = []
         for i in self.controllers:
