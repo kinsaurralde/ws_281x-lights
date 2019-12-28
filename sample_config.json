@@ -27,7 +27,7 @@
             "neopixels": {
                 "led_count": 60,
                 "max_brightness": 255,
-                "max_milliamps": 9000,
+                "max_watts": 50,
                 "volts": 5
             },
             "settings": {
@@ -49,6 +49,27 @@
                 {
                     "start": 10,
                     "end": 19
+                }
+            ]
+        },{
+            "primary": true,
+            "neopixels": {
+                "led_count": 300,
+                "max_brightness": 255,
+                "max_watts": 120,
+                "volts": 5
+            },
+            "settings": {
+                "initial_brightness": 100
+            },
+            "strips": [
+                {
+                    "start": 0,
+                    "end": 149
+                },
+                {
+                    "start": 150,
+                    "end": 299
                 }
             ]
         }

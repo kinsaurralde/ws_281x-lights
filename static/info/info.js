@@ -9,6 +9,7 @@ class Info {
         let self = this;
         this.s.on('connection_response', function() {
             console.log("Now Connected");
+            self.refresh();
         });
         this.s.on('info_response', function(data) {
             self.updateDisplay(data);
@@ -28,7 +29,6 @@ class Info {
 
     refresh() {
         if (this.update) {
-            console.debug("Refreshing info");
             this.s.emit('info');
         }
     }

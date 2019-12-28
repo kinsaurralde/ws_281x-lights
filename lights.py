@@ -244,6 +244,10 @@ class AnimationID:
         """Return current animation_id"""
         return self.id
 
+    def check(self, other_id):
+        """Check if other id is equal to this id"""
+        return other_id == self.id
+
 
 class Lights:
     def __init__(self, neopixels, id):
@@ -845,8 +849,10 @@ class Lights:
         if color == "random":
             c = self.neo.get_color_seperate(self.neo.get_random_color())
             self.set_all(c[0], c[1], c[2])
+        elif isinstance(color, list):
+            self.set_all(color[0], color[1], color[2])
         elif color is not None:
-            c = self.neo.get_color_seperate(int(color))
+            c = self.neo.get_color_seperate(color)
             self.set_all(c[0], c[1], c[2])
         self.fade(original, int(wait_ms / 2), "none", steps)
         return wait_ms

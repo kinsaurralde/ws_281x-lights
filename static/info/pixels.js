@@ -1,13 +1,14 @@
 class Display {
     constructor(div_id) {
-        this.container = document.getElementById(div_id);
+        this.id = div_id
+        this.container = document.getElementById(this.id);
         this.num_controllers = 0
         this.controllers = new Object();
     }
 
     setup(data) {
         let id = data["controller_id"]
-        this.controllers[id] = new Controller(id, data);
+        this.controllers[id] = new Controller(this.id, id, data);
         this.num_controllers++;
         this.container.appendChild(this.controllers[id].get());
     }
@@ -35,19 +36,31 @@ class Display {
 };
 
 class Controller {
-    constructor(id, data) {
+    constructor(disp_id, id, data) {
         console.debug("Creating controller", id, "with:", data);
         this.id = id;
+        this.disp_id = disp_id + "-" + this.id;
         this.container = document.createElement('div');
         this.container.className = "section-flex";
+        let title = document.createElement('div');
+        title.className = "text-1-25";
+        title.innerText = "Controller: " + this.id;
+        this.container.appendChild(title);
         this.num_strips = data["strip_info"].length;
         this.strips = new Array(this.num_strips);
         for (let i = 0; i < this.num_strips; i++) {
-            let cur = data["strip_info"][i];
-            this.strips[i] = new PixelStrip(cur["id"], cur["end"] - cur["start"]);
-            this.container.appendChild(this.strips[i].get());
+            this.addPixelStrip(i, data["strip_info"][i]);
         }
         this.strip_info = data["strip_info"];
+    }
+
+    addPixelStrip(i, data) {
+        this.strips[i] = new PixelStrip(this.disp_id, data["id"], data["end"] - data["start"] + 1);
+        let divider = document.createElement('div');
+        divider.className = "divider";
+        divider.style.width = "100%";
+        this.container.appendChild(divider);
+        this.container.appendChild(this.strips[i].get());
     }
 
     isDifferent(strip_info) {
@@ -70,15 +83,16 @@ class Controller {
 };
 
 class PixelStrip {
-    constructor(id, num_pixels) {
-        console.debug("Creating pixelstrip", id,);
+    constructor(disp_id, id, num_pixels) {
+        console.debug("Creating pixelstrip", id, "with", num_pixels);
         this.id = id;
+        this.disp_id = disp_id + "-" + this.id;
         this.container = document.createElement('div');
         this.container.className = "pixel-display-row";
         this.num_pixels = num_pixels;
         this.pixels = new Array(this.num_pixels);
         for (let i = 0; i < this.num_pixels; i++) {
-            this.pixels[i] = new Pixel();
+            this.pixels[i] = new Pixel(this.disp_id, i);
             this.container.appendChild(this.pixels[i].get())
         }
     }
@@ -96,13 +110,16 @@ class PixelStrip {
 };
 
 class Pixel {
-    constructor() {
+    constructor(disp_id, id) {
+        this.id = id;
+        this.disp_id = disp_id + "-" + this.id;
         this.r = 0;
         this.g = 0;
         this.b = 0;
         this.adjust = 50;
         this.container = document.createElement('div');
         this.container.className = "pixel-display";
+        this.container.id = this.disp_id;
         this.set();
     }
 

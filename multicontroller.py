@@ -200,7 +200,12 @@ class MultiController():
         return response
 
     def pixel_info(self):
-        return self.controllers[0].pixel_info()
+        response = []
+        for i in range(len(self.controllers)):
+            info = self.controllers[i].pixel_info()
+            if info is not None:
+                response.append(info)
+        return response
 
     def ping(self):
         data = []
@@ -333,6 +338,9 @@ class RemoteController():
             time.sleep(.01)
         self.info_data["error"] = False
         return self.info_data
+
+    def pixel_info(self):
+        return None
 
     def delay_start_time(self, value):
         self.start_time = value

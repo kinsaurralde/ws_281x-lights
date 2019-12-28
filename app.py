@@ -7,7 +7,6 @@ import argparse
 from flask import Flask, render_template, json, request
 from flask_socketio import SocketIO
 from key import Keys
-from controller import Controller
 from multicontroller import MultiController
 from saves import Saves
 
@@ -192,7 +191,6 @@ def thread(key_ids, function, args=None):
 
 @app.route('/<key_ids>/animate/<function>')
 @app.route('/<key_ids>/animate/<function>/<args>')
-#b@app.route('/<key_ids>/animate/<function>/<args>/<delay>')
 def animate(key_ids, function, args=None, delay=0):
     try:
         data = split_key_ids(key_ids)
@@ -242,23 +240,29 @@ def controllers(key, function, data = None):
 
 @socketio.on('connect')
 def connect():
-    print("Client Connected")
-    socketio.emit('connection_response')
+    print("Client Connected:", request.host)
+    # print(dir(request))
+    socketio.emit('connection_response', broadcast=False)
 
 @socketio.on('disconnect')
 def disconnect():
     print('Client Disconnected')
 
-
-info_active = True
+info_id = 0
 @socketio.on('info')
 def socket_info():
-    global info_active
-    while info_active:
-        socketio.emit('info_response', mc.pixel_info())
+    global info_id
+    info_id += 1
+    this_id = info_id
+    count = 1000
+    while this_id == info_id and count > 0: 
+        for i in mc.pixel_info():
+            socketio.emit('info_response', i)
         socketio.sleep(.015)
-    
-
+        count -= 1
+        if count == 50:
+            socketio.emit('info_renew') 
+        
 parser = argparse.ArgumentParser()
 parser.add_argument('-d', '--debug', action='store_true', help='Debug mode', default=False)
 parser.add_argument('-t', '--test', action='store_true', help='Testing mode (for non pi devices)', default=False)
