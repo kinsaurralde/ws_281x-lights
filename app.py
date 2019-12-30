@@ -11,7 +11,7 @@ from multicontroller import MultiController
 from saves import Saves
 
 app = Flask(__name__)
-socketio = SocketIO(app)
+socketio = SocketIO(app, cors_allowed_origins = '*')
 debug_exceptions = False  # if true, exception will be sent to web
 
 
@@ -240,13 +240,17 @@ def controllers(key, function, data = None):
 
 @socketio.on('connect')
 def connect():
-    print("Client Connected:", request.host)
-    # print(dir(request))
-    socketio.emit('connection_response', broadcast=False)
+    print("Client Connected:", request.remote_addr)
+    socketio.emit('controller_urls', mc.get_urls(), room=request.sid)
+    socketio.emit('connection_response', room=request.sid)
 
 @socketio.on('disconnect')
 def disconnect():
     print('Client Disconnected')
+
+@socketio.on('get_id')
+def get_id():
+    mc.emit_id()
 
 info_id = 0
 @socketio.on('info')
@@ -255,18 +259,25 @@ def socket_info():
     info_id += 1
     this_id = info_id
     count = 1000
-    while this_id == info_id and count > 0: 
+    wait_time = 0.015
+    end_time = time.time() + wait_time * count
+    while this_id == info_id and count > 0:
+        count -= 1
+        if time.time() > end_time - count * wait_time:
+            continue 
         for i in mc.pixel_info():
             socketio.emit('info_response', i)
-        socketio.sleep(.015)
-        count -= 1
+        socketio.sleep(wait_time)
         if count == 50:
-            socketio.emit('info_renew') 
+            socketio.emit('info_renew', room=request.sid)
+        elif count == 0:
+            socketio.emit('info_renew')
         
 parser = argparse.ArgumentParser()
 parser.add_argument('-d', '--debug', action='store_true', help='Debug mode', default=False)
 parser.add_argument('-t', '--test', action='store_true', help='Testing mode (for non pi devices)', default=False)
 parser.add_argument('-c', '--config', type=str, help='Path to config file', default="sample_config.json")
+parser.add_argument('-p', '--port', type=int, help='Port to run server on (overrides config file)', default=None)
 args = parser.parse_args()
 
 try:
@@ -284,6 +295,9 @@ mc = MultiController(config_data, init_vars, args.test)
 port = 200
 if "port" in config_data["info"]:
     port = int(config_data["info"]["port"])
+if args.port is not None:
+    port = args.port
 
 if __name__ == '__main__':
+    # print(dir(socketio))
     socketio.run(app, debug = args.debug, host = '0.0.0.0', port = port) 

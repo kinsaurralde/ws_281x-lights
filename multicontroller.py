@@ -218,6 +218,20 @@ class MultiController():
                 data.append(-1)
         return data
 
+    def get_urls(self):
+        response = []
+        for i in self.controllers:
+            response.append({
+                "controller_id": i.get_id(),
+                "url": i.get_url()
+            })
+        return response
+
+    def emit_id(self):
+        for i in self.controllers:
+            if i.is_remote():
+                i.emit_id()
+
 
 class RemoteController():
     def __init__(self, controller_id, data, default_vars):
@@ -240,7 +254,7 @@ class RemoteController():
         try:
             self.sio.on('connected', self._connect_response)
             self.sio.on('ping_response', self._ping_response)
-            self.sio.on('info_response', self._info_response)
+            self.sio.on('full_info_response', self._info_response)
             self.sio.connect(self.remote)
             self.sio.emit('ping')
             self.connected = True
@@ -295,6 +309,19 @@ class RemoteController():
             "arguments": arguments
         }]
 
+    def emit_id(self):
+        print("emmitting")
+        self.sio.emit('id', {'id': self.id})
+
+    def get_id(self):
+        return self.id
+
+    def get_url(self):
+        return self.remote
+
+    def is_remote(self):
+        return True
+
     def is_enabled(self):
         return self.attempt_connect
 
@@ -327,7 +354,7 @@ class RemoteController():
         return self.ping_data
 
     def info(self):
-        self._emit('info')
+        self._emit('full_info')
         self.waiting_info = True
         send_time = time.time()
         while self.waiting_info:

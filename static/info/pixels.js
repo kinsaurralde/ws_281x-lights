@@ -7,6 +7,7 @@ class Display {
     }
 
     setup(data) {
+        console.log(data);
         let id = data["controller_id"]
         this.controllers[id] = new Controller(this.id, id, data);
         this.num_controllers++;
@@ -66,6 +67,11 @@ class Controller {
     isDifferent(strip_info) {
         if (strip_info.length != this.strip_info.length) {
             return true
+        }
+        for (let i = 0; i < strip_info.length; i++) {
+            if (strip_info[i]["start"] != this.strip_info[i]["start"] || strip_info[i]["end"] != this.strip_info[i]["end"]) {
+                return true
+            }
         }
         return false
     }

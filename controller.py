@@ -31,6 +31,8 @@ class Controller:
         if "settings" in data:
             if "initial_brightness" in data["settings"]:
                 self.neo.setBrightness(data["settings"]["initial_brightness"])
+        if "controller_id" in data:
+            self.id = data["controller_id"]
         self.strips = []
         self.strip_data = []
         self.create_strip(0, self.num_pixels - 1)
@@ -66,6 +68,18 @@ class Controller:
             self.enable = not self.enable
         else:
             self.enable = value
+
+    def set_id(self, new_id):
+        self.id = new_id
+
+    def get_id(self):
+        return self.id
+
+    def get_url(self):
+        return None
+
+    def is_remote(self):
+        return False
 
     def is_enabled(self):
         return self.enable

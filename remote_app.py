@@ -9,7 +9,7 @@ from key import Keys
 from controller import Controller
 
 app = Flask(__name__)
-socketio = SocketIO(app)
+socketio = SocketIO(app, cors_allowed_origins = '*')
 
 debug_exceptions = False  # if true, exception will be sent to web
 
@@ -100,17 +100,45 @@ def json(data, methods=['POST']):
     current_json = data
     controller.execute_json(data)
 
-@socketio.on('info')
-def info(methods=['GET']):
+@socketio.on('id')
+def set_id(data, methods=['POST']):
+    print("Setting id to:", data["id"])
+    controller.set_id(data["id"])
+
+@socketio.on('full_info')
+def full_info(methods=['GET']):
     print("Info Requested")
     data = controller.info()
-    socketio.emit('info_response', data)
+    socketio.emit('full_info_response', data)
+
+info_id = 0
+@socketio.on('info')
+def socket_info():
+    print("Websocket Info")
+    global info_id
+    info_id += 1
+    this_id = info_id
+    count = 1000
+    wait_time = 0.015
+    end_time = time.time() + wait_time * count
+    while this_id == info_id and count > 0:
+        count -= 1
+        if time.time() > end_time - count * wait_time:
+            continue 
+        socketio.emit('info_response', controller.pixel_info())
+        socketio.sleep(wait_time)
+        if count == 50:
+            print("Renew Info")
+            socketio.emit('info_renew', room=request.sid)
+        elif count == 0:
+            socketio.emit('info_renew')
 
 @socketio.on('connect')
 def test_connect():
     global needs_default
     print("Connected")
-    socketio.emit('connected', {'needs_default': needs_default})
+    socketio.emit('get_id')
+    socketio.emit('connected', {'needs_default': needs_default}, room=request.sid)
     needs_default = False
 
 @socketio.on('disconnect')
@@ -118,4 +146,4 @@ def test_disconnect():
     print('Client disconnected')
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True, host='0.0.0.0', port=port)
+    socketio.run(app, debug=False, host='0.0.0.0', port=port)
