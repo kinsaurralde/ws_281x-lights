@@ -6,6 +6,7 @@ import argparse
 
 from flask import Flask, render_template, json, request
 from flask_socketio import SocketIO
+from info import Info
 from key import Keys
 from multicontroller import MultiController
 from saves import Saves
@@ -252,26 +253,35 @@ def disconnect():
 def get_id():
     mc.emit_id()
 
-info_id = 0
 @socketio.on('info')
 def socket_info():
-    global info_id
-    info_id += 1
-    this_id = info_id
-    count = 1000
-    wait_time = 0.015
-    end_time = time.time() + wait_time * count
-    while this_id == info_id and count > 0:
-        count -= 1
-        if time.time() > end_time - count * wait_time:
-            continue 
-        for i in mc.pixel_info():
-            socketio.emit('info_response', i)
-        socketio.sleep(wait_time)
-        if count == 50:
-            socketio.emit('info_renew', room=request.sid)
-        elif count == 0:
-            socketio.emit('info_renew')
+    # global info_id
+    # info_id += 1
+    # this_id = info_id
+    # count = 1000
+    # wait_time = 0.015
+    # end_time = time.time() + wait_time * count
+    # while this_id == info_id and count > 0:
+    #     count -= 1
+    #     if time.time() > end_time - count * wait_time:
+    #         continue 
+    #     for i in mc.pixel_info():
+    #         socketio.emit('info_response', i)
+    #     socketio.sleep(wait_time)
+    #     if count == 50:
+    #         socketio.emit('info_renew', room=request.sid)
+    #     elif count == 0:
+    #         socketio.emit('info_renew')
+    info.emit(request)
+
+@socketio.on('info_wait')
+def socket_info_wait(data):
+    info.set_wait(data)
+
+
+@socketio.on('ping')
+def ping():
+    socketio.emit('ping_response', time.time())
         
 parser = argparse.ArgumentParser()
 parser.add_argument('-d', '--debug', action='store_true', help='Debug mode', default=False)
@@ -291,6 +301,7 @@ keys = Keys(config_data)
 saves = Saves()
 init_vars = saves.run_function("run", "functions/default", "default_vars")
 mc = MultiController(config_data, init_vars, args.test)
+info = Info(socketio, mc)
 
 port = 200
 if "port" in config_data["info"]:

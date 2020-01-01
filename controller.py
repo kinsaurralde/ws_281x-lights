@@ -50,8 +50,8 @@ class Controller:
         self.strip_data.append(data)
         self.neo.update(self.strip_data)
 
-    def info(self):
-        data = self.response("info", False, None, True)
+    def info(self, error=False, message=None, detailed=True):
+        data = self.response("info", error, message, detailed)
         data["power"] = self.neo.get_power_info()
         return data
 
@@ -59,7 +59,9 @@ class Controller:
         data = {
             "controller_id": self.id,
             "strip_info": self.strip_data,
-            "pixels": self.strips[0].save_split()
+            "pixels": self.strips[0].save_split(),
+            "brightness": self.get_brightness(),
+            "power": self.neo.get_power_usage()
         }
         return data
 

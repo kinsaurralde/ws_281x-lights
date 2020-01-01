@@ -6,8 +6,10 @@ import os
 
 
 class Controller():
-    def __init__(self):
-        self.data = {}
+    def __init__(self, count):
+        self.data = {
+            "controller_id": count
+        }
 
     def load(self, data):
         print("loading")
@@ -15,7 +17,7 @@ class Controller():
     def create_new(self, is_primary: bool):
         self.data["primary"] = is_primary
         if not is_primary:
-            self.data["remote"] = input("Input remote URL")
+            self.data["remote"] = input("Input remote URL: ")
         self.physical_strip()
         self.settings()
         self.virtual_strips()
@@ -28,7 +30,7 @@ class Controller():
         max_watts = get_int(
             "Enter maximum watts entire strip can use: ", 0, 100000)
         volts = get_int("Enter voltage of power supply (5 or 12): ", 5, 12)
-        pin = get_int("Enter GPIO pin number (probably 18)", 0, 40)
+        pin = get_int("Enter GPIO pin number (probably 18): ", 0, 40)
         grb = get_bool("Is strip wired GRB")
         self.data["neopixels"] = {
             "led_count": led_count,
@@ -87,11 +89,13 @@ def ask_controllers():
     data = []
     more_controllers = True
     is_primary = True
+    count = 0
     while more_controllers:
-        current = Controller()
+        current = Controller(count)
         data.append(current.create_new(is_primary))
         is_primary = False
         more_controllers = get_bool("Add another (remote) controller?")
+        count += 1
     return data
 
 
@@ -149,7 +153,7 @@ def create_new(file_name: str):
         print_secondary_controller(i, folder_name, controller, data["keys"], data["info"])
         i += 1
     print("Secondary controllers placed in", folder_name)
-    print("To create folders for secondary controllers run ./secondary.py new", folder_name)
+    print("To create folders for secondary controllers run\n ./secondary.py new", folder_name)
 
 
 if len(sys.argv) < 2:

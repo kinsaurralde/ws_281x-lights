@@ -82,5 +82,6 @@ function init_data(r = 0, g = 0, b = 0) {
     for (let i = 0; i < 60; i++) {
         data["pixels"][i] = {"r": 0, "g": 0, "b": 0};
     }
+    console.log(data)
     return data
 }

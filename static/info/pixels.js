@@ -75,18 +75,28 @@ class Controller {
         div.className = "section-flex-no-border";
         div.appendChild(w.create125Text("Controller: " + this.id));
         div.appendChild(w.createVDivider());
+        div.appendChild(w.create125Text("Update:"));
+        div.appendChild(w.createSpacerS1());
         this.div_should_update = w.createInputCheckBox("Update", this.disp_id + "-update", true);
         div.appendChild(this.div_should_update);
-        div.appendChild(w.createSpacerS1());
-        div.appendChild(w.create125Text("Update"));
         div.appendChild(w.createVDivider());
+        div.appendChild(w.create125Text("Show Expanded:"));
+        div.appendChild(w.createSpacerS1());
         this.div_show_expanded = w.createInputCheckBox("Show Expanded", this.disp_id + "-show-expanded", false);
         this.div_show_expanded.onclick = function() {
             self.show_expanded(self);
         };
         div.appendChild(this.div_show_expanded);
+        div.appendChild(w.createVDivider());
+        div.appendChild(w.create125Text("Brightness:"))
         div.appendChild(w.createSpacerS1());
-        div.appendChild(w.create125Text("Show Expanded"));
+        this.div_brightness = w.create125Text("---");
+        div.appendChild(this.div_brightness);
+        div.appendChild(w.createVDivider());
+        div.appendChild(w.create125Text("Power Usage (W):"));
+        div.appendChild(w.createSpacerS1());
+        this.div_power = w.create125Text("---");
+        div.appendChild(this.div_power);
         return div
     }
 
@@ -124,6 +134,8 @@ class Controller {
 
     set(data) {
         if (this.div_should_update.checked) {
+            this.div_brightness.innerText = data["brightness"];
+            this.div_power.innerText = data["power"].toFixed(3);
             for (let i = 0; i < this.num_strips; i++) {
                 let info = data["strip_info"][i];
                 this.strips[i].set(data["pixels"].slice(info["start"], info["end"] + 1));

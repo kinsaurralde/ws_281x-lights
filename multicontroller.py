@@ -207,6 +207,14 @@ class MultiController():
                 response.append(info)
         return response
 
+    def full_info(self):
+        response = []
+        for i in range(len(self.controllers)):
+            info = self.controllers[i].full_info()
+            if info is not None:
+                response.append(info)
+        return response
+
     def ping(self):
         data = []
         for i in self.controllers:

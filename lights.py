@@ -84,6 +84,8 @@ class NeoPixels:
         self.pin = LED_PIN
         self.grb = False
         self.test_strip = [] * self.num_pixels
+        self.test_brightness = 0
+        self.power_usage = 0
 
     def init_neopixels(self, data):
         if "led_count" in data:
@@ -170,14 +172,15 @@ class NeoPixels:
         return self.num_pixels
 
     def setBrightness(self, value):
-        if self.testing:
-            return 0
         if value >= 0 and value <= self.max_brightness:
+            if self.testing:
+                self.test_brightness = value
+                return
             self.strip.setBrightness(value)
 
     def getBrightness(self):
         if self.testing:
-            return 0
+            return self.test_brightness
         return self.strip.getBrightness()
 
     def setPixelColor(self, strip_id, pixel_id, r, g=None, b=None):
@@ -203,17 +206,20 @@ class NeoPixels:
         return self.strip.getPixelColor(real_id)
 
     def check_power_usage(self):
-        if self.testing:
-            return 0
         total_color = 0
         for i in range(self.num_pixels):
-            pixel_color = self.strip.getPixelColor(i)
+            pixel_color = self.getPixelColor(0, i)
             pixel_colors = self.get_color_seperate(pixel_color)
             total_color += pixel_colors[0] + pixel_colors[1] + pixel_colors[2]
         total_color = (total_color / 765) * 18 / 60
         while total_color * (self.getBrightness() / 255) > self.max_watts:
             self.setBrightness(self.getBrightness() - 1)
         return total_color * (self.getBrightness() / 255)
+
+    def get_power_usage(self, refresh=True):
+        if refresh:
+            self.power_usage = self.check_power_usage()
+        return self.power_usage
 
     def get_power_info(self):
         return {
@@ -226,7 +232,7 @@ class NeoPixels:
         if self.testing:
             return
         if time.time() >= self.last_show + (limit / 1000) or limit == 0:
-            self.check_power_usage()
+            self.get_power_usage()
             self.strip.show()
             self.last_show = time.time()
 

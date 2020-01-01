@@ -6,6 +6,7 @@ import time
 from flask import Flask, json, request, render_template_string
 from flask_socketio import SocketIO
 from key import Keys
+from info import Info
 from controller import Controller
 
 app = Flask(__name__)
@@ -55,6 +56,8 @@ def off():
 
 controller = Controller(0)
 
+info = Info(socketio, controller, True)
+
 config_name = "config.json"
 if len(sys.argv) > 1:   # argv[0] is this file name so one argument is length of 2
     config_name = sys.argv[1]
@@ -89,7 +92,6 @@ def test():
 
 @socketio.on('ping')
 def ping(methods=['GET']):
-    print("Current time is:", time.time())
     socketio.emit('ping_response', time.time())
 
 @socketio.on('json')
@@ -111,27 +113,28 @@ def full_info(methods=['GET']):
     data = controller.info()
     socketio.emit('full_info_response', data)
 
-info_id = 0
 @socketio.on('info')
 def socket_info():
-    print("Websocket Info")
-    global info_id
-    info_id += 1
-    this_id = info_id
-    count = 1000
-    wait_time = 0.015
-    end_time = time.time() + wait_time * count
-    while this_id == info_id and count > 0:
-        count -= 1
-        if time.time() > end_time - count * wait_time:
-            continue 
-        socketio.emit('info_response', controller.pixel_info())
-        socketio.sleep(wait_time)
-        if count == 50:
-            print("Renew Info")
-            socketio.emit('info_renew', room=request.sid)
-        elif count == 0:
-            socketio.emit('info_renew')
+    # print("Websocket Info")
+    # global info_id
+    # info_id += 1
+    # this_id = info_id
+    # count = 1000
+    # wait_time = 0.015
+    # end_time = time.time() + wait_time * count
+    # while this_id == info_id and count > 0:
+    #     count -= 1
+    #     if time.time() > end_time - count * wait_time:
+    #         continue 
+    #     socketio.emit('info_response', controller.pixel_info())
+    #     socketio.sleep(wait_time)
+    #     if count == 50:
+    #         print("Renew Info")
+    #         socketio.emit('info_renew', room=request.sid)
+    #     elif count == 0:
+    #         socketio.emit('info_renew')
+    info.emit(request)
+
 
 @socketio.on('connect')
 def test_connect():
