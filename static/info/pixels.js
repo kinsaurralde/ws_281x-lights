@@ -14,7 +14,7 @@ class Display {
         this.container.appendChild(this.controllers[id].get());
     }
 
-    redraw(data) {
+    _redraw(data) {
         this.container.innerHTML = "";
         for (let key in this.controllers) {
             if (key != data["controller_id"]) {
@@ -27,10 +27,10 @@ class Display {
     set(data) {
         let id = data["controller_id"];
         if (!(id in this.controllers)) {
-            this.redraw(data);
+            this._redraw(data);
         }
         if (this.controllers[id].isDifferent(data["strip_info"])) {
-            this.redraw(data);
+            this._redraw(data);
         }
         this.controllers[id].set(data);
     }
@@ -43,25 +43,55 @@ class Controller {
         this.disp_id = disp_id + "-" + this.id;
         this.container = document.createElement('div');
         this.container.className = "section-flex";
-        let title = document.createElement('div');
-        title.className = "text-1-25";
-        title.innerText = "Controller: " + this.id;
-        this.container.appendChild(title);
+        this.container.id = this.disp_id;
+        this.container.appendChild(this._getButtons());
+        this.container_expanded = document.createElement('div');
+        this.container_expanded.className = "section-flex-no-border";
+        this.container_expanded.style.display = "none";
         this.num_strips = data["strip_info"].length;
         this.strips = new Array(this.num_strips);
         for (let i = 0; i < this.num_strips; i++) {
-            this.addPixelStrip(i, data["strip_info"][i]);
+            this._addPixelStrip(i, data["strip_info"][i]);
         }
+        this.container.appendChild(this.container_expanded);
         this.strip_info = data["strip_info"];
+        this.update = true;
     }
 
-    addPixelStrip(i, data) {
+    _addPixelStrip(i, data) {
         this.strips[i] = new PixelStrip(this.disp_id, data["id"], data["end"] - data["start"] + 1);
-        let divider = document.createElement('div');
-        divider.className = "divider";
-        divider.style.width = "100%";
-        this.container.appendChild(divider);
-        this.container.appendChild(this.strips[i].get());
+        if (i == 0) {
+            this.container.appendChild(w.createDivider());
+            this.container.appendChild(this.strips[i].get());
+        } else {
+            this.container_expanded.appendChild(w.createDivider());
+            this.container_expanded.appendChild(this.strips[i].get());
+        }
+    }
+
+    _getButtons() {
+        let self = this;
+        let div = document.createElement('div');
+        div.className = "section-flex-no-border";
+        div.appendChild(w.create125Text("Controller: " + this.id));
+        div.appendChild(w.createVDivider());
+        this.div_should_update = w.createInputCheckBox("Update", this.disp_id + "-update", true);
+        div.appendChild(this.div_should_update);
+        div.appendChild(w.createSpacerS1());
+        div.appendChild(w.create125Text("Update"));
+        div.appendChild(w.createVDivider());
+        this.div_show_expanded = w.createInputCheckBox("Show Expanded", this.disp_id + "-show-expanded", false);
+        this.div_show_expanded.onclick = function() {
+            self.show_expanded(self);
+        };
+        div.appendChild(this.div_show_expanded);
+        div.appendChild(w.createSpacerS1());
+        div.appendChild(w.create125Text("Show Expanded"));
+        return div
+    }
+
+    test() {
+        console.log(this.id);
     }
 
     isDifferent(strip_info) {
@@ -76,14 +106,28 @@ class Controller {
         return false
     }
 
+    _setUpdate(self) {
+        self.update = self.div_should_update.checked;
+    }
+
+    show_expanded(self) {
+        if (self.div_show_expanded.checked) {
+            self.container_expanded.style.display = "flex";
+        } else {
+            self.container_expanded.style.display = "none";
+        }
+    }
+
     get() {
         return this.container
     }
 
     set(data) {
-        for (let i = 0; i < this.num_strips; i++) {
-            let info = data["strip_info"][i];
-            this.strips[i].set(data["pixels"].slice(info["start"], info["end"] + 1));
+        if (this.div_should_update.checked) {
+            for (let i = 0; i < this.num_strips; i++) {
+                let info = data["strip_info"][i];
+                this.strips[i].set(data["pixels"].slice(info["start"], info["end"] + 1));
+            }
         }
     }
 };
@@ -101,6 +145,14 @@ class PixelStrip {
             this.pixels[i] = new Pixel(this.disp_id, i);
             this.container.appendChild(this.pixels[i].get())
         }
+    }
+
+    show() {
+
+    }
+
+    hide() {
+
     }
 
     set(data) {

@@ -248,9 +248,16 @@ select {
 }
 
 .divider {
+    width: 100%;
     margin-top: 1vh;
     margin-bottom: 1vh;
     border-bottom: .1vw solid var(--border-color); 
+}
+
+.v-divider {
+    margin-left: 1vw;
+    margin-right: 1vw;
+    border-right: .1vw solid var(--border-color); 
 }
 
 .color-sample-display {

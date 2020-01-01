@@ -17,6 +17,18 @@ class HTMLWriter {
         return spacer;
     }
 
+    createDivider() {
+        let div = document.createElement("div");
+        div.className = "divider";
+        return div
+    }
+
+    createVDivider() {
+        let div = document.createElement("div");
+        div.className = "v-divider";
+        return div
+    }
+
     appendSetting(parent, title, input, multiple = false) {
         let final_div = document.createElement("div");
         final_div.className = "section-setting";
@@ -48,12 +60,13 @@ class HTMLWriter {
         parent.appendChild(send_div);
     }
 
-    createInputCheckBox(value, id, precheck = false) {
+    createInputCheckBox(value, id, precheck = false, oninput=null) {
         let check_box = document.createElement("input");
         check_box.type = "checkbox";
         check_box.value = value;
         check_box.id = id;
         check_box.checked = precheck;
+        check_box.onclick = new Function(oninput);
         return check_box;
     }
 
@@ -75,6 +88,13 @@ class HTMLWriter {
         slider.id = id;
         slider.oninput = new Function(oninput);
         return slider;
+    }
+
+    create125Text(text) {
+        let div = document.createElement('div');
+        div.className = "text-1-25";
+        div.innerText = text;
+        return div;
     }
 
     createText5(value, id, oninput) {

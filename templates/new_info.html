@@ -5,6 +5,7 @@
     <title>Info</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="../../../static/main/main.css">
+    <script src="../../../static/writehtml.js"></script>
     <script src="../../../static/info/info.js"></script>
     <script src="../../../static/info/pixels.js"></script>
     <script src="../../../static/libs/socket.io.js"></script>
@@ -14,9 +15,15 @@
     <div id="page-title">Info</div>
     <div class="space-1"></div>
     <div class="divider"></div>
-    <input type="button" value="Refresh" onclick="info.refresh()">
-    <!-- <input type="button" value="History" onclick="info.get_history()"> -->
-    <input type="text" value="" id="webkey-value">
+    <div class="section-flex-no-border">
+        <input type="button" value="Refresh All" onclick="info.refresh()">
+        <div class="v-divider"></div>
+        <!-- <input type="button" value="History" onclick="info.get_history()"> -->
+        <div class="text-1-25">Web Key:</div>
+        <div class="space-s-1"></div>
+        <input type="text" class="width-5" id="webkey-value">
+    </div>
+    <div class="divider"></div>
     <div class="space-1"></div>
     <table id="info-table">
         <tr>
@@ -37,6 +44,7 @@
     </div>
 </body>
 <script>
+    let w = new HTMLWriter();
     let info = new Info();
 </script>
 

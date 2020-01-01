@@ -1,6 +1,6 @@
 class Info {
     constructor() {
-        this.display = new Display("controllers")
+        this.display = new Display("controllers");
         this.display.setup(init_data());
         this.url = "http://" + location.host;
         this.s = io();
@@ -13,7 +13,7 @@ class Info {
             self.refresh();
         });
         this.s.on('info_response', function(data) {
-            self.updateDisplay(data);
+            self._updateDisplay(data);
         });
         this.s.on('info_renew', function() {
             console.debug("Renew Info");
@@ -21,13 +21,13 @@ class Info {
         });
         this.s.on('controller_urls', function(data) {
             console.debug("Recieved controller URLS:", data);
-            self.addControllers(data);
+            self._addControllers(data);
         });
 
         this.refresh();
     }
 
-    addControllers(data) {
+    _addControllers(data) {
         this.rs = new Array(0);
         for (let i = 0; i < data.length; i++) {
             let url = data[i]["url"];
@@ -38,7 +38,7 @@ class Info {
             let self = this;
             let index = this.rs.length - 1;
             this.rs[index].on('info_response', function(data) {
-                self.updateDisplay(data);
+                self._updateDisplay(data);
             });
             this.rs[index].on('info_renew', function() {
                 console.debug("Renew Info");
@@ -47,14 +47,14 @@ class Info {
         }
     }
 
-    updateDisplay(data) {
+    _updateDisplay(data) {
         if (this.update) {
-
             this.display.set(data)
         }
     }
 
     refresh() {
+        console.debug("Refresh Info");
         if (this.update) {
             this.s.emit('info');
             for (let i = 0; i < this.rs.length; i++) {
