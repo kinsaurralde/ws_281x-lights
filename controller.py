@@ -326,6 +326,7 @@ class Controller:
                 break
 
     def execute_json(self, data):
-        execute = self._execute_json
-        thread = threading.Thread(target=execute, args=[data])
-        thread.start()
+        if self.enable:
+            execute = self._execute_json
+            thread = threading.Thread(target=execute, args=[data])
+            thread.start()

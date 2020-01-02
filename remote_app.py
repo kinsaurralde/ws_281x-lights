@@ -90,9 +90,9 @@ def test():
     print("Testing")
     
 
-@socketio.on('ping')
+@socketio.on('old_ping')
 def ping(methods=['GET']):
-    socketio.emit('ping_response', time.time())
+    socketio.emit('old_ping_response', time.time())
 
 @socketio.on('json')
 def json(data, methods=['POST']):
@@ -115,26 +115,11 @@ def full_info(methods=['GET']):
 
 @socketio.on('info')
 def socket_info():
-    # print("Websocket Info")
-    # global info_id
-    # info_id += 1
-    # this_id = info_id
-    # count = 1000
-    # wait_time = 0.015
-    # end_time = time.time() + wait_time * count
-    # while this_id == info_id and count > 0:
-    #     count -= 1
-    #     if time.time() > end_time - count * wait_time:
-    #         continue 
-    #     socketio.emit('info_response', controller.pixel_info())
-    #     socketio.sleep(wait_time)
-    #     if count == 50:
-    #         print("Renew Info")
-    #         socketio.emit('info_renew', room=request.sid)
-    #     elif count == 0:
-    #         socketio.emit('info_renew')
     info.emit(request)
 
+@socketio.on('ping1')
+def socket_ping():
+    info.ping(request)
 
 @socketio.on('connect')
 def test_connect():

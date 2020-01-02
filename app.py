@@ -253,36 +253,18 @@ def disconnect():
 def get_id():
     mc.emit_id()
 
+@socketio.on('ping1')
+def socket_ping():
+    return info.ping(request)
+
 @socketio.on('info')
 def socket_info():
-    # global info_id
-    # info_id += 1
-    # this_id = info_id
-    # count = 1000
-    # wait_time = 0.015
-    # end_time = time.time() + wait_time * count
-    # while this_id == info_id and count > 0:
-    #     count -= 1
-    #     if time.time() > end_time - count * wait_time:
-    #         continue 
-    #     for i in mc.pixel_info():
-    #         socketio.emit('info_response', i)
-    #     socketio.sleep(wait_time)
-    #     if count == 50:
-    #         socketio.emit('info_renew', room=request.sid)
-    #     elif count == 0:
-    #         socketio.emit('info_renew')
     info.emit(request)
 
 @socketio.on('info_wait')
 def socket_info_wait(data):
     info.set_wait(data)
 
-
-@socketio.on('ping')
-def ping():
-    socketio.emit('ping_response', time.time())
-        
 parser = argparse.ArgumentParser()
 parser.add_argument('-d', '--debug', action='store_true', help='Debug mode', default=False)
 parser.add_argument('-t', '--test', action='store_true', help='Testing mode (for non pi devices)', default=False)
@@ -310,5 +292,4 @@ if args.port is not None:
     port = args.port
 
 if __name__ == '__main__':
-    # print(dir(socketio))
     socketio.run(app, debug = args.debug, host = '0.0.0.0', port = port) 

@@ -75,7 +75,11 @@ class HTMLWriter {
         input_div.type = "button";
         input_div.value = value;
         input_div.id = id;
-        input_div.onclick = new Function(onclick);
+        if (typeof onclick == "string") {
+            input_div.onclick = new Function(onclick);
+        } else {
+            input_div.onclick = onclick;
+        }
         return input_div;
     }
 

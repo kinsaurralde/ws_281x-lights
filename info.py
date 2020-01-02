@@ -16,6 +16,11 @@ class Info:
         end_time = time.time() + self.wait * count
         while this_id == self.info_id and count > 0:
             count -= 1
+            if count == 50:
+                self.sio.emit('info_renew', room=request.sid)
+            elif count == 0:
+                self.sio.emit('info_renew')
+                return
             if time.time() > end_time - count * self.wait:
                 continue 
             pixel_info = self.c.pixel_info()
@@ -24,10 +29,16 @@ class Info:
             for i in pixel_info:
                 self.sio.emit('info_response', i)
             self.sio.sleep(self.wait)
-            if count == 50:
-                self.sio.emit('info_renew', room=request.sid)
-            elif count == 0:
-                self.sio.emit('info_renew')
+
+    def ping(self, request):
+        response = []
+        cur_time = time.time()
+        for i in self.c.get_local_controllers():
+            response.append({
+                "controller_id": i,
+                "time": cur_time
+            })
+        return response
 
     def set_wait(self, value):
         self.wait = value

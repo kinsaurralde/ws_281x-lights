@@ -7,7 +7,6 @@ class Display {
     }
 
     setup(data) {
-        console.log(data);
         let id = data["controller_id"]
         this.controllers[id] = new Controller(this.id, id, data);
         this.num_controllers++;

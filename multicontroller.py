@@ -100,6 +100,12 @@ class MultiController():
             self.history[id]["pos"] = 0
         self.history[id]["data"][self.history[id]["pos"]] = data
 
+    def get_local_controllers(self):
+        response = []
+        for i in self.controllers:
+            if not i.is_remote():
+                response.append(i.get_id())
+        return response
 
     def get_history(self):
         return self.history
@@ -186,6 +192,7 @@ class MultiController():
         elif function == "disable":
             if self.valid_id(int(data)):
                 self.controllers[int(data)].toggle_enable(False)
+                self.controllers[int(data)].off()
                 return self.info()
         return None
 
@@ -195,7 +202,9 @@ class MultiController():
         controller_status = self.controller_functions("status")
         for i in range(len(self.controllers)):
             response.append(self.controllers[i].info())
-            response[len(response) - 1]["ping"] = ping_data[i]
+            response[len(response) - 1]["ping"] = ping_data[i][0]
+            response[len(response) - 1]["time_unsynced"] = ping_data[i][1]
+            response[len(response) - 1]["time_debug"] = ping_data[i][2]
             response[len(response) - 1]["enabled"] = controller_status[i]
         return response
 
@@ -219,11 +228,16 @@ class MultiController():
         data = []
         for i in self.controllers:
             start_time = time.time()
-            ping_time = i.ping()
-            if ping_time != "Error" and ping_time != "Disabled":
-                data.append((ping_time - start_time) * 1000)
+            controller_time = i.ping()
+            end_time = time.time()
+            ping = (end_time - start_time) * 1000
+            if controller_time != "Error" and controller_time != "Disabled":
+                unsynced = False
+                if controller_time < start_time or controller_time > end_time:
+                    unsynced = True
+                data.append([ping, unsynced, [start_time, controller_time, end_time]])
             else:
-                data.append(-1)
+                data.append([-1, True, [0, 0, 0]])
         return data
 
     def get_urls(self):
@@ -246,7 +260,7 @@ class RemoteController():
         self.default_vars = default_vars
         self.id = controller_id
         self.start_time = 0
-        self.response_timeout = .250
+        self.response_timeout = .500
         self.is_remote = True
         self.remote = "http://" + data["remote"]
         self.sio = socketio.Client()
@@ -261,7 +275,7 @@ class RemoteController():
             return False
         try:
             self.sio.on('connected', self._connect_response)
-            self.sio.on('ping_response', self._ping_response)
+            self.sio.on('old_ping_response', self._ping_response)
             self.sio.on('full_info_response', self._info_response)
             self.sio.connect(self.remote)
             self.sio.emit('ping')
@@ -349,7 +363,7 @@ class RemoteController():
         self._emit('json', data)
 
     def ping(self):
-        self._emit('ping')
+        self._emit('old_ping')
         self.waiting_ping = True
         send_time = time.time()
         if self.attempt_connect is False:
@@ -368,7 +382,8 @@ class RemoteController():
         while self.waiting_info:
             if time.time() - send_time > self.response_timeout or not self.attempt_connect:
                 return {
-                    "error": True
+                    "error": True,
+                    "controller_id": self.id
                 }
             time.sleep(.01)
         self.info_data["error"] = False

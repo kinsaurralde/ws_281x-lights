@@ -16,24 +16,29 @@
     <div class="space-1"></div>
     <div class="divider"></div>
     <div class="section-flex-no-border">
-        <input type="button" value="Refresh All" onclick="info.refresh()">
+        <div class="text-1-25">Enabled:</div>
+        <div class="space-s-1"></div>
+        <input type="checkbox" onclick="info.toggleUpdate('info-enabled')" id="info-enabled" checked>
+        <div class="v-divider"></div>
+        <input type="button" value="Refresh / Reconnect" onclick="info.refresh()">
         <div class="v-divider"></div>
         <!-- <input type="button" value="History" onclick="info.get_history()"> -->
         <div class="text-1-25">Web Key:</div>
         <div class="space-s-1"></div>
-        <input type="text" class="width-5" id="webkey-value">
+        <input type="text" class="width-5" id="info-table-webkey">
     </div>
     <div class="divider"></div>
     <div class="space-1"></div>
     <table id="info-table">
         <tr>
             <th>Controller id</th>
-            <th>Power Usage (Watts)</th>
+            <th>Power Usage (W)</th>
             <th>Power Supply Max</th>
             <th>Brightness</th>
             <th>Num Pixels</th>
             <th>Num Strips</th>
-            <th>Ping (ms)</th>
+            <th>Controller Ping (ms)</th>
+            <th>Network Ping (ms)</th>
             <th>Enabled / Connected</th>
             <th>Enable</th>
             <th>Disable</th>
@@ -45,7 +50,7 @@
 </body>
 <script>
     let w = new HTMLWriter();
-    let info = new Info();
+    let info = new Info("controllers", "info-table");
 </script>
 
 </html>

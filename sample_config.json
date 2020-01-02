@@ -72,6 +72,48 @@
                     "end": 299
                 }
             ]
+        },{
+            "primary": true,
+            "neopixels": {
+                "led_count": 30,
+                "max_brightness": 255,
+                "max_watts": 120,
+                "volts": 5
+            },
+            "settings": {
+                "initial_brightness": 150
+            },
+            "strips": [
+                {
+                    "start": 0,
+                    "end": 14
+                },
+                {
+                    "start": 15,
+                    "end": 29
+                }
+            ]
+        },{
+            "primary": true,
+            "neopixels": {
+                "led_count": 100,
+                "max_brightness": 255,
+                "max_watts": 120,
+                "volts": 12
+            },
+            "settings": {
+                "initial_brightness": 255
+            },
+            "strips": [
+                {
+                    "start": 0,
+                    "end": 49
+                },
+                {
+                    "start": 50,
+                    "end": 99
+                }
+            ]
         }
     ]
 }
