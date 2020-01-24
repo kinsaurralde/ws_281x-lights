@@ -100,6 +100,7 @@ def info(function):
     elif function == "new_web":
         return render_template('new_info.html')
     elif function == "get":
+        print("INFO")
         data = mc.info()
         return create_response(data)
     elif function == "history":

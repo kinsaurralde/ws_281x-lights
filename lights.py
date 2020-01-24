@@ -25,11 +25,12 @@ VOLTAGE = 5
 def time_func(func):
     def wrapper(*args, **kwargs):
         s_time = time.time()
-        print("Start Time:", s_time)
+        # print("Start Time:", s_time)
         return_val = func(*args, **kwargs)
         e_time = time.time()
-        print("End Time:", e_time)
-        print("Difference:", e_time - s_time)
+        # print("End Time:", e_time)
+        # print("Difference:", e_time - s_time)
+        print("Difference (ms):", (e_time - s_time) * 1000)
         print("")
         return return_val
     return wrapper
@@ -84,6 +85,7 @@ class NeoPixels:
         self.pin = LED_PIN
         self.grb = False
         self.test_strip = [] * self.num_pixels
+        self.save_strip = [] * self.num_pixels
         self.test_brightness = 0
         self.power_usage = 0
 
@@ -105,6 +107,7 @@ class NeoPixels:
             led_channel = 1
         self.pixel_owner = [0] * self.num_pixels
         self.test_strip = [0] * self.num_pixels
+        self.save_strip = [0] * self.num_pixels
         self.strip = Adafruit_NeoPixel(
             self.num_pixels, self.pin, LED_FREQ_HZ, LED_DMA, LED_INVERT, self.max_brightness, led_channel)
         if self.testing:
@@ -173,8 +176,8 @@ class NeoPixels:
 
     def setBrightness(self, value):
         if value >= 0 and value <= self.max_brightness:
+            self.test_brightness = value
             if self.testing:
-                self.test_brightness = value
                 return
             self.strip.setBrightness(value)
 
@@ -192,10 +195,10 @@ class NeoPixels:
         if g is not None:
             color = self.get_color(r, g, b)
         if pixel_id <= self.v_strips[strip_id]["end"] and self.pixel_owner[real_pixel_id] == strip_id:
+            self.test_strip[real_pixel_id] = color
             if self.testing:
-                self.test_strip[real_pixel_id] = color
-            else:
-                self.strip.setPixelColor(real_pixel_id, color)
+                return 0
+            self.strip.setPixelColor(real_pixel_id, color)
             return 0
         return 1    # used to count if all pixels off
 
@@ -204,6 +207,9 @@ class NeoPixels:
         if self.testing:
             return self.test_strip[real_id]
         return self.strip.getPixelColor(real_id)
+
+    def get_all(self):
+        return self.save_strip
 
     def check_power_usage(self):
         total_color = 0
@@ -229,6 +235,14 @@ class NeoPixels:
         }
 
     def show(self, limit=0):
+        for i in range(self.num_pixels):
+            c = self.get_color_seperate(self.test_strip[i])
+            self.save_strip[i] = {
+                "id": i,
+                "r": c[0],
+                "g": c[1],
+                "b": c[2]
+            }
         if self.testing:
             return
         if time.time() >= self.last_show + (limit / 1000) or limit == 0:

@@ -102,7 +102,9 @@ class MultiController():
 
     def get_local_controllers(self):
         response = []
+        count = 0
         for i in self.controllers:
+            count += 1
             if not i.is_remote():
                 response.append(i.get_id())
         return response
@@ -260,8 +262,7 @@ class RemoteController():
         self.default_vars = default_vars
         self.id = controller_id
         self.start_time = 0
-        self.response_timeout = .500
-        self.is_remote = True
+        self.response_timeout = .750
         self.remote = "http://" + data["remote"]
         self.sio = socketio.Client()
         self.connected = False
@@ -300,12 +301,12 @@ class RemoteController():
             self.execute_json(self.default_vars)
 
     def _ping_response(self, data):
-        print("ping called back", data, "from", self.remote)
+        # print("ping called back", data, "from", self.remote)
         self.ping_data = data
         self.waiting_ping = False
 
     def _info_response(self, data):
-        print("Info called back from", self.remote)
+        # print("Info called back from", self.remote)
         self.info_data = data
         self.waiting_info = False
 

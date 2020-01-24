@@ -109,7 +109,7 @@ def set_id(data, methods=['POST']):
 
 @socketio.on('full_info')
 def full_info(methods=['GET']):
-    print("Info Requested")
+    # print("Info Requested")
     data = controller.info()
     socketio.emit('full_info_response', data)
 
@@ -119,7 +119,7 @@ def socket_info():
 
 @socketio.on('ping1')
 def socket_ping():
-    info.ping(request)
+    return info.ping(request)
 
 @socketio.on('connect')
 def test_connect():

@@ -22,6 +22,7 @@ class Info {
             self.refresh();
         });
         this.s.on('info_response', function(data) {
+            console.debug("Recieved Data", data);
             self._updateDisplay(data);
         });
         this.s.on('info_renew', function() {
@@ -34,11 +35,15 @@ class Info {
         });
 
         this.refresh();
+
+        this.times = new Array(0);
     }
 
     _addControllers(data) {
         this.r = new Array(0);
+        this.times = new Array(0);
         for (let i = 0; i < data.length; i++) {
+            this.times.push(new DiffTimer());
             let url = data[i]["url"];
             if (url == null) {
                 continue;
@@ -59,6 +64,9 @@ class Info {
     }
 
     _updateDisplay(data) {
+        if (data["controller_id"] < this.times.length) {
+            this.times[data["controller_id"]].record();
+        }
         if (this.update) {
             this.display.set(data)
         }
@@ -66,12 +74,15 @@ class Info {
 
     _clearTable() {
         let table_size = this.table.rows.length;
+        let network_ping = new Array();
         for (let i = 1; i < table_size; i++) {
+            network_ping.push(this.table.rows[1].cells[7].innerHTML);
             this.table.deleteRow(1);
         }
+        return network_ping
     }
 
-    _appendRow(data) {
+    _appendRow(data, ping_data) {
         let row = this.table.insertRow();
         let self = this;
         for (let j = 0; j < 11; j++) {
@@ -89,6 +100,7 @@ class Info {
                 this.table.rows[this.table.rows.length - 1].cells[i].innerHTML = " --- ";
             }
         }
+        this.table.rows[this.table.rows.length - 1].cells[7].innerHTML = ping_data[this.table.rows.length - 2];
         this.table.rows[this.table.rows.length - 1].cells[0].innerHTML = data["controller_id"];
         this.table.rows[this.table.rows.length - 1].cells[8].innerHTML = data["enabled"][0] + " / " + data["enabled"][1];
         this.table.rows[this.table.rows.length - 1].cells[9].appendChild(w.createButton("Enable", null, function() {
@@ -101,10 +113,10 @@ class Info {
 
     _updateTable(data) {
         if (this.has_table) {
-            this._clearTable();
+            let ping_data = this._clearTable();
             this.num_controllers = data.length;
             for (let i = 0; i < data.length; i++) {
-                this._appendRow(data[i]);
+                this._appendRow(data[i], ping_data);
             }
         }
     }
@@ -112,9 +124,11 @@ class Info {
     _send(path) {
         let request = new XMLHttpRequest();
         let self = this;
+        let start_time = Date.now();
         request.open('GET', path, true);
         request.onload = function () {
             if (this.status >= 200 && this.status < 400) {
+                console.debug("Responded in", Date.now() - start_time);
                 let data = JSON.parse(this.response);
                 console.debug("Recieved Data:", data);
                 self._updateTable(data);
@@ -145,21 +159,26 @@ class Info {
     }
 
     _ping_recieve(data, start_time, end_time) {
+        //console.debug("Recieved Data", start_time, end_time, data);
         for (let i = 0; i < data.length; i++) {
             let id = data[i]["controller_id"];
             this.table.rows[id + 1].cells[7].innerText = end_time - start_time;
         }
     }
 
+    refreshTable() {
+        this._send("/info/get");
+        this._ping_send();
+    }
+
     refresh() {
+        this.refreshTable();
         if (this.update) {
-            this._send("/info/get");
             this.s.emit('info');
             for (let i = 0; i < this.r.length; i++) {
                 this.r[i]["io"].emit('info');
             }
         }
-        this._ping_send();
     }
 
     toggleUpdate(div_id) {
@@ -183,6 +202,43 @@ class Info {
 
     setUpdate(val) {
         this.update = val;
+    }
+};
+
+class DiffTimer {
+    constructor() {
+        this.prev_time = Date.now();
+        this.times = new Array(2000).fill(-1);
+        this.counter = 0;
+    }
+
+    clear() {
+        this.times = new Array(2000).fill(-1); 
+        this.counter = 0;
+    }
+
+    record() {
+        if (this.counter != 0) {
+            this.times[this.counter] = Date.now() - this.prev_time;
+        }
+        this.counter += 1;
+        this.prev_time = Date.now();
+    }
+
+    getAverage() {
+        let total = 0;
+        let count = 0;
+        for (let i = 0; i < this.times.length; i++) {
+            if (this.times[i] != -1) {
+                count += 1
+                total += this.times[i];
+            }
+        }
+        return total / count
+    }
+
+    getAll() {
+        return this.times;
     }
 };
 

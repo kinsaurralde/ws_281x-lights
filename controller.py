@@ -56,13 +56,36 @@ class Controller:
         return data
 
     def pixel_info(self):
-        data = {
-            "controller_id": self.id,
-            "strip_info": self.strip_data,
-            "pixels": self.strips[0].save_split(),
-            "brightness": self.get_brightness(),
-            "power": self.neo.get_power_usage()
-        }
+        # data = {
+        #     "controller_id": self.id,
+        #     "strip_info": self.strip_data,
+        #     # "pixels": self.strips[0].save_split(),
+        #     "pixels": self.neo.get_all(),
+        #     "brightness": self.get_brightness(),
+        #     "power": self.neo.get_power_usage()
+        # }
+        # return data
+        # a = time.time()
+        data = {}
+        data["brightness"] = self.brightness
+        data["strip_info"] = self.strip_data
+        data["controller_id"] = self.id
+        # print("A:\t",(time.time() - a) * 1000)
+        # b = time.time()
+        data["pixels"] = self.neo.get_all()
+        # print("B:\t",(time.time() - b) * 1000)
+        # c = time.time()
+        data["power"] = self.neo.get_power_usage(False)
+        # print("C:\t",(time.time() - c) * 1000)
+        # d = time.time()
+        
+        # print("D:\t",(time.time() - d) * 1000)
+        # e = time.time()
+        
+        # print("E:\t",(time.time() - e) * 1000)
+        # f = time.time()
+        
+        # print("F:\t",(time.time() - a) * 1000)
         return data
 
     def toggle_enable(self, value):
@@ -91,6 +114,9 @@ class Controller:
 
     def ping(self):
         return time.time()
+
+    def get_local_controllers(self):
+        return [self.id]
 
     def response(self, command_run, error, message, detailed=False, strip_id=None):
         data = {
