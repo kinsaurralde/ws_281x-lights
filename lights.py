@@ -646,6 +646,7 @@ class Lights:
 
                 instant: if true, dont calculate difference (default: False)
         """
+        # print("Starttime:", self.start_time, time.time())
         t = Timer(self.neo.numMaxPixels(), self.start_time)
         this_id = self.animation_id.get()
         if instant:
@@ -657,7 +658,7 @@ class Lights:
                 for i in range(0, self.neo.numPixels(self.id)):
                     self.neo.setPixelColor(self.id, i, self.get_mix(
                         colors[k], colors[k+1], percent))
-                self.neo.show(15)
+                self.neo.show(25)
                 percent += 1
                 if t.sleepBreak(self.animation_id.get, this_id, wait_ms/100.0):
                     return 0
