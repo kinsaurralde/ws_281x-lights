@@ -8,7 +8,8 @@ from flask import Flask, render_template, json, request
 from flask_socketio import SocketIO
 from info import Info
 from key import Keys
-from multicontroller import MultiController
+# from multicontroller import MultiController
+from py.multicontroller import MultiController
 from saves import Saves
 
 app = Flask(__name__)
@@ -226,9 +227,21 @@ def saved(key_ids, folder, function, path = None, data = None):
 
 @app.route('/ping')
 def ping():
-    data = mc.ping()
-    print("Ping Data:", data)
-    return create_response(data)
+    # data = mc.ping()
+    # print("Ping Data:", data)
+    # return create_response(data)
+    return create_response([])
+
+@app.route('/test')
+def test():
+    actions = [{
+        "type": "run",
+        "function": "chase",
+        "arguments": {"r": 255, "g": 200, "b": 50}
+    }]
+    mc.execute(actions)
+    socketio.emit('test')
+    return create_response(None)
 
 @app.route('/<key>/controllers/<function>')
 @app.route('/<key>/controllers/<function>/<data>')
@@ -243,7 +256,7 @@ def controllers(key, function, data = None):
 @socketio.on('connect')
 def connect():
     print("Client Connected:", request.remote_addr)
-    socketio.emit('controller_urls', mc.get_urls(), room=request.sid)
+    # socketio.emit('controller_urls', mc.get_urls(), room=request.sid)
     socketio.emit('connection_response', room=request.sid)
 
 @socketio.on('disconnect')
@@ -256,11 +269,17 @@ def get_id():
 
 @socketio.on('ping1')
 def socket_ping():
+    return None
     return info.ping(request)
 
 @socketio.on('info')
 def socket_info():
     info.emit(request)
+
+@socketio.on('test2')
+def testtest():
+    print("Test")
+    socketio.emit('test')
 
 @socketio.on('info_wait')
 def socket_info_wait(data):
@@ -283,7 +302,8 @@ config_data = json.load(config_file)
 keys = Keys(config_data)
 saves = Saves()
 init_vars = saves.run_function("run", "functions/default", "default_vars")
-mc = MultiController(config_data, init_vars, args.test)
+# mc = MultiController(config_data, init_vars, args.test)
+mc = MultiController()
 info = Info(socketio, mc)
 
 port = 200

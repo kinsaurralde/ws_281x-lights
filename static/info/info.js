@@ -33,7 +33,6 @@ class Info {
             console.debug("Recieved controller URLS:", data);
             self._addControllers(data);
         });
-
         this.refresh();
 
         this.times = new Array(0);
@@ -113,11 +112,11 @@ class Info {
 
     _updateTable(data) {
         if (this.has_table) {
-            let ping_data = this._clearTable();
-            this.num_controllers = data.length;
-            for (let i = 0; i < data.length; i++) {
-                this._appendRow(data[i], ping_data);
-            }
+            // let ping_data = this._clearTable();
+            // this.num_controllers = data.length;
+            // for (let i = 0; i < data.length; i++) {
+            //     this._appendRow(data[i], ping_data);
+            // }
         }
     }
 
@@ -160,10 +159,10 @@ class Info {
 
     _ping_recieve(data, start_time, end_time) {
         //console.debug("Recieved Data", start_time, end_time, data);
-        for (let i = 0; i < data.length; i++) {
-            let id = data[i]["controller_id"];
-            this.table.rows[id + 1].cells[7].innerText = end_time - start_time;
-        }
+        // for (let i = 0; i < data.length; i++) {
+        //     let id = data[i]["controller_id"];
+        //     this.table.rows[id + 1].cells[7].innerText = end_time - start_time;
+        // }
     }
 
     refreshTable() {
