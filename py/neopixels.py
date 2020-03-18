@@ -20,7 +20,7 @@ PROVIDED_WATTS = 1
 VOLTAGE = 5
 
 class NeoPixels:
-    def __init__(self, led_count=9, max_brightness=255, pin=18, grb=False, remote=True):
+    def __init__(self, led_count=60, max_brightness=20, pin=18, grb=False, remote=True):
         # Configuration Settings
         self.led_count = led_count
         self.max_brightness = max_brightness
@@ -36,7 +36,9 @@ class NeoPixels:
         # Actual Strip
         self.strip = Adafruit_NeoPixel(
             self.led_count, self.pin, LED_FREQ_HZ, LED_DMA, LED_INVERT, self.max_brightness, self.led_channel)
+        print(self.remote)
         if not self.remote:
+            print("Not remote")
             self.strip.begin()
 
     def _valid_range(self, start, end):
@@ -71,8 +73,11 @@ class NeoPixels:
                 self.led_data[i] = data[i]
 
     def show(self, limit=0):
+        # print("Showing:", self.led_data)
         if not self.remote:
             if time.time() >= self.last_show + (limit / 1000) or limit == 0:
+                for i in range(self.led_count):
+                    self.strip.setPixelColor(i, self.led_data[i])
                 self.strip.show()
                 self.last_show = time.time()
 

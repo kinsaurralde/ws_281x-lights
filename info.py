@@ -6,13 +6,12 @@ class Info:
         self.c = controller
         self.info_id = 0
         self.remote = is_remote
-        self.wait = 0.015
+        self.wait = 0.02
 
     def emit(self, request):
         self.info_id += 1
         this_id = self.info_id
         count = 1000
-        self.wait = 1
         end_time = time.time() + self.wait * count
         while this_id == self.info_id and count > 0:
             # self.sio.emit('test')
@@ -25,14 +24,11 @@ class Info:
                 return
             if time.time() > end_time - count * self.wait:
                 continue
-            a = time.time()
             pixel_info = self.c.pixel_info()
-            b = time.time()
             if self.remote:
                 pixel_info = [pixel_info]
-            c = time.time()
             for i in pixel_info:
-                print("Emited:", i)
+                # print("Emited:", i)
                 self.sio.emit('info_response', i)
             while time.time() < end_time - count * self.wait:
                 self.sio.sleep(.001)

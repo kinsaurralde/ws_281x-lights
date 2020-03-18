@@ -134,7 +134,7 @@ class Controller {
     set(data) {
         if (this.div_should_update.checked) {
             this.div_brightness.innerText = data["brightness"];
-            this.div_power.innerText = data["power"].toFixed(3);
+            //this.div_power.innerText = data["power"].toFixed(3);
             for (let i = 0; i < this.num_strips; i++) {
                 let info = data["strip_info"][i];
                 this.strips[i].set(data["pixels"].slice(info["start"], info["end"] + 1));
@@ -168,7 +168,7 @@ class PixelStrip {
 
     set(data) {
         for (let i = 0; i < this.num_pixels; i++) {
-            this.pixels[i].set(data[i]['r'], data[i]['g'], data[i]['b']);
+            this.pixels[i].set(data[i]);
         }
     }
 
@@ -192,11 +192,11 @@ class Pixel {
         this.set();
     }
 
-    set(r = 0, g = 0, b = 0) {
-        this.r = r;
-        this.g = g;
-        this.b = b;
-        this.container.style.backgroundColor = "rgb(" + (r + this.adjust) + "," + (g + this.adjust) + "," + (b + this.adjust) + ")";
+    set(value = 0) {
+        this.r = (value >> 16) & 0xFF;
+        this.g = (value >> 8) & 0xFF;
+        this.b = value & 0xFF;
+        this.container.style.backgroundColor = "rgb(" + (this.r + this.adjust) + "," + (this.g + this.adjust) + "," + (this.b + this.adjust) + ")";
     }
 
     get() {

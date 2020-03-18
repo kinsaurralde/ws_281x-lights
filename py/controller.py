@@ -5,15 +5,16 @@ from py.neopixels import NeoPixels
 from py.virtual_strip import VirtualStrip
 
 class Controller:
-    def __init__(self):
+    def __init__(self, remote=False):
         self.virtual_strips = {}
-        self.neo = NeoPixels()
-        self.data = []
+        self.neo = NeoPixels(**{"remote": remote})
+        self.base_layer = []
+        self.animation_layer = []
+        self.overlay_layer = []
         self.on = True
         self.active = True
         self.starttime = time.time()
-        self.framerate = 2
-        self.wait_time = 1000 / self.framerate
+        self.set_framerate(0)
         self._init_data()
         self._start_loop()
 
@@ -24,8 +25,17 @@ class Controller:
         return self.framerate
 
     def set_framerate(self, value):
-        self.framerate = value
-        self.wait_time = 1000 / self.framerate
+        if value is not None:
+            self.framerate = value
+            if value == 0:
+                self.wait_time = 60000
+            else:
+                self.wait_time = 1000 / self.framerate
+            print("Setting framerate to", self.framerate, "with waittime", self.wait_time)
+            self.starttime = time.time()
+
+    def next_frame(self):
+        self.starttime = time.time()
 
     def num_pixels(self):
         return self.neo.num_pixels()
@@ -34,9 +44,14 @@ class Controller:
         data = self.neo.get_pixels()
         return data
 
-    def set_data(self, data):
-        print("Updaing pixels with data", data)
-        self.data = data
+    def set_base(self, data):
+        self.base_layer = self._layer(self.base_layer, data)
+        print("Base Layer is now:", self.base_layer)
+
+    def set_animation(self, data):
+        if len(data) > 0:
+            self.animation_layer = data
+            print("Animation layer is now:", self.animation_layer)
 
     def info(self):
         data = {
@@ -52,9 +67,20 @@ class Controller:
         return data
 
     def _init_data(self):
-        self.data.append([])
+        self.base_layer = [0] * self.neo.num_pixels()
+        self.animation_layer.append([])
         for i in range(self.neo.num_pixels()):
-            self.data[0].append(0)
+            self.animation_layer[0].append(0)
+
+    def _layer(self, layer1, layer2):
+        layer = [-1] * max(len(layer1), len(layer2))
+        for i in range(len(layer1)):
+            if layer1[i] >= 0:
+                layer[i] = layer1[i]
+        for i in range(len(layer2)):
+            if layer2[i] >= 0:
+                layer[i] = layer2[i]
+        return layer
 
     def _sleep(self, amount):
         self.starttime += (amount / 1000)
@@ -69,8 +95,8 @@ class Controller:
         self.starttime = time.time()
         self.counter = 0
         while self.active:
-            self.counter = (self.counter + 1) % len(self.data)
-            self.neo.update_pixels(self.data[self.counter])
-            self.neo.show()
+            self.counter = (self.counter + 1) % len(self.animation_layer)
+            self.neo.update_pixels(self._layer(self.base_layer, self.animation_layer[self.counter]))
+            self.neo.show(20)
             self._sleep(self.wait_time)
 

@@ -101,7 +101,6 @@ def info(function):
     elif function == "new_web":
         return render_template('new_info.html')
     elif function == "get":
-        print("INFO")
         data = mc.info()
         return create_response(data)
     elif function == "history":
@@ -227,20 +226,39 @@ def saved(key_ids, folder, function, path = None, data = None):
 
 @app.route('/ping')
 def ping():
-    # data = mc.ping()
-    # print("Ping Data:", data)
-    # return create_response(data)
-    return create_response([])
+    data = mc.ping()
+    print("Ping Data:", data)
+    return create_response(data)
 
-@app.route('/test')
-def test():
-    actions = [{
-        "type": "run",
-        "function": "chase",
-        "arguments": {"r": 255, "g": 200, "b": 50}
-    }]
+@app.route('/test/<function>')
+def test(function):
+    if function == "1":
+        actions = [{
+            "type": "run",
+            "function": "chase",
+            "arguments": {"r": 255, "g": 200, "b": 50},
+            "framerate": 20
+        }]
+    elif function == "2":
+        actions = [{
+            "type": "run",
+            "function": "chase",
+            "arguments": {"r": 255, "g": 255, "b": 25, "direction": -1},
+            "framerate": 2
+        }]
+    elif function == "3":
+        actions = [{
+            "type": "base",
+            "function": "color",
+            "arguments": {"r": 0, "g": 0, "b": 255},
+            "framerate": 0
+        }]
     mc.execute(actions)
-    socketio.emit('test')
+    return create_response(None)
+
+@app.route('/action', methods=['POST'])
+def action():
+    mc.execute(request.get_json())
     return create_response(None)
 
 @app.route('/<key>/controllers/<function>')
@@ -302,8 +320,7 @@ config_data = json.load(config_file)
 keys = Keys(config_data)
 saves = Saves()
 init_vars = saves.run_function("run", "functions/default", "default_vars")
-# mc = MultiController(config_data, init_vars, args.test)
-mc = MultiController()
+mc = MultiController(**{"remote": args.test})
 info = Info(socketio, mc)
 
 port = 200
