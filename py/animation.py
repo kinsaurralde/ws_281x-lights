@@ -23,19 +23,27 @@ class Animations:
     def __init__(self):
         self.led_count = 0
         self.grb = False
+        self.layers = {}
 
     def calc(self, actions, led_count):
         self.led_count = led_count
-        base_layer = []
-        animation_layer = []
-        framerate = None
+        self._reset_layers()
         for action in actions:
-            if action["type"] in ["run", "animate", "thread"]:
-                animation_layer.extend(self._get_function(action["function"], action["arguments"]))
-                framerate = action["framerate"]
+            if action["type"] == "run":
+                self.layers["animation"].extend(self._get_function(action["function"], action["arguments"]))
+                self.layers["framerate"] = action["framerate"]
             elif action["type"] == "base":
-                base_layer = self._get_function(action["function"], action["arguments"])[0]
-        return {"base": base_layer, "animation": animation_layer, "framerate": framerate}
+                self.layers["base"] = self._get_function(action["function"], action["arguments"])[0]
+            elif action["type"] == "control":
+                self.layers["control"] = self._get_function(action["function"], action["arguments"])[0] 
+            elif action["type"] == "setting":
+                self.layers["settings"] = self._get_settings(action["options"])
+        print(self.layers)
+        return self.layers
+
+    def _reset_layers(self):
+        self.layers = {}
+        self.layers["animation"] = []
 
     def _get_function(self, function, arguments):
         if function == "color":
@@ -46,6 +54,19 @@ class Animations:
             return self._mix_switch(**arguments)
         elif function == "pulse":
             return self._pulse(**arguments)
+        elif function == "wipe":
+            return self._wipe(**arguments)
+        else:
+            return self._set_all(0)
+
+    def _get_settings(self, options):
+        settings = {}
+        for option in options:
+            settings[option] = options[option]
+            if option == "on":
+                self.layers["control"] = self._set_all(-1 if options[option] else 0)[0]
+        print(self.layers["control"])
+        return settings
 
     def _set_all(self, r, g=None, b=None):
         result = self._get_blank()
@@ -115,6 +136,29 @@ class Animations:
             frame[max(j, 0):min(i, self.led_count)] = [self._get_color(r, g, b)] * abs(max(j, 0) - min(i, self.led_count))
             frames.append(frame)
             print("Frame:", frame)
+        return frames
+
+    def _wipe(self, r, g, b, direction=1):
+        """New color wipes across strip
+            
+            Parameters:
+
+                r, g, b: color
+
+                direction: (default: 1)
+                    1: forward direction
+                    -1: reverse direction
+        """
+        frames = []
+        start = 0
+        iter_range = range(self.led_count)
+        if direction == -1:
+            start = self.led_count
+            iter_range = reversed(iter_range)
+        for i, j in enumerate(iter_range):
+            frame = self._set_all(-1)[0]
+            frame[start:j:direction] = [self._get_color(r, g, b)] * (i + 1)
+            frames.append(frame)
         return frames
 
     def _get_color(self, r, g, b):

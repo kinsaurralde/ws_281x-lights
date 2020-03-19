@@ -11,8 +11,10 @@ class Controller:
         self.base_layer = []
         self.animation_layer = []
         self.overlay_layer = []
+        self.control_layer = []
         self.on = True
         self.active = True
+        self.paused = False
         self.starttime = time.time()
         self.set_framerate(0)
         self._init_data()
@@ -44,14 +46,24 @@ class Controller:
         data = self.neo.get_pixels()
         return data
 
+    def set_settings(self, settings):
+        for setting in settings:
+            if setting == "on":
+                self.on = bool(settings[setting])
+        print(settings, self.on)
+
     def set_base(self, data):
         self.base_layer = self._layer(self.base_layer, data)
-        print("Base Layer is now:", self.base_layer)
+        # print("Base Layer is now:", self.base_layer)
 
     def set_animation(self, data):
         if len(data) > 0:
             self.animation_layer = data
             print("Animation layer is now:", self.animation_layer)
+
+    def set_control(self, data):
+        self.control_layer = data
+        print("Control Layer is now:", self.control_layer)
 
     def info(self):
         data = {
@@ -71,15 +83,13 @@ class Controller:
         self.animation_layer.append([])
         for i in range(self.neo.num_pixels()):
             self.animation_layer[0].append(0)
-
-    def _layer(self, layer1, layer2):
-        layer = [-1] * max(len(layer1), len(layer2))
-        for i in range(len(layer1)):
-            if layer1[i] >= 0:
-                layer[i] = layer1[i]
-        for i in range(len(layer2)):
-            if layer2[i] >= 0:
-                layer[i] = layer2[i]
+   
+    def _layer(self, *args):
+        layer = [-1] * max([len(i) for i in args])
+        for l in args:
+            for i in range(len(l)):
+                if l[i] >= 0:
+                    layer[i] = l[i]
         return layer
 
     def _sleep(self, amount):
@@ -95,8 +105,10 @@ class Controller:
         self.starttime = time.time()
         self.counter = 0
         while self.active:
-            self.counter = (self.counter + 1) % len(self.animation_layer)
-            self.neo.update_pixels(self._layer(self.base_layer, self.animation_layer[self.counter]))
-            self.neo.show(20)
+            if not self.paused:
+                self.counter = (self.counter + 1) % len(self.animation_layer)
+                self.neo.update_pixels(self._layer(self.base_layer, self.animation_layer[self.counter], self.control_layer))
+                self.neo.show(20)
+                # print(self.control_layer)
             self._sleep(self.wait_time)
 

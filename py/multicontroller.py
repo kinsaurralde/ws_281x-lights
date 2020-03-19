@@ -26,9 +26,16 @@ class MultiController:
 
     def execute(self, actions):
         data = self.a.calc(actions, self.controllers[0].num_pixels())
-        self.controllers[0].set_base(data["base"])
-        self.controllers[0].set_animation(data["animation"])
-        self.controllers[0].set_framerate(data["framerate"])
+        if data.get("settings") is not None:
+            self.controllers[0].set_settings(data["settings"])
+        if data.get("base") is not None:
+            self.controllers[0].set_base(data["base"])
+        if data.get("animation") is not None:
+            self.controllers[0].set_animation(data["animation"])
+        if data.get("control") is not None:
+            self.controllers[0].set_control(data["control"])
+        if data.get("framerate") is not None:
+            self.controllers[0].set_framerate(data["framerate"])
 
     def pixel_info(self):
         response = []

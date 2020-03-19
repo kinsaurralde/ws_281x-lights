@@ -20,7 +20,7 @@ PROVIDED_WATTS = 1
 VOLTAGE = 5
 
 class NeoPixels:
-    def __init__(self, led_count=60, max_brightness=20, pin=18, grb=False, remote=True):
+    def __init__(self, led_count=60, max_brightness=255, pin=18, grb=False, remote=True):
         # Configuration Settings
         self.led_count = led_count
         self.max_brightness = max_brightness
