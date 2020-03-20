@@ -1,4 +1,6 @@
 ---
+config_info:
+  name: sample
 settings:
   rows:
     - title: 'Control'

@@ -22,13 +22,16 @@
 import random
 
 class Animations:
-    def __init__(self):
-        self.led_count = 0
+    def __init__(self, led_count):
+        self.led_count = led_count
         self.grb = False
         self.layers = {}
 
-    def calc(self, actions, led_count):
-        self.led_count = led_count
+    def set_led_count(self, value):
+        if value > 0:
+            self.led_count = value
+
+    def calc(self, actions):
         self._reset_layers()
         for action in actions:
             if action["type"] == "run":

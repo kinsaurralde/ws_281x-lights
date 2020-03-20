@@ -7,8 +7,6 @@ import argparse
 from flask import Flask, render_template, json, request
 from flask_socketio import SocketIO
 from info import Info
-from key import Keys
-# from multicontroller import MultiController
 from py.multicontroller import MultiController
 from saves import Saves
 
@@ -24,7 +22,7 @@ debug_exceptions = False  # if true, exception will be sent to web
 parser = argparse.ArgumentParser()
 parser.add_argument('-d', '--debug', action='store_true', help='Debug mode', default=False)
 parser.add_argument('-t', '--test', action='store_true', help='Testing mode (for non pi devices)', default=False)
-parser.add_argument('-c', '--config', type=str, help='Path to config directory', default="configs/sample/")
+parser.add_argument('-c', '--config', type=str, help='Path to main config file', default="configs/sample/main.yaml")
 parser.add_argument('-p', '--port', type=int, help='Port to run server on (overrides config file)', default=None)
 args = parser.parse_args()
 
@@ -200,16 +198,19 @@ def testtest():
 def socket_info_wait(data):
     info.set_wait(data)
 
-controller_config = open_yaml(args.config + "controllers.yaml")
-web_config = open_yaml(args.config + "web.yaml")
-quick_actions = open_yaml(args.config + "quick_actions.yaml")
+main_config = open_yaml(args.config)
+web_config = main_config["config"]["web"]
+config_paths = main_config["config"]["config_paths"]
+controller_config = open_yaml(config_paths["controllers"])
+quick_actions = open_yaml(config_paths["quick_actions"])
+v_controller_config = open_yaml(config_paths["virtual_controllers"])
 
-mc = MultiController(testing=args.test, config=controller_config["config"])
+mc = MultiController(testing=args.test, config=controller_config["config"], virtual_controller_config=v_controller_config["config"])
 info = Info(socketio, mc)
 
 port = 200
-if "port" in web_config["config"]:
-    port = int(web_config["config"]["port"])
+if "port" in web_config:
+    port = int(web_config["port"])
 if args.port is not None:
     port = args.port
 

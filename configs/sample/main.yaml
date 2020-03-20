@@ -1,0 +1,10 @@
+---
+config_info:
+  name: sample
+config:
+  web:
+    port: 200
+  config_paths:
+    controllers: 'configs/sample/controllers.yaml'
+    quick_actions: 'configs/sample/quick_actions.yaml'
+    virtual_controllers: 'configs/sample/virtual_controllers.yaml'

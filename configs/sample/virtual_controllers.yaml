@@ -1,0 +1,12 @@
+---
+config_info:
+  name: sample
+config:
+  virtual_controllers:
+    - name: middle_half
+      sections:
+      - controller_id: test
+        start: 15
+        end: 44
+        offset: 0
+

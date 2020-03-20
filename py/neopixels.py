@@ -43,15 +43,6 @@ class NeoPixels:
             print("Not testing")
             self.strip.begin()
 
-    def _valid_range(self, start, end):
-        if start < 0 or start >= self.led_count:
-            return False
-        if end < 0 or end >= self.led_count:
-            return False
-        if start > end:
-            return False
-        return True
-
     def num_pixels(self):
         return self.led_count
 
