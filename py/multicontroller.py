@@ -4,14 +4,24 @@ import time
 
 from py.controller import Controller
 from py.animation import Animations
-
+from py.virtualcontroller import VirtualController
 
 class MultiController:
-    def __init__(self, remote=False):
+    def __init__(self, testing, config):
+        self.testing = testing
         self.a = Animations()
-        self.controllers = [0] * 1
-        self.controllers[0] = Controller(**{"remote": remote})
+        self.controllers = []
+        self.virtual_controllers = []
+        self._init_controllers(config)
         self.reset_all()
+
+    def _init_controllers(self, config):
+        for c in config["controllers"]:
+            if c["active"]:
+                self.controllers.append(Controller(c, testing=self.testing))
+
+    def _get_options(self, options):
+        pass
 
     def reset_all(self):
         actions = [{

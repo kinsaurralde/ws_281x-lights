@@ -2,12 +2,11 @@ import time
 import threading
 
 from py.neopixels import NeoPixels
-from py.virtual_strip import VirtualStrip
 
 class Controller:
-    def __init__(self, remote=False):
+    def __init__(self, config, testing=False):
         self.virtual_strips = {}
-        self.neo = NeoPixels(**{"remote": remote})
+        self.neo = NeoPixels(**config["neopixels"], testing=testing)
         self.base_layer = []
         self.animation_layer = []
         self.overlay_layer = []

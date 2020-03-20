@@ -21,6 +21,18 @@ app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins = '*')
 debug_exceptions = False  # if true, exception will be sent to web
 
+parser = argparse.ArgumentParser()
+parser.add_argument('-d', '--debug', action='store_true', help='Debug mode', default=False)
+parser.add_argument('-t', '--test', action='store_true', help='Testing mode (for non pi devices)', default=False)
+parser.add_argument('-c', '--config', type=str, help='Path to config directory', default="configs/sample/")
+parser.add_argument('-p', '--port', type=int, help='Port to run server on (overrides config file)', default=None)
+args = parser.parse_args()
+
+def open_yaml(path):
+    data = {}
+    with open(path) as open_file:
+        data = yaml.load(open_file)
+    return data
 
 def create_response(data):
     response = app.response_class(response=json.dumps(
@@ -108,126 +120,8 @@ def info(function):
     elif function == "get":
         data = mc.info()
         return create_response(data)
-    elif function == "history":
-        data = mc.get_history()
-        return create_response(data)
     else:
         return page_not_found("Info function not found")
-
-
-@app.route('/<key>/<strip_id>/key/<function>')
-@app.route('/<key>/<strip_id>/key/<function>/<param>')
-def key(strip_id, key, function, param=None):
-    try:
-        params = []
-        if param != None:
-            params = param.split(',')
-        keys.check_key(key, -1)
-        if function == "web":
-            return render_template('keys.html')
-        keys.run_function(function, params)
-        return create_response(keys.get_keys(key))
-    except Exception as e:
-        return exception_handler(e)
-
-
-@app.route('/<key_ids>/off')
-def off(key_ids):
-    try:
-        data = split_key_ids(key_ids)
-        keys.check_key(data["key"], data["strip_id"])
-        controller_response = mc.off(
-            data["controller_ids"], int(data["strip_id"]))
-    except Exception as e:
-        return exception_handler(e)
-    return create_response(controller_response)
-
-
-@app.route('/<key_ids>/stopanimation')
-def stopanimation(key_ids):
-    data = split_key_ids(key_ids)
-    controller_response = mc.stop(
-        data["controller_ids"], int(data["strip_id"]))
-    return create_response(controller_response)
-
-
-@app.route('/settings/<controller_ids>/<args>')
-def change_settings(controller_ids, args):
-    settings = args.split(",")
-    new_settings = {}
-    for setting in settings:
-        current = setting.split("=")
-        if current[0] == "break":
-            if current[1] == "true":
-                new_settings["break_animation"] = True
-            else:
-                new_settings["break_animation"] = False
-        if current[0] == "brightness":
-            new_settings["brightness"] = int(current[1])
-    mc.change_settings(controller_ids.split(','), new_settings)
-    return create_response({})
-
-
-@app.route('/<key_ids>/run/<function>')
-@app.route('/<key_ids>/run/<function>/<args>')
-def run(key_ids, function, args=None):
-    try:
-        data = split_key_ids(key_ids)
-        keys.check_keys(data["key"], data["controller_ids"])
-        if args is not None:
-            args = [int(x) if x.lstrip('-').isdigit() else make_list(x) for x in args.split(',')]
-        controller_response = mc.run(data["controller_ids"], int(
-            data["strip_id"]), function, args)
-        return create_response(controller_response)
-    except Exception as e:
-        return exception_handler(e)
-
-@app.route('/<key_ids>/thread/<function>')
-@app.route('/<key_ids>/thread/<function>/<args>')
-def thread(key_ids, function, args=None):
-    try:
-        data = split_key_ids(key_ids)
-        keys.check_key(data["key"], data["strip_id"])
-        if args is not None:
-            args = [int(x) if x.lstrip('-').isdigit() else make_list(x) for x in args.split(',')]
-        controller_response = mc.thread(
-            data["controller_ids"], int(data["strip_id"]), function, args)
-        return create_response(controller_response)
-    except Exception as e:
-        return exception_handler(e)
-
-@app.route('/<key_ids>/animate/<function>')
-@app.route('/<key_ids>/animate/<function>/<args>')
-def animate(key_ids, function, args=None, delay=0):
-    try:
-        data = split_key_ids(key_ids)
-        keys.check_key(data["key"], data["strip_id"])
-        if args is not None:
-            args = [int(x) if x.lstrip('-').isdigit() else make_list(x) for x in args.split(',')]
-        controller_response = mc.animate(data["controller_ids"],
-                                         int(data["strip_id"]), function, args, delay)
-        return create_response(controller_response)
-    except Exception as e:
-        return exception_handler(e)
-
-@app.route('/json', methods=['GET', 'POST'])
-def post_json():
-    data = request.get_json()
-    return create_response(mc.json(data))
-
-@app.route('/<key_ids>/saved/<folder>/<function>')
-@app.route('/<key_ids>/saved/<folder>/<function>/<path>')
-@app.route('/<key_ids>/saved/<folder>/<function>/<path>/<data>', methods=['GET', 'POST'])
-def saved(key_ids, folder, function, path = None, data = None):
-    try:
-        key_ids = split_key_ids(key_ids)
-        return_data = {}
-        data = saves.run_function(function, folder, path, data)
-        if function == "run":
-            return create_response(mc.json(data, key_ids["controller_ids"]))
-        return create_response(data)
-    except Exception as e:
-        return exception_handler(e)
 
 @app.route('/ping')
 def ping():
@@ -274,16 +168,6 @@ def quickaction():
         mc.execute(quick_actions["actions"][recieved["name"]]["actions"], recieved["options"])
     return create_response({"recieved": recieved})
 
-@app.route('/<key>/controllers/<function>')
-@app.route('/<key>/controllers/<function>/<data>')
-def controllers(key, function, data = None):
-    try:
-        keys.check_key(key, -1)
-        data = mc.controller_functions(function, data)
-        return create_response(data)
-    except Exception as e:
-        return exception_handler(e)
-
 @socketio.on('connect')
 def connect():
     print("Client Connected:", request.remote_addr)
@@ -316,34 +200,16 @@ def testtest():
 def socket_info_wait(data):
     info.set_wait(data)
 
-parser = argparse.ArgumentParser()
-parser.add_argument('-d', '--debug', action='store_true', help='Debug mode', default=False)
-parser.add_argument('-t', '--test', action='store_true', help='Testing mode (for non pi devices)', default=False)
-parser.add_argument('-c', '--config', type=str, help='Path to config file', default="sample_config.json")
-parser.add_argument('-p', '--port', type=int, help='Port to run server on (overrides config file)', default=None)
-args = parser.parse_args()
+controller_config = open_yaml(args.config + "controllers.yaml")
+web_config = open_yaml(args.config + "web.yaml")
+quick_actions = open_yaml(args.config + "quick_actions.yaml")
 
-try:
-    config_file = open(args.config, "r")
-except FileNotFoundError:
-    print("Config file not found")
-    exit(1)
-config_data = json.load(config_file)
-
-quick_actions = {}
-with open("static/config/quick_actions.yaml") as quick_actions_file:
-    quick_actions = yaml.load(quick_actions_file)
-print("Quick Actions:", quick_actions)
-
-keys = Keys(config_data)
-saves = Saves()
-init_vars = saves.run_function("run", "functions/default", "default_vars")
-mc = MultiController(**{"remote": args.test})
+mc = MultiController(testing=args.test, config=controller_config["config"])
 info = Info(socketio, mc)
 
 port = 200
-if "port" in config_data["info"]:
-    port = int(config_data["info"]["port"])
+if "port" in web_config["config"]:
+    port = int(web_config["config"]["port"])
 if args.port is not None:
     port = args.port
 

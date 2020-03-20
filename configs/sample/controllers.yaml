@@ -1,0 +1,27 @@
+---
+config_info:
+  name: sample
+config:
+  controllers:
+  - active: true
+    remote: false
+    url: 
+    neopixels:
+      led_count: 120
+      max_brightness: 255
+      pin: 18
+      grb: false
+      flipped: false
+    settings:
+      initial_brightness: 200
+  - active: false
+    remote: true
+    url: url.com
+    neopixels:
+      led_count: 60
+      max_brightness: 255
+      pin: 18
+      grb: false
+      flipped: false
+    settings:
+      initial_brightness: 200
