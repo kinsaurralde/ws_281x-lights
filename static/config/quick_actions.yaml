@@ -1,0 +1,183 @@
+---
+settings:
+  rows:
+    - title: 'Control'
+      buttons: ['reset', 'off', 'on']
+    - title: 'Animations'
+      buttons: ['clear_animation', 'blue_chase_1', 'mix_1', 'rgb_wipe_1', 'red_pulse_1', 'green_pulse_1', 'rcgmby_bounce_1', 'random_cycle']
+    - title: 'Base Layer'
+      buttons: ['black_base', 'red_base', 'green_base', 'blue_base', 'white_base', random_base]
+inactive:
+  - test
+actions:
+  'reset':
+    display: 'Clear All'
+    actions:
+      - type: setting
+        options:
+          'on': true
+      - type: control
+        function: reset
+        arguments:
+  'off': 
+    display: 'Hide'
+    actions:
+    - type: setting
+      options:
+        'on': false
+  'on':
+    display: 'Show'
+    actions:
+    - type: setting
+      options:
+        'on': true
+  'clear_animation':
+    display: 'Clear'
+    actions:
+      - type: run
+        function: clear
+  'blue_chase_1':
+    display: 'Blue Chase'
+    actions:
+    - type: run
+      function: chase
+      arguments:
+        r: 0
+        g: 0
+        b: 255
+      framerate: 10
+  'mix_1':
+    display: 'Mix'
+    actions:
+    - type: run
+      function: mix_switch
+      arguments:
+        colors:
+        - [255, 0, 0]
+        - [0, 255, 0]
+        - [0, 0, 255]
+        - [255, 0, 0]
+      framerate: 100
+  'rgb_wipe_1':
+    display: 'RGB Wipe'
+    actions:
+      - type: run
+        function: wipe
+        arguments:
+          r: 255
+          g: 0
+          b: 0
+        framerate: 60
+      - type: run
+        function: wipe
+        arguments:
+          r: 0
+          g: 255
+          b: 0
+        framerate: 60
+      - type: run
+        function: wipe
+        arguments:
+          r: 0
+          g: 0
+          b: 255
+        framerate: 60
+  'red_pulse_1':
+    display: 'Red Pulse'
+    actions:
+      - type: run
+        function: pulse
+        arguments:
+          r: 255
+          g: 0
+          b: 0
+          length: 10
+        framerate: 20
+  'green_pulse_1':
+    display: 'Green Pulse'
+    actions:
+      - type: run
+        function: pulse
+        arguments:
+          r: 0
+          g: 255
+          b: 0
+          direction: -1
+          length: 10
+        framerate: 30
+  'random_cycle':
+    display: 'Random Cycle'
+    actions:
+      - type: run
+        function: random
+        arguments: {}
+        framerate: 10
+  'random_base':
+    display: 'Random'
+    actions:
+      - type: base
+        function: random
+        arguments:
+          each: 15
+  'rcgmby_bounce_1':
+    display: 'Bounce 1'
+    actions:
+      - type: run
+        function: bounce
+        arguments:
+          colors:
+            - [255, 0, 0]
+            - [0, 255, 255]
+            - [0, 255, 0]
+            - [255, 0, 255]
+            - [0, 0, 255]
+            - [255, 255, 0]
+          length: 10
+          direction: -1
+        framerate: 60
+  'red_base':
+    display: 'Red'
+    actions:
+    - type: base
+      function: color
+      arguments:
+        r: 255
+        g: 0
+        b: 0
+  'green_base':
+    display: 'Green'
+    actions:
+    - type: base
+      function: color
+      arguments:
+        r: 0
+        g: 255
+        b: 0
+  'blue_base':
+    display: 'Blue'
+    actions:
+    - type: base
+      function: color
+      arguments:
+        r: 0
+        g: 0
+        b: 255
+  'black_base':
+    display: 'Clear'
+    actions:
+    - type: base
+      function: color
+      arguments:
+        r: 0
+        g: 0
+        b: 0
+  'white_base':
+    display: 'White'
+    actions:
+    - type: base
+      function: color
+      arguments:
+        r: 255
+        g: 255
+        b: 255
+  

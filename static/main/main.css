@@ -331,6 +331,10 @@ select {
     width: 10vw !important; 
 }
 
+.width-8 {
+    width: 8vw !important; 
+}
+
 .width-5 {
     width: 5vw !important; 
 }

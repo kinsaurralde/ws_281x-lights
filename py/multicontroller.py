@@ -24,7 +24,7 @@ class MultiController:
             c.set_base(data)
             c.next_frame()
 
-    def execute(self, actions):
+    def execute(self, actions, options=None):
         data = self.a.calc(actions, self.controllers[0].num_pixels())
         if data.get("settings") is not None:
             self.controllers[0].set_settings(data["settings"])

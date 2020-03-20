@@ -14,8 +14,6 @@ class Info:
         count = 1000
         end_time = time.time() + self.wait * count
         while this_id == self.info_id and count > 0:
-            # self.sio.emit('test')
-            t = time.time()
             count -= 1
             if count == 50:
                 self.sio.emit('info_renew', room=request.sid)
@@ -28,7 +26,6 @@ class Info:
             if self.remote:
                 pixel_info = [pixel_info]
             for i in pixel_info:
-                # print("Emited:", i)
                 self.sio.emit('info_response', i)
             while time.time() < end_time - count * self.wait:
                 self.sio.sleep(.001)

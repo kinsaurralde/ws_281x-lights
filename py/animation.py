@@ -1,6 +1,6 @@
 # "color": strip.set_all, #
 # "random": strip.random_cycle,
-# "wipe": strip.wipe,
+# "wipe": strip.wipe, #
 # "single": strip.set_pixel,
 # "specific": strip.set_pixels,
 # "pulse": strip.pulse,
@@ -9,15 +9,17 @@
 # "rainbowCycle": strip.rainbow_cycle,
 # "rainbow": strip.rainbow_cycle,
 # "rainbowChase": strip.rainbow_chase,
-# "mix": strip.mix_switch,
+# "mix": strip.mix_switch, #
 # "reverse": strip.reverse,
-# "bounce": strip.bounce,
+# "bounce": strip.bounce, #
 # "pattern": strip.pattern,
 # "blend": strip.blend,
 # "fade": strip.fade,
 # "fade_alt": strip.fade_alt,
 # "twinkle": strip.twinkle,
 # "pulse_pattern": strip.pulse_pattern
+
+import random
 
 class Animations:
     def __init__(self):
@@ -30,8 +32,8 @@ class Animations:
         self._reset_layers()
         for action in actions:
             if action["type"] == "run":
-                self.layers["animation"].extend(self._get_function(action["function"], action["arguments"]))
-                self.layers["framerate"] = action["framerate"]
+                self.layers["animation"].extend(self._get_function(action["function"], action.get("arguments")))
+                self.layers["framerate"] = action.get("framerate", 0)
             elif action["type"] == "base":
                 self.layers["base"] = self._get_function(action["function"], action["arguments"])[0]
             elif action["type"] == "control":
@@ -46,16 +48,26 @@ class Animations:
         self.layers["animation"] = []
 
     def _get_function(self, function, arguments):
-        if function == "color":
+        if function == "clear":
+            return self._set_all(-1)
+        elif function == "color":
             return self._set_all(**arguments)
+        elif function == "random":
+            return self._random(**arguments)
         elif function == "chase":
             return self._chase(**arguments)
         elif function == "mix_switch":
             return self._mix_switch(**arguments)
         elif function == "pulse":
             return self._pulse(**arguments)
+        elif function == "bounce":
+            return self._bounce(**arguments)
         elif function == "wipe":
             return self._wipe(**arguments)
+        elif function == "reset":
+            self.layers["base"] = self._set_all(0)[0]
+            self.layers["animation"].extend(self._set_all(-1))
+            return self._set_all(-1)
         else:
             return self._set_all(0)
 
@@ -76,6 +88,26 @@ class Animations:
             else:
                 result[i] = self._get_color(r, g, b)
         return [result]
+
+    def _random(self, each=-1, frame_delay=5, iterations=40):
+        """Flashes random lights
+            
+            Parameters:
+                
+                each: number of pixels before new color is selected
+        """
+        frames = []
+        current_color = self._get_random_color()
+        if each == -1:
+            each = self.led_count
+        for i in range(iterations):
+            frame = self._get_blank()
+            for j in range(self.led_count):
+                if j % each == 0:
+                    current_color = self._get_random_color()
+                frame[j] = current_color
+            frames.extend([frame] * frame_delay)
+        return frames
 
     def _chase(self, r, g, b, interval=5, direction=1):
         frames = []
@@ -131,11 +163,29 @@ class Animations:
         for i in iter_range:
             frame = self._set_all(-1)[0]
             j = i - length
-            if direction == -1:
-                i, j = j, i
-            frame[max(j, 0):min(i, self.led_count)] = [self._get_color(r, g, b)] * abs(max(j, 0) - min(i, self.led_count))
+            lower_index = max(j, 0)
+            upper_index = min(i, self.led_count)
+            frame[lower_index:upper_index] = [self._get_color(r, g, b)] * abs(lower_index - upper_index)
             frames.append(frame)
-            print("Frame:", frame)
+        return frames
+
+    def _bounce(self, colors, length=5, direction=1):
+        """Bounce Pulse across strip
+
+            Parameters:
+
+                colors: list of colors to pulse
+
+                length: how many pixels in pulse (default: 5)
+
+                direction: initial direction (default: 1)
+                    1: forwards
+                    -1: backwards
+        """
+        frames = []
+        for color in colors:
+            frames.extend(self._pulse(color[0], color[1], color[2], direction, length))
+            direction *= -1
         return frames
 
     def _wipe(self, r, g, b, direction=1):
@@ -209,14 +259,14 @@ class Animations:
         b = 0
         color_off = random.randint(0, 2)
         if color_off != 0:
-            r = random.randint(0, 255)
+            r = random.randint(0, 127) * 2
         if color_off != 1:
-            g = random.randint(0, 255)
+            g = random.randint(0, 127) * 2
         if color_off != 2:
-            b = random.randint(0, 255)
-        return self.get_color(r, g, b)
+            b = random.randint(0, 127) * 2
+        return self._get_color(r, g, b)
 
     def _get_blank(self, length=None):
         if length is None:
-            return [0] * self.led_count
-        return [0] * length
+            return [-1] * self.led_count
+        return [-1] * length

@@ -1,0 +1,70 @@
+<html>
+
+<head>
+    <title>Lights</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="../static/main/main.css">
+    <script src="../static/writehtml.js"></script>
+    <script src="../static/index/actions.js"></script>
+    <script src="../static/sender.js"></script>
+</head>
+
+<body>
+    <div id="page-title">Lights</div>
+
+
+    <div class="section" id="quick">
+        <div class="section-title">Quick Actions<input type="button" class="expand-button" value="^" style="width: 2vw;"
+                onclick="expand('quick','block')"></div>
+        <div class="space-1"></div>
+        <div class="section-hidden" id="quick-expanded" style="display: block;">
+            <div class="divider"></div>
+            {% for r in quick_actions["settings"]["rows"]%}
+                <div>{{r["title"]}}</div>
+                {% for b in r["buttons"] %}
+                    {% if b in quick_actions["actions"] %}
+                        <input type="button" value="{{quick_actions['actions'][b]['display']}}" onclick="actions.send_action('{{b}}')">
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="section" id="info">
+        <div class="section-title">Info<input type="button" class="expand-button" value="^" style="width: 2vw;"
+                onclick="expand('info','block')"></div>
+        <div class="space-1"></div>
+        <div class="section-hidden" id="info-expanded" style="display: block;">
+            <div class="divider"></div>
+            <!-- <div class="space-1"></div>
+            <div class="section-title-secondary">History</div>
+            <textarea id="info-log" readonly>
+            </textarea>
+            <div class="divider"></div>
+            <div class="space-1"></div>
+            <div class="section-title-secondary">Messages</div>
+            <textarea id="info-messages" readonly>
+            </textarea>
+            <div class="divider"></div> -->
+            <input type="button" value="View Code"
+                onclick="openURL('https:\/\/github.com/kinsaurralde/ws_281x-lights')">
+            <input type="button" value="View Status" onclick="openURL('info/web')">
+            <input type="button" value="View New Status" onclick="openURL('info/new_web')">
+            <input type="button" value="kinsaurralde.com" onclick="openURL('https:\/\/kinsaurralde.com')">
+            <div class="divider"></div>
+        </div>
+    </div>
+
+    <script>
+        let sender = new Sender();
+        let actions = new Actions(sender);
+
+        function openURL(url) {
+            window.open(url, "_blank");
+        }
+    </script>
+
+   
+</body>
+
+</html>

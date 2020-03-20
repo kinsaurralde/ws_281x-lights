@@ -27,12 +27,12 @@ class Controller:
         return self.framerate
 
     def set_framerate(self, value):
-        if value is not None:
+        if value is None or value == 0:
+            self.framerate = None
+            self.wait_time = 50
+        elif value > 0:
             self.framerate = value
-            if value == 0:
-                self.wait_time = 60000
-            else:
-                self.wait_time = 1000 / self.framerate
+            self.wait_time = 1000 / self.framerate
             print("Setting framerate to", self.framerate, "with waittime", self.wait_time)
             self.starttime = time.time()
 
@@ -54,16 +54,18 @@ class Controller:
 
     def set_base(self, data):
         self.base_layer = self._layer(self.base_layer, data)
-        # print("Base Layer is now:", self.base_layer)
+        self._draw_frame()
+        # print("Base Layer is now", self.animation_layer)
 
     def set_animation(self, data):
         if len(data) > 0:
             self.animation_layer = data
-            print("Animation layer is now:", self.animation_layer)
+            self.counter = 0
+            # print("Animation Layer is now", self.animation_layer)
 
     def set_control(self, data):
         self.control_layer = data
-        print("Control Layer is now:", self.control_layer)
+        self._draw_frame()
 
     def info(self):
         data = {
@@ -82,7 +84,7 @@ class Controller:
         self.base_layer = [0] * self.neo.num_pixels()
         self.animation_layer.append([])
         for i in range(self.neo.num_pixels()):
-            self.animation_layer[0].append(0)
+            self.animation_layer[0].append(-1)
    
     def _layer(self, *args):
         layer = [-1] * max([len(i) for i in args])
@@ -95,11 +97,16 @@ class Controller:
     def _sleep(self, amount):
         self.starttime += (amount / 1000)
         while time.time() < self.starttime:
-            time.sleep(.001)
+            time.sleep(.0025)
 
     def _start_loop(self):
         threading_thread = threading.Thread(target=self._loop)
         threading_thread.start()
+
+    def _draw_frame(self):
+        if self.counter < len(self.animation_layer):
+            self.neo.update_pixels(self._layer(self.base_layer, self.animation_layer[self.counter], self.control_layer))
+            self.neo.show(20)
     
     def _loop(self):
         self.starttime = time.time()
@@ -107,8 +114,6 @@ class Controller:
         while self.active:
             if not self.paused:
                 self.counter = (self.counter + 1) % len(self.animation_layer)
-                self.neo.update_pixels(self._layer(self.base_layer, self.animation_layer[self.counter], self.control_layer))
-                self.neo.show(20)
-                # print(self.control_layer)
+                self._draw_frame()
             self._sleep(self.wait_time)
 

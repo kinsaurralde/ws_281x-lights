@@ -12,6 +12,11 @@ from key import Keys
 from py.multicontroller import MultiController
 from saves import Saves
 
+try:
+    import yaml # 3.6
+except:
+    import ruamel.yaml as yaml  # 3.7
+
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins = '*')
 debug_exceptions = False  # if true, exception will be sent to web
@@ -91,7 +96,7 @@ def page_not_found(e):
 @app.route('/')
 def index():
     """Main control page"""
-    return render_template('index.html')
+    return render_template('new_index.html', quick_actions=quick_actions)
 
 
 @app.route('/info/<function>')
@@ -261,6 +266,14 @@ def action():
     mc.execute(request.get_json())
     return create_response(None)
 
+@app.route('/quickaction', methods=['POST'])
+def quickaction():
+    recieved = request.get_json(force=True)
+    print("Quick actions recieved", recieved)
+    if recieved["name"] in quick_actions["actions"]:
+        mc.execute(quick_actions["actions"][recieved["name"]]["actions"], recieved["options"])
+    return create_response({"recieved": recieved})
+
 @app.route('/<key>/controllers/<function>')
 @app.route('/<key>/controllers/<function>/<data>')
 def controllers(key, function, data = None):
@@ -316,6 +329,11 @@ except FileNotFoundError:
     print("Config file not found")
     exit(1)
 config_data = json.load(config_file)
+
+quick_actions = {}
+with open("static/config/quick_actions.yaml") as quick_actions_file:
+    quick_actions = yaml.load(quick_actions_file)
+print("Quick Actions:", quick_actions)
 
 keys = Keys(config_data)
 saves = Saves()
