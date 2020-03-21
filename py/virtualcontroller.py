@@ -1,7 +1,8 @@
 from py.animation import Animations
 
 class VirtualController():
-    def __init__(self, name):
+    def __init__(self, name, real):
+        self.real = real
         self.virtual_id = name
         self.led_count = 0
         self.a = Animations(self.led_count)

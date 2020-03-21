@@ -11,6 +11,7 @@ config:
       led_count: 60
       max_brightness: 255
       pin: 18
+      max_watts: 50
       grb: false
       flipped: false
     settings:
@@ -23,6 +24,7 @@ config:
       led_count: 60
       max_brightness: 255
       pin: 18
+      max_watts: 10
       grb: false
       flipped: false
     settings:

@@ -20,15 +20,15 @@ PROVIDED_WATTS = 1
 VOLTAGE = 5
 
 class NeoPixels:
-    def __init__(self, led_count=60, max_brightness=255, pin=18, grb=False, testing=True, flipped=True):
+    def __init__(self, led_count=60, max_brightness=255, pin=18, max_watts=1, grb=False, testing=True, flipped=True):
         # Configuration Settings
         self.led_count = led_count
         self.max_brightness = max_brightness
         self.pin = pin
         self.grb = grb
+        self.max_watts = max_watts
         self.testing = testing
         self.flipped = flipped
-        print("Flipped:", self.flipped)
         self.led_channel = self.pin in [13, 19, 41, 45, 53]
         # Current Pixels
         self.led_data = [0] * led_count
@@ -38,10 +38,17 @@ class NeoPixels:
         # Actual Strip
         self.strip = Adafruit_NeoPixel(
             self.led_count, self.pin, LED_FREQ_HZ, LED_DMA, LED_INVERT, self.max_brightness, self.led_channel)
-        print(self.testing)
         if not self.testing:
-            print("Not testing")
             self.strip.begin()
+
+    def info(self):
+        return {
+            "num_pixels": self.led_count,
+            "max_brightness": self.max_brightness,
+            "brightness": self.brightness,
+            "max_watts": self.max_watts,
+            "flipped": self.flipped
+        }
 
     def num_pixels(self):
         return self.led_count
@@ -51,6 +58,7 @@ class NeoPixels:
             self.brightness = value
             if not self.testing:
                 self.strip.setBrightness(self.brightness)
+        return self.brightness
 
     def get_brightness(self):
         return self.brightness

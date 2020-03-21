@@ -4,7 +4,7 @@ import sys
 import time
 import argparse
 
-from flask import Flask, render_template, json, request
+from flask import Flask, render_template, json, request, send_from_directory
 from flask_socketio import SocketIO
 from info import Info
 from py.multicontroller import MultiController
@@ -38,7 +38,6 @@ def create_response(data):
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
 
-
 def error_response(message):
     data = {
         "error": True,
@@ -46,68 +45,14 @@ def error_response(message):
     }
     return create_response(data)
 
-
-def exception_handler(ex):
-    if debug_exceptions:
-        raise ex
-    try:
-        raise ex
-    except ValueError as e:
-        return error_response("Value Error: invalid parameter"+str(e))
-    except NameError as e:
-        return page_not_found("Invalid animate function: "+str(e))
-    except TypeError as e:
-        return error_response("Type Error: "+str(e))
-    except AssertionError:
-        return error_response("Assertion Error: invalid key")
-    except FileNotFoundError:
-        return error_response("Invalid File name or path" + str(e))
-
-
-def split_key_ids(items):
-    split = items.split(':')
-    data = {
-        "key": 0,
-        "controller_ids": 0,
-        "strip_id": 0
-    }
-    if len(split) > 0:
-        if split[0] != "":
-            data["key"] = int(split[0])
-    if len(split) > 1:
-        if split[1] != "":
-            data["controller_ids"] = split[1].split(',')
-    if len(split) > 2:
-        if split[2] != "":
-            data["strip_id"] = split[2]
-    return data
-
-
-def make_list(arg):
-    arg = str(arg)
-    if ';' in arg:
-        arg = [[int(y) for y in x.split('.')] for x in arg.split(';')]
-    elif '!' in arg:
-        arg = float(arg[1:])
-    elif '.' in arg:
-        arg = [[int(x) for x in arg.split('.')]]
-    elif arg in ["false", "False"]:
-        arg = False
-    elif arg in ["true", "True"]:
-        arg = True
-    return arg
-
-
 @app.errorhandler(404)
 def page_not_found(e):
     return error_response(str(e)), 404
 
-
 @app.route('/')
 def index():
     """Main control page"""
-    return render_template('new_index.html', quick_actions=quick_actions)
-
+    return render_template('new_index.html', quick_actions=quick_actions, controllers=mc.info())
 
 @app.route('/info/<function>')
 def info(function):
@@ -127,32 +72,6 @@ def ping():
     print("Ping Data:", data)
     return create_response(data)
 
-@app.route('/test/<function>')
-def test(function):
-    if function == "1":
-        actions = [{
-            "type": "run",
-            "function": "chase",
-            "arguments": {"r": 255, "g": 200, "b": 50},
-            "framerate": 20
-        }]
-    elif function == "2":
-        actions = [{
-            "type": "run",
-            "function": "chase",
-            "arguments": {"r": 255, "g": 255, "b": 25, "direction": -1},
-            "framerate": 2
-        }]
-    elif function == "3":
-        actions = [{
-            "type": "base",
-            "function": "color",
-            "arguments": {"r": 0, "g": 0, "b": 255},
-            "framerate": 0
-        }]
-    mc.execute(actions)
-    return create_response(None)
-
 @app.route('/action', methods=['POST'])
 def action():
     mc.execute(request.get_json())
@@ -169,7 +88,6 @@ def quickaction():
 @socketio.on('connect')
 def connect():
     print("Client Connected:", request.remote_addr)
-    # socketio.emit('controller_urls', mc.get_urls(), room=request.sid)
     socketio.emit('connection_response', room=request.sid)
 
 @socketio.on('disconnect')
@@ -189,14 +107,14 @@ def socket_ping():
 def socket_info():
     info.emit(request)
 
-@socketio.on('test2')
-def testtest():
-    print("Test")
-    socketio.emit('test')
-
 @socketio.on('info_wait')
 def socket_info_wait(data):
     info.set_wait(data)
+
+@socketio.on('set_brightness')
+def set_brightness(data):
+    result = mc.set_brightness(data)
+    socketio.emit('brightness_change', result)
 
 main_config = open_yaml(args.config)
 web_config = main_config["config"]["web"]

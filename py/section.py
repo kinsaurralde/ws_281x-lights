@@ -2,7 +2,6 @@ import time
 
 class Section:
     def __init__(self, data, controller_led_count):
-        print("Section:", data)
         self.led_count = controller_led_count
         self.data = data
         self.framerate = 0

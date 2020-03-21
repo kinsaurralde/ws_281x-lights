@@ -4,14 +4,48 @@
     <title>Lights</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="../static/main/main.css">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <script src="../../../static/libs/socket.io.js"></script>
     <script src="../static/writehtml.js"></script>
-    <script src="../static/index/actions.js"></script>
     <script src="../static/sender.js"></script>
+    <script src="../static/index/actions.js"></script>
+    <script src="../static/index/controllers.js"></script>
+
 </head>
 
 <body>
     <div id="page-title">Lights</div>
 
+    <div class="section" id="controllers">
+        <div class="section-title">Controllers<input type="button" class="expand-button" value="^" style="width: 2vw;" onclick="expand('controllers','block')"></div>
+        <div class="space-1"></div>
+        <div class="section-hidden" id="controllers-expanded" style="display: block;">
+        <div class="divider"></div>
+        <div class="space-1"></div>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Brightness Slider</th>
+                <th>Cur/Max Brightness</th>
+                <th>Num Pixels</th>
+                <th>Flipped</th>
+                <th>Remote</th>
+            </tr>
+            {%for c in controllers %}
+                {% set cid = c['controller_id'] %}
+                {% set id = 'controller_' + cid + '_' %}
+                <tr>
+                    <td>{{c["controller_id"]}}</td>
+                    <td><input id="{{id}}brightness_slider" type="range" min="0" max="{{c['neopixels']['max_brightness']}}" step="1" value="{{c['neopixels']['brightness']}}" oninput="controllers.send_brightness('{{cid}}')"></td>
+                    <td><span id="{{id}}brightness">{{c["neopixels"]["brightness"]}}</span> / {{c["neopixels"]["max_brightness"]}}</td>
+                    <td>{{c["neopixels"]["num_pixels"]}}</td>
+                    <td>{{c["neopixels"]["flipped"]}}</td>
+                    <td>{{c["remote"]}}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    </div>
 
     <div class="section" id="quick">
         <div class="section-title">Quick Actions<input type="button" class="expand-button" value="^" style="width: 2vw;"
@@ -31,36 +65,35 @@
     </div>
 
     <div class="section" id="info">
-        <div class="section-title">Info<input type="button" class="expand-button" value="^" style="width: 2vw;"
+        <!-- <div class="section-title">Info<input type="button" class="expand-button" value="^" style="width: 2vw;"
                 onclick="expand('info','block')"></div>
         <div class="space-1"></div>
         <div class="section-hidden" id="info-expanded" style="display: block;">
             <div class="divider"></div>
-            <!-- <div class="space-1"></div>
-            <div class="section-title-secondary">History</div>
-            <textarea id="info-log" readonly>
-            </textarea>
-            <div class="divider"></div>
-            <div class="space-1"></div>
-            <div class="section-title-secondary">Messages</div>
-            <textarea id="info-messages" readonly>
-            </textarea>
-            <div class="divider"></div> -->
             <input type="button" value="View Code"
-                onclick="openURL('https:\/\/github.com/kinsaurralde/ws_281x-lights')">
+                onclick="openURL('https:\/\/github.com/kinsaurralde/ws_281x-lights')"> -->
             <input type="button" value="View Status" onclick="openURL('info/web')">
             <input type="button" value="View New Status" onclick="openURL('info/new_web')">
             <input type="button" value="kinsaurralde.com" onclick="openURL('https:\/\/kinsaurralde.com')">
-            <div class="divider"></div>
-        </div>
+        <!-- </div> -->
     </div>
 
     <script>
         let sender = new Sender();
         let actions = new Actions(sender);
+        let controllers = new Controllers(sender);
 
         function openURL(url) {
             window.open(url, "_blank");
+        }
+
+        function expand(id, displayType) {
+            let target = document.getElementById(id + "-expanded");
+            if (target.style.display == "none") {
+                target.style.display = displayType;
+            } else {
+                target.style.display = "none";
+            }
         }
     </script>
 

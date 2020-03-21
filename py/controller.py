@@ -7,6 +7,7 @@ from py.section import Section
 class Controller:
     def __init__(self, name_id, config, testing=False):
         self.id = name_id
+        self.config = config
         self.neo = NeoPixels(**config["neopixels"], testing=testing)
         self.base_layer = []
         self.animation_layer = []
@@ -25,7 +26,6 @@ class Controller:
     def set_strip(self, data):
         for i in data:
             self.sections[str(data[i]["virtual_id"]) + "_" + str(data[i]["section_id"])] = Section(data[i], self.neo.num_pixels())
-        print("Sections:", self.sections)
 
     def get_framerate(self):
         return self.framerate
@@ -66,17 +66,12 @@ class Controller:
         self.control_layer = data
         self._draw_frame()
 
+    def set_brightness(self, data):
+        return self.neo.set_brightness(data)
+
     def info(self):
-        data = {
-            "controller_id": 0,
-            "error": False,
-            "message": None,
-            "strip_info": [],
-            "strips": [{
-                "strip_id": 0,
-            #    "data": self.strips[0].save_split()
-            }]
-        }
+        data = {"controller_id": self.id, "remote": self.config["remote"]}
+        data["neopixels"] = self.neo.info()
         return data
 
     def _init_data(self):

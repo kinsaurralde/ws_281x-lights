@@ -97,7 +97,7 @@ input[type=text] {
 input[type=range] {
     width: 16vw;
     height: .5vw;
-    position: relative;
+    /* position: relative; */
     top: .5vw;
     -webkit-appearance: none;  /* Override default CSS styles */
     appearance: none;

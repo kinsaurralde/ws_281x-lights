@@ -8,7 +8,6 @@ from py.virtualcontroller import VirtualController
 class MultiController:
     def __init__(self, testing, config, virtual_controller_config):
         self.testing = testing
-        # self.a = Animations()
         self.controllers = {}
         self.virtual_controllers = {}
         self._init_controllers(config)
@@ -16,11 +15,11 @@ class MultiController:
 
     def _init_controllers(self, config):
         counter = 0
-        self.virtual_controllers["ALL"] = VirtualController("ALL")
+        self.virtual_controllers["ALL"] = VirtualController("ALL", False)
         for c in config["controllers"]:
             if c["active"]:
                 self.controllers[c["name"]] = Controller(c["name"], c, testing=self.testing)
-                self.virtual_controllers[c["name"]] = VirtualController(c["name"] + "_virtual")
+                self.virtual_controllers[c["name"]] = VirtualController(c["name"] + "_virtual", True)
                 self.virtual_controllers[c["name"]].add_controller_info(c["name"], 0, c["neopixels"]["led_count"], 0)
                 self.controllers[c["name"]].set_strip(self.virtual_controllers[c["name"]].get_controller_info(c["name"]))
                 self.virtual_controllers["ALL"].add_controller_info(c["name"], 0, c["neopixels"]["led_count"], 0)
@@ -28,7 +27,7 @@ class MultiController:
         
     def _init_virtual_controllers(self, config):
         for v in config["virtual_controllers"]:
-            self.virtual_controllers[v["name"]] = VirtualController(v["name"])
+            self.virtual_controllers[v["name"]] = VirtualController(v["name"], False)
             for s in v["sections"]:
                 self.virtual_controllers[v["name"]].add_controller_info(**s)
         for c in self.controllers:
@@ -51,25 +50,28 @@ class MultiController:
             data = self.virtual_controllers[vc].calc(actions)
             layers = data["layers"]
             controller_info = data["controllers"]
-            if layers.get("settings") is not None:
-                self.controllers["test"].set_settings(layers["settings"])
-            if layers.get("base") is not None:
-                for c in controller_info:
-                    if c["id"] not in self.controllers:
-                        continue
+            for c in controller_info:
+                if c["id"] not in self.controllers:
+                    continue
+                section_id = c["virtual_id"] + "_" + c["section_id"]
+                if layers.get("settings") is not None:
+                    self.controllers[c["id"]].set_settings(layers["settings"])
+                if layers.get("base") is not None:
                     self.controllers[c["id"]].set_base(layers["base"][c["offset"]:c["offset"] + c["length"]], c["start"], c["end"])
-            if layers.get("animation") is not None:
-                for c in controller_info:
-                    if c["id"] not in self.controllers:
-                        continue
-                    self.controllers[c["id"]].set_animation(layers["animation"], c["virtual_id"] + "_" + c["section_id"])
-            if layers.get("control") is not None:
-                self.controllers["test"].set_control(layers["control"])
-            if layers.get("framerate") is not None:
-                for c in controller_info:
-                    if c["id"] not in self.controllers:
-                        continue
-                    self.controllers[c["id"]].set_framerate(layers["framerate"], c["virtual_id"] + "_" + c["section_id"])
+                if layers.get("animation") is not None:
+                    self.controllers[c["id"]].set_animation(layers["animation"], section_id)
+                if layers.get("control") is not None:
+                    self.controllers[c["id"]].set_control(layers["control"])
+                if layers.get("framerate") is not None:
+                    self.controllers[c["id"]].set_framerate(layers["framerate"], section_id)
+
+    def set_brightness(self, data):
+        result = []
+        for row in data:
+            id = row["id"]
+            if id in self.controllers:
+                result.append({"id": id, "value": self.controllers[id].set_brightness(int(row["value"]))})
+        return result
 
     def pixel_info(self):
         response = []
@@ -83,6 +85,5 @@ class MultiController:
     def info(self):
         data = []
         for c in self.controllers:
-            # data.append(c.info())
-            pass
+            data.append(self.controllers[c].info())
         return data
