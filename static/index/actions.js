@@ -1,13 +1,12 @@
 class Actions {
-    constructor(sender, options=null) {
+    constructor(sender) {
         this.sender = sender;
-        this.options = options
     }
 
     send_action(action_name) {
         let json = {
             "name": action_name,
-            "options": this.options
+            "options": controllers.get_options()
         };
         this.sender.post('/quickaction', json, this.success_action);
     }

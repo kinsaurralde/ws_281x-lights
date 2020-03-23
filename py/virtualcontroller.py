@@ -15,7 +15,7 @@ class VirtualController():
         template["id"] = controller_id
         template["section_id"] = str(len(self.controller_info))
         template["start"] = start
-        template["end"] = end + 1
+        template["end"] = end
         template["offset"] = offset
         template["length"] = end - start + 1
         self.change_led_count(end - start + 1)
@@ -32,6 +32,9 @@ class VirtualController():
                 result[i["section_id"]] = i
         # print(result)
         return result
+
+    def info(self):
+        return {"vid": self.virtual_id, "real": self.real, "led_count": self.led_count, "controller_info": self.controller_info}
 
     def calc(self, actions):
         return {"layers": self.a.calc(actions), "controllers": self.controller_info}

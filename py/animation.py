@@ -38,9 +38,9 @@ class Animations:
                 self.layers["animation"].extend(self._get_function(action["function"], action.get("arguments")))
                 self.layers["framerate"] = action.get("framerate", 0)
             elif action["type"] == "base":
-                self.layers["base"] = self._get_function(action["function"], action["arguments"])[0]
+                self.layers["base"] = self._get_function(action["function"], action.get("arguments"))[0]
             elif action["type"] == "control":
-                self.layers["control"] = self._get_function(action["function"], action["arguments"])[0] 
+                self.layers["control"] = self._get_function(action["function"], action.get("arguments"))[0] 
             elif action["type"] == "setting":
                 self.layers["settings"] = self._get_settings(action["options"])
         # print(self.layers)

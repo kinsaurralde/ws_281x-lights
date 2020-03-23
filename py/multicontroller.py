@@ -20,9 +20,9 @@ class MultiController:
             if c["active"]:
                 self.controllers[c["name"]] = Controller(c["name"], c, testing=self.testing)
                 self.virtual_controllers[c["name"]] = VirtualController(c["name"] + "_virtual", True)
-                self.virtual_controllers[c["name"]].add_controller_info(c["name"], 0, c["neopixels"]["led_count"], 0)
+                self.virtual_controllers[c["name"]].add_controller_info(c["name"], 0, c["neopixels"]["led_count"] - 1, 0)
                 self.controllers[c["name"]].set_strip(self.virtual_controllers[c["name"]].get_controller_info(c["name"]))
-                self.virtual_controllers["ALL"].add_controller_info(c["name"], 0, c["neopixels"]["led_count"], 0)
+                self.virtual_controllers["ALL"].add_controller_info(c["name"], 0, c["neopixels"]["led_count"] - 1, 0)
                 counter += 1
         
     def _init_virtual_controllers(self, config):
@@ -37,19 +37,22 @@ class MultiController:
     def _get_options(self, options):
         virtual_controllers = ["middle_half"]
         if options is not None:
-            if "strips" in options:
-                virtual_controllers = options["strips"]
+            if "virtual_controllers" in options:
+                virtual_controllers = options["virtual_controllers"]
         return {"virtual_controllers": virtual_controllers}
 
     def execute(self, actions, options={}):
         options = self._get_options(options)
         vcontrollers = options["virtual_controllers"]
+        print("V", vcontrollers)
         for vc in vcontrollers:
-            if vc not in self.virtual_controllers:
+            if vc not in self.virtual_controllers and vc + "_virtual" not in self.virtual_controllers:
+                print("CONTINUE")
                 continue
             data = self.virtual_controllers[vc].calc(actions)
             layers = data["layers"]
             controller_info = data["controllers"]
+            print("Contorller info", vc, controller_info)
             for c in controller_info:
                 if c["id"] not in self.controllers:
                     continue
@@ -57,7 +60,7 @@ class MultiController:
                 if layers.get("settings") is not None:
                     self.controllers[c["id"]].set_settings(layers["settings"])
                 if layers.get("base") is not None:
-                    self.controllers[c["id"]].set_base(layers["base"][c["offset"]:c["offset"] + c["length"]], c["start"], c["end"])
+                    self.controllers[c["id"]].set_base(layers["base"][c["offset"]:c["offset"] + c["length"]], c["start"], c["end"] + 1)
                 if layers.get("animation") is not None:
                     self.controllers[c["id"]].set_animation(layers["animation"], section_id)
                 if layers.get("control") is not None:
@@ -86,4 +89,10 @@ class MultiController:
         data = []
         for c in self.controllers:
             data.append(self.controllers[c].info())
+        return data
+
+    def vinfo(self):
+        data = []
+        for v in self.virtual_controllers:
+            data.append(self.virtual_controllers[v].info())
         return data

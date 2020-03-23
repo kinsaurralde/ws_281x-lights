@@ -52,7 +52,7 @@ def page_not_found(e):
 @app.route('/')
 def index():
     """Main control page"""
-    return render_template('new_index.html', quick_actions=quick_actions, controllers=mc.info())
+    return render_template('new_index.html', quick_actions=quick_actions, controllers=mc.info(), vcontrollers=mc.vinfo())
 
 @app.route('/info/<function>')
 def info(function):
