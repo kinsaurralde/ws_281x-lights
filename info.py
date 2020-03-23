@@ -22,11 +22,7 @@ class Info:
                 return
             if time.time() > end_time - count * self.wait:
                 continue
-            pixel_info = self.c.pixel_info()
-            if self.remote:
-                pixel_info = [pixel_info]
-            for i in pixel_info:
-                self.sio.emit('info_response', i)
+            self.sio.emit('info_response', self.c.pixel_info())
             while time.time() < end_time - count * self.wait:
                 self.sio.sleep(.001)
             

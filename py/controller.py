@@ -43,6 +43,9 @@ class Controller:
         data = self.neo.get_pixels()
         return data
 
+    def get_id(self):
+        return self.id
+
     def set_settings(self, settings):
         for setting in settings:
             if setting == "on":
@@ -68,6 +71,9 @@ class Controller:
 
     def set_brightness(self, data):
         return self.neo.set_brightness(data)
+
+    def get_brightness(self):
+        return self.neo.get_brightness()
 
     def info(self):
         data = {"controller_id": self.id, "remote": self.config["remote"]}
@@ -115,6 +121,7 @@ class Controller:
     def _draw_frame(self):
         if self.counter < len(self.animation_layer):
             # self._draw_animation()
+            # print(self.neo.num_pixels())
             self.neo.update_pixels(self._layer(self.base_layer, self._draw_animation(), self.control_layer))
             self.neo.show(20)
     

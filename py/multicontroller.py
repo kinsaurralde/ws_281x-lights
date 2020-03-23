@@ -22,7 +22,7 @@ class MultiController:
                 self.virtual_controllers[c["name"]] = VirtualController(c["name"] + "_virtual", True)
                 self.virtual_controllers[c["name"]].add_controller_info(c["name"], 0, c["neopixels"]["led_count"] - 1, 0)
                 self.controllers[c["name"]].set_strip(self.virtual_controllers[c["name"]].get_controller_info(c["name"]))
-                self.virtual_controllers["ALL"].add_controller_info(c["name"], 0, c["neopixels"]["led_count"] - 1, 0)
+                self.virtual_controllers["ALL"].add_controller_info(c["name"], 0, c["neopixels"]["led_count"] - 1, self.virtual_controllers["ALL"].get_led_count())
                 counter += 1
         
     def _init_virtual_controllers(self, config):
@@ -76,11 +76,16 @@ class MultiController:
                 result.append({"id": id, "value": self.controllers[id].set_brightness(int(row["value"]))})
         return result
 
+    def get_brightness(self):
+        result = []
+        for c in self.controllers:
+           result.append({"id": c, "value": self.controllers[c].get_brightness()})
+        return result 
+
     def pixel_info(self):
         response = []
         for i in self.controllers:
-            info = {}
-            info["strip_info"] = [{"id": 0, "start": 0, "end": self.controllers[i].num_pixels() - 1}]
+            info = {"controller_id": self.controllers[i].get_id()}
             info["pixels"] = self.controllers[i].get_pixels()
             response.append(info)
         return response

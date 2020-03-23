@@ -8,7 +8,6 @@ class Info {
             this.has_table = true;
         }
         this.display = new Display(controller_div_id);
-        this.display.setup(init_data());
         this.url = "http://" + location.host;
         this.s = io();
         this.r = new Array();
@@ -29,12 +28,11 @@ class Info {
             console.debug("Renew Info");
             self.refresh();
         });
-        this.s.on('controller_urls', function(data) {
-            console.debug("Recieved controller URLS:", data);
-            self._addControllers(data);
+        this.s.on('brightness_change', function(data) {
+            self.display.set_brightness(data);
         });
         this.refresh();
-
+        this.s.emit('set_brightness', []);
         this.times = new Array(0);
     }
 
@@ -255,6 +253,5 @@ function init_data(r = 0, g = 0, b = 0) {
     for (let i = 0; i < 60; i++) {
         data["pixels"][i] = {"r": 0, "g": 0, "b": 0};
     }
-    console.log(data)
     return data
 }

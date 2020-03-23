@@ -94,10 +94,11 @@ class HTMLWriter {
         return slider;
     }
 
-    create125Text(text) {
+    create125Text(text, id=null) {
         let div = document.createElement('div');
         div.className = "text-1-25";
         div.innerText = text;
+        div.id = id;
         return div;
     }
 

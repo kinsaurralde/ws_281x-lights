@@ -17,7 +17,7 @@ config:
     settings:
       initial_brightness: 200
   - name: remote_test
-    active: false
+    active: true
     remote: true
     url: url.com
     neopixels:
@@ -26,6 +26,6 @@ config:
       pin: 18
       max_watts: 10
       grb: false
-      flipped: false
+      flipped: true
     settings:
       initial_brightness: 200

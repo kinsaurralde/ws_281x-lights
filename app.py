@@ -105,6 +105,7 @@ def socket_ping():
 
 @socketio.on('info')
 def socket_info():
+    socketio.emit('brightness_change', mc.get_brightness())
     info.emit(request)
 
 @socketio.on('info_wait')

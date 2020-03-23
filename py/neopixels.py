@@ -69,6 +69,8 @@ class NeoPixels:
     def update_pixels(self, data):
         if len(data) < self.led_count:
             return -1
+        if len(data) > self.led_count:
+            data = data[0:self.led_count]
         if self.flipped:
             data = list(reversed(data))
         for i in range(0, self.led_count):

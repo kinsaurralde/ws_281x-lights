@@ -25,6 +25,9 @@ class VirtualController():
         self.led_count += amount
         self.a.set_led_count(self.led_count)
 
+    def get_led_count(self):
+        return self.led_count
+
     def get_controller_info(self, id):
         result = {}
         for i in self.controller_info:
