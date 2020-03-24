@@ -18,8 +18,7 @@ class Controller:
         self.active = True
         self.paused = False
         self.starttime = time.time()
-        # self.framerate = 60
-        self.wait_time = 8
+        self.wait_time = 8  # 125 per second
         self._init_data()
         self._start_loop()
 
@@ -50,23 +49,17 @@ class Controller:
         for setting in settings:
             if setting == "on":
                 self.on = bool(settings[setting])
-        # print(settings, self.on)
 
-    def set_base(self, data, start=0, end=None):
-        if end is None:
-            end = self.neo.num_pixels()
-        if not self._valid_range(start, end):
-            return 
-        self.base_layer[start:end] = self._layer(self.base_layer[start:end], data[0:end-start])
+    def set_base(self, data, vs_id):
+        self.sections[vs_id].set_base(data)
         self._draw_frame()
-        # print("Base Layer is now", self.base_layer)
 
     def set_animation(self, data, vs_id):
         if len(data) > 0:
             self.sections[vs_id].set_animation(data)
 
-    def set_control(self, data):
-        self.control_layer = data
+    def set_control(self, data, vs_id):
+        self.sections[vs_id].set_control(data)
         self._draw_frame()
 
     def set_brightness(self, data):
@@ -123,8 +116,6 @@ class Controller:
 
     def _draw_frame(self):
         if self.counter < len(self.animation_layer):
-            # self._draw_animation()
-            # print(self.neo.num_pixels())
             self.neo.update_pixels(self._layer(self.base_layer, self._draw_animation(), self.control_layer))
             self.neo.show(20)
     

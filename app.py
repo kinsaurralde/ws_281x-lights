@@ -8,7 +8,6 @@ from flask import Flask, render_template, json, request, send_from_directory
 from flask_socketio import SocketIO
 from info import Info
 from py.multicontroller import MultiController
-from saves import Saves
 
 try:
     import yaml # 3.6
@@ -17,7 +16,6 @@ except:
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins = '*')
-debug_exceptions = False  # if true, exception will be sent to web
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-d', '--debug', action='store_true', help='Debug mode', default=False)
@@ -80,7 +78,6 @@ def action():
 @app.route('/quickaction', methods=['POST'])
 def quickaction():
     recieved = request.get_json(force=True)
-    print("Quick actions recieved", recieved)
     if recieved["name"] in quick_actions["actions"]:
         mc.execute(quick_actions["actions"][recieved["name"]]["actions"], recieved["options"])
     return create_response({"recieved": recieved})

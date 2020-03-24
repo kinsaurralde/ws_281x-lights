@@ -43,7 +43,7 @@ class Animations:
                 self.layers["control"] = self._get_function(action["function"], action.get("arguments"))[0] 
             elif action["type"] == "setting":
                 self.layers["settings"] = self._get_settings(action["options"])
-        # print(self.layers)
+        print(self.layers)
         return self.layers
 
     def _reset_layers(self):
@@ -69,7 +69,8 @@ class Animations:
             return self._wipe(**arguments)
         elif function == "reset":
             self.layers["base"] = self._set_all(0)[0]
-            self.layers["animation"].extend(self._set_all(-1))
+            # self.layers["animation"].extend(self._set_all(-1))
+            self.layers["animation"] = [[self._get_blank(),'']]
             return self._set_all(-1)
         else:
             return self._set_all(0)
@@ -80,7 +81,6 @@ class Animations:
             settings[option] = options[option]
             if option == "on":
                 self.layers["control"] = self._set_all(-1 if options[option] else 0)[0]
-        print(self.layers["control"])
         return settings
 
     def _set_all(self, r, g=None, b=None):
@@ -109,7 +109,7 @@ class Animations:
                 if j % each == 0:
                     current_color = self._get_random_color()
                 frame[j] = current_color
-            frames.extend([frame] * frame_delay)
+            frames.extend([[frame, []]] * frame_delay)
         return frames
 
     def _chase(self, r, g, b, interval=5, direction=1):
@@ -123,7 +123,7 @@ class Animations:
                 if i + q >= self.led_count:
                     break
                 frame[i + q] = self._get_color(r, g, b)
-            frames.append(frame)
+            frames.append(self._make_frame(frame))
         return frames
 
     def _mix_switch(self, colors, instant=False):
@@ -143,7 +143,7 @@ class Animations:
                 for i in range(0, self.led_count):
                     frame[i] = self._get_mix(colors[k], colors[k+1], percent)
                 percent += 1
-                frames.append(frame)
+                frames.append(self._make_frame(frame))
         return frames
 
     def _pulse(self, r, g, b, direction=1, length=5):
@@ -169,7 +169,7 @@ class Animations:
             lower_index = max(j, 0)
             upper_index = min(i, self.led_count)
             frame[lower_index:upper_index] = [self._get_color(r, g, b)] * abs(lower_index - upper_index)
-            frames.append(frame)
+            frames.append(self._make_frame(frame))
         return frames
 
     def _bounce(self, colors, length=5, direction=1):
@@ -211,7 +211,8 @@ class Animations:
         for i, j in enumerate(iter_range):
             frame = self._set_all(-1)[0]
             frame[start:j:direction] = [self._get_color(r, g, b)] * (i + 1)
-            frames.append(frame)
+            frames.append(self._make_frame(frame))
+        frames[len(frames) - 1][1].append("animation_to_base")
         return frames
 
     def _get_color(self, r, g, b):
@@ -269,7 +270,8 @@ class Animations:
             b = random.randint(0, 127) * 2
         return self._get_color(r, g, b)
 
-    def _get_blank(self, length=None):
-        if length is None:
-            return [-1] * self.led_count
-        return [-1] * length
+    def _make_frame(self, data):
+        return [data, []]
+
+    def _get_blank(self):
+        return [-1] * self.led_count

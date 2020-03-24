@@ -33,7 +33,6 @@ class VirtualController():
         for i in self.controller_info:
             if i["id"] == id:
                 result[i["section_id"]] = i
-        # print(result)
         return result
 
     def info(self):
