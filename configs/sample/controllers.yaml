@@ -8,7 +8,7 @@ config:
     remote: false
     url: 
     neopixels:
-      led_count: 60
+      led_count: 120
       max_brightness: 255
       pin: 18
       max_watts: 50
@@ -20,12 +20,13 @@ config:
   - name: remote_test
     active: true
     remote: true
-    url: url.com
+    # url: localhost:5000
+    url: rpi3.kinsaurralde.com:5000
     neopixels:
-      led_count: 30
+      led_count: 60
       max_brightness: 255
       pin: 18
-      max_watts: 10
+      max_watts: 18
       watts_per_60: 18
       grb: false
       flipped: true

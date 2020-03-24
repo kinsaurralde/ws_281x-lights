@@ -3,6 +3,7 @@ import time
 # import socketio
 
 from py.controller import Controller
+from py.remote_controller import RemoteController
 from py.virtualcontroller import VirtualController
 
 class MultiController:
@@ -17,7 +18,10 @@ class MultiController:
         self.virtual_controllers["ALL"] = VirtualController("ALL", False)
         for c in config["controllers"]:
             if c["active"]:
-                self.controllers[c["name"]] = Controller(c["name"], c, testing=self.testing)
+                controller = Controller(c["name"], c, testing=self.testing)
+                if c["remote"]:
+                    controller = RemoteController(c["name"], c, testing=self.testing)
+                self.controllers[c["name"]] = controller
                 self.virtual_controllers[c["name"]] = VirtualController(c["name"] + "_virtual", True)
                 self.virtual_controllers[c["name"]].add_controller_info(c["name"], 0, c["neopixels"]["led_count"] - 1, 0)
                 self.controllers[c["name"]].set_strip(self.virtual_controllers[c["name"]].get_controller_info(c["name"]))
@@ -98,4 +102,18 @@ class MultiController:
         data = []
         for v in self.virtual_controllers:
             data.append(self.virtual_controllers[v].info())
+        return data
+
+    def ping(self):
+        data = []
+        for c in self.controllers:
+            info = {"controller_id": c}
+            start = time.time()
+            mid = self.controllers[c].ping()
+            end = time.time()
+            info["start"] = start
+            info["mid"] = mid
+            info["end"] = end
+            info["ping"] = end - start
+            data.append(info)
         return data

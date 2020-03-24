@@ -43,7 +43,6 @@ class Animations:
                 self.layers["control"] = self._get_function(action["function"], action.get("arguments"))[0] 
             elif action["type"] == "setting":
                 self.layers["settings"] = self._get_settings(action["options"])
-        print(self.layers)
         return self.layers
 
     def _reset_layers(self):

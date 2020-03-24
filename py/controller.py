@@ -32,9 +32,6 @@ class Controller:
     def set_framerate(self, value, vs_id):
         self.sections[vs_id].set_framerate(value)
 
-    def next_frame(self):
-        self.starttime = time.time()
-
     def num_pixels(self):
         return self.neo.num_pixels()
 
@@ -76,6 +73,9 @@ class Controller:
         data["neopixels"] = self.neo.info()
         return data
 
+    def ping(self):
+        return time.time()
+
     def _init_data(self):
         self.base_layer = [0] * self.neo.num_pixels()
         self.animation_layer.append([])
@@ -102,7 +102,7 @@ class Controller:
     def _sleep(self, amount):
         self.starttime += (amount / 1000)
         while time.time() < self.starttime:
-            time.sleep(.0025)
+            time.sleep(.003)
 
     def _start_loop(self):
         threading_thread = threading.Thread(target=self._loop)
@@ -127,4 +127,3 @@ class Controller:
                 self.counter = (self.counter + 1) % len(self.animation_layer)
                 self._draw_frame()
             self._sleep(self.wait_time)
-
