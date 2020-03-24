@@ -85,9 +85,11 @@ class MultiController:
     def pixel_info(self):
         response = []
         for i in self.controllers:
-            info = {"controller_id": self.controllers[i].get_id()}
-            info["pixels"] = self.controllers[i].get_pixels()
-            response.append(info)
+            response.append({
+                "controller_id": self.controllers[i].get_id(),
+                "pixels": self.controllers[i].get_pixels(),
+                "watts": self.controllers[i].get_power_usage()
+            })
         return response
 
     def info(self):

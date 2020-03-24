@@ -34,7 +34,6 @@ class Display {
     }
 
     set_brightness(data) {
-        console.log("DAAT", data, this);
         for (let i in data) {
             if (data[i]["id"] in this.controllers) {
                 this.controllers[data[i]["id"]].set_brightness(data[i]["value"]);
@@ -92,6 +91,7 @@ class Controller {
     set(data) {
         if (this.div_should_update.checked) {
             this.strip.set(data["pixels"]);
+            this.div_power.innerText = data["watts"].toFixed(3);
         }
     }
 };

@@ -8,7 +8,7 @@ settings:
     - title: 'Animations'
       buttons: ['clear_animation', 'blue_chase_1', 'mix_1', 'rgb_wipe_1', 'red_pulse_1', 'green_pulse_1', 'rcgmby_bounce_1', 'random_cycle']
     - title: 'Base Layer'
-      buttons: ['black_base', 'red_base', 'green_base', 'blue_base', 'white_base', 'random_base']
+      buttons: ['black_base', 'red_base', 'green_base', 'blue_base', 'yellow_base', 'cyan_base', 'magenta_base', 'white_base', 'random_base']
 inactive:
   - test
 actions:
@@ -162,6 +162,33 @@ actions:
       function: color
       arguments:
         r: 0
+        g: 0
+        b: 255
+  'yellow_base':
+    display: 'Yellow'
+    actions:
+    - type: base
+      function: color
+      arguments:
+        r: 255
+        g: 255
+        b: 0
+  'cyan_base':
+    display: 'Cyan'
+    actions:
+    - type: base
+      function: color
+      arguments:
+        r: 0
+        g: 255
+        b: 255
+  'magenta_base':
+    display: 'Magenta'
+    actions:
+    - type: base
+      function: color
+      arguments:
+        r: 255
         g: 0
         b: 255
   'black_base':

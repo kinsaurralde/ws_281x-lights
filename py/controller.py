@@ -75,6 +75,9 @@ class Controller:
     def get_brightness(self):
         return self.neo.get_brightness()
 
+    def get_power_usage(self):
+        return self.neo.get_power_usage(False)
+
     def info(self):
         data = {"controller_id": self.id, "remote": self.config["remote"]}
         data["neopixels"] = self.neo.info()

@@ -12,6 +12,7 @@ config:
       max_brightness: 255
       pin: 18
       max_watts: 50
+      watts_per_60: 18
       grb: false
       flipped: false
     settings:
@@ -25,6 +26,7 @@ config:
       max_brightness: 255
       pin: 18
       max_watts: 10
+      watts_per_60: 18
       grb: false
       flipped: true
     settings:

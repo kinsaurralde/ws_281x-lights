@@ -20,13 +20,16 @@ PROVIDED_WATTS = 1
 VOLTAGE = 5
 
 class NeoPixels:
-    def __init__(self, led_count=60, max_brightness=255, pin=18, max_watts=1, grb=False, testing=True, flipped=True):
+    def __init__(self, led_count=60, max_brightness=255, pin=18, max_watts=1, watts_per_60=18, grb=False, testing=True, flipped=True):
         # Configuration Settings
         self.led_count = led_count
         self.max_brightness = max_brightness
         self.pin = pin
         self.grb = grb
         self.max_watts = max_watts
+        self.watts_per_60 = watts_per_60
+        self.watts_per_led = (self.watts_per_60 / 60)
+        self.power_usage = 0
         self.testing = testing
         self.flipped = flipped
         self.led_channel = self.pin in [13, 19, 41, 45, 53]
@@ -66,6 +69,19 @@ class NeoPixels:
     def get_pixels(self):
         return self.led_data
 
+    def check_power_usage(self):
+        total_color = 0
+        for i in range(self.led_count):
+            pixel_color = self._get_color_seperate(self.led_data[i])
+            total_color += pixel_color[0] + pixel_color[1] + pixel_color[2]
+        total_color = (total_color / 765) * self.watts_per_led
+        return total_color * (self.brightness / 255)
+
+    def get_power_usage(self, refresh=True):
+        if refresh:
+            self.power_usage = self.check_power_usage()
+        return self.power_usage
+
     def update_pixels(self, data):
         if len(data) < self.led_count:
             return -1
@@ -78,13 +94,22 @@ class NeoPixels:
                 self.led_data[i] = data[i]
 
     def show(self, limit=0):
-        # print("Showing:", self.led_data) 
-        if not self.testing:
-            if time.time() >= self.last_show + (limit / 1000) or limit == 0:
+        if time.time() >= self.last_show + (limit / 1000) or limit == 0:
+            self.get_power_usage(True)
+            if not self.testing:
                 for i in range(self.led_count):
                     self.strip.setPixelColor(i, self.led_data[i])
                 self.strip.show()
-                self.last_show = time.time()
+            self.last_show = time.time()
 
-if __name__ == "__main__":
-    neo = NeoPixels(60, 255, 18, True, True)
+    def _get_color_seperate(self, value):
+        """Seperates colors into rgb from single value
+            Parameters:
+                value: value of color to seperate
+        """
+        r = (value >> 16) & 0xFF
+        g = (value >> 8) & 0xFF
+        b = value & 0xFF
+        if self.grb:
+            return (g, r, b)
+        return (r, g, b)

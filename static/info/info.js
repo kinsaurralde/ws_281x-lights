@@ -61,9 +61,9 @@ class Info {
     }
 
     _updateDisplay(data) {
-        if (data["controller_id"] < this.times.length) {
-            this.times[data["controller_id"]].record();
-        }
+        // if (data["controller_id"] < this.times.length) {
+        //     this.times[data["controller_id"]].record();
+        // }
         if (this.update) {
             this.display.set(data)
         }
