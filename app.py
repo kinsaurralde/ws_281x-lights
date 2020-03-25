@@ -57,7 +57,7 @@ def info(function):
     if function == "web":
         return render_template('info.html')
     elif function == "new_web":
-        return render_template('new_info.html')
+        return render_template('new_info.html', controllers=mc.info())
     elif function == "get":
         data = mc.info()
         return create_response(data)
@@ -65,9 +65,8 @@ def info(function):
         return page_not_found("Info function not found")
 
 @app.route('/ping')
-def ping():
+def ping_http():
     data = mc.ping()
-    print("Ping Data:", data)
     return create_response(data)
 
 @app.route('/action', methods=['POST'])
@@ -91,14 +90,9 @@ def connect():
 def disconnect():
     print('Client Disconnected')
 
-@socketio.on('get_id')
-def get_id():
-    mc.emit_id()
-
-@socketio.on('ping1')
-def socket_ping():
-    return None
-    return info.ping(request)
+@socketio.on('webping')
+def ping_web():
+    return
 
 @socketio.on('info')
 def socket_info():

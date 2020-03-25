@@ -36,14 +36,20 @@ class RemoteController(Controller):
         self.connected = False
 
     def _ping_response(self, data):
-        print("Ping response")
         self.ping_wait = False
         self.ping_mid = data["mid_time"]
 
+    def _emit_response(self, start_time):
+        print("Emit Calledback", (time.time() - start_time) * 1000)
+
     def _emit(self, message, data):
-        emit_data = {"data": data, "info": {}}
-        emit_data["info"]["version"] = "test"
-        self.sio.emit(message, emit_data)
+        if self.connected:
+            emit_data = {"data": data, "info": {}}
+            emit_data["info"]["version"] = "test"
+            start_time = time.time()
+            self.sio.emit(message, emit_data, self._emit_response(start_time))
+        else:
+            self._connect()
 
     def ping(self):
         self.ping_wait = True
@@ -52,6 +58,7 @@ class RemoteController(Controller):
         while self.ping_wait:
             time.sleep(0.001)
             if time.time() > pingtimeout:
+                self.connected = False
                 print("Ping to", self.url, "timed out")
                 return 0
         return self.ping_mid

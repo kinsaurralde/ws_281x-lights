@@ -14,6 +14,7 @@ class Info {
         this.update = true;
         this.ping_data = new Array();
         this.num_controllers = 1;
+        this.div_webping = document.getElementById("webping");
 
         let self = this;
         this.s.on('connection_response', function() {
@@ -125,10 +126,10 @@ class Info {
         request.open('GET', path, true);
         request.onload = function () {
             if (this.status >= 200 && this.status < 400) {
-                console.debug("Responded in", Date.now() - start_time);
+                console.log("Responded in", Date.now() - start_time, "ms");
                 let data = JSON.parse(this.response);
-                console.debug("Recieved Data:", data);
-                self._updateTable(data);
+                console.log("Recieved Data:", data);
+                self._ping_recieve(data);
             } else {
                 console.log("There was an error");
             }
@@ -140,41 +141,37 @@ class Info {
     }
 
     _ping_send() {
-        this.ping_data = Array(this.num_controllers);
-        this.ping_data.fill(Date.now());
-        let start_time = Date.now();
-        let self = this;
-        this.s.emit('ping1', function(data) {
-            self._ping_recieve(data, start_time, Date.now());
-        });
-        for (let i = 0; i < this.r.length; i++) {
-            start_time = Date.now();
-            this.r[i]["io"].emit('ping1', function(data) {
-                self._ping_recieve(data, start_time, Date.now());
-            });
-        }
-    }
-
-    _ping_recieve(data, start_time, end_time) {
-        //console.debug("Recieved Data", start_time, end_time, data);
-        // for (let i = 0; i < data.length; i++) {
-        //     let id = data[i]["controller_id"];
-        //     this.table.rows[id + 1].cells[7].innerText = end_time - start_time;
+        // this.ping_data = Array(this.num_controllers);
+        // this.ping_data.fill(Date.now());
+        // let start_time = Date.now();
+        // let self = this;
+        // this.s.emit('ping1', function(data) {
+        //     self._ping_recieve(data, start_time, Date.now());
+        // });
+        // for (let i = 0; i < this.r.length; i++) {
+        //     start_time = Date.now();
+        //     this.r[i]["io"].emit('ping1', function(data) {
+        //         self._ping_recieve(data, start_time, Date.now());
+        //     });
         // }
     }
 
+    _ping_recieve(data) {
+        this.display.ping_recieve(data);
+    }
+
     refreshTable() {
-        this._send("/info/get");
-        this._ping_send();
+        //this._send("/info/get");
+        //this._ping_send();
     }
 
     refresh() {
         this.refreshTable();
         if (this.update) {
             this.s.emit('info');
-            for (let i = 0; i < this.r.length; i++) {
-                this.r[i]["io"].emit('info');
-            }
+            // for (let i = 0; i < this.r.length; i++) {
+            //     this.r[i]["io"].emit('info');
+            // }
         }
     }
 
@@ -199,6 +196,15 @@ class Info {
 
     setUpdate(val) {
         this.update = val;
+    }
+
+    ping() {
+        let self = this;
+        let start_time = Date.now();
+        this.s.emit('webping', function() {
+            self.div_webping.innerText = Date.now() - start_time;
+        });
+        this._send('/ping');
     }
 };
 

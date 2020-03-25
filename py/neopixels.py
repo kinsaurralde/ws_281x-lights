@@ -43,6 +43,7 @@ class NeoPixels:
             self.led_count, self.pin, LED_FREQ_HZ, LED_DMA, LED_INVERT, self.max_brightness, self.led_channel)
         if not self.testing:
             self.strip.begin()
+        self.active = True
 
     def info(self):
         return {

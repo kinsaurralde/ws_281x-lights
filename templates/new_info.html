@@ -20,14 +20,19 @@
         <div class="space-s-1"></div>
         <input type="checkbox" onclick="info.toggleUpdate('info-enabled')" id="info-enabled" checked>
         <div class="v-divider"></div>
-        <input type="button" value="Refresh Table" onclick="info.refresh()">
+        <div class="text-1-25">Ping:</div>
+        <div class="space-s-1"></div>
+        <div class="text-1-25"><span id="webping"> --- </span> ms</div>
+        <div class="space-s-1"></div>
+        <input type="button" value="Test" onclick="info.ping()">
+        <!-- <input type="button" value="Refresh Table" onclick="info.refresh()">
         <div class="space-s-1"></div>
         <input type="button" value="Reconnect Pixels" onclick="info.refresh()">
-        <div class="v-divider"></div>
+        <div class="v-divider"></div> -->
         <!-- <input type="button" value="History" onclick="info.get_history()"> -->
-        <div class="text-1-25">Web Key:</div>
+        <!-- <div class="text-1-25">Web Key:</div>
         <div class="space-s-1"></div>
-        <input type="text" class="width-5" id="info-table-webkey">
+        <input type="text" class="width-5" id="info-table-webkey"> -->
     </div>
     <div class="divider"></div>
     <div class="space-1"></div>
@@ -35,16 +40,17 @@
         <tr>
             <th>Controller id</th>
             <th>Power Usage (W)</th>
-            <th>Power Supply Max</th>
             <th>Brightness</th>
             <th>Num Pixels</th>
-            <th>Num Strips</th>
-            <th>Controller Response (ms)</th>
-            <th>Reponse (ms)</th>
-            <th>Enabled / Connected</th>
-            <th>Enable</th>
-            <th>Disable</th>
         </tr>
+        {% for c in controllers %}
+           <tr>
+               <td>{{c['controller_id']}}</td>
+               <td><span id="table_{{c['controller_id']}}_power">---</span> / {{c['neopixels']['max_watts']}}</td>
+               <td><span id="table_{{c['controller_id']}}_brightness">---</span> / {{c['neopixels']['max_brightness']}}</td>
+               <td>{{c['neopixels']['num_pixels']}}</td>    
+           </tr>
+        {% endfor %}
     </table>
     <div class="divider"></div>
     <div id="controllers">

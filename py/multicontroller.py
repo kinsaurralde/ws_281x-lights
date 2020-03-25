@@ -114,6 +114,6 @@ class MultiController:
             info["start"] = start
             info["mid"] = mid
             info["end"] = end
-            info["ping"] = end - start
+            info["ping"] = (end - start) * 1000
             data.append(info)
         return data
