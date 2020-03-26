@@ -38,11 +38,18 @@ def index():
 def connect():
     print("Client Connected:", request.remote_addr)
     socketio.emit('connection_response', room=request.sid)
+    if controller is not None:
+        controller.set_settings([{"on": True}])
+        controller.set_control([-1] * controller.num_pixels(), controller.id + "_virtual_0")
 
 @socketio.on('disconnect')
 def disconnect():
     print("Client Disconnected:", request.remote_addr)
     socketio.emit('disconnect_response', room=request.sid)
+    if controller is not None:
+        print("OFF")
+        controller.set_settings([{"on": False}])
+        controller.set_control([0] * controller.num_pixels(), controller.id + "_virtual_0")
 
 @socketio.on('setup_controller')
 def setup_controller(data):

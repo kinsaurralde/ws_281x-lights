@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Info</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="../../../static/main/main.css">
+    <script src="../../../static/info.js"></script>
+    <script src="../../../static/main/pixel.js"></script>
+</head>
+
+<body>
+    <div id="page-title">Info</div>
+    <div class="space-1"></div>
+    <div class="divider"></div>
+    <input type="button" value="Refresh" onclick="info.refresh()">
+    <input type="button" value="History" onclick="info.get_history()">
+    <input type="text" value="" id="webkey-value">
+    <div class="space-1"></div>
+    <table id="info-table">
+        <tr>
+            <th>Controller id</th>
+            <th>Power Usage (Watts)</th>
+            <th>Power Supply Max</th>
+            <th>Brightness</th>
+            <th>Num Pixels</th>
+            <th>Num Strips</th>
+            <th>Ping (ms)</th>
+            <th>Enabled / Connected</th>
+            <th>Enable</th>
+            <th>Disable</th>
+        </tr>
+    </table>
+    <div class="divider"></div>
+    <div id="controllers">
+    </div>
+</body>
+<script>
+    var info = new Info();
+</script>
+
+</html>

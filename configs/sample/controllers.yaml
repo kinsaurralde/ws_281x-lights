@@ -20,8 +20,8 @@ config:
   - name: remote_test
     active: true
     remote: true
-    url: localhost:5000
-    # url: rpi3.kinsaurralde.com:5000
+    # url: localhost:5000
+    url: rpi3.kinsaurralde.com:5000
     neopixels:
       led_count: 60
       max_brightness: 255

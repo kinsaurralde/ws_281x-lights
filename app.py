@@ -50,14 +50,12 @@ def page_not_found(e):
 @app.route('/')
 def index():
     """Main control page"""
-    return render_template('new_index.html', quick_actions=quick_actions, controllers=mc.info(), vcontrollers=mc.vinfo())
+    return render_template('index.html', quick_actions=quick_actions, controllers=mc.info(), vcontrollers=mc.vinfo(), colors=default_colors)
 
 @app.route('/info/<function>')
 def info(function):
     if function == "web":
-        return render_template('info.html')
-    elif function == "new_web":
-        return render_template('new_info.html', controllers=mc.info())
+        return render_template('info.html', controllers=mc.info())
     elif function == "get":
         data = mc.info()
         return create_response(data)
@@ -71,7 +69,8 @@ def ping_http():
 
 @app.route('/action', methods=['POST'])
 def action():
-    mc.execute(request.get_json())
+    data = request.get_json()
+    mc.execute(data["actions"], data["options"])
     return create_response(None)
 
 @app.route('/quickaction', methods=['POST'])
@@ -108,12 +107,17 @@ def set_brightness(data):
     result = mc.set_brightness(data)
     socketio.emit('brightness_change', result)
 
+@socketio.on('action')
+def socket_action(data):
+    mc.execute(data["actions"], data["options"])
+
 main_config = open_yaml(args.config)
 web_config = main_config["config"]["web"]
 config_paths = main_config["config"]["config_paths"]
 controller_config = open_yaml(config_paths["controllers"])
 quick_actions = open_yaml(config_paths["quick_actions"])
 v_controller_config = open_yaml(config_paths["virtual_controllers"])
+default_colors = open_yaml(config_paths["colors"])
 
 mc = MultiController(testing=args.test, config=controller_config["config"], virtual_controller_config=v_controller_config["config"])
 info = Info(socketio, mc)
