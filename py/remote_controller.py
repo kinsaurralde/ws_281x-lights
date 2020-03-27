@@ -40,9 +40,10 @@ class RemoteController(Controller):
         self.ping_mid = data["mid_time"]
 
     def _emit_response(self, start_time):
-        print("Emit Calledback", (time.time() - start_time) * 1000)
+        pass
 
     def _emit(self, message, data):
+        print("Emitting", message)
         if self.connected:
             emit_data = {"data": data, "info": {}}
             emit_data["info"]["version"] = "test"
@@ -65,28 +66,31 @@ class RemoteController(Controller):
 
     def set_strip(self, data):
         self._emit('set_strip', {"data": data})
-        super().set_strip(data)
+        return super().set_strip(data)
         
     def set_framerate(self, value, vs_id):
         self._emit('set_framerate', {"value": value, "vs_id": vs_id})
-        super().set_framerate(value, vs_id)
+        return super().set_framerate(value, vs_id)
 
     def set_settings(self, settings):
         self._emit('set_settings', {"settings": settings})
-        super().set_settings(settings)
+        return super().set_settings(settings)
         
     def set_base(self, data, vs_id):
         self._emit('set_base', {"data": data, "vs_id": vs_id})
-        super().set_base(data, vs_id)
+        return super().set_base(data, vs_id)
         
     def set_animation(self, data, vs_id):
         self._emit('set_animation', {"data": data, "vs_id": vs_id})
-        super().set_animation(data, vs_id)
+        return super().set_animation(data, vs_id)
         
     def set_control(self, data, vs_id):
         self._emit('set_control', {"data": data, "vs_id": vs_id})
-        super().set_control(data, vs_id)
+        return super().set_control(data, vs_id)
 
     def set_brightness(self, data):
         self._emit('set_brightness', {"data": data})
-        super().set_brightness(data)
+        return super().set_brightness(data)
+
+    def _init_data(self):
+        return None

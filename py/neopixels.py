@@ -10,7 +10,8 @@ LED_PIN = 18      # GPIO pin connected to the pixels (18 uses PWM!).
 LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA = 10      # DMA channel to use for generating signal (try 10)
 LED_BRIGHTNESS = 0     # Set to 0 for darkest and 255 for brightest
-LED_INVERT = False # True to invert the signal (when using NPN transistor level shift)
+# True to invert the signal (when using NPN transistor level shift)
+LED_INVERT = False
 
 PROVIDED_MILLIAMPS = 10000
 POWER_MULTIPLIER = 0.9
@@ -18,6 +19,7 @@ MAX_MILLIAMPS = PROVIDED_MILLIAMPS*POWER_MULTIPLIER
 
 PROVIDED_WATTS = 1
 VOLTAGE = 5
+
 
 class NeoPixels:
     def __init__(self, led_count=60, max_brightness=255, pin=18, max_watts=1, watts_per_60=18, grb=False, testing=True, flipped=True):
@@ -33,6 +35,7 @@ class NeoPixels:
         self.testing = testing
         self.flipped = flipped
         self.led_channel = self.pin in [13, 19, 41, 45, 53]
+        self.gamma = [None] * 256
         # Current Pixels
         self.led_data = [0] * led_count
         self.brightness = self.max_brightness
@@ -54,6 +57,12 @@ class NeoPixels:
             "flipped": self.flipped
         }
 
+    def set_gamma(self, data):
+        if not isinstance(data, list) or len(data) != 256:
+            print("Invalid Gamma")
+        else:
+            self.gamma = data
+
     def num_pixels(self):
         return self.led_count
 
@@ -61,7 +70,10 @@ class NeoPixels:
         if value >= 0 and value <= self.max_brightness:
             self.brightness = value
             if not self.testing:
-                self.strip.setBrightness(self.brightness)
+                b = self.brightness
+                if self.gamma[value] is not None:
+                    b = self.gamma[value]
+                self.strip.setBrightness(b)
         return self.brightness
 
     def get_brightness(self):
@@ -114,3 +126,14 @@ class NeoPixels:
         if self.grb:
             return (g, r, b)
         return (r, g, b)
+
+    def _get_color(self, r, g, b):
+        """ Gets int value of rgb color
+
+            Parameters:
+
+                r, g, b: color
+        """
+        if self.grb:
+            return ((int(g) * 65536) + (int(r) * 256) + int(b))
+        return ((int(r) * 65536) + (int(g) * 256) + int(b))

@@ -3,6 +3,7 @@ class Controllers {
         this.divs = {}
         sender.add_listen('brightness_change', this, this.set_brightness);
         this._init_divs();
+        this.last_brightness = Date.now();
     }
 
     _init_divs() {
@@ -26,15 +27,19 @@ class Controllers {
         this._div_saved(id);
         let value = this.divs[id]["brightness_slider"].value;
         sender.emit("set_brightness", [{"id": id, "value": value}]);
+        this.last_brightness = Date.now();
     }
 
     set_brightness(self, data) {
+        console.debug("Setting brightness", data);
+        let update = Date.now() - self.last_brightness > 500
         for (let i = 0; i < 1; i++) {
             let id = data[i]["id"];
-            console.debug("Setting brightness slider for", id, "to", data[i]["value"]);
             self._div_saved(id);
-            self.divs[id]["brightness_slider"].value = data[i]["value"];
             self.divs[id]["brightness_number"].innerText = data[i]["value"];
+            if (update) {
+                self.divs[id]["brightness_slider"].value = data[i]["value"];
+            }
         }
     }
 

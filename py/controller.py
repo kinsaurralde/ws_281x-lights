@@ -9,6 +9,8 @@ class Controller:
         self.id = name_id
         self.config = config
         self.neo = NeoPixels(**config["neopixels"], testing=testing)
+        self.neo.set_brightness(int(config["settings"]["initial_brightness"]))
+        self.neo.set_gamma(config["settings"]["correction"]["gamma"])
         self.base_layer = []
         self.animation_layer = []
         self.overlay_layer = []
@@ -24,7 +26,9 @@ class Controller:
 
     def set_strip(self, data):
         for i in data:
-            self.sections[str(data[i]["virtual_id"]) + "_" + str(data[i]["section_id"])] = Section(data[i], self.neo.num_pixels())
+            vs_id = str(data[i]["virtual_id"]) + "_" + str(data[i]["section_id"])
+            if vs_id not in self.sections:
+                self.sections[vs_id] = Section(data[i], self.neo.num_pixels())
 
     def get_framerate(self):
         return self.framerate
@@ -123,7 +127,7 @@ class Controller:
         self.starttime = time.time()
         self.counter = 0
         while self.active:
-            if not self.paused:
+            if not self.paused and len(self.animation_layer) > 0:
                 self.counter = (self.counter + 1) % len(self.animation_layer)
                 self._draw_frame()
             self._sleep(self.wait_time)

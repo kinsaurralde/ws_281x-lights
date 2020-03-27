@@ -47,7 +47,6 @@ def disconnect():
     print("Client Disconnected:", request.remote_addr)
     socketio.emit('disconnect_response', room=request.sid)
     if controller is not None:
-        print("OFF")
         controller.set_settings([{"on": False}])
         controller.set_control([0] * controller.num_pixels(), controller.id + "_virtual_0")
 
