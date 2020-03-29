@@ -28,7 +28,7 @@ animations:
   - name: chase
     display: Chase
     arguments:
-      color: ["red"]
+      colors: ["red"]
       wait_ms: 50
       wait_total: False
       arg1: *interval
@@ -57,7 +57,8 @@ animations:
   - name: mix_switch
     display: Mix
     arguments:
-      color: ["red", "green", "blue", "red"]
+      colors: ["red", "green", "blue", "red"]
+      wait_ms: 15
       arg1:
         name: Instant
         value: instant
@@ -66,18 +67,18 @@ animations:
   - name: pulse
     display: Pulse
     arguments:
-      color: ["blue"]
+      colors: ["blue"]
       arguments:
         arg1: *length
         arg2: *direction
   - name: bounce
     display: Bounce
     arguments:
-      color: ["purple", "cyan", "orange", "pink", "yellow", "turquoise"]
+      colors: ["purple", "cyan", "orange", "pink", "yellow", "turquoise"]
       arg1: *length
       arg2: *direction
   - name: wipe
     display: Wipe
     arguments:
-      color: ["green"]
+      colors: ["green"]
       arg2: *direction

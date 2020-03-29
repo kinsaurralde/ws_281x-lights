@@ -112,6 +112,7 @@ class Animations:
         return frames
 
     def _chase(self, r, g, b, interval=5, direction=1):
+        direction = int(direction)
         frames = []
         iter_range = range(interval)
         if direction == -1:
@@ -158,6 +159,7 @@ class Animations:
 
             length: how many pixels in pulse (default: 5)
         """
+        direction = int(direction)
         frames = []
         iter_range = range(self.led_count + length)
         if direction == -1:
@@ -184,6 +186,7 @@ class Animations:
                     1: forwards
                     -1: backwards
         """
+        direction = int(direction)
         frames = []
         for color in colors:
             frames.extend(self._pulse(color[0], color[1], color[2], direction, length))
@@ -201,6 +204,7 @@ class Animations:
                     1: forward direction
                     -1: reverse direction
         """
+        direction = int(direction)
         frames = []
         start = 0
         iter_range = range(self.led_count)

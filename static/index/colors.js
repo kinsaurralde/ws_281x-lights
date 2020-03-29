@@ -1,16 +1,19 @@
 class Colors {
     constructor() {
-        //let self = this;
-        //sender.get('/config/colors', this.add_defaults, self);
         this.colors = {};
         this.recieved = false;
         this.custom_max = parseInt(document.getElementById("custom_colors").children.length);
         this.custom_pos = parseInt(document.getElementById("custom_colors_count").innerText);
     }
 
+    get(name) {
+        if (name in this.colors) {
+            return {"r": this.colors[name]["value"]["r"], "g": this.colors[name]["value"]["g"], "b": this.colors[name]["value"]["b"]};
+        }
+        return {"r": 255, "g": 255, "b": 255}
+    }
+
     get_names() {
-        //while (!this.recieved) {}
-        console.log(this.recieved);
         let names = []
         for (let i in this.colors) {
             names.push(i);
@@ -34,7 +37,6 @@ class Colors {
     }
     
     add_color(name, r, g, b) {
-        console.log("Adding color", name, "with values", r, g, b);
         this.colors[name] = {"value": {
             "r": r,
             "g": g,

@@ -1,7 +1,5 @@
 class Animations {
     constructor() {
-        //let self = this;
-        //sender.get('/config/animations', this.add_animations, self);
         this.table = document.getElementById("animations_table");
         this.rows = {};
     }
@@ -13,7 +11,23 @@ class Animations {
     }
 
     send(id) {
-        console.log("sending", id);
+        if (id in this.rows) {
+            let args = this.rows[id].get_values();
+            let framerate = 1000 / args["wait_ms"];
+            let actions = [{
+                "type": "run",
+                "function": args["name"],
+                "framerate": framerate,
+                "arguments": args["arguments"]
+            }];
+            let json = {
+                "options": controllers.get_options(),
+                "actions": actions
+            };
+            console.log(json);
+            sender.emit('action', json);
+            //this.sender.post('/quickaction', json, this.success_action);
+        }
     }
 
     row_colors(id, action, args) {
@@ -50,6 +64,7 @@ class Row {
         this.display = display;
         this.args = args;
         this.cells = [];
+        this.names = [];
     }
 
     create() {
@@ -63,22 +78,73 @@ class Row {
         this.cells[0].style.width = "5vw";
         this.cells[1] = this._color(["NONE"], false);
         this.cells[2] = document.createTextNode(this.display);
-        if ("color" in this.args) {
-            this.cells[3] = this._color(this.args["color"], true);
+        if ("colors" in this.args) {
+            this.cells[3] = this._color(this.args["colors"], this.args["colors"].length > 1);
+            this.names.push({"name": "colors", "cell": 3, "type": "color"});
         }
-        this.cells[4] = this._wait_ms(100);
+        this.cells[4] = this._wait_ms(50);
         if ("wait_ms" in this.args) {
             this.cells[4] = this._wait_ms(this.args["wait_ms"]);
         }
         if ("arg1" in this.args) {
             this.cells[5] = this._arg(this.args["arg1"]);
+            this.names.push({"name": this.args["arg1"]["value"], "cell": 5, "type": this.args["arg1"]["type"]});
         }
         if ("arg2" in this.args) {
             this.cells[6] = this._arg(this.args["arg2"]);
+            this.names.push({"name": this.args["arg2"]["value"], "cell": 6, "type": this.args["arg2"]["type"]});
         }
         if ("arg3" in this.args) {
             this.cells[7] = this._arg(this.args["arg3"]);
+            this.names.push({"name": this.args["arg3"]["value"], "cell": 7, "type": this.args["arg3"]["type"]});
         }
+        if ("arg4" in this.args) {
+            this.cells[8] = this._arg(this.args["arg4"]);
+            this.names.push({"name": this.args["arg4"]["value"], "cell": 8, "type": this.args["arg4"]["type"]});
+        }
+    }
+
+    get_values() {
+        let result = {"name": this.name, "wait_ms": this.cells[4].value, "arguments": {}};
+        for (let i = 0; i < this.names.length; i++) {
+            let name = this.names[i]["name"];
+            let div = this.cells[this.names[i]["cell"]];
+            let type = this.names[i]["type"];
+            let value = [];
+            if (div.children.length == 0) {
+                result["arguments"][name] = div.value; 
+                continue;
+            } 
+            for (let j = 0; j < div.children.length; j++) {
+                let cur_val = div.children[j].value;
+                if (cur_val != "+") {
+                    value.push(cur_val);
+                }
+            }
+            if (type == "color") {
+                if (value.length == 1) {
+                    value = colors.get(value[0]);
+                    result["arguments"]["r"] = parseInt(value["r"])
+                    result["arguments"]["g"] = parseInt(value["g"])
+                    result["arguments"]["b"] = parseInt(value["b"])
+                    continue
+                } else {
+                    for (let i = 0; i < value.length; i++) {
+                        let color = colors.get(value[i]);
+                        value[i] = [parseInt(color["r"]), parseInt(color["g"]), parseInt(color["b"])];
+                    }
+                }
+                
+            }
+            if (value.length == 1) {
+                value = value[0];
+            }
+            if (type == "int") {
+                value = parseInt(value);
+            }
+            result["arguments"][name] = value;
+        }
+        return result
     }
 
     get() {
@@ -132,7 +198,6 @@ class Row {
     }
 
     _arg(data) {
-        console.log("Daa", data);
         let div = document.createElement("div");
         let input = document.createElement("div");
         let text = document.createTextNode(data["name"] + ": ");
