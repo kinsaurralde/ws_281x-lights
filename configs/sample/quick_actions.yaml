@@ -120,7 +120,7 @@ actions:
       - type: base
         function: random
         arguments:
-          each: 15
+          interval: 15
   'rcgmby_bounce_1':
     display: 'Bounce 1'
     actions:

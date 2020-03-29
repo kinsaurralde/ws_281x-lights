@@ -1,0 +1,83 @@
+---
+config_info:
+  name: sample
+placeholder:
+  interval: &interval
+    name: Interval
+    value: interval
+    type: int
+    default: 5
+    min: 1
+  interval: &length
+    name: Length
+    value: length
+    type: int
+    default: 8
+    min: 1
+  direction: &direction
+    name: Direction
+    value: direction
+    type: option
+    default: 1
+    options:
+      - name: Forward
+        value: 1
+      - name: Reverse
+        value: -1
+animations:
+  - name: chase
+    display: Chase
+    arguments:
+      color: ["red"]
+      wait_ms: 50
+      wait_total: False
+      arg1: *interval
+      arg2: *direction
+  - name: random
+    display: Random
+    arguments:
+      arg1:
+        name: Interval
+        value: interval
+        type: int
+        default: -1
+        min: -1
+      arg2:
+        name: Frame Switch
+        value: frame_delay
+        type: int
+        default: 5
+        min: 1
+      arg3:
+        name: Iterations
+        value: iterations
+        type: int
+        default: 40
+        min: 1
+  - name: mix_switch
+    display: Mix
+    arguments:
+      color: ["red", "green", "blue", "red"]
+      arg1:
+        name: Instant
+        value: instant
+        type: bool
+        default: False
+  - name: pulse
+    display: Pulse
+    arguments:
+      color: ["blue"]
+      arguments:
+        arg1: *length
+        arg2: *direction
+  - name: bounce
+    display: Bounce
+    arguments:
+      color: ["purple", "cyan", "orange", "pink", "yellow", "turquoise"]
+      arg1: *length
+      arg2: *direction
+  - name: wipe
+    display: Wipe
+    arguments:
+      color: ["green"]
+      arg2: *direction

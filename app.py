@@ -62,6 +62,14 @@ def info(function):
     else:
         return page_not_found("Info function not found")
 
+@app.route('/config/<function>')
+def get_config(function):
+    if function == "colors":
+        return create_response(default_colors)
+    elif function == "animations":
+        return create_response(web_animations)
+    return create_response({"colors": default_colors, "animations": web_animations})
+
 @app.route('/ping')
 def ping_http():
     data = mc.ping()
@@ -118,6 +126,7 @@ controller_config = open_yaml(config_paths["controllers"])
 quick_actions = open_yaml(config_paths["quick_actions"])
 v_controller_config = open_yaml(config_paths["virtual_controllers"])
 default_colors = open_yaml(config_paths["colors"])
+web_animations = open_yaml(config_paths["animations"])
 
 mc = MultiController(testing=args.test, config=controller_config["config"], virtual_controller_config=v_controller_config["config"])
 info = Info(socketio, mc)

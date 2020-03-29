@@ -29,7 +29,7 @@ config:
       initial_brightness: 100
       correction: *default
   - name: remote_test
-    active: true
+    active: false
     remote: true
     # url: localhost:5000
     url: rpi3.kinsaurralde.com:5000

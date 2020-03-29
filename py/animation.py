@@ -91,21 +91,21 @@ class Animations:
                 result[i] = self._get_color(r, g, b)
         return [result]
 
-    def _random(self, each=-1, frame_delay=5, iterations=40):
+    def _random(self, interval=-1, frame_delay=5, iterations=40):
         """Flashes random lights
             
             Parameters:
                 
-                each: number of pixels before new color is selected
+                interval: number of pixels before new color is selected
         """
         frames = []
         current_color = self._get_random_color()
-        if each == -1:
-            each = self.led_count
+        if interval == -1:
+            interval = self.led_count
         for i in range(iterations):
             frame = self._get_blank()
             for j in range(self.led_count):
-                if j % each == 0:
+                if j % interval == 0:
                     current_color = self._get_random_color()
                 frame[j] = current_color
             frames.extend([[frame, []]] * frame_delay)

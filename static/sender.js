@@ -7,14 +7,12 @@ class Sender {
     }
 
     add_listen(message, self, response) {
-        console.debug("asdd");
         this.socket.on(message, function(data) {
             response(self, data);
         });
     }
 
     emit(message, json, response=null) {
-        // console.debug("Emmiting", message, "with data", json);
         this.socket.emit(message, json, function(data) {
             if (response != null) {
                 response(data);
@@ -41,4 +39,23 @@ class Sender {
         };
         request.send(data);
     }
-}
+
+    get(url, success_func=null) {
+        let request = new XMLHttpRequest();
+        request.open('GET', url, true);
+        request.setRequestHeader("Content-type", "application/json");
+        console.log("GET", url);
+        request.onload = function() {
+            if (this.status >= 200 && this.status < 400) {
+                let data = JSON.parse(this.response);
+                console.log("Received Data:", data);
+                if (success_func != null) {
+                    success_func(data);
+                }
+            } else {
+                console.log("Error", this.response);
+            }
+        };
+        request.send();
+    }
+};

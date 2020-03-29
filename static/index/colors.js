@@ -1,8 +1,21 @@
 class Colors {
     constructor() {
+        //let self = this;
+        //sender.get('/config/colors', this.add_defaults, self);
         this.colors = {};
+        this.recieved = false;
         this.custom_max = parseInt(document.getElementById("custom_colors").children.length);
         this.custom_pos = parseInt(document.getElementById("custom_colors_count").innerText);
+    }
+
+    get_names() {
+        //while (!this.recieved) {}
+        console.log(this.recieved);
+        let names = []
+        for (let i in this.colors) {
+            names.push(i);
+        }
+        return names
     }
 
     custom_add() {
@@ -21,6 +34,7 @@ class Colors {
     }
     
     add_color(name, r, g, b) {
+        console.log("Adding color", name, "with values", r, g, b);
         this.colors[name] = {"value": {
             "r": r,
             "g": g,
@@ -28,11 +42,23 @@ class Colors {
         }};
     }
 
-    default(name, value) {
+    default(name, value=null) {
         if (!(name in this.colors)) {
             this.add_color(name, value[0], value[1], value[2]);
         }
         this.send(name);
+    }
+
+    add_defaults(data) {
+        let div = document.getElementById("default_colors");
+        for (let i in data["colors"]["noedit"]) {
+            let color = data["colors"]["noedit"][i]
+            this.add_color(color["name"], color["value"][0], color["value"][1], color["value"][2]);
+            let button = w.createButton(color["display"], "default_color_" + color["name"], "colors.default('" + color['name'] + "')");
+            button.style.margin = ".12vw";
+            div.appendChild(button);
+        }
+        this.recieved = true;
     }
 
     custom(name, id) {
@@ -93,4 +119,4 @@ class Colors {
     _clear_animation() {
         return true
     }
-}
+};

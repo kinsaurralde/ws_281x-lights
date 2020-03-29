@@ -4,6 +4,7 @@
     <title>Lights</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="../static/css/main.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/project.css">
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
     <script src="../../../static/libs/socket.io.js"></script>
     <script src="../static/writehtml.js"></script>
@@ -11,6 +12,7 @@
     <script src="../static/index/colors.js"></script>
     <script src="../static/index/actions.js"></script>
     <script src="../static/index/controllers.js"></script>
+    <script src="../static/index/animations.js"></script>
 
 </head>
 
@@ -71,8 +73,7 @@
     </div>
 
     <div class="section" id="quick">
-        <div class="section-title">Quick Actions<input type="button" class="expand-button" value="^" style="width: 2vw;"
-                onclick="expand('quick','block')"></div>
+        <div class="section-title">Quick Actions<input type="button" class="expand-button" value="^" style="width: 2vw;" onclick="expand('quick','block')"></div>
         <div class="space-1"></div>
         <div class="section-hidden" id="quick-expanded" style="display: block;">
             <div class="divider"></div>
@@ -87,6 +88,27 @@
         </div>
     </div>
 
+    <div class="section" id="animations">
+        <div class="section-title">Animations<input type="button" class="expand-button" value="^" style="width: 2vw;" onclick="expand('animations','block')"></div>
+        <div class="space-1"></div>
+        <div class="section-hidden" id="animations-expanded" style="display: block;">
+        <div class="divider"></div>
+        <table id="animations_table">
+            <tr>
+                <th>Send</th>
+                <th>Base</th>
+                <th>Function</th>
+                <th>Color</th>
+                <th>Wait ms</th>
+                <th>Argument 1</th>
+                <th>Argument 2</th>
+                <th>Argument 3</th>
+                <th>Argument 4</th>
+            </tr>
+        </table>
+        </div>
+    </div>
+
     <div class="section" id="colors">
         <div class="section-title">Colors
             <input type="button" class="expand-button" value="^" style="width: 2vw;" onclick="expand('colors', 'block')">
@@ -96,11 +118,7 @@
         <div class="space-1"></div>
         <div class="section-hidden" id="colors-expanded" style="display: block;">
             <div class="divider"></div>
-            {% for c in colors['colors']['noedit'] %}
-                {% set name = c['name'] %}
-                {% set value = c['value'] %}
-                    <input type="button" value="{{c['display']}}" onclick="colors.default('{{name}}', {{value}})">
-            {% endfor %}
+            <div id="default_colors"></div>
             <div id="custom_colors">
                 {% set count = namespace(value=0) %}
                 {% for c in colors['colors']['edit'] %}
@@ -147,10 +165,19 @@
     </div>
 
     <script>
+        let w = new HTMLWriter();
         let sender = new Sender();
         let actions = new Actions(sender);
         let controllers = new Controllers();
         let colors = new Colors();
+        let animations = new Animations();
+
+        sender.get('config/all', recieved_config);
+
+        function recieved_config(data) {
+            colors.add_defaults(data["colors"]);
+            animations.add_animations(data["animations"]);
+        }
 
         function openURL(url) {
             window.open(url, "_blank");
