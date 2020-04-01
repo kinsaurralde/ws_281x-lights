@@ -79,7 +79,7 @@ input, select {
 }
 
 input[type=button] {
-    width: 8vw;
+    width: 7.75vw;
     height: 1.5vw;
     border: .1vw solid var(--input-border);
     background-color: var(--input-background);
@@ -97,7 +97,7 @@ input[type=text] {
 input[type=range] {
     width: 16vw;
     height: .5vw;
-    position: relative;
+    /* position: relative; */
     top: .5vw;
     -webkit-appearance: none;  /* Override default CSS styles */
     appearance: none;
@@ -116,6 +116,11 @@ input[type=range]::-webkit-slider-thumb {
     cursor: pointer;
 }
 
+input.input-slider-flex-align {
+    position: relative;
+    top: 0.5vw;
+}
+
 select[multiple] option:checked {
     background: red linear-gradient(0deg, red 0%, red 100%);
 }
@@ -131,6 +136,11 @@ textarea {
 
 .text-1-25 {
     font-size: 1.25vw;
+}
+
+.flex-align {
+    position: relative;
+    top: 0.1vw;
 }
 
 @media screen and (max-width: 1000px) {
@@ -329,6 +339,10 @@ select {
 
 .width-10 {
     width: 10vw !important; 
+}
+
+.width-8 {
+    width: 8vw !important; 
 }
 
 .width-5 {

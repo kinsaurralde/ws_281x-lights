@@ -24,14 +24,29 @@ class Display {
     }
 
     set(data) {
-        let id = data["controller_id"];
-        if (!(id in this.controllers)) {
-            this._redraw(data);
+        for (let i in data) {
+            let id = data[i]["controller_id"];
+            if (!(id in this.controllers)) {
+                this._redraw(data[i]);
+            }
+            this.controllers[id].set(data[i]);
+        }  
+    }
+
+    set_brightness(data) {
+        for (let i in data) {
+            if (data[i]["id"] in this.controllers) {
+                this.controllers[data[i]["id"]].set_brightness(data[i]["value"]);
+            }
         }
-        if (this.controllers[id].isDifferent(data["strip_info"])) {
-            this._redraw(data);
+    }
+
+    ping_recieve(data) {
+        for (let i in data) {
+            if (data[i]["controller_id"] in this.controllers) {
+                this.controllers[data[i]["controller_id"]].set_ping(data[i]);
+            }
         }
-        this.controllers[id].set(data);
     }
 };
 
@@ -44,32 +59,16 @@ class Controller {
         this.container.className = "section-flex";
         this.container.id = this.disp_id;
         this.container.appendChild(this._getButtons());
-        this.container_expanded = document.createElement('div');
-        this.container_expanded.className = "section-flex-no-border";
-        this.container_expanded.style.display = "none";
-        this.num_strips = data["strip_info"].length;
-        this.strips = new Array(this.num_strips);
-        for (let i = 0; i < this.num_strips; i++) {
-            this._addPixelStrip(i, data["strip_info"][i]);
-        }
-        this.container.appendChild(this.container_expanded);
-        this.strip_info = data["strip_info"];
+        this.container.appendChild(w.createDivider());
+        this.strip = new PixelStrip(this.disp_id, this.id, data["pixels"].length);
+        this.container.appendChild(this.strip.get());
+        this.div_brightness_table = document.getElementById("table_" + this.id + "_brightness");
+        this.div_power_table = document.getElementById("table_" + this.id + "_power");
+
         this.update = true;
     }
 
-    _addPixelStrip(i, data) {
-        this.strips[i] = new PixelStrip(this.disp_id, data["id"], data["end"] - data["start"] + 1);
-        if (i == 0) {
-            this.container.appendChild(w.createDivider());
-            this.container.appendChild(this.strips[i].get());
-        } else {
-            this.container_expanded.appendChild(w.createDivider());
-            this.container_expanded.appendChild(this.strips[i].get());
-        }
-    }
-
     _getButtons() {
-        let self = this;
         let div = document.createElement('div');
         div.className = "section-flex-no-border";
         div.appendChild(w.create125Text("Controller: " + this.id));
@@ -79,66 +78,43 @@ class Controller {
         this.div_should_update = w.createInputCheckBox("Update", this.disp_id + "-update", true);
         div.appendChild(this.div_should_update);
         div.appendChild(w.createVDivider());
-        div.appendChild(w.create125Text("Show Expanded:"));
-        div.appendChild(w.createSpacerS1());
-        this.div_show_expanded = w.createInputCheckBox("Show Expanded", this.disp_id + "-show-expanded", false);
-        this.div_show_expanded.onclick = function() {
-            self.show_expanded(self);
-        };
-        div.appendChild(this.div_show_expanded);
-        div.appendChild(w.createVDivider());
         div.appendChild(w.create125Text("Brightness:"))
         div.appendChild(w.createSpacerS1());
-        this.div_brightness = w.create125Text("---");
+        this.div_brightness = w.create125Text("---", "controller_" + this.id + "_brightness");
         div.appendChild(this.div_brightness);
         div.appendChild(w.createVDivider());
         div.appendChild(w.create125Text("Power Usage (W):"));
         div.appendChild(w.createSpacerS1());
         this.div_power = w.create125Text("---");
         div.appendChild(this.div_power);
+        div.appendChild(w.createVDivider());
+        div.appendChild(w.create125Text("Ping:"));
+        div.appendChild(w.createSpacerS1());
+        this.div_ping = w.create125Text("---");
+        div.appendChild(this.div_ping);
+        div.appendChild(w.createSpacerS1());
+        div.appendChild(w.create125Text("ms"));
         return div
-    }
-
-    test() {
-        console.log(this.id);
-    }
-
-    isDifferent(strip_info) {
-        if (strip_info.length != this.strip_info.length) {
-            return true
-        }
-        for (let i = 0; i < strip_info.length; i++) {
-            if (strip_info[i]["start"] != this.strip_info[i]["start"] || strip_info[i]["end"] != this.strip_info[i]["end"]) {
-                return true
-            }
-        }
-        return false
-    }
-
-    _setUpdate(self) {
-        self.update = self.div_should_update.checked;
-    }
-
-    show_expanded(self) {
-        if (self.div_show_expanded.checked) {
-            self.container_expanded.style.display = "flex";
-        } else {
-            self.container_expanded.style.display = "none";
-        }
     }
 
     get() {
         return this.container
     }
 
+    set_brightness(value) {
+        this.div_brightness.innerText = value;
+        this.div_brightness_table.innerText = value;
+    }
+
+    set_ping(data) {
+        this.div_ping.innerText = data["ping"].toFixed(3);
+    }
+
     set(data) {
         if (this.div_should_update.checked) {
-            this.div_brightness.innerText = data["brightness"];
-            this.div_power.innerText = data["power"].toFixed(3);
-            for (let i = 0; i < this.num_strips; i++) {
-                let info = data["strip_info"][i];
-                this.strips[i].set(data["pixels"].slice(info["start"], info["end"] + 1));
-            }
+            this.strip.set(data["pixels"]);
+            this.div_power.innerText = data["watts"].toFixed(3);
+            this.div_power_table.innerText = data["watts"].toFixed(3);
         }
     }
 };
@@ -158,17 +134,10 @@ class PixelStrip {
         }
     }
 
-    show() {
-
-    }
-
-    hide() {
-
-    }
-
     set(data) {
+        console.debug(data);
         for (let i = 0; i < this.num_pixels; i++) {
-            this.pixels[i].set(data[i]['r'], data[i]['g'], data[i]['b']);
+            this.pixels[i].set(data[i]);
         }
     }
 
@@ -192,11 +161,11 @@ class Pixel {
         this.set();
     }
 
-    set(r = 0, g = 0, b = 0) {
-        this.r = r;
-        this.g = g;
-        this.b = b;
-        this.container.style.backgroundColor = "rgb(" + (r + this.adjust) + "," + (g + this.adjust) + "," + (b + this.adjust) + ")";
+    set(value = 0) {
+        this.r = (value >> 16) & 0xFF;
+        this.g = (value >> 8) & 0xFF;
+        this.b = value & 0xFF;
+        this.container.style.backgroundColor = "rgb(" + (this.r + this.adjust) + "," + (this.g + this.adjust) + "," + (this.b + this.adjust) + ")";
     }
 
     get() {

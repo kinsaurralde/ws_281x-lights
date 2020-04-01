@@ -94,10 +94,11 @@ class HTMLWriter {
         return slider;
     }
 
-    create125Text(text) {
+    create125Text(text, id=null) {
         let div = document.createElement('div');
         div.className = "text-1-25";
         div.innerText = text;
+        div.id = id;
         return div;
     }
 
@@ -124,9 +125,15 @@ class HTMLWriter {
         let select = document.createElement("select");
         select.id = id;
         for (let i = 0; i < options.length; i++) {
+            let text = options[i];
+            let value = options[i];
+            if (typeof(options[i]) == "object" && options[i] != null) {
+                text = options[i]["name"];
+                value = options[i]["value"];
+            }
             let opt = document.createElement("option");
-            opt.appendChild(document.createTextNode(options[i]));
-            opt.value = options[i];
+            opt.appendChild(document.createTextNode(text));
+            opt.value = value;
             select.appendChild(opt);
         }
         select.value = value;
@@ -160,7 +167,7 @@ class HTMLWriter {
         title_div.innerText = title;
         return title_div;
     }
-}
+};
 
 function verify_number(min, max, d_value, div_id) {
     let div = document.getElementById(div_id);

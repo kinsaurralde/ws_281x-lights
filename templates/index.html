@@ -3,295 +3,184 @@
 <head>
     <title>Lights</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="../static/main/main.css">
-    <script src="../static/main/generic_functions.js"></script>
+    <link rel="stylesheet" type="text/css" href="../static/css/main.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/project.css">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <script src="../../../static/libs/socket.io.js"></script>
     <script src="../static/writehtml.js"></script>
-    <script src="../static/main/main.js"></script>
-    <script src="../static/main/generic.js"></script>
-    <script src="../static/main/pixel.js"></script>
-    <script src="../static/main/sender.js"></script>
-    <script src="../static/main/save.js"></script>
-    <script src="../static/main/preset.js"></script>
-    <script src="../static/main/functions.js"></script>
+    <script src="../static/sender.js"></script>
+    <script src="../static/index/colors.js"></script>
+    <script src="../static/index/actions.js"></script>
+    <script src="../static/index/controllers.js"></script>
+    <script src="../static/index/animations.js"></script>
+
 </head>
 
-<body onload="pageLoad()">
-    <div id="page-title">Lights</div>
-
-
-    <div class="section" id="main-display" style="display: none;">
-        <div class="section-flex" id="main-pixel-display"></div>
-    </div>
-
-    <div class="section" id="settings">
-        <div class="section-title">Settings<input type="button" class="expand-button" value="^" style="width: 2vw;"
-                onclick="expand('settings','block')"></div>
+<body>
+    <div class="section" id="controllers">
+        <div class="section-title">Controllers<input type="button" class="expand-button" value="^" style="width: 2vw;" onclick="expand('controllers','block')"></div>
         <div class="space-1"></div>
-        <div class="section-flex-no-border">
-            <div class="divider"></div>
-            <div class="section-setting">
-                <div class="section-title-secondary">Brightness</div>
-                <div class="space-1"></div>
-                <input type="range" value="25" min="1" max="255" id="settings-brightness"
-                    oninput="lights.setBrightness()">
-            </div>
-            <div class="space-s-1"></div>
-            <div class="section-setting">
-                <div class="section-title-secondary">Reverse</div>
-                <div class="space-1"></div>
-                <input type="checkbox" checked id="settings-reversed" onclick="lights.settingReversed()">
-            </div>
-            <div class="space-s-1"></div>
-            <div class="section-setting">
-                <div class="section-title-secondary">Controller ids</div>
-                <div class="space-1"></div>
-                <input type="text" value="0" oninput="lights.updateControllers()" class="width-5"
-                    id="settings-controllers">
-            </div>
-            <div class="space-s-1"></div>
-            <div class="section-setting">
-                <div class="section-title-secondary">Strip id</div>
-                <div class="space-1"></div>
-                <input type="number" id="settings-strip-id" min="0" value="0" oninput="lights.updateStripId()">
-            </div>
-            <div class="space-s-1"></div>
-            <div class="section-setting">
-                <div class="section-title-secondary">Key</div>
-                <div class="space-1"></div>
-                <input type="number" id="settings-key" min="0" value="0" oninput="lights.updateKey()">
-            </div>
-            <div class="space-s-1"></div>
-            <div class="section-setting">
-                <div class="section-title-secondary">Web Theme</div>
-                <div class="space-1"></div>
-                <select id="settings-web-theme" oninput="colorTheme()">
-                    <option selected disabled hidden>Auto</option>
-                    <option value="light">Light</option>
-                    <option value="dark">Dark</option>
-                    <option value="high_contrast">High Contrast</option>
-                    <option value="high_contrast_colored">Contrast Colored</option>
-                    <option value="dark_rgb">Dark RGB</option>
-                    <option value="custom">Custom</option>
-                </select>
-            </div>
-            <div class="space-s-1"></div>
-            <div class="section-setting">
-                <div class="section-title-secondary">Fullscreen</div>
-                <div class="space-1"></div>
-                <input type="button" value="Toggle" onclick="toggleFullScreen()">
-            </div>
-            <div class="space-s-1"></div>
-            <div class="section-setting">
-                <div class="section-title-secondary">Lights Hostname:Port</div>
-                <div class="space-1"></div>
-                http:// <input type="text" value="" oninput="lights.updateHostname()" class="width-10"
-                    id="settings-hostname"> :
-                <input type="text" value="" oninput="lights.updatePort()" class="width-5" id="settings-port">
-            </div>
-            <div class="space-s-1"></div>
-            <div class="section-setting">
-                <div class="section-title-secondary">Status</div>
-                <div class="space-1"></div>
-                <input type="button" value="OK" onclick="viewMessages()" id="settings-status">
-            </div>
-            <div class="section" id="settings-web-theme-expanded" style="display: none;">
-                <div class="section-title-secondary">Custom Web Theme</div>
-                <div style="display: flex;" id="settings-web-custom-container">
-                </div>
-            </div>
-            <div class="section-hidden" id="settings-expanded" style="width: 100%; display: none">
-                <div id="settings-controllers-container" style="width: 100%;">
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="section" id="functions">
-        <div class="section-title">Functions
-            <input type="button" class="expand-button" value="^" style="width: 2vw;" onclick="expand('functions','block')">
-            <input type="button" value="Refresh" onclick="func.list()">
-            <input type="button" value="Variables" onclick="func.list_vars()">
-        </div>
+        <div class="section-hidden" id="controllers-expanded" style="display: block;">
+        <div class="divider"></div>
         <div class="space-1"></div>
-        <div class="section-hidden" id="functions-expanded" style="display: block;">
-            <div class="divider"></div>
-            <div id="functions-buttons" style="display: flex;"></div>
-        </div>
+        <table id="controller_table">
+            <tr>
+                <th>Name</th>
+                <th>Brightness Slider</th>
+                <th>Cur/Max Brightness</th>
+                <th>Num Pixels</th>
+                <th>Pixel Sections</th>
+                <th>Send</th>
+            </tr>
+            {% for v in vcontrollers %}
+                {% set vid = v['vid'] %}
+                {% if v['real'] == True %}
+                    {% set cid = vid[:-8] %}
+                    {% set id = 'controller_' + cid + '_' %}
+                    {% for c in controllers %}
+                        {% if c["controller_id"] == cid %}
+                            <tr>
+                                <td>{{c["controller_id"]}}</td>
+                                <td><input id="{{id}}brightness_slider" type="range" min="0" max="{{c['neopixels']['max_brightness']}}" step="1" value="{{c['neopixels']['brightness']}}" oninput="controllers.send_brightness('{{cid}}')"></td>
+                                <td><span id="{{id}}brightness">{{c["neopixels"]["brightness"]}}</span> / {{c["neopixels"]["max_brightness"]}}</td>
+                                <td>{{c["neopixels"]["num_pixels"]}}</td>
+                                <td>{{c["controller_id"]}}: ALL</td>
+                                <td><input type="checkbox" id="{{id}}send" oninput="controllers.set_send('{{cid}}')" checked></td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}                 
+                {% else %}
+                    <tr>
+                        <td>{{vid}}</td>
+                        <td>---</td>
+                        <td>---</td>
+                        <td>{{v['led_count']}}</td>
+                        <td>
+                            {% if vid == "ALL" %}
+                                ALL
+                            {% else %}
+                                {% for s in v['controller_info'] %}
+                                    {{s['id']}}: {{s['start']}} - {{s['end']}}
+                                {% endfor %}
+                            {% endif %}
+                        </td>
+                        <td><input type="checkbox" id="controller_{{vid}}_send" oninput="controllers.set_send('{{vid}}')"></td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </table>
+    </div>
     </div>
 
     <div class="section" id="quick">
-        <div class="section-title">Quick Buttons<input type="button" class="expand-button" value="^" style="width: 2vw;"
-                onclick="expand('quick','block')"></div>
+        <div class="section-title">Quick Actions<input type="button" class="expand-button" value="^" style="width: 2vw;" onclick="expand('quick','block')"></div>
         <div class="space-1"></div>
         <div class="section-hidden" id="quick-expanded" style="display: block;">
             <div class="divider"></div>
-            <input type="button" value="Off" onclick="lights.off()">
-            <input type="button" value="Fade" onclick="lights.send('thread/fade/0,200,off')">
-            <input type="button" value="Random Each" onclick="lights.random(1)">
-            <input type="button" value="Random" onclick="lights.random(-1)">
-            <input type="button" value="Red" onclick="lights.colorAll(255,0,0)">
-            <input type="button" value="Green" onclick="lights.colorAll(0,255,0)">
-            <input type="button" value="Blue" onclick="lights.colorAll(0,0,255)">
-            <input type="button" value="White" onclick="lights.colorAll(255,255,255)">
-            <input type="button" value="*Pattern 1*" onclick="lights.send('animate/pulse_pattern/0.0.255;255.255.255,24,50,false,1,1')">
-            <input type="button" value="*Pattern 2*" onclick="lights.send('animate/pulse_pattern/255.0.0;0.255.0,30,25,false,1,1')">
-            <input type="button" value="*Bounce 1*" onclick="lights.send('animate/bounce/255.0.0;255.255.0;0.255.0;0.255.255;255.0.255;0.0.255,2000,16,1,False,true')">
-            <div class="space-1"></div>
-            <input type="button" value="Stop Animation" onclick="lights.stopAnimation()">
-            <input type="button" value="*Red Chase*" onclick="lights.chase(255,0,0,50,3,1)">
-            <input type="button" value="*Green Chase*" onclick="lights.chase(0,255,0,50,3,-1)">
-            <input type="button" value="*Blue Chase*" onclick="lights.chase(0,0,255,50,6,1)">
-            <input type="button" value="*Rainbow Chase*" onclick="lights.rainbowChase('animate', 50)">
-            <input type="button" value="*Rainbow Cycle*" onclick="lights.rainbowCycle('animate', 50)">
-            <input type="button" value="*Random Each*" onclick="lights.random(1, 150, true)">
-            <input type="button" value="*Random*" onclick="lights.random(-1, 250, true)">
-            <input type="button" value="*Red Pulse*" onclick="lights.send('animate/pulse_pattern/255.0.0,6,50,false,3,1')">
-            <input type="button" value="*Green Pulse*" onclick="lights.send('animate/pulse_pattern/0.255.0,6,50,false,3,1')">
-            <input type="button" value="*Blue Pulse*" onclick="lights.send('animate/pulse_pattern/0.0.255,6,50,false,3,1')">
-            <div class="space-1"></div>
-            <input type="button" value="#Red Pulse#" onclick="lights.pulse('thread',255,0,0,0,2000,10, false, true)">
-            <input type="button" value="#Green Pulse#" onclick="lights.pulse('thread',0,255,0,0,10,4, false, false)">
-            <input type="button" value="#Blue Pulse#" onclick="lights.pulse('thread',0,0,255,1,25,6, false, false)">
-            <input type="button" value="#Red Wipe#" onclick="lights.wipe(255,0,0,-1,40,'thread')">
-            <input type="button" value="#Green Wipe#" onclick="lights.wipe(0,255,0,1,20,'thread')">
-            <input type="button" value="#Blue Wipe#" onclick="lights.wipe(0,0,255,-1,10,'thread')">
-            <input type="button" value="*Mix*" onclick="lights.send('animate/mix/255.0.0;0.255.0;0.0.255;255.0.0,2000,false')">
-            <input type="button" value="*Bounce 2*" onclick="lights.send('animate/bounce/0.255.255;0.255.255,1000,5,1,True,true')">
-            <input type="button" value="RCGMBY" onclick="lights.send('run/pattern/255.0.0;0.255.255;0.255.0;255.0.255;0.0.255;255.255.0,6,true,false')">
-            <input type="button" value="RGB" onclick="lights.send('run/pattern/255.0.0;0.255.0;0.0.255,3,true,false')">
-            <input type="button" value="Blend" onclick="lights.send('run/blend/3,100,20')">
+            {% for r in quick_actions["settings"]["rows"]%}
+                <div>{{r["title"]}}</div>
+                {% for b in r["buttons"] %}
+                    {% if b in quick_actions["actions"] %}
+                        <input type="button" value="{{quick_actions['actions'][b]['display']}}" onclick="actions.send_action('{{b}}')">
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
         </div>
     </div>
 
-    <div class="section" id="full-color">
-        <div class="section-title">Full Color<input type="button" class="expand-button" value="^" style="width: 2vw;"
-                onclick="expand('full-color','block')"><input type="button" class="expand-button" value="+"
-                style="width: 2vw;" onclick="addSave()"><input type="button" class="expand-button" value="-"
-                style="width: 2vw;" onclick="removeSave()"></div>
+    <div class="section" id="animations">
+        <div class="section-title">Animations<input type="button" class="expand-button" value="^" style="width: 2vw;" onclick="expand('animations','block')"></div>
         <div class="space-1"></div>
+        <div class="section-hidden" id="animations-expanded" style="display: block;">
         <div class="divider"></div>
-        <div class="section-hidden" id="full-color-live" style="display: block;">
-
-        </div>
-        <div class="space-1"></div>
-        <div class="section-hidden" id="full-color-expanded" style="display: none;">
-            <div class="divider"></div>
-        </div>
-    </div>
-
-    <div class="section" id="generic">
-        <div class="section-title">Generic Functions<input type="button" class="expand-button" value="^" style="width: 2vw;"
-                onclick="expand('generic','block')"><input type="button" class="expand-button" value="+"
-                style="width: 2vw;" onclick="addGeneric()"><input type="button" class="expand-button" value="-"
-                style="width: 2vw;" onclick="removeGeneric()"></div>
-        <div class="space-1"></div>
-        <div class="section-hidden" id="generic-expanded" style="display: block;">
-            <div class="divider"></div>
-            <table id="generic-table">
-                <tr>
-                    <th>Controllers</th>
-                    <th>Strip id</th>
-                    <th>Type</th>
-                    <th>Function</th>
-                    <th>Color</th>
-                    <th>Wait ms</th>
-                    <th>(Wait) Mode</th>
-                    <th>Direction</th>
-                    <th>Value</th>
-                    <th>Option</th>
-                    <th>Misc</th>
-                    <th>Send</th>
-                </tr>
-            </table>
+        <table id="animations_table">
+            <tr>
+                <th>Send</th>
+                <th>Base</th>
+                <th>Function</th>
+                <th>Color</th>
+                <th>Wait ms</th>
+                <th>Argument 1</th>
+                <th>Argument 2</th>
+                <th>Argument 3</th>
+                <th>Argument 4</th>
+            </tr>
+        </table>
         </div>
     </div>
 
-    <div class="section" id="individual-pixels">
-        <div class="section-title">Individual Pixels<input type="button" class="expand-button" value="^"
-                style="width: 2vw;" onclick="expand('individual-pixels','block')"></div>
+    <div class="section" id="colors">
+        <div class="section-title">Colors
+            <input type="button" class="expand-button" value="^" style="width: 2vw;" onclick="expand('colors', 'block')">
+            <input type="button" class="expand-button" value="+" style="width: 2vw;" onclick="colors.custom_add()">
+            <input type="button" class="expand-button" value="-" style="width: 2vw;" onclick="colors.custom_remove()">
+        </div>
         <div class="space-1"></div>
-        <div class="section-hidden" id="individual-pixels-expanded" style="display: block;">
+        <div class="section-hidden" id="colors-expanded" style="display: block;">
             <div class="divider"></div>
-            <div class="section-flex" id="pixel-holder" style="padding: 0;">
+            <div id="default_colors"></div>
+            <div id="custom_colors">
+                {% set count = namespace(value=0) %}
+                {% for c in colors['colors']['edit'] %}
+                    {% set name = c['name'] %}
+                    {% set id = 'colors_' + name %}
+                    {% set disp = 'none' %}
+                    {% if c['visible'] == true %}
+                        {% set disp = 'block' %}
+                        {% set count.value = count.value + 1 %}
+                    {% endif %}
+                    {% set r = c['value'][0] %}
+                    {% set g = c['value'][1] %}
+                    {% set b = c['value'][2] %}
+                    <div style="display: {{disp}};" id="color_{{loop.index}}">
+                        <div class="divider"></div>
+                        <div class="section-flex-no-border">
+                            <div style="width: 6vw;" id="{{id}}_name" class="flex-align text-1-25">{{name}}</div>
+                            <div class="v-divider"></div>
+                            <input type="range" id="{{id}}_r" class="input-slider-flex-align" min="0" max="255" value="{{r}}" oninput="colors.change_color('{{id}}')">
+                            <input type="range" id="{{id}}_g" class="input-slider-flex-align" min="0" max="255" value="{{g}}" oninput="colors.change_color('{{id}}')">
+                            <input type="range" id="{{id}}_b" class="input-slider-flex-align" min="0" max="255" value="{{b}}" oninput="colors.change_color('{{id}}')">
+                            <div class="v-divider"></div>
+                            <div id="{{id}}_display" class="color-sample-display" style="background-color: rgb({{r}}, {{g}}, {{b}});"></div>
+                            <div class="space-s-2"></div>
+                            <div class="flex-align text-1-25" style="width: 7vw;">
+                                <span id="{{id}}_r_txt">{{r}}</span>
+                                <span id="{{id}}_g_txt">{{g}}</span>
+                                <span id="{{id}}_b_txt">{{b}}</span>
+                            </div>
+                            <div class="v-divider"></div>
+                            <input type="button" value="Send" onclick="colors.custom('{{name}}', '{{id}}')">
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
-            <div class="section-hidden" id="individual-pixels-settings">
-            </div>
-        </div>
-    </div>
-
-    <div class="section" id="manualurl">
-        <div class="section-title">Manual URL<input type="button" class="expand-button" value="^" style="width: 2vw;"
-                onclick="expand('manualurl','block')"></div>
-        <div class="space-1"></div>
-        <div class="section-hidden" id="manualurl-expanded" style="display: block;">
-            <div class="divider"></div>
-            <div class="space-1"></div>
-            <span id="info-manual-urlbase">[ LOADING ]</span>
-            <input type="text" id="manual-text">
-            <input type="button" value="Send" onclick="lights.manual('manual-text', false)">
-            <input type="button" value="Send in New Tab" onclick="lights.manual('manual-text', true)">
-            <div class="divider"></div>
+            <div id="custom_colors_count" style="display: none;">{{count.value}}</div>
         </div>
     </div>
 
     <div class="section" id="info">
-        <div class="section-title">Info<input type="button" class="expand-button" value="^" style="width: 2vw;"
-                onclick="expand('info','block')"></div>
-        <div class="space-1"></div>
-        <div class="section-hidden" id="info-expanded" style="display: block;">
-            <div class="divider"></div>
-            <div class="space-1"></div>
-            <div class="section-title-secondary">History</div>
-            <textarea id="info-log" readonly>
-            </textarea>
-            <div class="divider"></div>
-            <div class="space-1"></div>
-            <div class="section-title-secondary">Messages</div>
-            <textarea id="info-messages" readonly>
-            </textarea>
-            <div class="divider"></div>
-            <input type="button" value="View Code"
-                onclick="openURL('https:\/\/github.com/kinsaurralde/ws_281x-lights')">
-            <input type="button" value="View Status" onclick="openURL('info/web')">
-            <input type="button" value="View New Status" onclick="openURL('info/new_web')">
-            <input type="button" value="kinsaurralde.com" onclick="openURL('https:\/\/kinsaurralde.com')">
-            <div class="divider"></div>
-        </div>
+        <input type="button" value="View Code" onclick="openURL('https:\/\/github.com/kinsaurralde/ws_281x-lights')">
+        <input type="button" value="View Status" onclick="openURL('info/web')">
+        <input type="button" value="kinsaurralde.com" onclick="openURL('https:\/\/kinsaurralde.com')">
     </div>
 
     <script>
-        var send = document.getElementById("send-data-0");
-        var html = new HTMLWriter();
-        var lights = new LightStrip(60);
-        var saves = new Array();
-        var preset = new Preset();
-        var generic = new Generic();
-        var func = new Functions(func);
+        let w = new HTMLWriter();
+        let sender = new Sender();
+        let actions = new Actions(sender);
+        let controllers = new Controllers();
+        let colors = new Colors();
+        let animations = new Animations();
 
-        function pageLoad() {
-            addSaveLive();
-            addSave(255, 0, 0);
-            addSave(0, 255, 0);
-            addSave(0, 0, 255);
-            addSave(0, 255, 255);
-            addSave(255, 0, 255);
-            addSave(255, 255, 0);
-            addSave(255, 255, 255);
-            addSave(0, 0, 0);
-            generic.add_row("bounce");
-            generic.add_row("Pulse Pattern");
-            generic.add_row("mix");
-            generic.add_row("pulse");
-            generic.add_row("blend");
-            generic.add_row("wipe");
-            generic.add_row("pattern");
-            generic.add_row("chase");
-            generic.add_row("fade");
-            generic.add_row("shift");
-            generic.add_row("reverse");
-            generic.add_row("random");
-            generic.add_row("twinkle");
-            func.list();
+        sender.get('config/all', recieved_config);
+
+        function recieved_config(data) {
+            colors.add_defaults(data["colors"]);
+            animations.add_animations(data["animations"]);
+        }
+
+        function openURL(url) {
+            window.open(url, "_blank");
         }
 
         function expand(id, displayType) {
@@ -302,18 +191,9 @@
                 target.style.display = "none";
             }
         }
-
-        function openURL(url) {
-            window.open(url, "_blank");
-        }
-
-        function viewMessages() {
-            let element = document.getElementById("info");
-            element.scrollIntoView({ behavior: "smooth" });
-
-        }
-
     </script>
+
+   
 </body>
 
 </html>
