@@ -43,7 +43,6 @@ class RemoteController(Controller):
         pass
 
     def _emit(self, message, data):
-        print("Emitting", message)
         if self.connected:
             emit_data = {"data": data, "info": {}}
             emit_data["info"]["version"] = "test"
@@ -91,6 +90,3 @@ class RemoteController(Controller):
     def set_brightness(self, data):
         self._emit('set_brightness', {"data": data})
         return super().set_brightness(data)
-
-    def _init_data(self):
-        return None
