@@ -9,4 +9,16 @@ config:
         start: 15
         end: 44
         offset: 0
+    - name: left_half
+      sections:
+      - controller_id: test
+        start: 0
+        end: 59
+        offset: 0
+    - name: right_half
+      sections:
+      - controller_id: test
+        start: 60
+        end: 119
+        offset: 60
 
