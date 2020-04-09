@@ -6,7 +6,7 @@ class Info:
         self.c = controller
         self.info_id = 0
         self.remote = is_remote
-        self.wait = 0.02
+        self.wait = .02
 
     def emit(self, request):
         self.info_id += 1

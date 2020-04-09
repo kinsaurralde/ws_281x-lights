@@ -1,6 +1,7 @@
 import time
 import threading
 
+from py.remote_neopixels import RemoteNeopixels
 from py.neopixels import NeoPixels
 from py.section import Section
 
@@ -8,9 +9,6 @@ class Controller:
     def __init__(self, name_id, config, testing=False):
         self.id = name_id
         self.config = config
-        self.neo = NeoPixels(**config["neopixels"], testing=testing)
-        self.neo.set_brightness(int(config["settings"]["initial_brightness"]))
-        self.neo.set_gamma(config["settings"]["correction"]["gamma"])
         self.base_layer = []
         self.animation_layer = []
         self.overlay_layer = []
@@ -21,6 +19,13 @@ class Controller:
         self.paused = False
         self.starttime = time.time()
         self.wait_time = 8  # 125 per second
+        self.remote = not config["calculate"]
+        if self.remote:
+            self.neo = RemoteNeopixels(**config["neopixels"], testing=testing, url=config["url"])
+        else:
+            self.neo = NeoPixels(**config["neopixels"], testing=testing)
+        self.neo.set_brightness(int(config["settings"]["initial_brightness"]))
+        self.neo.set_gamma(config["settings"]["correction"]["gamma"])
         self._init_data()
         self._start_loop()
 
@@ -120,8 +125,11 @@ class Controller:
 
     def _draw_frame(self):
         if self.counter < len(self.animation_layer):
-            self.neo.update_pixels(self._layer(self.base_layer, self._draw_animation(), self.control_layer))
+            lock = threading.Lock()
+            lock.acquire()
+            self.neo.update_pixels(self._layer(self._draw_animation(), self.control_layer))
             self.neo.show(20)
+            lock.release()
     
     def _loop(self):
         self.starttime = time.time()

@@ -138,4 +138,4 @@ if args.port is not None:
     port = args.port
 
 if __name__ == '__main__':
-    socketio.run(app, debug = args.debug, host = '0.0.0.0', port = port) 
+    socketio.run(app, debug = args.debug, host = '0.0.0.0', port = port, use_reloader = False) 

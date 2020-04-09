@@ -12,10 +12,7 @@ def received_info(data):
 
 
 sio = socketio.Client()
-sio.connect("http://192.168.29.60:5000")
+sio.connect("http://rpi2.kinsaurralde.com:5000")
 
 sio.on('info_response', received_info)
-
-
-
 

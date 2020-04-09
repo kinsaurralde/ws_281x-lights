@@ -1,25 +1,10 @@
 from rpi_ws281x import Adafruit_NeoPixel
-import random
-import math
 import time
-import threading
 
 # Initial LED strip configuration:
-LED_COUNT = 0      # Number of LED pixels.
-LED_PIN = 18      # GPIO pin connected to the pixels (18 uses PWM!).
 LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA = 10      # DMA channel to use for generating signal (try 10)
-LED_BRIGHTNESS = 0     # Set to 0 for darkest and 255 for brightest
-# True to invert the signal (when using NPN transistor level shift)
-LED_INVERT = False
-
-PROVIDED_MILLIAMPS = 10000
-POWER_MULTIPLIER = 0.9
-MAX_MILLIAMPS = PROVIDED_MILLIAMPS*POWER_MULTIPLIER
-
-PROVIDED_WATTS = 1
-VOLTAGE = 5
-
+LED_INVERT = False # True to invert the signal (when using NPN transistor level shift)
 
 class NeoPixels:
     def __init__(self, led_count=60, max_brightness=255, pin=18, max_watts=1, watts_per_60=18, grb=False, testing=True, flipped=True):
@@ -102,6 +87,7 @@ class NeoPixels:
             data = data[0:self.led_count]
         if self.flipped:
             data = list(reversed(data))
+        self.get_pixels()
         for i in range(0, self.led_count):
             if data[i] != -1:
                 self.led_data[i] = data[i]
