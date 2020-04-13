@@ -36,6 +36,7 @@ def update(data):
 
 @socketio.on('neopixel_set_brightness')
 def set_brightness(data):
+    print("Set brightness", data["value"])
     reciever.set_brightness(data)
 
 class Reciever:
@@ -57,7 +58,7 @@ class Reciever:
     def set_brightness(self, data):
         if not self.ready or self.testing:
             return
-        self.strip.set_brightness(data["value"])
+        self.strip.setBrightness(data["value"])
 
     def update(self, data):
         if not self.ready or self.testing:

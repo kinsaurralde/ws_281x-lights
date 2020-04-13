@@ -1,0 +1,2 @@
+~/.ssh/rpi3,pi@rpi3.kinsaurralde.com,Files/rgb_secondary,secondary/apartment/secondary_config_1
+~/.ssh/rpi0,pi@rpi0.kinsaurralde.com,Files/rgb_secondary,secondary/apartment/secondary_config_2

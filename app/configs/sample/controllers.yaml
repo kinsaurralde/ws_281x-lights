@@ -31,9 +31,9 @@ config:
       correction: *default
   - name: window
     active: true
-    remote: false
-    calculate: false
-    url: http://rpi3.kinsaurralde.com:5001
+    remote: true
+    calculate: true
+    url: rpi3.kinsaurralde.com:5001
     neopixels:
       led_count: 100
       max_brightness: 255

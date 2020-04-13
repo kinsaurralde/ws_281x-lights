@@ -2,7 +2,7 @@ import socketio
 
 from py.neopixels import NeoPixels
 
-neo = NeoPixels(60, 255, 18, 18, 18, False, False, True)
+neo = NeoPixels(60, 55, 18, 18, 18, False, False, True)
 
 
 def received_info(data):
@@ -12,7 +12,7 @@ def received_info(data):
 
 
 sio = socketio.Client()
-sio.connect("http://rpi2.kinsaurralde.com:5000")
+sio.connect("http://10.0.0.101:5000")
 
 sio.on('info_response', received_info)
 

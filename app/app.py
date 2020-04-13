@@ -6,7 +6,7 @@ import argparse
 
 from flask import Flask, render_template, json, request, send_from_directory
 from flask_socketio import SocketIO
-from info import Info
+from py.info import Info
 from py.multicontroller import MultiController
 
 try:
