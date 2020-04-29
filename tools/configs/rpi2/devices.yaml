@@ -1,0 +1,13 @@
+devices:
+  - name: rpi2
+    user: pi
+    hostname: rpi2.kinsaurralde.com
+    remote: false
+    path: Files/lights/
+    ssh: ~/.ssh/rpi2
+  - name: rpi3_remote
+    user: pi
+    hostname: rpi3.kinsaurralde.com
+    remote: true
+    path: Files/lights/
+    ssh: ~/.ssh/rpi3

@@ -1,7 +1,6 @@
 import time
 import threading
 
-from py.remote_neopixels import RemoteNeopixels
 from py.neopixels import NeoPixels
 from py.section import Section
 
@@ -20,10 +19,7 @@ class Controller:
         self.starttime = time.time()
         self.wait_time = 8  # 125 per second
         self.remote = not config["calculate"]
-        if self.remote:
-            self.neo = RemoteNeopixels(**config["neopixels"], testing=testing, url=config["url"])
-        else:
-            self.neo = NeoPixels(**config["neopixels"], testing=testing)
+        self.neo = NeoPixels(**config["neopixels"], testing=(testing or self.remote))
         self.neo.set_brightness(int(config["settings"]["initial_brightness"]))
         self.neo.set_gamma(config["settings"]["correction"]["gamma"])
         self._init_data()

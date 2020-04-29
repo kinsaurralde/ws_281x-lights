@@ -88,6 +88,10 @@ def quickaction():
         mc.execute(quick_actions["actions"][recieved["name"]]["actions"], recieved["options"])
     return create_response({"recieved": recieved})
 
+@app.route('/shutdown')
+def shutdown():
+    socketio.server.stop()
+
 @socketio.on('connect')
 def connect():
     print("Client Connected:", request.remote_addr)

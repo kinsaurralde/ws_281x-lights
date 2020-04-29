@@ -30,7 +30,7 @@ config:
       initial_brightness: 100
       correction: *default
   - name: window
-    active: false
+    active: true
     remote: true
     calculate: true
     url: rpi3.kinsaurralde.com:5001

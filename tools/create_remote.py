@@ -6,7 +6,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-s', '--source', type=str, help='Path to source directory (app folder)', default="../app/")
-parser.add_argument('-d', '--destination', type=str, help='Path to destination directory (remote_app folder)', default="../remote_app/")
+parser.add_argument('-d', '--destination', type=str, help='Path to destination directory (remote_app folder)', default="tmp/remote_app/")
 args = parser.parse_args()
 
 if __name__ == "__main__":
