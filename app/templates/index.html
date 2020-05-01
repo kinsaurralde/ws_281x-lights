@@ -29,44 +29,24 @@
                 <th>Brightness Slider</th>
                 <th>Cur/Max Brightness</th>
                 <th>Num Pixels</th>
-                <th>Pixel Sections</th>
+                <th>Draw Wait</th>
+                <th>Animation Framerate</th>
+                <th>Multiplier</th>
                 <th>Send</th>
             </tr>
-            {% for v in vcontrollers %}
-                {% set vid = v['vid'] %}
-                {% if v['real'] == True %}
-                    {% set cid = vid[:-8] %}
-                    {% set id = 'controller_' + cid + '_' %}
-                    {% for c in controllers %}
-                        {% if c["controller_id"] == cid %}
-                            <tr>
-                                <td>{{c["controller_id"]}}</td>
-                                <td><input id="{{id}}brightness_slider" type="range" min="0" max="{{c['neopixels']['max_brightness']}}" step="1" value="{{c['neopixels']['brightness']}}" oninput="controllers.send_brightness('{{cid}}')"></td>
-                                <td><span id="{{id}}brightness">{{c["neopixels"]["brightness"]}}</span> / {{c["neopixels"]["max_brightness"]}}</td>
-                                <td>{{c["neopixels"]["num_pixels"]}}</td>
-                                <td>{{c["controller_id"]}}: ALL</td>
-                                <td><input type="checkbox" id="{{id}}send" oninput="controllers.set_send('{{cid}}')" checked></td>
-                            </tr>
-                        {% endif %}
-                    {% endfor %}                 
-                {% else %}
-                    <tr>
-                        <td>{{vid}}</td>
-                        <td>---</td>
-                        <td>---</td>
-                        <td>{{v['led_count']}}</td>
-                        <td>
-                            {% if vid == "ALL" %}
-                                ALL
-                            {% else %}
-                                {% for s in v['controller_info'] %}
-                                    {{s['id']}}: {{s['start']}} - {{s['end']}}
-                                {% endfor %}
-                            {% endif %}
-                        </td>
-                        <td><input type="checkbox" id="controller_{{vid}}_send" oninput="controllers.set_send('{{vid}}')"></td>
-                    </tr>
-                {% endif %}
+            {% for c in controllers %}
+                {% set id = c["controller_id"] %}
+                <tr>
+                    <td>{{id}}</td>
+                    <td><input id="controller_{{id}}_brightness_slider" type="range" min="0" max="{{c['neopixels']['max_brightness']}}" step="1" value="{{c['neopixels']['brightness']}}" oninput="controllers.send_brightness('{{id}}')"></td>
+                    <td><span id="controller_{{id}}_brightness">{{c["neopixels"]["brightness"]}}</span> / {{c["neopixels"]["max_brightness"]}}</td>
+                    <td>{{c["neopixels"]["num_pixels"]}}</td>
+                    <!-- <td><input id="controller_{{id}}_draw_framerate" type="number" min="1" max="120" step="1" value="{{c['framerate']['draw_framerate']}}"></td> -->
+                    <td>{{c['framerate']['draw_waitms'] | round(3)}}ms</td>
+                    <td><input id="controller_{{id}}_animation_framerate_slider" type="range" min="1" max="120" step="1" value="{{c['framerate']['animation_framerate']}}" class="width-10" oninput="controllers.send_framerate('{{id}}')"></td>
+                    <td>x <input id="controller_{{id}}_animation_multiplier" type="number" min="1" max="100" value="{{c['framerate']['animation_multiplier']}}" onkeydown="return false" style="width: 2vw;" oninput="controllers.send_framerate('{{id}}')"> = <span id="controller_{{id}}_animation_framerate_number">{{c["framerate"]["animation_framerate"]}} </span></td>
+                    <td><input type="checkbox" id="controller_{{id}}_send" oninput="controllers.set_send('{{cid}}')" checked></td>
+                </tr>               
             {% endfor %}
         </table>
     </div>

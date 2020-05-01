@@ -2,9 +2,9 @@
 import time
 # import socketio
 
-from py.controller import Controller
-from py.remote_controller import RemoteController
-from py.virtualcontroller import VirtualController
+from py.advanced.controller import Controller
+from py.advanced.remote_controller import RemoteController
+from py.advanced.virtualcontroller import VirtualController
 
 class MultiController:
     def __init__(self, testing, config, virtual_controller_config):

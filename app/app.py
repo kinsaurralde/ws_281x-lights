@@ -7,7 +7,7 @@ import argparse
 from flask import Flask, render_template, json, request, send_from_directory
 from flask_socketio import SocketIO
 from py.info import Info
-from py.multicontroller import MultiController
+from py.simple.multicontroller import MultiController
 
 try:
     import yaml # 3.6
@@ -50,7 +50,7 @@ def page_not_found(e):
 @app.route('/')
 def index():
     """Main control page"""
-    return render_template('index.html', quick_actions=quick_actions, controllers=mc.info(), vcontrollers=mc.vinfo(), colors=default_colors)
+    return render_template('index.html', quick_actions=quick_actions, controllers=mc.info(), colors=default_colors)
 
 @app.route('/info/<function>')
 def info(function):
@@ -118,6 +118,11 @@ def socket_info_wait(data):
 def set_brightness(data):
     result = mc.set_brightness(data)
     socketio.emit('brightness_change', result)
+
+@socketio.on('set_framerate')
+def set_framerate(data):
+    result = mc.set_framerate(data)
+    socketio.emit('framerate_change', result)
 
 @socketio.on('action')
 def socket_action(data):

@@ -1,0 +1,12 @@
+---
+config_info:
+  name: localhost
+config:
+  web:
+    port: 5000
+  config_paths:
+    controllers: 'configs/localhost/controllers.yaml'
+    quick_actions: 'configs/localhost/quick_actions.yaml'
+    virtual_controllers: 'configs/localhost/virtual_controllers.yaml'
+    colors: 'configs/localhost/colors.yaml'
+    animations: 'configs/localhost/animations.yaml'

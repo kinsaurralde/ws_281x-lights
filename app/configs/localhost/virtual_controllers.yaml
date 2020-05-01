@@ -1,0 +1,24 @@
+---
+config_info:
+  name: sample
+config:
+  virtual_controllers:
+    - name: middle_half
+      sections:
+      - controller_id: floor
+        start: 15
+        end: 44
+        offset: 0
+    - name: left_half
+      sections:
+      - controller_id: floor
+        start: 0
+        end: 59
+        offset: 0
+    - name: right_half
+      sections:
+      - controller_id: floor
+        start: 60
+        end: 119
+        offset: 60
+

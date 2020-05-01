@@ -1,7 +1,7 @@
 import time
 import socketio
 
-from py.controller import Controller
+from py.advanced.controller import Controller
 
 
 class RemoteController(Controller):

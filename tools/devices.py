@@ -33,7 +33,7 @@ if __name__ == "__main__":
     subprocess.run(["rm", "-rf", "tmp/"])
     subprocess.run(["mkdir", "tmp"])
     subprocess.run(["cp", "-r", args.app_path, "tmp/app/"])
-    subprocess.run(["./create_remote.py"])
+    subprocess.run(["./create_remote.py", "-s", args.app_path])
     devices = load_yaml(args.path + "/devices.yaml")
     for device in devices["devices"]:
         send(device)

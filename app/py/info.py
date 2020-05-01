@@ -26,7 +26,6 @@ class Info:
             while time.time() < end_time - count * self.wait:
                 self.sio.sleep(.001)
             
-
     def ping(self, request):
         response = []
         cur_time = time.time()
