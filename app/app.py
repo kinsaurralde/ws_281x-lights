@@ -7,7 +7,7 @@ import argparse
 from flask import Flask, render_template, json, request, send_from_directory
 from flask_socketio import SocketIO
 from py.info import Info
-from py.simple.multicontroller import MultiController
+from py.multicontroller import MultiController
 
 try:
     import yaml # 3.6

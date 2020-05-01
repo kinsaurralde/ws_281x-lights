@@ -40,7 +40,7 @@ config:
       pin: 18
       max_watts: 120
       watts_per_60: 18
-      grb: false
+      grb: true
       flipped: true
     settings:
       initial_brightness: 200

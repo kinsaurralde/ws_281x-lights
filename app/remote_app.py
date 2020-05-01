@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import time
 import argparse
 
@@ -11,7 +12,7 @@ socketio = SocketIO(app, cors_allowed_origins = '*')
 parser = argparse.ArgumentParser()
 parser.add_argument('-d', '--debug', action='store_true', help='Debug mode', default=False)
 parser.add_argument('-t', '--test', action='store_true', help='Testing mode (for non pi devices)', default=False)
-parser.add_argument('-p', '--port', type=int, help='Port to run server', default=5000)
+parser.add_argument('-p', '--port', type=int, help='Port to run server', default=5001)
 args = parser.parse_args()
 
 def create_response(data):
@@ -92,6 +93,7 @@ def set_animation(data):
 @socketio.on('set_control')
 def set_control(data):
     r = check_valid(data)
+    print(r)
     if r["valid"]:
         controller.set_control(**r["args"])
 
@@ -109,4 +111,4 @@ connected = False
 controller = None
 
 if __name__ == '__main__':
-    socketio.run(app, debug = args.debug, host = '0.0.0.0', port = args.port) 
+    socketio.run(app, debug = args.debug, host = '0.0.0.0', port = args.port, use_reloader = False) 

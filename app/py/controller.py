@@ -2,7 +2,7 @@ import time
 import threading
 
 from py.neopixels import NeoPixels
-from py.animation import Animations
+# from py.animation import Animations
 
 class Controller:
     def __init__(self, name_id, config, testing=False):
@@ -25,7 +25,7 @@ class Controller:
         self.neo = NeoPixels(**config["neopixels"], testing=(testing or self.remote))
         self.neo.set_brightness(int(config["settings"]["initial_brightness"]))
         self.neo.set_gamma(config["settings"]["correction"]["gamma"])
-        self.a = Animations(self.neo.num_pixels())
+        # self.a = Animations(self.neo.num_pixels())
         self._init_data()
         self._start_loop()
         print("Created controller with id", name_id)
@@ -100,8 +100,8 @@ class Controller:
     def get_power_usage(self):
         return self.neo.get_power_usage(False)
 
-    def calc(self, actions):
-        return self.a.calc(actions)
+    # def calc(self, actions):
+    #     return self.a.calc(actions)
 
     def info(self):
         data = {"controller_id": self.id, "remote": self.config["remote"]}

@@ -10,7 +10,7 @@ parser.add_argument('-d', '--destination', type=str, help='Path to destination d
 args = parser.parse_args()
 
 if __name__ == "__main__":
-    copies = [["py/remote/remote_app.py", "app.py"], ["py/simple/controller.py", "py/controller.py"], ["py/neopixels.py"]]
+    copies = [["remote_app.py", "app.py"], ["py/controller.py"], ["py/neopixels.py"]]
     if not os.path.exists(args.source):
         print("App directory", args.source, "does not exist")
         exit(1)

@@ -2,7 +2,9 @@
 import time
 # import socketio
 
-from py.simple.controller import Controller
+from py.remote_controller import RemoteController
+from py.controller import Controller
+from py.animation import Animations
 
 class MultiController:
     def __init__(self, testing, config, virtual_controller_config):
@@ -13,13 +15,19 @@ class MultiController:
     def _init_controllers(self, config):
         for c in config["controllers"]:
             if c["active"]:
-                controller = Controller(c["name"], c, testing=self.testing)
+                if c["remote"]:
+                    controller = RemoteController(c["name"], c, testing=self.testing)
+                else:
+                    controller = Controller(c["name"], c, testing=self.testing)
                 self.controllers[c["name"]] = controller
                 
     def execute(self, actions, options={}):
         controllers = self.controllers.keys()
+        a = Animations(0)
         for controller in controllers:
-            layers = self.controllers[controller].calc(actions)
+            a.set_led_count(self.controllers[controller].num_pixels())
+            a.set_grb(self.controllers[controller].neo.grb)
+            layers = a.calc(actions)
             if layers.get("settings") is not None:
                 self.controllers[controller].set_settings(layers["settings"])
             if layers.get("base") is not None:

@@ -45,3 +45,19 @@ config:
     settings:
       initial_brightness: 200
       correction: *default
+  - name: remotetest100
+    active: true
+    remote: true
+    calculate: true
+    url: "localhost:5001"
+    neopixels:
+      led_count: 100
+      max_brightness: 255
+      pin: 18
+      max_watts: 120
+      watts_per_60: 19
+      grb: false
+      flipped: true
+    settings:
+      initial_brightness: 200
+      correction: *default

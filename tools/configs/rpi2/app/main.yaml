@@ -1,12 +1,12 @@
 ---
 config_info:
-  name: sample
+  name: generated
 config:
   web:
     port: 5000
   config_paths:
-    controllers: 'configs/sample/controllers.yaml'
-    quick_actions: 'configs/sample/quick_actions.yaml'
-    virtual_controllers: 'configs/sample/virtual_controllers.yaml'
-    colors: 'configs/sample/colors.yaml'
-    animations: 'configs/sample/animations.yaml'
+    controllers: 'configs/generated/controllers.yaml'
+    quick_actions: 'configs/generated/quick_actions.yaml'
+    virtual_controllers: 'configs/generated/virtual_controllers.yaml'
+    colors: 'configs/generated/colors.yaml'
+    animations: 'configs/generated/animations.yaml'

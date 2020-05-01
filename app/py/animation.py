@@ -31,6 +31,9 @@ class Animations:
         if value > 0:
             self.led_count = value
 
+    def set_grb(self, value):
+        self.grb = value
+
     def calc(self, actions):
         self._reset_layers()
         for action in actions:
