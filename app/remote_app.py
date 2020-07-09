@@ -41,7 +41,7 @@ def connect():
     socketio.emit('connection_response', room=request.sid)
     if controller is not None:
         controller.set_settings([{"on": True}])
-        controller.set_control([-1] * controller.num_pixels(), controller.id + "_virtual_0")
+        controller.set_control([-1] * controller.num_pixels())
 
 @socketio.on('disconnect')
 def disconnect():
@@ -49,7 +49,7 @@ def disconnect():
     socketio.emit('disconnect_response', room=request.sid)
     if controller is not None:
         controller.set_settings([{"on": False}])
-        controller.set_control([0] * controller.num_pixels(), controller.id + "_virtual_0")
+        controller.set_control([0] * controller.num_pixels())
 
 @socketio.on('setup_controller')
 def setup_controller(data):
@@ -86,6 +86,7 @@ def set_base(data):
     
 @socketio.on('set_animation')
 def set_animation(data):
+    print("Set Animation", time.time())
     r = check_valid(data)
     if r["valid"]:
         controller.set_animation(**r["args"])
@@ -93,7 +94,6 @@ def set_animation(data):
 @socketio.on('set_control')
 def set_control(data):
     r = check_valid(data)
-    print(r)
     if r["valid"]:
         controller.set_control(**r["args"])
 

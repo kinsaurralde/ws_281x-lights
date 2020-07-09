@@ -114,6 +114,7 @@ class Colors {
                 "g": color["g"],
                 "b": color["b"]
             }});
+            console.log("Sendgin", json);
             sender.emit('action', json);
         }
     }

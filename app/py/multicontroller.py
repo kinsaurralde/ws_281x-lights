@@ -1,5 +1,6 @@
 # import requests
 import time
+import threading
 # import socketio
 
 from py.remote_controller import RemoteController
@@ -20,25 +21,36 @@ class MultiController:
                 else:
                     controller = Controller(c["name"], c, testing=self.testing)
                 self.controllers[c["name"]] = controller
+
+    def _set_controllers(self, controller, layer, start_time):
+        if layer.get("settings") is not None:
+            self.controllers[controller].set_settings(layer["settings"], start_time)
+        if layer.get("base") is not None:
+            self.controllers[controller].set_base(layer["base"], start_time)
+        if layer.get("animation") is not None:
+            if len(layer.get("animation")) > 0:
+                self.controllers[controller].set_animation(layer["animation"], start_time)
+        if layer.get("control") is not None:
+            self.controllers[controller].set_control(layer["control"], start_time)
+        if layer.get("framerate") is not None:
+            self.controllers[controller].set_framerate_value(layer["framerate"], start_time)
                 
     def execute(self, actions, options={}):
         controllers = self.controllers.keys()
         a = Animations(0)
-        for controller in controllers:
+        layers = []
+        for controller in options["controllers"]:
             a.set_led_count(self.controllers[controller].num_pixels())
             a.set_grb(self.controllers[controller].neo.grb)
-            layers = a.calc(actions)
-            if layers.get("settings") is not None:
-                self.controllers[controller].set_settings(layers["settings"])
-            if layers.get("base") is not None:
-                self.controllers[controller].set_base(layers["base"])
-            if layers.get("animation") is not None:
-                if len(layers.get("animation")) > 0:
-                    self.controllers[controller].set_animation(layers["animation"])
-            if layers.get("control") is not None:
-                self.controllers[controller].set_control(layers["control"])
-            if layers.get("framerate") is not None:
-                self.controllers[controller].set_framerate_value(layers["framerate"])
+            layers.append((controller, a.calc(actions)))
+        start_time = time.time() + 0.1
+        for layer in layers:
+            print("Layer", layer[0], time.time())
+            if self.controllers[layer[0]].get_remote():
+                self._set_controllers(layer[0], layer[1], start_time)
+            else:
+                threading_thread = threading.Thread(target=self._set_controllers, args=(layer[0], layer[1], start_time))
+                threading_thread.start()            
 
     def set_brightness(self, data):
         result = []

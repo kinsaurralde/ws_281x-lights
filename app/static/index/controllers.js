@@ -76,27 +76,15 @@ class Controllers {
 
     set_send(id) {
         this._div_saved(id);
-        let checked = this.divs[id]["send"].checked;
-        if (id == "ALL" && checked) {
-            for (let controller in this.divs) {
-                if (controller != "ALL") {
-                    this.divs[controller]["send"].checked = false;
-                }
-            } 
-        } else if (id != "ALL" && checked) {
-            if (this.divs["ALL"]["send"].checked) {
-                this.divs[id]["send"].checked = false;
-            }
-        }
     }
 
     get_options() {
-        let vcontrollers = []
+        let controllers = []
         for (let controller in this.divs) {
             if (this.divs[controller]["send"].checked) {
-                vcontrollers.push(controller);
+                controllers.push(controller);
             }
         }   
-        return {"virtual_controllers": vcontrollers}
+        return {"controllers": controllers}
     }
 };

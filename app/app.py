@@ -126,6 +126,7 @@ def set_framerate(data):
 
 @socketio.on('action')
 def socket_action(data):
+    print("Recieved Action:", data["actions"])
     mc.execute(data["actions"], data["options"])
 
 main_config = open_yaml(args.config)

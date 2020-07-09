@@ -46,7 +46,7 @@ config:
       initial_brightness: 200
       correction: *default
   - name: remotetest100
-    active: true
+    active: false
     remote: true
     calculate: true
     url: "localhost:5001"

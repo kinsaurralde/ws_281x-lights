@@ -42,12 +42,14 @@ class Controller:
             "animation_multiplier": self.animation_framerate_multiplier
         }
 
-    def set_framerate_value(self, value):
+    def set_framerate_value(self, value, start_time=None):
+        self._sleep_until(start_time)
         if value > 0:
             self.framerate = value
             self.wait_time = 1000 / self.framerate
 
-    def set_framerate(self, data):
+    def set_framerate(self, data, start_time=None):
+        self._sleep_until(start_time)
         if "draw" in data:
             value = int(data["draw"])
             if value > 0:
@@ -74,20 +76,26 @@ class Controller:
     def get_id(self):
         return self.id
 
-    def set_settings(self, settings):
+    def set_settings(self, settings, start_time=None):
+        self._sleep_until(start_time)
         for setting in settings:
             if setting == "on":
                 self.on = bool(settings[setting])
 
-    def set_base(self, data):
+    def set_base(self, data, start_time=None):
+        self._sleep_until(start_time)
         self.base_layer = data
         self._draw_frame()
 
-    def set_animation(self, data):
+    def set_animation(self, data, start_time=None):
+        print(0, start_time, time.time())
+        self._sleep_until(start_time)
+        print(1, start_time, time.time())
         if len(data) > 0:
             self.animation_layer = data
 
-    def set_control(self, data):
+    def set_control(self, data, start_time=None):
+        self._sleep_until(start_time)
         self.control_layer = data
         self._draw_frame()
 
@@ -99,6 +107,9 @@ class Controller:
 
     def get_power_usage(self):
         return self.neo.get_power_usage(False)
+
+    def get_remote(self):
+        return self.remote
 
     # def calc(self, actions):
     #     return self.a.calc(actions)
@@ -143,11 +154,21 @@ class Controller:
         while time.time() < self.starttime:
             time.sleep(.003)
 
+    def _sleep_until(self, start_time):
+        if start_time is None:
+            return
+        while time.time() < start_time:
+            time.sleep(.001)
+
     def _start_loop(self):
         threading_thread = threading.Thread(target=self._loop)
         threading_thread.start()
 
     def _special(self, frame):
+        if len(frame) < 2:
+            return
+        if not isinstance(frame[1], list):
+            return
         for action in frame[1]:
             if action == "animation_to_base":
                 self.base_layer = frame[0]
@@ -155,8 +176,9 @@ class Controller:
     def _draw_animation(self):
         frame = self.animation_layer[self.counter]
         if isinstance(frame, list):
-            self._special(frame)
-            return frame[0]
+            if len(frame) > 1 and isinstance(frame[0], list):
+                self._special(frame)
+                return frame[0]
         return frame
 
     def _draw_frame(self):

@@ -45,7 +45,7 @@
                     <td>{{c['framerate']['draw_waitms'] | round(3)}}ms</td>
                     <td><input id="controller_{{id}}_animation_framerate_slider" type="range" min="1" max="120" step="1" value="{{c['framerate']['animation_framerate']}}" class="width-10" oninput="controllers.send_framerate('{{id}}')"></td>
                     <td>x <input id="controller_{{id}}_animation_multiplier" type="number" min="1" max="100" value="{{c['framerate']['animation_multiplier']}}" onkeydown="return false" style="width: 2vw;" oninput="controllers.send_framerate('{{id}}')"> = <span id="controller_{{id}}_animation_framerate_number">{{c["framerate"]["animation_framerate"]}} </span></td>
-                    <td><input type="checkbox" id="controller_{{id}}_send" oninput="controllers.set_send('{{cid}}')" checked></td>
+                    <td><input type="checkbox" id="controller_{{id}}_send" oninput="controllers.set_send('{{id}}')" checked></td>
                 </tr>               
             {% endfor %}
         </table>

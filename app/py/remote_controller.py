@@ -46,6 +46,7 @@ class RemoteController(Controller):
             emit_data = {"data": data, "info": {}}
             emit_data["info"]["version"] = "test"
             start_time = time.time()
+            print("Emitted", time.time())
             self.sio.emit(message, emit_data, self._emit_response(start_time))
         else:
             self._connect()
@@ -66,25 +67,25 @@ class RemoteController(Controller):
         self._emit('set_strip', {"data": data})
         return super().set_strip(data)
         
-    def set_framerate(self, value):
+    def set_framerate(self, value, start_time=None):
         data = super().set_framerate(value)
-        self._emit('set_framerate', {"data": data})
+        self._emit('set_framerate', {"data": data, "start_time": start_time})
         return data
 
-    def set_settings(self, settings):
-        self._emit('set_settings', {"settings": settings})
+    def set_settings(self, settings, start_time=None):
+        self._emit('set_settings', {"settings": settings, "start_time": start_time})
         return super().set_settings(settings)
         
-    def set_base(self, data):
-        self._emit('set_base', {"data": data})
+    def set_base(self, data, start_time=None):
+        self._emit('set_base', {"data": data, "start_time": start_time})
         return super().set_base(data)
         
-    def set_animation(self, data):
-        self._emit('set_animation', {"data": data})
+    def set_animation(self, data, start_time=None):
+        self._emit('set_animation', {"data": data, "start_time": start_time})
         return super().set_animation(data)
         
-    def set_control(self, data):
-        self._emit('set_control', {"data": data})
+    def set_control(self, data, start_time=None):
+        self._emit('set_control', {"data": data, "start_time": start_time})
         return super().set_control(data)
 
     def set_brightness(self, data):

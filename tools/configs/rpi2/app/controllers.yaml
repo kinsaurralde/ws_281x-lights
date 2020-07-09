@@ -33,7 +33,8 @@ config:
     active: true
     remote: true
     calculate: true
-    url: rpi3.kinsaurralde.com:5001
+    url: 10.0.0.108:5001
+    # url: rpi3.kinsaurralde.com:5001
     neopixels:
       led_count: 100
       max_brightness: 255
