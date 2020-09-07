@@ -1,0 +1,13 @@
+#control-table tbody tr:nth-child(4n),
+#control-table tbody tr:nth-child(4n - 1) {
+  background-color: var(--body-background);
+}
+
+#control-table tbody tr:nth-child(4n - 2),
+#control-table tbody tr:nth-child(4n - 3) {
+  background-color: var(--input-background);
+}
+
+#colors-noedit button {
+  margin: 0.25vh;
+}

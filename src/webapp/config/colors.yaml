@@ -1,0 +1,46 @@
+---
+colors:
+  noedit:
+    - name: black
+      value: [0, 0, 0]
+    - name: red
+      value: [255, 0, 0]
+    - name: green
+      value: [0, 255, 0]
+    - name: blue
+      value: [0, 0, 255]
+    - name: yellow
+      value: [255, 255, 0]
+    - name: cyan
+      value: [0, 255, 255]
+    - name: magenta
+      value: [255, 0, 255]
+    - name: white
+      value: [255, 255, 255]
+    - name: orange
+      value: [255, 55, 0]
+    - name: purple
+      value: [55, 0, 225]
+    - name: turquoise
+      value: [0, 255, 55]
+    - name: pink
+      value: [255, 0, 55]
+  edit:
+    - name: custom_1
+      value: [255, 0, 55]
+      visible: true
+    - name: custom_2
+      value: [55, 255, 0]
+      visible: false
+    - name: custom_3
+      value: [0, 55, 255]
+      visible: false
+    - name: custom_4
+      value: [255, 55, 0]
+      visible: false
+    - name: custom_5
+      value: [0, 255, 55]
+      visible: false
+    - name: custom_6
+      value: [55, 0, 255]
+      visible: false

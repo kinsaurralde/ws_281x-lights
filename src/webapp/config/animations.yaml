@@ -1,0 +1,68 @@
+---
+args:
+  animation: animation
+  color: color
+  color_bg: color
+  colors: color_list
+  arg1: unsigned_int
+  arg2: unsigned_int
+  arg3: unsigned_int
+  arg4: int
+  arg5: int
+  arg6: bool
+  arg7: bool
+  arg8: bool
+animations:
+  Color:
+    color: 
+      label: Color
+      default: blue
+  Wipe:
+    color: 
+      label: Color
+      default: green
+    color_bg: 
+      label: Background
+      default: none
+    arg1: 
+      label: Steps
+      default: 1
+    arg6: 
+      label: Reverse
+      default: false
+  Pulse:
+    colors:
+      label: Colors
+      default: red, yellow, green, custom_1
+    color_bg: 
+      label: Background
+      default: none
+    arg1: 
+      label: Length
+      default: 5
+    arg2: 
+      label: Spacing
+      default: 5
+    arg3: 
+      label: Shift Amount
+      default: 1
+    arg4: 
+      label: Pattern Size
+      default: -1
+    arg6: 
+      label: Reverse
+      default: false
+  Rainbow:
+    arg3: 
+      label: Shift Amount
+      default: 1
+    arg6: 
+      label: Reverse
+      default: false
+  Cycle:
+    colors: 
+      label: Colors
+      default: red, green, blue
+    arg1: 
+      label: Steps between colors
+      default: 50

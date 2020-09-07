@@ -1,0 +1,16 @@
+[MASTER]
+
+disable=
+    parse-error,
+    missing-docstring,
+    invalid-name,
+    redefined-outer-name,
+    superfluous-parens,
+    import-error,
+    bare-except,
+    bad-continuation,
+    duplicate-code,
+    too-few-public-methods,
+    too-many-instance-attributes,
+    too-many-arguments,
+    anomalous-backslash-in-string

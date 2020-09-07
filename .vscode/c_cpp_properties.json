@@ -3,10 +3,16 @@
         {
             "name": "Win32",
             "includePath": [
+                "C:\\Users\\kinsa\\Documents\\Arduino\\libraries\\RemoteDebug\\src",
+                "C:\\Users\\kinsa\\Documents\\Arduino\\libraries\\FastLED",
+                "C:\\Users\\kinsa\\Documents\\Arduino\\libraries\\WebSockets\\src",
+                "C:\\Users\\kinsa\\Documents\\Arduino\\libraries\\SocketIoClient",
+                "C:\\Users\\kinsa\\Documents\\Arduino\\libraries\\NTPClient",
                 "C:\\Users\\kinsa\\Documents\\Arduino\\libraries\\Adafruit_NeoPixel",
                 "C:\\Users\\kinsa\\Documents\\Arduino\\libraries\\ArduinoJson\\src",
                 "C:\\Users\\kinsa\\AppData\\Local\\Arduino15\\packages\\esp8266\\tools\\**",
-                "C:\\Users\\kinsa\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\2.7.2\\**"
+                "C:\\Users\\kinsa\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\2.7.2\\**",
+                "C:\\Users\\kinsa\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\2.7.4\\**"
             ],
             "forcedInclude": [],
             "intelliSenseMode": "msvc-x64",

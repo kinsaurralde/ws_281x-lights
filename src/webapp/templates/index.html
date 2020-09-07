@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+
+    <title>LED</title>
+    <meta name="description" content="LED controll" />
+    <link rel="stylesheet" href="../static/main.css" />
+    <link rel="stylesheet" href="../static/project.css" />
+    <script defer src="../static/helpers.js"></script>
+    <script defer src="../static/controllers.js"></script>
+    <script defer src="../static/groups.js"></script>
+    <script defer src="../static/animations.js"></script>
+    <script defer src="../static/colors.js"></script>
+  </head>
+
+  <body>
+    <div class="divider"></div>
+    <div class="section-title">Controllers</div>
+    <div class="space-1"></div>
+    <table id="controller-table">
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Brightness</th>
+          <th scope="col">Number of LEDs</th>
+          <th scope="col">Max milliwatts</th>
+          <th scope="col">Target Group ID</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <div class="divider"></div>
+    <div class="section-title">Custom Target Groups</div>
+    <table id="groups-table"></table>
+
+    <div class="divider"></div>
+    <div class="section-title">Colors</div>
+    <div class="divider"></div>
+    <div id="colors-noedit">
+      <input type="number" min="-1" value="-1" id="colors-noedit-target" />
+    </div>
+    <div class="divider"></div>
+    <div id="colors-edit"></div>
+
+    <div class="divider"></div>
+    <div class="section-title">Animations</div>
+    <div class="space-3"></div>
+    <div id="main-control">
+      <table id="animations-table">
+        <thead>
+          <tr>
+            <th scope="col">Animation</th>
+            <th scope="col">Color 1</th>
+            <th scope="col">Color 2</th>
+            <th scope="col">Colors</th>
+            <th scope="col">Arg1</th>
+            <th scope="col">Arg2</th>
+            <th scope="col">Arg3</th>
+            <th scope="col">Arg4</th>
+            <th scope="col">Arg5</th>
+            <th scope="col">Arg6</th>
+            <th scope="col">Arg7</th>
+            <th scope="col">Arg8</th>
+            <th scope="col">Wait ms</th>
+            <th scope="col">Steps</th>
+            <th scope="col">Target</th>
+            <th scope="col">Send</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <script>
+      window.onload = function () {
+        window.controllers = new Controllers()
+        window.animations = new Animations()
+        window.colors = new Colors()
+        window.groups = new Groups()
+      }
+
+      function loadedControllers() {
+        groups.init(controllers.getNames())
+      }
+    </script>
+  </body>
+</html>

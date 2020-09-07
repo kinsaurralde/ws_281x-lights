@@ -1,5 +1,10 @@
+node_modules/
+.vscode/
+npn-debug.log
+src/webapp/config/controllers_*.yaml
+!src/webapp/config/controllers_sampler.yaml
+build/*
+.coverage
+htmlcov/
 __pycache__/
-*.pyc
-tools/secondary/*
-tools/data/
-tools/tmp/*
+wifi_credentials.h
