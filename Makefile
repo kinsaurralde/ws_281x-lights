@@ -53,10 +53,10 @@ test:
 	make coverage
 
 test_webapp:
-	cd src/webapp && coverage run --source=. -m pytest && cd ../../
+	cd src/webapp && pytest && cd ../../
 
 coverage:
-	cd src/webapp && coverage report && coverage html && cd ../../
+	cd src/webapp && coverage run --source=. -m pytest && coverage report && coverage html && cd ../../
 
 build: all
 	g++ -c -fPIC ${BUILD_RPI_SRC_DIR}pixels.cpp -o ${BUILD_RPI_SRC_DIR}pixels.o ${CPP_FLAGS}
@@ -105,7 +105,7 @@ lint: clean
 	find src/ -iname *.js | xargs ${CLANG_FORMAT} -i
 	${HTML_VALIDATE} ${HTML_VALIDATE_CONFG} ${HTML_DIR}*.html
 	${ESLINT} ${ESLINT_CONFIG} ${CSSJS_DIR}*.js
-	black ${PY_FILES}
+	python3 -m black ${PY_FILES}
 	pylint ${PYLINT_CONFIG} ${PY_FILES}
 
 upload_rpi: all
