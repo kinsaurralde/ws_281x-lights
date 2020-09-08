@@ -6,6 +6,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: Setup
+      if: always()
+      run: make setup
     - name: Build
       if: always()
       run: make build
