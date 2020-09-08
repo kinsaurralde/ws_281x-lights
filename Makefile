@@ -80,8 +80,8 @@ run_local: build
 setup:
 	sudo apt install nodejs
 	sudo apt install npm
+	make node_modules
 	sudo npm i docsify-cli -g
-	npm install clang-format prettier html-validate eslint eslint-config-defaults eslint-config-google
 	sudo apt install pylint
 	sudo apt install python3-pip
 	sudo pip3 install eventlet
@@ -94,6 +94,9 @@ setup:
 	sudo pip3 install Flask
 	sudo pip3 install flask_socketio
 	sudo pip3 install ruamel.yaml 
+
+node_modules:
+	npm install clang-format prettier html-validate eslint eslint-config-defaults eslint-config-google
 
 lint: clean
 	${PRETTIER} ${PRETTIER_CONIG} --write ${CSSJS_DIR}*.css

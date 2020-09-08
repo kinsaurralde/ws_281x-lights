@@ -1,5 +1,7 @@
 # ws281x-led
 
+Full documentation [here](https://kinsaurralde.github.io/ws_281x-lights/#/)
+
 ## Table of Contents
 1. [Top Level Directory Structure](#top-level-directory-structure)
 2. [Installation](#installation)

@@ -1,0 +1,17 @@
+name: Lint and Validate
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: install node dependencies
+      if: always()
+      run: make node_modules
+    - name: Lint
+      if: always()
+      run: make lint
+    - name: Notify on failure
+      if: failure()
+      run: echo 'run "make lint" to see/fix errors locally'

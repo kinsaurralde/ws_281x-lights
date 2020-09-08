@@ -1,0 +1,17 @@
+name: Build and Test
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build
+      if: always()
+      run: make build
+    - name: Test
+      if: always()
+      run: make test
+    - name: Notify on failure
+      if: failure()
+      run: echo 'run "make build" and "make test" to see/fix errors locally'
