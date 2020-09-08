@@ -89,6 +89,7 @@ setup:
 	pip3 install pytest-flask
 	pip3 install pytest-mock
 	pip3 install coverage
+	pip3 install setuptools
 	sudo pip3 install rpi_ws281x
 	sudo apt install screen
 	sudo pip3 install Flask
