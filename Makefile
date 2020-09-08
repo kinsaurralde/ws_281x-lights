@@ -53,7 +53,7 @@ test:
 	make coverage
 
 test_webapp:
-	cd src/webapp && pytest && cd ../../
+	cd src/webapp && python3 -m pytest && cd ../../
 
 coverage:
 	cd src/webapp && coverage run --source=. -m pytest && coverage report && coverage html && cd ../../
@@ -90,6 +90,7 @@ setup:
 	pip3 install pytest-mock
 	pip3 install coverage
 	pip3 install setuptools
+	pip3 install pylint
 	sudo pip3 install rpi_ws281x
 	sudo apt install screen
 	sudo pip3 install Flask

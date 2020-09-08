@@ -14,7 +14,7 @@ jobs:
       run: make build
     - name: Test
       if: always()
-      run: make test
+      run: make test_webapp
     - name: Notify on failure
       if: failure()
       run: echo 'run "make build" and "make test" to see/fix errors locally'
