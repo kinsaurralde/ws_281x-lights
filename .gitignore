@@ -2,7 +2,7 @@ node_modules/
 .vscode/
 npn-debug.log
 src/webapp/config/controllers_*.yaml
-!src/webapp/config/controllers_sampler.yaml
+!src/webapp/config/controllers_sample.yaml
 build/*
 .coverage
 htmlcov/

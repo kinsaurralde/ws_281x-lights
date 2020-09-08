@@ -1,0 +1,42 @@
+---
+controllers:
+  - name: tester_a_0
+    url: http://localhost:6000
+    strip_id: 0
+    init:
+      num_leds: 300
+      milliwatts: 5000
+      brightness: 100
+    active: false
+  - name: tester_a_1
+    url: http://localhost:6000
+    strip_id: 1
+    init:
+      num_leds: 300
+      milliwatts: 5000
+      brightness: 100
+    active: false
+  - name: tester_b_0
+    url: http://localhost:6000
+    strip_id: 0
+    init:
+      num_leds: 300
+      milliwatts: 100
+      brightness: 100
+    active: false
+  - name: tester_b_1
+    url: http://localhost:6000
+    strip_id: 1
+    init:
+      num_leds: 300
+      milliwatts: 100
+      brightness: 100
+    active: false
+  - name: tester_c_0
+    url: http://localhost:6000
+    strip_id: 0
+    init:
+      num_leds: 60
+      milliwatts: 5000
+      brightness: 100
+    active: true
