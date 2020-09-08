@@ -5,10 +5,21 @@ class Colors {
     this.noedit = document.getElementById('colors-noedit');
     this.edit = document.getElementById('colors-edit');
     this.status = createStatus();
+    this.visible = 0;
     this.num_custom = 0;
     this.colors = {};
     this.colors_list = {};
     this.getColors();
+    this.setupEventListeners();
+  }
+
+  setupEventListeners() {
+    document.getElementById('colors-add').addEventListener('click', () => {
+      this.addColor();
+    });
+    document.getElementById('colors-remove').addEventListener('click', () => {
+      this.removeColor();
+    });
   }
 
   getColors() {
@@ -39,8 +50,23 @@ class Colors {
     this.colors[color] = getValue;
   }
 
-  addColor(name, r, g, b) {
-    this.colors[name] = [r, g, b];
+  addColor() {
+    if (this.visible < this.num_custom) {
+      document.getElementById(`colors-custom-${this.visible}`).style.display =
+          'flex';
+      this.visible += 1;
+    } else {
+      this.addEditable(`custom_${this.visible + 1}`, 255, 255, 255);
+    }
+  }
+
+  removeColor() {
+    if (this.visible < 1) {
+      return;
+    }
+    this.visible -= 1;
+    document.getElementById(`colors-custom-${this.visible}`).style.display =
+        'none';
   }
 
   addNoedit(color) {
@@ -74,6 +100,7 @@ class Colors {
   }
 
   addEditable(name, r, g, b, visible = true) {
+    this.visible += 1;
     const row_num = this.num_custom;
     this.num_custom += 1;
     const id = 'colors-custom-' + row_num;
