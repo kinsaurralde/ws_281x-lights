@@ -106,7 +106,7 @@ lint: clean
 	${HTML_VALIDATE} ${HTML_VALIDATE_CONFG} ${HTML_DIR}*.html
 	${ESLINT} ${ESLINT_CONFIG} ${CSSJS_DIR}*.js
 	python3 -m black ${PY_FILES}
-	pylint ${PYLINT_CONFIG} ${PY_FILES}
+	python3 -m pylint ${PYLINT_CONFIG} ${PY_FILES}
 
 upload_rpi: all
 	cd tools &&	python3 upload_rpi.py
