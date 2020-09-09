@@ -36,7 +36,7 @@ all:
 	cp ${CONTROLLERS_DIR}extern.cpp -t ${BUILD_DIR}raspberrypi/src/
 	cp ${CONTROLLERS_DIR}wrapper.py ${CONTROLLERS_DIR}controller_server.py ${CONTROLLERS_DIR}controller.py ${BUILD_DIR}raspberrypi/
 	cp ${SCRIPTS_DIR}rpi_startup.sh ${BUILD_DIR}raspberrypi/
-	cp ${TOOLS_DIR}makefiles/rpi_Makefile ${BUILD_DIR}raspberrypi/Makefile
+	cp makefiles/rpi_Makefile ${BUILD_DIR}raspberrypi/Makefile
 
 	# Copy to esp8266
 	cp ${CONTROLLERS_DIR}pixels.cpp ${CONTROLLERS_DIR}pixels.h -t ${BUILD_DIR}esp8266/
@@ -49,7 +49,6 @@ all:
 	cp -r ${WEBAPP_DIR} ${BUILD_DIR}
 
 test:
-	make test_webapp
 	make coverage
 
 test_webapp:

@@ -20,6 +20,7 @@ Full documentation [here](https://kinsaurralde.github.io/ws_281x-lights/#/)
 ├── lint_config         # Configuration for linters
 ├── src                 # Source files
 ├── tools               # Programs used to copy, send, or test
+├── makefiles           # Makefiles for raspberrypi
 ├── .gitignore
 ├── Makefile
 ├── LICENSE
@@ -70,8 +71,95 @@ The files in this directory are only intended for a raspberry pi.
 The webapp directory can be run on any device that has python since it does not interact with special hardware that the esp8266 and raspberry pi use.
 
 ## Testing
+Tests can be run through either
+```bash
+make test
+```
+for all tests with coverage report OR
+```bash
+make test_webapp
+```
+to just test the webapp server with no coverage report.
+
+Currently only the webapp server has tests.
+
+A coverage report in HTML format is available at `src/webapp/htmlcov/index.html` after a test with coverage is run.
 
 ## Tools
+
+```
+.
+├── ...
+├── tools
+│   ├── configs
+|   |   ├── localtest.yaml
+|   |   └── upload_rpi.yaml 
+│   ├── localtest.py
+│   └── upload_rpi.py
+└── ...
+```
+
+### localtest
+Localtest creates locally test controler servers. It uses the controller config specified in `localtest.yaml`. 
+The controller servers run in test mode with incrementing port numbers starting at 6000.
+
+Arguments:
+```
+usage: localtest.py [-h] [-c CONFIG] [-b BUILDFOLDER]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -c CONFIG, --config CONFIG
+                        Path to config file
+  -b BUILDFOLDER, --buildfolder BUILDFOLDER
+                        Path to buildfolder
+```
+
+This can be run by either
+```bash
+cd tools
+./localtest.py
+```
+or
+```bash
+make run_local
+```
+
+### upload_rpi
+Upload rpi uses sftp to send the required files to other devices (most likely raspberry pis).
+The locations to send through and other information can be set in `upload_rpi.yaml`
+
+Arguments:
+```
+usage: upload_rpi.py [-h] [-c CONFIG] [-b BUILDFOLDER]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -c CONFIG, --config CONFIG
+                        Path to config file
+  -b BUILDFOLDER, --buildfolder BUILDFOLDER
+                        Path to buildfolder
+```
+
+This can be run by either
+```bash
+cd tools
+./upload_rpi.py
+```
+or
+```bash
+make upload_rpi
+```
+
+Config file example (default value)
+```
+- userhost: pi@rpi4.kinsaurralde.com      # user@hostname
+  key: "~/.ssh/rpi4"                      # path to ssh key
+  destination: "Files/test_rgb/"          # folder that files should be put into
+  webapp: false                           # include webapp compenent
+  controller: true                        # include controller component
+```
+
 
 ## Application Architecture
 ![Application Architecture](images/application_architecture.png)
@@ -79,7 +167,6 @@ The webapp directory can be run on any device that has python since it does not 
 ## Todo
 - Controller brightness
 - Power consumption measurement and adjustment
-- Webpage hide/add/remove colors slots
 - SocketIO
     - Controller ping on webpage
     - Controller brighntess on webpage
