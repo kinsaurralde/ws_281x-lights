@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
 
     <title>LED</title>
-    <meta name="description" content="LED controll" />
+    <meta name="description" content="LED Control" />
     <link rel="stylesheet" href="../static/main.css" />
     <link rel="stylesheet" href="../static/project.css" />
     <script defer src="../static/helpers.js"></script>
@@ -17,65 +17,98 @@
 
   <body>
     <div class="divider"></div>
-    <div class="section-title">Controllers</div>
+    <div class="section-flex-no-border space-between">
+      <div class="section-title">Controllers</div>
+      <div>
+        <button type="button" onclick="showSection('section-controllers')">Show</button>
+        <button type="button" onclick="hideSection('section-controllers')">Hide</button>
+      </div>
+    </div>
     <div class="space-1"></div>
-    <table id="controller-table">
-      <thead>
-        <tr>
-          <th scope="col">Name</th>
-          <th scope="col">Brightness</th>
-          <th scope="col">Number of LEDs</th>
-          <th scope="col">Max milliwatts</th>
-          <th scope="col">Target Group ID</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-
-    <div class="divider"></div>
-    <div class="section-title">Custom Target Groups</div>
-    <table id="groups-table"></table>
-
-    <div class="divider"></div>
-    <div class="section-title">Colors</div>
-    <div class="divider"></div>
-    <div id="colors-noedit">
-      <input type="number" min="-1" value="-1" id="colors-noedit-target" />
-    </div>
-    <div class="divider"></div>
-    <div id="colors-edit"></div>
-    <div>
-      <button type="button" id="colors-add">Add Color</button>
-      <button type="button" id="colors-remove">Remove Color</button>
-    </div>
-
-    <div class="divider"></div>
-    <div class="section-title">Animations</div>
-    <div class="space-3"></div>
-    <div id="main-control">
-      <table id="animations-table">
+    <div id="section-controllers">
+      <table id="controller-table">
         <thead>
           <tr>
-            <th scope="col">Animation</th>
-            <th scope="col">Color 1</th>
-            <th scope="col">Color 2</th>
-            <th scope="col">Colors</th>
-            <th scope="col">Arg1</th>
-            <th scope="col">Arg2</th>
-            <th scope="col">Arg3</th>
-            <th scope="col">Arg4</th>
-            <th scope="col">Arg5</th>
-            <th scope="col">Arg6</th>
-            <th scope="col">Arg7</th>
-            <th scope="col">Arg8</th>
-            <th scope="col">Wait ms</th>
-            <th scope="col">Steps</th>
-            <th scope="col">Target</th>
-            <th scope="col">Send</th>
+            <th scope="col">Name</th>
+            <th scope="col">Brightness</th>
+            <th scope="col">Number of LEDs</th>
+            <th scope="col">Max milliwatts</th>
+            <th scope="col">Target Group ID</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-flex-no-border space-between">
+      <div class="section-title">Custom Target Groups</div>
+      <div>
+        <button type="button" onclick="showSection('section-target-group')">Show</button>
+        <button type="button" onclick="hideSection('section-target-group')">Hide</button>
+      </div>
+    </div>
+    <div id="section-target-group">
+      <table id="groups-table"></table>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-flex-no-border space-between">
+      <div class="section-title">Colors</div>
+      <div>
+        <button type="button" onclick="showSection('section-colors')">Show</button>
+        <button type="button" onclick="hideSection('section-colors')">Hide</button>
+      </div>
+    </div>
+
+    <div id="section-colors">
+      <div class="divider"></div>
+      <div id="colors-noedit">
+        <input type="number" min="-1" value="-1" id="colors-noedit-target" />
+      </div>
+      <div class="divider"></div>
+      <div id="colors-edit"></div>
+      <div>
+        <button type="button" id="colors-add">Add Color</button>
+        <button type="button" id="colors-remove">Remove Color</button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-flex-no-border space-between">
+      <div class="section-title">Animations</div>
+      <div>
+        <button type="button" onclick="showSection('section-animations')">Show</button>
+        <button type="button" onclick="hideSection('section-animations')">Hide</button>
+      </div>
+    </div>
+    <div id="section-animations">
+      <div class="space-3"></div>
+      <div id="main-control">
+        <table id="animations-table">
+          <thead>
+            <tr>
+              <th scope="col">Animation</th>
+              <th scope="col">Color 1</th>
+              <th scope="col">Color 2</th>
+              <th scope="col">Colors</th>
+              <th scope="col">Arg1</th>
+              <th scope="col">Arg2</th>
+              <th scope="col">Arg3</th>
+              <th scope="col">Arg4</th>
+              <th scope="col">Arg5</th>
+              <th scope="col">Arg6</th>
+              <th scope="col">Arg7</th>
+              <th scope="col">Arg8</th>
+              <th scope="col">Wait ms</th>
+              <th scope="col">Steps</th>
+              <th scope="col">Target</th>
+              <th scope="col">Send</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
 
     <script>

@@ -98,4 +98,12 @@ function createStatus() {
   };
 }
 
+function showSection(id) {
+  document.getElementById(id).style.display = 'block';
+}
+
+function hideSection(id) {
+  document.getElementById(id).style.display = 'none';
+}
+
 /* eslint-enable no-unused-vars */
