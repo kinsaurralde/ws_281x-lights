@@ -71,6 +71,19 @@ The files in this directory are only intended for a raspberry pi.
 The webapp directory can be run on any device that has python since it does not interact with special hardware that the esp8266 and raspberry pi use.
 
 ## Testing
+Tests can be run through either
+```bash
+make test
+```
+for all tests with coverage report OR
+```bash
+make test_webapp
+```
+to just test the webapp server with no coverage report.
+
+Currently only the webapp server has tests.
+
+A coverage report in HTML format is available at `src/webapp/htmlcov/index.html` after a test with coverage is run.
 
 ## Tools
 
