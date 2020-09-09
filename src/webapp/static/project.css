@@ -11,3 +11,7 @@
 #colors-noedit button {
   margin: 0.25vh;
 }
+
+.space-between {
+  justify-content: space-between;
+}

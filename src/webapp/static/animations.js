@@ -1,4 +1,5 @@
 /* exported Animations */
+/* globals groups colors */
 
 class Animations {
   constructor() {
