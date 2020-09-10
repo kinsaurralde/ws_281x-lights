@@ -3,6 +3,7 @@
 #ifndef PIXELS_H
 #define PIXELS_H
 
+
 class Pixels {
    private:
     bool initialized;

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+import time
 import argparse
 
 from collections import OrderedDict
@@ -16,7 +17,7 @@ except:
     import ruamel.yaml as yaml  # 3.7
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -125,6 +126,11 @@ def getcontrollers():
     return create_response(controllers.getConfig())
 
 
+@app.route("/delay")
+def delay():
+    time.sleep(10)
+
+
 @socketio.on("connect")
 def connect():
     print("Client Connected:", request.remote_addr)
@@ -134,6 +140,12 @@ def connect():
 @socketio.on("disconnect")
 def disconnect():
     print("Client Disconnected")
+
+
+@socketio.on("set_brightness")
+def setBrightness(json):
+    print("set brighntess", str(json))
+    controllers.brightness(json)
 
 
 animations_config = open_yaml("config/animations.yaml")

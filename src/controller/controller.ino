@@ -21,7 +21,6 @@
 // Change the following values if needed
 #define LED_PIN_0 5
 #define LED_PIN_1 6
-#define BRIGHTNESS_MUTLIPLIER 0.5   // value of 0.5 means half brightness
 
 // WIFI_SSID and WIFI_PASSWORD are set in wifi_credentials.h
 
@@ -165,8 +164,9 @@ void handleGetPixels() {
 
 void handleBrightness() {
     String brightness = server.arg("value");
+    int id = server.arg("id").toInt();
     if (brightness != "") {
-        neopixels.pixels[0]->setBrightness(brightness.toInt() * BRIGHTNESS_MUTLIPLIER);
+        neopixels.pixels[0]->setBrightness(brightness.toInt());
     }
     server.send(200, "text/plain", String(neopixels.pixels[0]->getBrightness()));
 }

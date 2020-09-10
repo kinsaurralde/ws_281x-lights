@@ -61,7 +61,7 @@ def handleFreeHeap():
 
 @app.route("/brightness")
 def handleBrightness():
-    return create_response(neo.handleBrightness())
+    return create_response(neo.handleBrightness(request.args.get('id'), request.args.get('value')))
 
 @app.route("/ledon")
 def ledon():

@@ -83,7 +83,7 @@ setup:
 	sudo npm i docsify-cli -g
 	sudo apt install pylint
 	sudo apt install python3-pip
-	sudo pip3 install eventlet
+	pip3 install eventlet
 	pip3 install black
 	pip3 install pytest-flask
 	pip3 install pytest-mock

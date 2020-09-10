@@ -55,7 +55,7 @@ class List(ctypes.Structure):
         return self.lib.List_getCurrent(self.obj)
 
 
-MAX_BRIGHTNESS = 120
+MAX_BRIGHTNESS = 127
 
 class Pixels:
     def __init__(self, val):

@@ -20,12 +20,15 @@ class Controllers:
             configs[controller["name"]] = controller
         return configs
 
-    def _send(self, url, payload, controller_id=None):
+    def _send(self, url, payload=None, controller_id=None):
         if self.nosend:
             print(f"Would have sent to {url}:\n{payload}")
             return {"url": url, "id": controller_id, "message": "No send is true"}
         try:
-            requests.post(url, data=json.dumps(payload), timeout=0.5)
+            if payload is None:
+                requests.get(url)
+            else:
+                requests.post(url, data=json.dumps(payload), timeout=0.5)
         except requests.RequestException:
             print(f"Failed to send to {url}")
             return {"url": url, "id": controller_id, "message": "Connection Error"}
@@ -61,3 +64,12 @@ class Controllers:
 
     def getConfig(self):
         return self.config
+
+    def brightness(self, requests):
+        for request in requests:
+            name = request["name"]
+            value = request["value"]
+            url = self.config[name]["url"]
+            self._send(
+                url + f"/brightness?value={value}&id={self.config[name]['strip_id']}"
+            )
