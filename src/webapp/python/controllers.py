@@ -3,12 +3,16 @@ import time
 import threading
 import requests
 
+BRIGHTNESS_BUFFER_TIMER = 3
+
 
 class Controllers:
     def __init__(self, config, nosend):
         self.nosend = nosend
         self.send_counter = 0
         self.urls = {}
+        self.brightness_queue = {}
+        self.brightness_timer_active = False
         self.fails = []
         self.config = self._setupConfig(config["controllers"])
         self.getControllerLatencies()
@@ -109,11 +113,22 @@ class Controllers:
     def getConfig(self):
         return self.config
 
+    def _brightness(self):
+        time.sleep(BRIGHTNESS_BUFFER_TIMER)
+        for name in self.brightness_queue:
+            print(f"Sending {self.brightness_queue[name]} to {name}")
+            self._send(self.brightness_queue[name])
+        self.brightness_timer_active = False
+
     def brightness(self, requests):
         for request in requests:
             name = request["name"]
             value = request["value"]
             url = self.config[name]["url"]
-            self._send(
+            self.brightness_queue[name] = (
                 url + f"/brightness?value={value}&id={self.config[name]['strip_id']}"
             )
+            if not self.brightness_timer_active:
+                self.brightness_timer_active = True
+                thread = threading.Thread(target=self._brightness())
+                thread.start()
