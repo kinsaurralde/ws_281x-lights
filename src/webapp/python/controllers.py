@@ -3,7 +3,7 @@ import time
 import threading
 import requests
 
-BRIGHTNESS_BUFFER_TIMER = 3
+BRIGHTNESS_BUFFER_TIMER = 0.01
 
 
 class Controllers:

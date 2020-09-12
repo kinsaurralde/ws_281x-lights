@@ -1,4 +1,5 @@
 /* exported Controllers */
+/* globals socket */
 
 class Controllers {
   constructor() {
@@ -28,6 +29,10 @@ class Controllers {
     return Object.keys(this.controllers);
   }
 
+  sendBrightness(name, value) {
+    socket.emit('set_brightness', [{'name': name, 'value': value}]);
+  }
+
   addRow(controller) {
     console.log('Adding', controller);
     this.num_strips += 1;
@@ -40,6 +45,7 @@ class Controllers {
 
     brightness_slider.addEventListener('input', () => {
       brightness_value.textContent = brightness_slider.value;
+      this.sendBrightness(controller.name, brightness_slider.value);
     });
     brightness_value.className = 'section-title-secondary';
     brightness_value.textContent = controller.init.brightness;

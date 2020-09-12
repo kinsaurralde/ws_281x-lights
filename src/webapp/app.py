@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import json
-import time
 import argparse
 
 from collections import OrderedDict
@@ -126,11 +125,6 @@ def getcontrollers():
     return create_response(controllers.getConfig())
 
 
-@app.route("/delay")
-def delay():
-    time.sleep(10)
-
-
 @socketio.on("connect")
 def connect():
     print("Client Connected:", request.remote_addr)
@@ -144,7 +138,7 @@ def disconnect():
 
 @socketio.on("set_brightness")
 def setBrightness(json):
-    print("set brighntess", str(json))
+    # print("set brighntess", str(json))
     controllers.brightness(json)
 
 
