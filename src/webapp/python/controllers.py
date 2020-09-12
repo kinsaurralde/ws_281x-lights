@@ -72,7 +72,7 @@ class Controllers:
             if previous == 0:
                 previous = latency
             self.urls[url] = (previous + latency) / 2
-        print(self.urls)
+        print("Controller Latencies", self.urls)
 
     def setNoSend(self, value):
         self.nosend = value
@@ -115,9 +115,10 @@ class Controllers:
 
     def _brightness(self):
         time.sleep(BRIGHTNESS_BUFFER_TIMER)
-        for name in self.brightness_queue:
-            print(f"Sending {self.brightness_queue[name]} to {name}")
+        while len(self.brightness_queue) > 0:
+            name = list(self.brightness_queue.keys())[0]
             self._send(self.brightness_queue[name])
+            self.brightness_queue.pop(name)
         self.brightness_timer_active = False
 
     def brightness(self, requests):

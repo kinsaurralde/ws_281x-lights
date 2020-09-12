@@ -110,7 +110,6 @@ void Pixels::setBrightness(unsigned int value) {
     } else {
         brightness = max_brightness;
     }
-    std::cout << "BrIGhtNeSs " << brightness << " | " << max_brightness << std::endl;
 }
 
 void Pixels::setIncrementSteps(unsigned int value) {
@@ -118,11 +117,9 @@ void Pixels::setIncrementSteps(unsigned int value) {
 }
 
 void Pixels::initialize(unsigned int num_leds, unsigned int milliwatts, unsigned int brightness, unsigned int max_brightness) {
-    std::cout << "InitIalizeee1 " << max_brightness << " | " << this->max_brightness << std::endl;
     if (max_brightness <= 255 && max_brightness < this->max_brightness) {
         this->max_brightness = max_brightness;
     }
-    std::cout << "InitIalizeee2 " << max_brightness << " | " << this->max_brightness << std::endl;
     setSize(num_leds);
     setBrightness(brightness);
     initialized = true;
