@@ -10,6 +10,7 @@
 
 #include "pixels.h"
 #include "structs.h"
+#include "version.h"
 #include "wifi_credentials.h"
 
 #define BUILTINLED_A 16
@@ -31,6 +32,7 @@ void handleFreeHeap();
 void handleGetPixels();
 void handleData();
 void handleBrightness();
+void handleVersionInfo();
 void handleLEDOn();
 void handleLEDOff();
 
@@ -81,6 +83,7 @@ void setup() {
     server.on("/getpixels", handleGetPixels);
     server.on("/heapfree", handleFreeHeap);
     server.on("/brightness", handleBrightness);
+    server.on("/versioninfo", handleVersionInfo);
     server.on("/ledon", handleLEDOn);
     server.on("/ledoff", handleLEDOff);
     server.onNotFound(handleNotFound);  // When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
@@ -247,6 +250,20 @@ void handleInit() {
     FastLED.setMaxPowerInMilliWatts(milliwatts);
     neopixels.pixels[id]->initialize(num_leds, milliwatts, brightness, MAX_BRIGHTNESS);
     server.send(200, "text/plain", "Init");
+}
+
+void handleVersionInfo() {
+    StaticJsonDocument<512> doc;
+    JsonObject obj = doc.to<JsonObject>();
+    obj["major"] = MAJOR;
+    obj["minor"] = MINOR;
+    obj["patch"] = PATCH;
+    obj["esp_hash"] = ESP_HASH;
+    obj["rpi_hash"] = RPI_HASH;
+    Serial.println(ESP_HASH);
+    String info;
+    serializeJson(doc, info);
+    server.send(200, "application/json", info);
 }
 
 void handleFreeHeap() {

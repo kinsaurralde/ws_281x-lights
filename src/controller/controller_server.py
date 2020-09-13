@@ -5,6 +5,7 @@ import argparse
 from flask import Flask, request
 
 from controller import NeoPixels, Animations
+import version
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -62,6 +63,16 @@ def handleFreeHeap():
 @app.route("/brightness")
 def handleBrightness():
     return create_response(neo.handleBrightness(request.args.get('id'), request.args.get('value')))
+
+@app.route("/versioninfo")
+def versioninfo():
+    return create_response({
+        "major": version.MAJOR,
+        "minor": version.MINOR,
+        "patch": version.PATCH,
+        "esp_hash": version.ESP_HASH,
+        "rpi_hash": version.RPI_HASH,
+    })
 
 @app.route("/ledon")
 def ledon():
