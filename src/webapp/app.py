@@ -6,6 +6,7 @@ from collections import OrderedDict
 
 from flask import Flask, json, render_template, request
 from flask_socketio import SocketIO
+from engineio.payload import Payload
 
 # from py.controllers import Controllers
 import python
@@ -14,6 +15,8 @@ try:
     import yaml  # 3.6
 except:
     import ruamel.yaml as yaml  # 3.7
+
+Payload.max_decode_packets = 50
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")

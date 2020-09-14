@@ -125,6 +125,10 @@ void Pixels::initialize(unsigned int num_leds, unsigned int milliwatts, unsigned
     initialized = true;
 }
 
+bool Pixels::isInitialized() {
+    return initialized;
+}
+
 void Pixels::increment() {
     for (unsigned int i = 0; i < increment_steps; i++) {
         (this->*incrementor)();

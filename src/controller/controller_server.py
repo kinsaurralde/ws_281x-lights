@@ -82,10 +82,11 @@ def ledon():
 def ledoff():
     return "Off"
 
-@app.route("/init", methods=["POST"])
+@app.route("/init", methods=["GET", "POST"])
 def init():
-    neo.init(json.loads(request.data))
-    return "Init"
+    if request.method == 'GET':
+        return create_response(neo.getInit())
+    return create_response(neo.init(json.loads(request.data)))
 
 
 if __name__ == "__main__":

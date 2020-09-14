@@ -148,3 +148,10 @@ class NeoPixels:
         print("Init strip", values)
         strip_id = values["id"]
         self.pixels[strip_id].initialize(values["init"].get("num_leds", 60), values["init"].get("milliwatts", 1000), values["init"].get("brightness", 100), values["init"].get("max_brightness", 127))
+        return getInit()
+
+    def getInit(self):
+        strips = []
+        for i in range(self.led_strip_count):
+            strips.append(self.pixels[i].isInitialized())
+        return strips
