@@ -8,8 +8,9 @@ from flask import Flask, json, render_template, request
 from flask_socketio import SocketIO
 from engineio.payload import Payload
 
-# from py.controllers import Controllers
 import python
+
+from version import *
 
 try:
     import yaml  # 3.6
@@ -51,6 +52,14 @@ parser.add_argument(
 
 args = parser.parse_args()
 
+VERSION_INFO = {
+    "major": MAJOR,
+    "minor": MINOR,
+    "patch": PATCH,
+    "esp_hash": ESP_HASH,
+    "rpi_hash": RPI_HASH,
+}
+
 
 def getNosend():
     return args.nosend
@@ -63,10 +72,12 @@ def open_yaml(path):
     return data
 
 
-def create_response(data):
-    ordered = OrderedDict(data)
+def create_response(data, ordered=False):
+    payload = data
+    if ordered:
+        payload = OrderedDict(data)
     response = app.response_class(
-        response=json.dumps(ordered, sort_keys=False),
+        response=json.dumps(payload, sort_keys=False),
         status=200,
         mimetype="application/json",
     )
@@ -125,7 +136,12 @@ def getcolors():
 
 @app.route("/getcontrollers")
 def getcontrollers():
-    return create_response(controllers.getConfig())
+    return create_response(controllers.getConfig(), True)
+
+
+@app.route("/getversioninfo")
+def getversioninfo():
+    return create_response(controllers.getControllerVersionInfo())
 
 
 @socketio.on("connect")
@@ -141,7 +157,6 @@ def disconnect():
 
 @socketio.on("set_brightness")
 def setBrightness(json):
-    # print("set brighntess", str(json))
     controllers.brightness(json)
 
 
@@ -153,7 +168,7 @@ if args.test:
     for i, controller in enumerate(controllers_config["controllers"]):
         controller["url"] = "http://localhost:" + str(6000 + i)
 
-controllers = python.Controllers(controllers_config, args.nosend)
+controllers = python.Controllers(controllers_config, args.nosend, VERSION_INFO)
 
 if __name__ == "__main__":
     socketio.run(

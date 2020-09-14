@@ -13,4 +13,5 @@ disable=
     too-few-public-methods,
     too-many-instance-attributes,
     too-many-arguments,
-    anomalous-backslash-in-string
+    anomalous-backslash-in-string,
+    wildcard-import

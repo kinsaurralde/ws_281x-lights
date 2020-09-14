@@ -7,7 +7,8 @@ BRIGHTNESS_BUFFER_TIMER = 0.01
 
 
 class Controllers:
-    def __init__(self, config, nosend):
+    def __init__(self, config, nosend, version_info):
+        self.version_info = version_info
         self.nosend = nosend
         self.send_counter = 0
         self.urls = {}
@@ -53,14 +54,14 @@ class Controllers:
             )
         try:
             if payload is None:
-                requests.get(url)
-            else:
-                requests.post(url, data=json.dumps(payload), timeout=0.5)
+                return requests.get(url)
+            return requests.post(url, data=json.dumps(payload), timeout=0.5)
         except requests.RequestException:
             print(f"Failed to send to {url}")
             self.fails.append(
                 {"url": url, "id": controller_id, "message": "Connection Error"}
             )
+        return []
 
     def getControllerLatencies(self):
         for url in self.urls:
@@ -73,6 +74,40 @@ class Controllers:
                 previous = latency
             self.urls[url] = (previous + latency) / 2
         print("Controller Latencies", self.urls)
+
+    def getControllerVersionInfo(self):
+        self.fails = []
+        data = []
+        version_match = True
+        hash_match = True
+        for url in self.urls:
+            response = self._sending_thread(url + "/versioninfo").json()
+            data.append(response)
+            print("Response", response)
+            if (
+                response["major"] != self.version_info["major"]
+                or response["minor"] != self.version_info["minor"]
+                or response["patch"] != self.version_info["patch"]
+            ):
+                version_match = False
+                self.fails.append(
+                    {"url": url, "id": "version", "message": "Version doesnt match"}
+                )
+            if (
+                response["esp_hash"] != self.version_info["esp_hash"]
+                or response["rpi_hash"] != self.version_info["rpi_hash"]
+            ):
+                hash_match = False
+                self.fails.append(
+                    {"url": url, "id": "hash", "message": "Hash doesnt match"}
+                )
+        return {
+            "versioninfo": data,
+            "fails": self.fails,
+            "webapp": self.version_info,
+            "version_match": version_match,
+            "hash_match": hash_match,
+        }
 
     def setNoSend(self, value):
         self.nosend = value

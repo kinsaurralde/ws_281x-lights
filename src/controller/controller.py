@@ -1,4 +1,5 @@
 import time
+
 import ctypes
 import threading
 from rpi_ws281x import Adafruit_NeoPixel

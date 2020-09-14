@@ -34,7 +34,7 @@ PYLINT_CONFIG		= --rcfile=lint_config/pylintrc
 WEBAPP_CONFIG_ARG	= "config/controllers_sample.yaml"
 
 ESP_HASH			= $(shell sha1sum ${CONTROLLERS_DIR}controller.ino ${CONTROLLERS_DIR}pixels* ${CONTROLLERS_DIR}structs* | sha1sum | head -c 40)
-RPI_HASH			= $(shell sha1sum ${CONTROLLERS_DIR}controller.ino ${CONTROLLERS_DIR}pixels* ${CONTROLLERS_DIR}structs* ${CONTROLLERS_DIR}*.py | sha1sum | head -c 40)
+RPI_HASH			= $(shell sha1sum ${CONTROLLERS_DIR}*.py ${CONTROLLERS_DIR}pixels* ${CONTROLLERS_DIR}structs* | sha1sum | head -c 40)
 
 all:
 	# Create Directories
@@ -108,11 +108,11 @@ setup:
 	sudo apt install pylint
 	sudo apt install python3-pip
 	pip3 install eventlet
+	pip3 install setuptools
 	pip3 install black
 	pip3 install pytest-flask
 	pip3 install pytest-mock
 	pip3 install coverage
-	pip3 install setuptools
 	pip3 install pylint
 	sudo pip3 install rpi_ws281x
 	sudo apt install screen
