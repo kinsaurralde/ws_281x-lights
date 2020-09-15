@@ -83,7 +83,6 @@ class Controllers:
         for url in self.urls:
             response = self._sending_thread(url + "/versioninfo").json()
             data.append(response)
-            print("Response", response)
             if (
                 response["major"] != self.version_info["major"]
                 or response["minor"] != self.version_info["minor"]
@@ -108,6 +107,26 @@ class Controllers:
             "version_match": version_match,
             "hash_match": hash_match,
         }
+
+    def getControllerInitialized(self):
+        self.fails = []
+        data = {}
+        for url in self.urls:
+            response = self._sending_thread(url + "/init").json()
+            for controller in self.config:
+                if self.config[controller]["url"] == url:
+                    response_index = int(self.config[controller]["strip_id"])
+                    if response_index < 0 or response_index >= len(response):
+                        self.fails.append(
+                            {
+                                "url": url,
+                                "id": response_index,
+                                "message": "Strip id does not exist on remote controller",
+                            }
+                        )
+                    else:
+                        data[controller] = response[response_index]
+        return {"fails": self.fails, "initialized": data}
 
     def setNoSend(self, value):
         self.nosend = value

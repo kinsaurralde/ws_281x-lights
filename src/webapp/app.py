@@ -144,6 +144,11 @@ def getversioninfo():
     return create_response(controllers.getControllerVersionInfo())
 
 
+@app.route("/getinitialized")
+def getinitialized():
+    return create_response(controllers.getControllerInitialized())
+
+
 @socketio.on("connect")
 def connect():
     print("Client Connected:", request.remote_addr)

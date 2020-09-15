@@ -241,11 +241,9 @@ void handleInit() {
         unsigned int brightness = doc["init"]["brightness"].as<unsigned int>();
         unsigned int num_leds = doc["init"]["num_leds"].as<unsigned int>();
         unsigned int milliwatts = doc["init"]["milliwatts"].as<unsigned int>();
-        Serial.println(brightness);
-        Serial.println(num_leds);
-        Serial.println(milliwatts);
-        FastLED.setMaxPowerInMilliWatts(milliwatts);
-        neopixels.pixels[id]->initialize(num_leds, milliwatts, brightness, MAX_BRIGHTNESS);
+        if (id < LED_STRIP_COUNT) {
+            neopixels.pixels[id]->initialize(num_leds, milliwatts, brightness, MAX_BRIGHTNESS);
+        }
     }
     const size_t CAPACITY = JSON_ARRAY_SIZE(LED_STRIP_COUNT);
     StaticJsonDocument<CAPACITY> doc;
