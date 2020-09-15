@@ -1,6 +1,12 @@
 /* exported Controllers */
 /* globals socket */
 
+const TABLE_COLUMNS = 6;
+
+const GOOD = 'GOOD';
+const WARNING = 'WARNING';
+const ERROR = 'ERROR';
+
 class Controllers {
   constructor() {
     const table = document.getElementById('controller-table');
@@ -10,6 +16,7 @@ class Controllers {
     this.controllers = {};
     this.brightness_link = [];
     this.fetchControllers();
+    this.fetchInitialized();
   }
 
   fetchControllers() {
@@ -24,6 +31,39 @@ class Controllers {
           }
           loadedControllers();
         });
+  }
+
+  fetchInitialized() {
+    fetch('/getinitialized')
+        .then((response) => response.json())
+        .then((initialized) => {
+          console.log('Recieved Initialized', initialized);
+          for (const name in initialized.initialized) {
+            if (name in initialized.initialized) {
+              const status =
+                  document.getElementById(`controllers-table-${name}-status`);
+              console.log(initialized.initialized);
+              if (initialized.initialized[name]) {
+                this.setStatus(status, GOOD);
+              } else {
+                this.setStatus(status, ERROR);
+              }
+            }
+          }
+        });
+  }
+
+  setStatus(div, type) {
+    div.classList.remove(...div.classList);
+    div.classList.add('section-title-secondary');
+    div.textContent = type;
+    if (type === WARNING) {
+      div.classList.add('yellow');
+    } else if (type === GOOD) {
+      div.classList.add('green');
+    } else {  // type === ERROR
+      div.classList.add('red');
+    }
   }
 
   getNames() {
@@ -52,7 +92,7 @@ class Controllers {
   addRow(controller) {
     console.log('Adding', controller);
     this.num_strips += 1;
-    const id = 'controllers-table-' + controller.id;
+    const id = 'controllers-table-' + controller.name;
 
     this.brightness_link.push(false);
     const box = createCheckBox(id + '-checkbox', false, null);
@@ -61,6 +101,10 @@ class Controllers {
     const brightness_slider = createRange(
         id + '-brightness-slider', controller.init.brightness, 0, 255);
     const brightness_value = document.createElement('span');
+
+    const status = document.createElement('div');
+    status.id = id + '-status';
+    this.setStatus(status, 'UNKNOWN');
 
     const index = this.num_strips - 1;
     box.addEventListener('input', () => {
@@ -80,7 +124,7 @@ class Controllers {
 
     const row = this.table.insertRow();
     const cells = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < TABLE_COLUMNS; i++) {
       cells.push(row.insertCell());
     }
     cells[0].appendChild(name);
@@ -90,5 +134,6 @@ class Controllers {
     cells[2].textContent = controller.init.num_leds;
     cells[3].textContent = controller.init.milliwatts;
     cells[4].textContent = this.num_strips - 1;
+    cells[5].appendChild(status);
   }
 }

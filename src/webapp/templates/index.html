@@ -35,6 +35,7 @@
             <th scope="col">Number of LEDs</th>
             <th scope="col">Max milliwatts</th>
             <th scope="col">Target Group ID</th>
+            <th scope="col">Status</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -114,9 +115,6 @@
 
     <script>
       var socket = io()
-      socket.on("connect", function () {
-        //socket.emit('my event', {data: 'I\'m connected!'});
-      })
 
       window.onload = function () {
         window.controllers = new Controllers()

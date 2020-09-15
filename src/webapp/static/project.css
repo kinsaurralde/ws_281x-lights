@@ -15,3 +15,15 @@
 .space-between {
   justify-content: space-between;
 }
+
+.green {
+  color: green;
+}
+
+.yellow {
+  color: yellow;
+}
+
+.red {
+  color: red;
+}

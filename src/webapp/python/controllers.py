@@ -21,22 +21,19 @@ class Controllers:
     def _setupConfig(self, controllers):
         id_counter = 0
         configs = {}
-        threads = []
         for controller in controllers:
             url = controller["url"]
             if url not in self.urls:
                 self.urls[url] = 0
-            threads.append(
-                self._send(
-                    url + "/init",
-                    {"id": controller["strip_id"], "init": controller["init"]},
-                )
-            )
+            self.initController(url, controller)
             controller["id"] = id_counter
             configs[controller["name"]] = controller
-        for thread in threads:
-            thread.join()
         return configs
+
+    def initController(self, url, controller):
+        self._send(
+            url + "/init", {"id": controller["strip_id"], "init": controller["init"]},
+        )
 
     def _send(self, url, payload=None, controller_id=None):
         thread = threading.Thread(
