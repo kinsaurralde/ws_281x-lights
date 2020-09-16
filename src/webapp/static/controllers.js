@@ -17,6 +17,7 @@ class Controllers {
     const status_table = document.getElementById('status-table');
     this.table = table.getElementsByTagName('tbody')[0];
     this.status_table = status_table.getElementsByTagName('tbody')[0];
+    this.status = {};
     this.num_controllers = 0;
     this.num_strips = 0;
     this.controllers = {};
@@ -47,14 +48,8 @@ class Controllers {
           console.log('Recieved Initialized', initialized);
           for (const name in initialized.initialized) {
             if (name in initialized.initialized) {
-              const status =
-                  document.getElementById(`controllers-table-${name}-status`);
-              this.setStatusInitialized(name, initialized.initialized[name]);
-              if (initialized.initialized[name]) {
-                this.setStatus(status, GOOD);
-              } else {
-                this.setStatus(status, ERROR);
-              }
+              this.setStatusInitialized(
+                  name, initialized.initialized[name] ? TRUE : FALSE);
             }
           }
         });
@@ -77,7 +72,6 @@ class Controllers {
               esp_hash;
           document.getElementById('status-webapp-rpihash').textContent =
               rpi_hash;
-          console.log(version_info.versioninfo);
           for (const controller in version_info.versioninfo) {
             if (controller in version_info.versioninfo) {
               const data = version_info.versioninfo[controller];
@@ -92,8 +86,7 @@ class Controllers {
               this.setStatusVersion(controller, status, version_string);
               const hash_match =
                   esp_hash === data.esp_hash && rpi_hash === data.rpi_hash;
-              this.setStatusHashMatch(controller, hash_match);
-              console.log(data);
+              this.setStatusHashMatch(controller, hash_match ? TRUE : FALSE);
             }
           }
         });
@@ -117,18 +110,43 @@ class Controllers {
   }
 
   setStatusInitialized(name, value) {
+    this.status[name].initialized = value;
     const div = document.getElementById(`status-table-${name}-initialized`);
-    this.setStatus(div, value ? TRUE : FALSE);
+    this.setStatus(div, value);
   }
 
   setStatusVersion(name, value, text) {
+    this.status[name].version = value;
     const div = document.getElementById(`status-table-${name}-version`);
     this.setStatus(div, value, text);
   }
 
   setStatusHashMatch(name, value) {
+    this.status[name].hash_match = value;
     const div = document.getElementById(`status-table-${name}-hashmatch`);
-    this.setStatus(div, value ? TRUE : FALSE);
+    this.setStatus(div, value);
+    this.setOverallStatus(name);
+  }
+
+  setOverallStatus(name) {
+    let good = true;
+    let warn = false;
+    if (this.status[name].initialized === FALSE) {
+      good = false;
+    }
+    if (this.status[name].version === ERROR) {
+      good = false;
+    }
+    if (this.status[name].version === WARNING) {
+      good = false;
+      warn = true;
+    }
+    if (this.status[name].hash_match === FALSE) {
+      good = false;
+      warn = true;
+    }
+    const div = document.getElementById(`controllers-table-${name}-status`);
+    this.setStatus(div, good ? GOOD : warn ? WARNING : ERROR);
   }
 
   getNames() {
@@ -205,6 +223,11 @@ class Controllers {
   }
 
   addStatusRow(name) {
+    this.status[name] = {
+      'initialized': UNKNOWN,
+      'version': UNKNOWN,
+      'hash_match': UNKNOWN,
+    };
     const row = this.status_table.insertRow();
     const cells = [];
     for (let i = 0; i < STATUS_COLUMNS; i++) {
