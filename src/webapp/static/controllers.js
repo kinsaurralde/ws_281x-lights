@@ -15,8 +15,15 @@ const UNKNOWN = 'UNKNOWN';
 class Controllers {
   constructor() {
     socket.on('update', (data) => {
+      console.debug(data);
       if ('ping' in data) {
         this.updatePing(data.ping);
+      }
+      if ('initialized' in data) {
+        this.handleInitialzedResponse(data['initialized']);
+      }
+      if ('version' in data) {
+        this.handleVersionInfoResponse(data['version']);
       }
     });
     const table = document.getElementById('controller-table');
@@ -52,13 +59,17 @@ class Controllers {
         .then((response) => response.json())
         .then((initialized) => {
           console.log('Recieved Initialized', initialized);
-          for (const name in initialized.initialized) {
-            if (name in initialized.initialized) {
-              this.setStatusInitialized(
-                  name, initialized.initialized[name] ? TRUE : FALSE);
-            }
-          }
+          this.handleInitialzedResponse(initialized);
         });
+  }
+
+  handleInitialzedResponse(initialized) {
+    for (const name in initialized.initialized) {
+      if (name in initialized.initialized) {
+        this.setStatusInitialized(
+            name, initialized.initialized[name] ? TRUE : FALSE);
+      }
+    }
   }
 
   fetchVersionInfo() {
@@ -66,36 +77,34 @@ class Controllers {
         .then((response) => response.json())
         .then((version_info) => {
           console.log('Recieved Version Info', version_info);
-          const major = version_info.webapp.major;
-          const minor = version_info.webapp.minor;
-          const patch = version_info.webapp.patch;
-          const version = `${major}.${minor}.${patch}`;
-          const esp_hash = version_info.webapp.esp_hash;
-          const rpi_hash = version_info.webapp.rpi_hash;
-          document.getElementById('status-webapp-version').textContent =
-              version;
-          document.getElementById('status-webapp-esphash').textContent =
-              esp_hash;
-          document.getElementById('status-webapp-rpihash').textContent =
-              rpi_hash;
-          for (const controller in version_info.versioninfo) {
-            if (controller in version_info.versioninfo) {
-              const data = version_info.versioninfo[controller];
-              const version_string =
-                  `${data.major}.${data.minor}.${data.patch}`;
-              const version_match =
-                  (major === data.major && minor === data.minor);
-              const full_version_match =
-                  (version_match && patch === data.patch);
-              const status =
-                  full_version_match ? GOOD : version_match ? WARNING : ERROR;
-              this.setStatusVersion(controller, status, version_string);
-              const hash_match =
-                  esp_hash === data.esp_hash && rpi_hash === data.rpi_hash;
-              this.setStatusHashMatch(controller, hash_match ? TRUE : FALSE);
-            }
-          }
+          this.handleVersionInfoResponse(version_info);
         });
+  }
+
+  handleVersionInfoResponse(version_info) {
+    const major = version_info.webapp.major;
+    const minor = version_info.webapp.minor;
+    const patch = version_info.webapp.patch;
+    const version = `${major}.${minor}.${patch}`;
+    const esp_hash = version_info.webapp.esp_hash;
+    const rpi_hash = version_info.webapp.rpi_hash;
+    document.getElementById('status-webapp-version').textContent = version;
+    document.getElementById('status-webapp-esphash').textContent = esp_hash;
+    document.getElementById('status-webapp-rpihash').textContent = rpi_hash;
+    for (const controller in version_info.versioninfo) {
+      if (controller in version_info.versioninfo) {
+        const data = version_info.versioninfo[controller];
+        const version_string = `${data.major}.${data.minor}.${data.patch}`;
+        const version_match = (major === data.major && minor === data.minor);
+        const full_version_match = (version_match && patch === data.patch);
+        const status =
+            full_version_match ? GOOD : version_match ? WARNING : ERROR;
+        this.setStatusVersion(controller, status, version_string);
+        const hash_match =
+            esp_hash === data.esp_hash && rpi_hash === data.rpi_hash;
+        this.setStatusHashMatch(controller, hash_match ? TRUE : FALSE);
+      }
+    }
   }
 
   updatePing(data) {
@@ -215,7 +224,7 @@ class Controllers {
   }
 
   addRow(controller) {
-    console.log('Adding', controller);
+    console.log('Adding controller', controller);
     this.num_strips += 1;
     const id = 'controllers-table-' + controller.name;
 

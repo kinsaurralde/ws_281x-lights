@@ -16,8 +16,8 @@ class Controllers:
         self.last_brightness = {}
         self.brightness_queue = {}
         self.brightness_timer_active = False
+        self.background_data = {}
         self.config = self._setupConfig(config["controllers"])
-        # self.updateControllerLatencies()
 
     def _setupConfig(self, controllers):
         id_counter = 0
@@ -78,6 +78,10 @@ class Controllers:
                 previous = self.latencies[url]
                 if previous is None:
                     previous = latency
+                    self.background_data[
+                        "initialized"
+                    ] = self.getControllerInitialized()
+                    self.background_data["version"] = self.getControllerVersionInfo()
                 self.latencies[url] = (previous + latency) / 2
         print("Controller Latencies", self.latencies)
 
@@ -87,6 +91,11 @@ class Controllers:
             for controller in self.urls[url]:
                 latency[controller] = self.latencies[url]
         return latency
+
+    def getBackgroundData(self):
+        data = self.background_data
+        self.background_data = {}
+        return data
 
     def getControllerVersionInfo(self):
         fails = []
@@ -100,7 +109,6 @@ class Controllers:
             response = response.json()
             for controller in self.urls[url]:
                 data[controller] = response
-            # data.append(response)
             if (
                 response["major"] != self.version_info["major"]
                 or response["minor"] != self.version_info["minor"]
