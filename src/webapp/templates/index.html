@@ -35,6 +35,8 @@
             <th scope="col">Number of LEDs</th>
             <th scope="col">Max milliwatts</th>
             <th scope="col">Target Group ID</th>
+            <th scope="col">Ping (ms)</th>
+            <th scope="col">Status</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -112,11 +114,38 @@
       </div>
     </div>
 
+    <div class="divider"></div>
+    <div class="section-flex-no-border space-between">
+      <div class="section-title">Status</div>
+      <div>
+        <button type="button" onclick="showSection('section-status')">Show</button>
+        <button type="button" onclick="hideSection('section-status')">Hide</button>
+      </div>
+    </div>
+    <div id="section-status">
+      <div class="space-5"></div>
+      <table id="status-table">
+        <thead>
+          <tr>
+            <th scope="col">Controller</th>
+            <th scope="col">Initialized</th>
+            <th scope="col">Connected</th>
+            <th scope="col">Version</th>
+            <th scope="col">Hash match</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="space-5"></div>
+      <div class="divider"></div>
+      <div>Webapp version:&nbsp;&nbsp;&nbsp;&nbsp;<span id="status-webapp-version"></span></div>
+      <div>Webapp esp hash:&nbsp;<span id="status-webapp-esphash"></span></div>
+      <div>Webapp rpi hash:&nbsp;&nbsp;&nbsp;<span id="status-webapp-rpihash"></span></div>
+    </div>
+    <div class="divider"></div>
+
     <script>
       var socket = io()
-      socket.on("connect", function () {
-        //socket.emit('my event', {data: 'I\'m connected!'});
-      })
 
       window.onload = function () {
         window.controllers = new Controllers()

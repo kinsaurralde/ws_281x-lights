@@ -5,6 +5,7 @@ import argparse
 from flask import Flask, request
 
 from controller import NeoPixels, Animations
+import version
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -63,6 +64,16 @@ def handleFreeHeap():
 def handleBrightness():
     return create_response(neo.handleBrightness(request.args.get('id'), request.args.get('value')))
 
+@app.route("/versioninfo")
+def versioninfo():
+    return create_response({
+        "major": version.MAJOR,
+        "minor": version.MINOR,
+        "patch": version.PATCH,
+        "esp_hash": version.ESP_HASH,
+        "rpi_hash": version.RPI_HASH,
+    })
+
 @app.route("/ledon")
 def ledon():
     return "On"
@@ -71,10 +82,11 @@ def ledon():
 def ledoff():
     return "Off"
 
-@app.route("/init", methods=["POST"])
+@app.route("/init", methods=["GET", "POST"])
 def init():
-    neo.init(json.loads(request.data))
-    return "Init"
+    if request.method == 'GET':
+        return create_response(neo.getInit())
+    return create_response(neo.init(json.loads(request.data)))
 
 
 if __name__ == "__main__":

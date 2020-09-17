@@ -10,6 +10,7 @@
 
 #include "pixels.h"
 #include "structs.h"
+#include "version.h"
 #include "wifi_credentials.h"
 
 #define BUILTINLED_A 16
@@ -31,6 +32,7 @@ void handleFreeHeap();
 void handleGetPixels();
 void handleData();
 void handleBrightness();
+void handleVersionInfo();
 void handleLEDOn();
 void handleLEDOff();
 
@@ -81,6 +83,7 @@ void setup() {
     server.on("/getpixels", handleGetPixels);
     server.on("/heapfree", handleFreeHeap);
     server.on("/brightness", handleBrightness);
+    server.on("/versioninfo", handleVersionInfo);
     server.on("/ledon", handleLEDOn);
     server.on("/ledoff", handleLEDOff);
     server.onNotFound(handleNotFound);  // When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
@@ -231,22 +234,39 @@ void handleData() {
 }
 
 void handleInit() {
-    if (server.hasArg("plain") == false) {  //Check if body received
-        server.send(200, "text/plain", "Body not received");
-        return;
+    if (server.hasArg("plain") == true) {  //Check if body received
+        StaticJsonDocument<1024> doc;
+        deserializeJson(doc, server.arg("plain"));
+        unsigned int id = doc["id"].as<unsigned int>();
+        unsigned int brightness = doc["init"]["brightness"].as<unsigned int>();
+        unsigned int num_leds = doc["init"]["num_leds"].as<unsigned int>();
+        unsigned int milliwatts = doc["init"]["milliwatts"].as<unsigned int>();
+        if (id < LED_STRIP_COUNT) {
+            neopixels.pixels[id]->initialize(num_leds, milliwatts, brightness, MAX_BRIGHTNESS);
+        }
     }
-    StaticJsonDocument<1024> doc;
-    deserializeJson(doc, server.arg("plain"));
-    unsigned int id = doc["id"].as<unsigned int>();
-    unsigned int brightness = doc["init"]["brightness"].as<unsigned int>();
-    unsigned int num_leds = doc["init"]["num_leds"].as<unsigned int>();
-    unsigned int milliwatts = doc["init"]["milliwatts"].as<unsigned int>();
-    Serial.println(brightness);
-    Serial.println(num_leds);
-    Serial.println(milliwatts);
-    FastLED.setMaxPowerInMilliWatts(milliwatts);
-    neopixels.pixels[id]->initialize(num_leds, milliwatts, brightness, MAX_BRIGHTNESS);
-    server.send(200, "text/plain", "Init");
+    const size_t CAPACITY = JSON_ARRAY_SIZE(LED_STRIP_COUNT);
+    StaticJsonDocument<CAPACITY> doc;
+    JsonArray array = doc.to<JsonArray>();
+    for (unsigned int i = 0; i < LED_STRIP_COUNT; i++) {
+        array.add(neopixels.pixels[i]->isInitialized());
+    }
+    String info;
+    serializeJson(doc, info);
+    server.send(200, "application/json", info);
+}
+
+void handleVersionInfo() {
+    StaticJsonDocument<512> doc;
+    JsonObject obj = doc.to<JsonObject>();
+    obj["major"] = MAJOR;
+    obj["minor"] = MINOR;
+    obj["patch"] = PATCH;
+    obj["esp_hash"] = ESP_HASH;
+    obj["rpi_hash"] = RPI_HASH;
+    String info;
+    serializeJson(doc, info);
+    server.send(200, "application/json", info);
 }
 
 void handleFreeHeap() {

@@ -165,7 +165,6 @@ Config file example (default value)
 ![Application Architecture](images/application_architecture.png)
 
 ## Todo
-- Controller brightness
 - Power consumption measurement and adjustment
 - SocketIO
     - Controller ping on webpage
