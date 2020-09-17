@@ -1,7 +1,7 @@
 /* exported Controllers */
 /* globals socket */
 
-const TABLE_COLUMNS = 6;
+const TABLE_COLUMNS = 7;
 const STATUS_COLUMNS = 5;
 
 const GOOD = 'GOOD';
@@ -9,10 +9,16 @@ const WARNING = 'WARNING';
 const ERROR = 'ERROR';
 const FALSE = 'FALSE';
 const TRUE = 'TRUE';
+const PLAIN = 'PLAIN';
 const UNKNOWN = 'UNKNOWN';
 
 class Controllers {
   constructor() {
+    socket.on('update', (data) => {
+      if ('ping' in data) {
+        this.updatePing(data.ping);
+      }
+    });
     const table = document.getElementById('controller-table');
     const status_table = document.getElementById('status-table');
     this.table = table.getElementsByTagName('tbody')[0];
@@ -92,6 +98,22 @@ class Controllers {
         });
   }
 
+  updatePing(data) {
+    for (const controller in data) {
+      if (controller in data) {
+        const div =
+            document.getElementById(`controllers-table-${controller}-ping`);
+        if (data[controller] === null) {
+          this.setStatus(div, FALSE, 'DISCONNECTED');
+          this.setStatusConnected(controller, FALSE, 'DISCONNECTED');
+        } else {
+          this.setStatus(div, PLAIN, data[controller].toFixed(3));
+          this.setStatusConnected(controller, TRUE);
+        }
+      }
+    }
+  }
+
   setStatus(div, type, text = null) {
     div.classList.remove(...div.classList);
     div.classList.add('section-title-secondary');
@@ -104,6 +126,8 @@ class Controllers {
       div.classList.add('yellow');
     } else if (type === GOOD || type === TRUE) {
       div.classList.add('green');
+    } else if (type === PLAIN) {
+      div.classList.add('white');
     } else {
       div.classList.add('red');
     }
@@ -128,6 +152,13 @@ class Controllers {
     this.setOverallStatus(name);
   }
 
+  setStatusConnected(name, value, text) {
+    this.status[name].connected = value;
+    const div = document.getElementById(`status-table-${name}-connected`);
+    this.setStatus(div, value, text);
+    this.setOverallStatus(name);
+  }
+
   setOverallStatus(name) {
     let good = true;
     let warn = false;
@@ -145,12 +176,23 @@ class Controllers {
       good = false;
       warn = true;
     }
+    if (this.status[name].connected === FALSE) {
+      good = false;
+    }
     const div = document.getElementById(`controllers-table-${name}-status`);
     this.setStatus(div, good ? GOOD : warn ? WARNING : ERROR);
   }
 
   getNames() {
     return Object.keys(this.controllers);
+  }
+
+  setBrightness(name, value) {
+    const id = `controllers-table-${name}-brightness-`;
+    if (document.getElementById(id + 'slider') != null) {
+      document.getElementById(id + 'slider').value = value;
+      document.getElementById(id + 'value').textContent = value;
+    }
   }
 
   sendBrightness(name, value, index) {
@@ -184,6 +226,9 @@ class Controllers {
     const brightness_slider = createRange(
         id + '-brightness-slider', controller.init.brightness, 0, 255);
     const brightness_value = document.createElement('span');
+    brightness_value.id = id + '-brightness-value';
+
+    const ping = createSecondTitle(id + '-ping', '---');
 
     const status = document.createElement('div');
     status.id = id + '-status';
@@ -217,7 +262,8 @@ class Controllers {
     cells[2].textContent = controller.init.num_leds;
     cells[3].textContent = controller.init.milliwatts;
     cells[4].textContent = this.num_strips - 1;
-    cells[5].appendChild(status);
+    cells[5].appendChild(ping);
+    cells[6].appendChild(status);
 
     this.addStatusRow(controller.name);
   }
@@ -227,6 +273,7 @@ class Controllers {
       'initialized': UNKNOWN,
       'version': UNKNOWN,
       'hash_match': UNKNOWN,
+      'connected': FALSE,
     };
     const row = this.status_table.insertRow();
     const cells = [];

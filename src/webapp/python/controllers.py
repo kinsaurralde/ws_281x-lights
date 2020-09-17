@@ -13,10 +13,11 @@ class Controllers:
         self.send_counter = 0
         self.urls = {}
         self.latencies = {}
+        self.last_brightness = {}
         self.brightness_queue = {}
         self.brightness_timer_active = False
         self.config = self._setupConfig(config["controllers"])
-        self.getControllerLatencies()
+        # self.updateControllerLatencies()
 
     def _setupConfig(self, controllers):
         id_counter = 0
@@ -25,7 +26,7 @@ class Controllers:
             url = controller["url"]
             if url not in self.urls:
                 self.urls[url] = []
-                self.latencies[url] = 0
+                self.latencies[url] = None
             self.urls[url].append(controller["name"])
             self.initController(url, controller)
             controller["id"] = id_counter
@@ -33,6 +34,7 @@ class Controllers:
         return configs
 
     def initController(self, url, controller):
+        self.last_brightness[controller["name"]] = controller["init"]["brightness"]
         self._send(
             [],
             url + "/init",
@@ -53,28 +55,38 @@ class Controllers:
             fails.append(
                 {"url": url, "id": controller_id, "message": "No send is true"}
             )
+            return None
         try:
             if payload is None:
-                return requests.get(url)
+                return requests.get(url, timeout=0.5)
             return requests.post(url, data=json.dumps(payload), timeout=0.5)
         except requests.RequestException:
             print(f"Failed to send to {url}")
             fails.append(
                 {"url": url, "id": controller_id, "message": "Connection Error"}
             )
-        return []
+        return None
 
-    def getControllerLatencies(self):
+    def updateControllerLatencies(self):
         for url in self.latencies:
             start_time = time.time()
-            self._sending_thread([], url)
-            end_time = time.time()
-            latency = int((end_time - start_time) * 1000)
-            previous = self.latencies[url]
-            if previous == 0:
-                previous = latency
-            self.latencies[url] = (previous + latency) / 2
+            if self._sending_thread([], url) is None:
+                self.latencies[url] = None
+            else:
+                end_time = time.time()
+                latency = int((end_time - start_time) * 1000)
+                previous = self.latencies[url]
+                if previous is None:
+                    previous = latency
+                self.latencies[url] = (previous + latency) / 2
         print("Controller Latencies", self.latencies)
+
+    def getControllerLatencies(self):
+        latency = {}
+        for url in self.latencies:
+            for controller in self.urls[url]:
+                latency[controller] = self.latencies[url]
+        return latency
 
     def getControllerVersionInfo(self):
         fails = []
@@ -82,7 +94,10 @@ class Controllers:
         version_match = True
         hash_match = True
         for url in self.urls:
-            response = self._sending_thread(fails, url + "/versioninfo").json()
+            response = self._sending_thread(fails, url + "/versioninfo")
+            if response is None:
+                continue
+            response = response.json()
             for controller in self.urls[url]:
                 data[controller] = response
             # data.append(response)
@@ -113,7 +128,10 @@ class Controllers:
         fails = []
         data = {}
         for url in self.urls:
-            response = self._sending_thread(fails, url + "/init").json()
+            response = self._sending_thread(fails, url + "/init")
+            if response is None:
+                continue
+            response = response.json()
             for controller in self.config:
                 if self.config[controller]["url"] == url:
                     response_index = int(self.config[controller]["strip_id"])
@@ -135,7 +153,6 @@ class Controllers:
     def send(self, commands):
         queue = {}
         fails = []
-        total_estimated_latency = 0
         for command in commands:
             controller_name = command["id"]
             if controller_name not in self.config:
@@ -150,21 +167,17 @@ class Controllers:
             command["id"] = self.config[controller_name]["strip_id"]
             url = self.config[controller_name]["url"]
             if url not in queue:
-                total_estimated_latency += self.latencies[url]
                 queue[url] = []
             queue[url].append(command)
         threads = []
         for url in queue:
-            total_estimated_latency -= self.latencies[url]
-            for command in queue[url]:
-                command["delay"] = total_estimated_latency
             threads.append(
                 self._send(fails, url + "/data", queue[url], queue[url][0]["id"])
             )
         for thread in threads:
             thread.join()
         if self.send_counter % 25 == 0:
-            self.getControllerLatencies()
+            self.updateControllerLatencies()
         return fails
 
     def getConfig(self):
@@ -178,6 +191,9 @@ class Controllers:
             self.brightness_queue.pop(name)
         self.brightness_timer_active = False
 
+    def getLastBrightness(self):
+        return self.last_brightness
+
     def brightness(self, requests):
         for request in requests:
             name = request["name"]
@@ -186,6 +202,7 @@ class Controllers:
             self.brightness_queue[name] = (
                 url + f"/brightness?value={value}&id={self.config[name]['strip_id']}"
             )
+            self.last_brightness[name] = value
             if not self.brightness_timer_active:
                 self.brightness_timer_active = True
                 thread = threading.Thread(target=self._brightness())

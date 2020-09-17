@@ -49,6 +49,13 @@ parser.add_argument(
     help="Port to run server on (overrides config file)",
     default=5000,
 )
+parser.add_argument(
+    "-b",
+    "--background",
+    action="store_false",
+    help="Disable Background Information Thread",
+    default=True,
+)
 
 args = parser.parse_args()
 
@@ -174,8 +181,11 @@ if args.test:
         controller["url"] = "http://localhost:" + str(6000 + i)
 
 controllers = python.Controllers(controllers_config, args.nosend, VERSION_INFO)
+background = python.Background(socketio, controllers)
 
 if __name__ == "__main__":
+    if args.background:
+        background.startLoop()
     socketio.run(
         app, debug=args.debug, host="0.0.0.0", port=args.port, use_reloader=False
     )
