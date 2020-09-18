@@ -146,7 +146,6 @@ git:
 	make test
 	make clean
 	make lint
-	git add .
 	git status
 
 clean:

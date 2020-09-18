@@ -31,6 +31,7 @@ class Controllers {
     this.table = table.getElementsByTagName('tbody')[0];
     this.status_table = status_table.getElementsByTagName('tbody')[0];
     this.status = {};
+    this.urls = {};
     this.num_controllers = 0;
     this.num_strips = 0;
     this.controllers = {};
@@ -225,6 +226,10 @@ class Controllers {
 
   addRow(controller) {
     console.log('Adding controller', controller);
+    if (!(controller.url in this.urls)) {
+      this.urls[controller.url] = [];
+    }
+    this.urls[controller.url].push(controller.name);
     this.num_strips += 1;
     const id = 'controllers-table-' + controller.name;
 
@@ -303,6 +308,14 @@ class Controllers {
           'noreconnect',
         ],
         initial_mode);
+    mode.addEventListener('input', () => {
+      this.changeMode(name, mode.value);
+      const url = this.controllers[name].url;
+      for (let i = 0; i < this.urls[url].length; i++) {
+        document.getElementById(`status-table-${this.urls[url][i]}-active`)
+            .value = mode.value;
+      }
+    });
     this.setStatus(initialized, UNKNOWN);
     this.setStatus(connected, UNKNOWN);
     this.setStatus(version, UNKNOWN);
@@ -319,5 +332,16 @@ class Controllers {
     cells[3].appendChild(version);
     cells[4].appendChild(hash_match);
     cells[5].appendChild(mode);
+  }
+
+  changeMode(name, mode) {
+    if (mode === 'active') {
+      console.log('Enable', name);
+      fetch(`/enable?name=${name}`);
+    } else if (mode === 'noreconnect') {
+    } else if (mode === 'disabled') {
+      console.log('Disable', name);
+      fetch(`/disable?name=${name}`);
+    }
   }
 }
