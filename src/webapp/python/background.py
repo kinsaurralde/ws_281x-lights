@@ -9,7 +9,7 @@ class Background:
         self.active = True
         self.delay_ms = 50
         self.full_loop_ms = 1000
-        self.update_after_loops = 6
+        self.update_after_loops = 10
         self.start_time = time.time()
 
     def startLoop(self):
@@ -33,7 +33,8 @@ class Background:
             if counter % self.full_loop_ms == 0:
                 loop_counter += 1
                 counter = 0
-                self.socketio.emit("update", data)
+                if len(data) > 0:
+                    self.socketio.emit("update", data)
                 data = {}
             time.sleep(self.delay_ms / 1000)
             counter += self.delay_ms

@@ -4,8 +4,7 @@
 #include <ESP8266WiFi.h>
 #include <stdlib.h>
 
-//#define FASTLED_ESP8266_NODEMCU_PIN_ORDER
-#define FASTLED_ESP8266_RAW_PIN_ORDER
+#define FASTLED_ESP8266_NODEMCU_PIN_ORDER
 
 #include <FastLED.h>
 

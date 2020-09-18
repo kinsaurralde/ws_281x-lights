@@ -12,28 +12,39 @@ class Controllers:
         self.nosend = nosend
         self.send_counter = 0
         self.urls = {}
+        self.inactive = {}
+        self.disabled = {}
         self.latencies = {}
         self.last_brightness = {}
         self.brightness_queue = {}
         self.brightness_timer_active = False
         self.background_data = {}
         self.config = self._setupConfig(config["controllers"])
+        print(self.urls, "\n", self.disabled)
 
     def _setupConfig(self, controllers):
         id_counter = 0
         configs = {}
         for controller in controllers:
             url = controller["url"]
+            self.latencies[url] = None
             if url not in self.urls:
                 self.urls[url] = []
-                self.latencies[url] = None
-            self.urls[url].append(controller["name"])
+            if controller["active"] == "active":
+                self.urls[url].append(controller["name"])
+            elif controller["active"] == "disabled":
+                if url not in self.disabled:
+                    self.disabled[url] = []
+                self.disabled[url].append(controller["name"])
             self.initController(url, controller)
             controller["id"] = id_counter
             configs[controller["name"]] = controller
         return configs
 
     def initController(self, url, controller):
+        print("Init", url, self.disabled)
+        if url in self.disabled:
+            return
         self.last_brightness[controller["name"]] = controller["init"]["brightness"]
         self._send(
             [],
@@ -69,6 +80,9 @@ class Controllers:
 
     def updateControllerLatencies(self):
         for url in self.latencies:
+            if url in self.disabled:
+                self.latencies[url] = None
+                continue
             start_time = time.time()
             if self._sending_thread([], url) is None:
                 self.latencies[url] = None
@@ -103,6 +117,8 @@ class Controllers:
         version_match = True
         hash_match = True
         for url in self.urls:
+            if url in self.disabled:
+                continue
             response = self._sending_thread(fails, url + "/versioninfo")
             if response is None:
                 continue
@@ -136,6 +152,8 @@ class Controllers:
         fails = []
         data = {}
         for url in self.urls:
+            if url in self.disabled:
+                continue
             response = self._sending_thread(fails, url + "/init")
             if response is None:
                 continue
@@ -174,6 +192,8 @@ class Controllers:
                 continue
             command["id"] = self.config[controller_name]["strip_id"]
             url = self.config[controller_name]["url"]
+            if url in self.disabled:
+                continue
             if url not in queue:
                 queue[url] = []
             queue[url].append(command)
@@ -207,6 +227,8 @@ class Controllers:
             name = request["name"]
             value = request["value"]
             url = self.config[name]["url"]
+            if url in self.disabled:
+                continue
             self.brightness_queue[name] = (
                 url + f"/brightness?value={value}&id={self.config[name]['strip_id']}"
             )

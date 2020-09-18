@@ -2,7 +2,7 @@
 /* globals socket */
 
 const TABLE_COLUMNS = 7;
-const STATUS_COLUMNS = 5;
+const STATUS_COLUMNS = 6;
 
 const GOOD = 'GOOD';
 const WARNING = 'WARNING';
@@ -274,10 +274,10 @@ class Controllers {
     cells[5].appendChild(ping);
     cells[6].appendChild(status);
 
-    this.addStatusRow(controller.name);
+    this.addStatusRow(controller.name, controller.active);
   }
 
-  addStatusRow(name) {
+  addStatusRow(name, initial_mode) {
     this.status[name] = {
       'initialized': UNKNOWN,
       'version': UNKNOWN,
@@ -295,6 +295,14 @@ class Controllers {
     const connected = document.createElement('div');
     const version = document.createElement('div');
     const hash_match = document.createElement('div');
+    const mode = createSelect(
+        id + '-active',
+        [
+          'active',
+          'disabled',
+          'noreconnect',
+        ],
+        initial_mode);
     this.setStatus(initialized, UNKNOWN);
     this.setStatus(connected, UNKNOWN);
     this.setStatus(version, UNKNOWN);
@@ -310,5 +318,6 @@ class Controllers {
     cells[2].appendChild(connected);
     cells[3].appendChild(version);
     cells[4].appendChild(hash_match);
+    cells[5].appendChild(mode);
   }
 }
