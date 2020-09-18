@@ -4,7 +4,8 @@
 #include <ESP8266WiFi.h>
 #include <stdlib.h>
 
-#define FASTLED_ESP8266_NODEMCU_PIN_ORDER
+//#define FASTLED_ESP8266_NODEMCU_PIN_ORDER
+#define FASTLED_ESP8266_RAW_PIN_ORDER
 
 #include <FastLED.h>
 
@@ -169,9 +170,9 @@ void handleBrightness() {
     String brightness = server.arg("value");
     int id = server.arg("id").toInt();
     if (brightness != "") {
-        neopixels.pixels[0]->setBrightness(brightness.toInt());
+        neopixels.pixels[id]->setBrightness(brightness.toInt());
     }
-    server.send(200, "text/plain", String(neopixels.pixels[0]->getBrightness()));
+    server.send(200, "text/plain", String(neopixels.pixels[id]->getBrightness()));
 }
 
 void setArgs(AnimationArgs& args, JsonObject values) {

@@ -66,7 +66,7 @@ all:
 	cp ${CONTROLLERS_DIR}pixels.cpp ${CONTROLLERS_DIR}pixels.h -t ${BUILD_DIR}esp8266/
 	cp ${CONTROLLERS_DIR}structs.cpp ${CONTROLLERS_DIR}structs.h -t ${BUILD_DIR}esp8266/
 	cp ${CONTROLLERS_DIR}controller.ino ${BUILD_DIR}esp8266/
-	touch ${BUILD_DIR}esp8266/wifi_controller.h
+	touch ${BUILD_DIR}esp8266/wifi_credentials.h
 	printf "#define WIFI_SSID \"ssid\"\n#define WIFI_PASSWORD \"password\"\n" > ${BUILD_DIR}esp8266/wifi_credentials.h
 
 	# Copy to webapp
