@@ -19,30 +19,25 @@ class Controllers:
         self.brightness_queue = {}
         self.brightness_timer_active = False
         self.background_data = {}
-        self.config = self._setupConfig(config["controllers"])
-        print(self.urls, "\n", self.disabled)
+        self.config = {}
+        self._setupConfig(config["controllers"])
 
     def _setupConfig(self, controllers):
         id_counter = 0
-        configs = {}
+        self.config = {}
         for controller in controllers:
+            self.config[controller["name"]] = controller
             url = controller["url"]
             self.latencies[url] = None
             if url not in self.urls:
                 self.urls[url] = []
-            if controller["active"] == "active":
-                self.urls[url].append(controller["name"])
-            elif controller["active"] == "disabled":
-                if url not in self.disabled:
-                    self.disabled[url] = []
-                self.disabled[url].append(controller["name"])
+            self.urls[url].append(controller["name"])
+            if controller["active"] == "disabled":
+                self.disableController(controller["name"])
             self.initController(url, controller)
             controller["id"] = id_counter
-            configs[controller["name"]] = controller
-        return configs
 
     def initController(self, url, controller):
-        print("Init", url, self.disabled)
         if url in self.disabled:
             return
         self.last_brightness[controller["name"]] = controller["init"]["brightness"]
@@ -77,6 +72,27 @@ class Controllers:
                 {"url": url, "id": controller_id, "message": "Connection Error"}
             )
         return None
+
+    def disableController(self, name):
+        if name not in self.config:
+            return [{"url": None, "id": name, "message": "Controller not found",}]
+        url = self.config[name]["url"]
+        if url not in self.disabled:
+            self.disabled[url] = []
+        if name not in self.disabled[url]:
+            self.disabled[url].append(name)
+        self.urls[url] = []
+        return []
+
+    def enableController(self, name):
+        if name not in self.config:
+            return [{"url": None, "id": name, "message": "Controller not found",}]
+        url = self.config[name]["url"]
+        if url not in self.disabled:
+            return [{"url": None, "id": name, "message": "Controller not disabled",}]
+        self.urls[url] = self.disabled[url]
+        self.disabled.pop(url)
+        return []
 
     def updateControllerLatencies(self):
         for url in self.latencies:

@@ -156,6 +156,18 @@ def getinitialized():
     return create_response(controllers.getControllerInitialized())
 
 
+@app.route("/enable")
+def enableControllers():
+    fails = controllers.enableController(request.args.get("name"))
+    return create_response({"error": len(fails) > 0, "message": fails})
+
+
+@app.route("/disable")
+def disableControllers():
+    fails = controllers.disableController(request.args.get("name"))
+    return create_response({"error": len(fails) > 0, "message": fails})
+
+
 @socketio.on("connect")
 def connect():
     print("Client Connected:", request.remote_addr)

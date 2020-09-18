@@ -28,8 +28,9 @@ class Background:
                 thread.start()
                 loop_counter = 1
             if loop_counter % self.update_after_loops == self.update_after_loops // 2:
-                data["ping"] = self.controller.getControllerLatencies()
                 data.update(self.controller.getBackgroundData())
+                if counter % self.full_loop_ms == 0:
+                    data["ping"] = self.controller.getControllerLatencies()
             if counter % self.full_loop_ms == 0:
                 loop_counter += 1
                 counter = 0
