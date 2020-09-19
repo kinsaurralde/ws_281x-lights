@@ -81,7 +81,6 @@ class Controllers:
             self.disabled[url] = []
         if name not in self.disabled[url]:
             self.disabled[url].append(name)
-        self.urls[url] = []
         return []
 
     def enableController(self, name):
@@ -97,7 +96,7 @@ class Controllers:
     def updateControllerLatencies(self):
         for url in self.latencies:
             if url in self.disabled:
-                self.latencies[url] = None
+                self.latencies[url] = "disabled"
                 continue
             start_time = time.time()
             if self._sending_thread([], url) is None:
@@ -106,7 +105,7 @@ class Controllers:
                 end_time = time.time()
                 latency = int((end_time - start_time) * 1000)
                 previous = self.latencies[url]
-                if previous is None:
+                if isinstance(previous) is not int:
                     previous = latency
                     self.background_data[
                         "initialized"

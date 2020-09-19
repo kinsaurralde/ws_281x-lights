@@ -15,16 +15,7 @@ const UNKNOWN = 'UNKNOWN';
 class Controllers {
   constructor() {
     socket.on('update', (data) => {
-      console.debug(data);
-      if ('ping' in data) {
-        this.updatePing(data.ping);
-      }
-      if ('initialized' in data) {
-        this.handleInitialzedResponse(data['initialized']);
-      }
-      if ('version' in data) {
-        this.handleVersionInfoResponse(data['version']);
-      }
+      this.handleUpdate(data);
     });
     const table = document.getElementById('controller-table');
     const status_table = document.getElementById('status-table');
@@ -62,6 +53,19 @@ class Controllers {
           console.log('Recieved Initialized', initialized);
           this.handleInitialzedResponse(initialized);
         });
+  }
+
+  handleUpdate(data) {
+    console.debug(data);
+    if ('ping' in data) {
+      this.updatePing(data.ping);
+    }
+    if ('initialized' in data) {
+      this.handleInitialzedResponse(data['initialized']);
+    }
+    if ('version' in data) {
+      this.handleVersionInfoResponse(data['version']);
+    }
   }
 
   handleInitialzedResponse(initialized) {
@@ -109,16 +113,27 @@ class Controllers {
   }
 
   updatePing(data) {
-    for (const controller in data) {
-      if (controller in data) {
+    for (const controller in this.controllers) {
+      if (controller in this.controllers) {
         const div =
             document.getElementById(`controllers-table-${controller}-ping`);
-        if (data[controller] === null) {
-          this.setStatus(div, FALSE, 'DISCONNECTED');
-          this.setStatusConnected(controller, FALSE, 'DISCONNECTED');
+        const div_mode_select =
+            document.getElementById(`status-table-${controller}-active`);
+        if (controller in data) {
+          if (data[controller] === null) {
+            this.setStatus(div, FALSE, 'DISCONNECTED');
+            this.setStatusConnected(controller, FALSE, 'DISCONNECTED');
+          } else if (data[controller] === 'disabled') {
+            div_mode_select.value = 'disabled';
+            this.setStatus(div, FALSE, 'DISABLED');
+            this.setStatusConnected(controller, FALSE, 'DISABLED');
+          } else {
+            this.setStatus(div, PLAIN, data[controller].toFixed(3));
+            this.setStatusConnected(controller, TRUE);
+          }
         } else {
-          this.setStatus(div, PLAIN, data[controller].toFixed(3));
-          this.setStatusConnected(controller, TRUE);
+          this.setStatus(div, FALSE, 'DISABLED');
+          this.setStatusConnected(controller, FALSE, 'DISABLED');
         }
       }
     }
@@ -305,7 +320,6 @@ class Controllers {
         [
           'active',
           'disabled',
-          'noreconnect',
         ],
         initial_mode);
     mode.addEventListener('input', () => {

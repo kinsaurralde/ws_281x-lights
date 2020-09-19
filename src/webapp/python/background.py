@@ -9,7 +9,7 @@ class Background:
         self.active = True
         self.delay_ms = 50
         self.full_loop_ms = 1000
-        self.update_after_loops = 10
+        self.update_after_loops = 8
         self.start_time = time.time()
 
     def startLoop(self):
