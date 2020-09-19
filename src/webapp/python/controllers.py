@@ -4,6 +4,8 @@ import threading
 import requests
 
 BRIGHTNESS_BUFFER_TIMER = 0.01
+GET_TIMEOUT = 0.3
+POST_TIMEOUT = 0.5
 
 
 class Controllers:
@@ -21,6 +23,7 @@ class Controllers:
         self.background_data = {}
         self.config = {}
         self._setupConfig(config["controllers"])
+        self.updateControllerLatencies()
 
     def _setupConfig(self, controllers):
         id_counter = 0
@@ -64,8 +67,8 @@ class Controllers:
             return None
         try:
             if payload is None:
-                return requests.get(url, timeout=0.5)
-            return requests.post(url, data=json.dumps(payload), timeout=0.5)
+                return requests.get(url, timeout=GET_TIMEOUT)
+            return requests.post(url, data=json.dumps(payload), timeout=POST_TIMEOUT)
         except requests.RequestException:
             print(f"Failed to send to {url}")
             fails.append(
@@ -91,9 +94,10 @@ class Controllers:
             return [{"url": None, "id": name, "message": "Controller not disabled",}]
         self.urls[url] = self.disabled[url]
         self.disabled.pop(url)
+        self.initController(url, self.config[name])
         return []
 
-    def updateControllerLatencies(self):
+    def updateControllerLatencies(self, background=None):
         for url in self.latencies:
             if url in self.disabled:
                 self.latencies[url] = "disabled"
@@ -103,14 +107,16 @@ class Controllers:
                 self.latencies[url] = None
             else:
                 end_time = time.time()
-                latency = int((end_time - start_time) * 1000)
+                latency = float((end_time - start_time) * 1000)
                 previous = self.latencies[url]
-                if isinstance(previous) is not int:
-                    previous = latency
+                if not isinstance(previous, float):
                     self.background_data[
                         "initialized"
                     ] = self.getControllerInitialized()
                     self.background_data["version"] = self.getControllerVersionInfo()
+                    if background is not None and previous is None:
+                        background.updateData()
+                    previous = latency
                 self.latencies[url] = (previous + latency) / 2
         print("Controller Latencies", self.latencies)
 

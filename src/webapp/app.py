@@ -159,19 +159,27 @@ def getinitialized():
 @app.route("/enable")
 def enableControllers():
     fails = controllers.enableController(request.args.get("name"))
+    emitUpdatedData()
     return create_response({"error": len(fails) > 0, "message": fails})
 
 
 @app.route("/disable")
 def disableControllers():
     fails = controllers.disableController(request.args.get("name"))
+    emitUpdatedData()
     return create_response({"error": len(fails) > 0, "message": fails})
+
+
+@app.route("/update")
+def update():
+    emitUpdatedData()
 
 
 @socketio.on("connect")
 def connect():
     print("Client Connected:", request.remote_addr)
     socketio.emit("connection_response", room=request.sid)
+    emitUpdatedData()
 
 
 @socketio.on("disconnect")
@@ -182,6 +190,12 @@ def disconnect():
 @socketio.on("set_brightness")
 def setBrightness(json):
     controllers.brightness(json)
+
+
+def emitUpdatedData():
+    background.updatePing()
+    background.updateData()
+    background.emitUpdate()
 
 
 animations_config = open_yaml("config/animations.yaml")

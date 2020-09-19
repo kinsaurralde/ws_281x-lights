@@ -159,53 +159,63 @@ class Controllers {
   }
 
   setStatusInitialized(name, value) {
-    this.status[name].initialized = value;
-    const div = document.getElementById(`status-table-${name}-initialized`);
-    this.setStatus(div, value);
+    if (name in this.status) {
+      this.status[name].initialized = value;
+      const div = document.getElementById(`status-table-${name}-initialized`);
+      this.setStatus(div, value);
+    }
   }
 
   setStatusVersion(name, value, text) {
-    this.status[name].version = value;
-    const div = document.getElementById(`status-table-${name}-version`);
-    this.setStatus(div, value, text);
+    if (name in this.status) {
+      this.status[name].version = value;
+      const div = document.getElementById(`status-table-${name}-version`);
+      this.setStatus(div, value, text);
+    }
   }
 
   setStatusHashMatch(name, value) {
-    this.status[name].hash_match = value;
-    const div = document.getElementById(`status-table-${name}-hashmatch`);
-    this.setStatus(div, value);
-    this.setOverallStatus(name);
+    if (name in this.status) {
+      this.status[name].hash_match = value;
+      const div = document.getElementById(`status-table-${name}-hashmatch`);
+      this.setStatus(div, value);
+      this.setOverallStatus(name);
+    }
   }
 
   setStatusConnected(name, value, text) {
-    this.status[name].connected = value;
-    const div = document.getElementById(`status-table-${name}-connected`);
-    this.setStatus(div, value, text);
-    this.setOverallStatus(name);
+    if (name in this.status) {
+      this.status[name].connected = value;
+      const div = document.getElementById(`status-table-${name}-connected`);
+      this.setStatus(div, value, text);
+      this.setOverallStatus(name);
+    }
   }
 
   setOverallStatus(name) {
-    let good = true;
-    let warn = false;
-    if (this.status[name].initialized === FALSE) {
-      good = false;
+    if (name in this.status) {
+      let good = true;
+      let warn = false;
+      if (this.status[name].initialized === FALSE) {
+        good = false;
+      }
+      if (this.status[name].version === ERROR) {
+        good = false;
+      }
+      if (this.status[name].version === WARNING) {
+        good = false;
+        warn = true;
+      }
+      if (this.status[name].hash_match === FALSE) {
+        good = false;
+        warn = true;
+      }
+      if (this.status[name].connected === FALSE) {
+        good = false;
+      }
+      const div = document.getElementById(`controllers-table-${name}-status`);
+      this.setStatus(div, good ? GOOD : warn ? WARNING : ERROR);
     }
-    if (this.status[name].version === ERROR) {
-      good = false;
-    }
-    if (this.status[name].version === WARNING) {
-      good = false;
-      warn = true;
-    }
-    if (this.status[name].hash_match === FALSE) {
-      good = false;
-      warn = true;
-    }
-    if (this.status[name].connected === FALSE) {
-      good = false;
-    }
-    const div = document.getElementById(`controllers-table-${name}-status`);
-    this.setStatus(div, good ? GOOD : warn ? WARNING : ERROR);
   }
 
   getNames() {
@@ -350,11 +360,9 @@ class Controllers {
 
   changeMode(name, mode) {
     if (mode === 'active') {
-      console.log('Enable', name);
       fetch(`/enable?name=${name}`);
     } else if (mode === 'noreconnect') {
     } else if (mode === 'disabled') {
-      console.log('Disable', name);
       fetch(`/disable?name=${name}`);
     }
   }
