@@ -55,9 +55,8 @@ void setup() {
     delay(10);
     Serial.println('\n');
     pinMode(BUILTINLED_A, OUTPUT);
-    digitalWrite(BUILTINLED_A, LOW);
     pinMode(BUILTINLED_B, OUTPUT);
-    digitalWrite(BUILTINLED_B, LOW);
+    digitalWrite(BUILTINLED_A, HIGH);
     total_frame_counter = 0;
     
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);  // Connect to the network
@@ -100,6 +99,7 @@ void setup() {
 
     server.begin();  // Actually start the server
     Serial.println("HTTP server started");
+    digitalWrite(BUILTINLED_A, LOW);
 }
 
 void loop(void) {
@@ -169,9 +169,9 @@ void handleBrightness() {
     String brightness = server.arg("value");
     int id = server.arg("id").toInt();
     if (brightness != "") {
-        neopixels.pixels[0]->setBrightness(brightness.toInt());
+        neopixels.pixels[id]->setBrightness(brightness.toInt());
     }
-    server.send(200, "text/plain", String(neopixels.pixels[0]->getBrightness()));
+    server.send(200, "text/plain", String(neopixels.pixels[id]->getBrightness()));
 }
 
 void setArgs(AnimationArgs& args, JsonObject values) {

@@ -66,7 +66,7 @@ all:
 	cp ${CONTROLLERS_DIR}pixels.cpp ${CONTROLLERS_DIR}pixels.h -t ${BUILD_DIR}esp8266/
 	cp ${CONTROLLERS_DIR}structs.cpp ${CONTROLLERS_DIR}structs.h -t ${BUILD_DIR}esp8266/
 	cp ${CONTROLLERS_DIR}controller.ino ${BUILD_DIR}esp8266/
-	touch ${BUILD_DIR}esp8266/wifi_controller.h
+	touch ${BUILD_DIR}esp8266/wifi_credentials.h
 	printf "#define WIFI_SSID \"ssid\"\n#define WIFI_PASSWORD \"password\"\n" > ${BUILD_DIR}esp8266/wifi_credentials.h
 
 	# Copy to webapp
@@ -101,6 +101,7 @@ run_local: build
 	cd ${TOOLS_DIR} && python3 -i localtest.py
 
 setup:
+	sudo apt update --fix-missing
 	sudo apt install nodejs
 	sudo apt install npm
 	make node_modules
@@ -146,7 +147,6 @@ git:
 	make test
 	make clean
 	make lint
-	git add .
 	git status
 
 clean:

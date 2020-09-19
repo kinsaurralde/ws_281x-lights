@@ -4,5 +4,5 @@
 #define MINOR 0
 #define PATCH 0
 
-#define ESP_HASH "5b25a89bcb75e3213f2cd3d6619577aa4674f848"
+#define ESP_HASH "42d46aeabaefd26f329fac58c578dcb1ea1812f5"
 #define RPI_HASH "289868b38c9d267c002280cebe036f539ca1c5d3"

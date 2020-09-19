@@ -4,6 +4,8 @@ import threading
 import requests
 
 BRIGHTNESS_BUFFER_TIMER = 0.01
+GET_TIMEOUT = 0.3
+POST_TIMEOUT = 0.5
 
 
 class Controllers:
@@ -12,28 +14,35 @@ class Controllers:
         self.nosend = nosend
         self.send_counter = 0
         self.urls = {}
+        self.inactive = {}
+        self.disabled = {}
         self.latencies = {}
         self.last_brightness = {}
         self.brightness_queue = {}
         self.brightness_timer_active = False
         self.background_data = {}
-        self.config = self._setupConfig(config["controllers"])
+        self.config = {}
+        self._setupConfig(config["controllers"])
+        self.updateControllerLatencies()
 
     def _setupConfig(self, controllers):
         id_counter = 0
-        configs = {}
+        self.config = {}
         for controller in controllers:
+            self.config[controller["name"]] = controller
             url = controller["url"]
+            self.latencies[url] = None
             if url not in self.urls:
                 self.urls[url] = []
-                self.latencies[url] = None
             self.urls[url].append(controller["name"])
+            if controller["active"] == "disabled":
+                self.disableController(controller["name"])
             self.initController(url, controller)
             controller["id"] = id_counter
-            configs[controller["name"]] = controller
-        return configs
 
     def initController(self, url, controller):
+        if url in self.disabled:
+            return
         self.last_brightness[controller["name"]] = controller["init"]["brightness"]
         self._send(
             [],
@@ -58,8 +67,8 @@ class Controllers:
             return None
         try:
             if payload is None:
-                return requests.get(url, timeout=0.5)
-            return requests.post(url, data=json.dumps(payload), timeout=0.5)
+                return requests.get(url, timeout=GET_TIMEOUT)
+            return requests.post(url, data=json.dumps(payload), timeout=POST_TIMEOUT)
         except requests.RequestException:
             print(f"Failed to send to {url}")
             fails.append(
@@ -67,21 +76,47 @@ class Controllers:
             )
         return None
 
-    def updateControllerLatencies(self):
+    def disableController(self, name):
+        if name not in self.config:
+            return [{"url": None, "id": name, "message": "Controller not found",}]
+        url = self.config[name]["url"]
+        if url not in self.disabled:
+            self.disabled[url] = []
+        if name not in self.disabled[url]:
+            self.disabled[url].append(name)
+        return []
+
+    def enableController(self, name):
+        if name not in self.config:
+            return [{"url": None, "id": name, "message": "Controller not found",}]
+        url = self.config[name]["url"]
+        if url not in self.disabled:
+            return [{"url": None, "id": name, "message": "Controller not disabled",}]
+        self.urls[url] = self.disabled[url]
+        self.disabled.pop(url)
+        self.initController(url, self.config[name])
+        return []
+
+    def updateControllerLatencies(self, background=None):
         for url in self.latencies:
+            if url in self.disabled:
+                self.latencies[url] = "disabled"
+                continue
             start_time = time.time()
             if self._sending_thread([], url) is None:
                 self.latencies[url] = None
             else:
                 end_time = time.time()
-                latency = int((end_time - start_time) * 1000)
+                latency = float((end_time - start_time) * 1000)
                 previous = self.latencies[url]
-                if previous is None:
-                    previous = latency
+                if not isinstance(previous, float):
                     self.background_data[
                         "initialized"
                     ] = self.getControllerInitialized()
                     self.background_data["version"] = self.getControllerVersionInfo()
+                    if background is not None and previous is None:
+                        background.updateData()
+                    previous = latency
                 self.latencies[url] = (previous + latency) / 2
         print("Controller Latencies", self.latencies)
 
@@ -103,6 +138,8 @@ class Controllers:
         version_match = True
         hash_match = True
         for url in self.urls:
+            if url in self.disabled:
+                continue
             response = self._sending_thread(fails, url + "/versioninfo")
             if response is None:
                 continue
@@ -136,6 +173,8 @@ class Controllers:
         fails = []
         data = {}
         for url in self.urls:
+            if url in self.disabled:
+                continue
             response = self._sending_thread(fails, url + "/init")
             if response is None:
                 continue
@@ -174,6 +213,8 @@ class Controllers:
                 continue
             command["id"] = self.config[controller_name]["strip_id"]
             url = self.config[controller_name]["url"]
+            if url in self.disabled:
+                continue
             if url not in queue:
                 queue[url] = []
             queue[url].append(command)
@@ -207,6 +248,8 @@ class Controllers:
             name = request["name"]
             value = request["value"]
             url = self.config[name]["url"]
+            if url in self.disabled:
+                continue
             self.brightness_queue[name] = (
                 url + f"/brightness?value={value}&id={self.config[name]['strip_id']}"
             )

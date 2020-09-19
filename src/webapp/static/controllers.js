@@ -2,7 +2,7 @@
 /* globals socket */
 
 const TABLE_COLUMNS = 7;
-const STATUS_COLUMNS = 5;
+const STATUS_COLUMNS = 6;
 
 const GOOD = 'GOOD';
 const WARNING = 'WARNING';
@@ -15,22 +15,14 @@ const UNKNOWN = 'UNKNOWN';
 class Controllers {
   constructor() {
     socket.on('update', (data) => {
-      console.debug(data);
-      if ('ping' in data) {
-        this.updatePing(data.ping);
-      }
-      if ('initialized' in data) {
-        this.handleInitialzedResponse(data['initialized']);
-      }
-      if ('version' in data) {
-        this.handleVersionInfoResponse(data['version']);
-      }
+      this.handleUpdate(data);
     });
     const table = document.getElementById('controller-table');
     const status_table = document.getElementById('status-table');
     this.table = table.getElementsByTagName('tbody')[0];
     this.status_table = status_table.getElementsByTagName('tbody')[0];
     this.status = {};
+    this.urls = {};
     this.num_controllers = 0;
     this.num_strips = 0;
     this.controllers = {};
@@ -61,6 +53,19 @@ class Controllers {
           console.log('Recieved Initialized', initialized);
           this.handleInitialzedResponse(initialized);
         });
+  }
+
+  handleUpdate(data) {
+    console.debug(data);
+    if ('ping' in data) {
+      this.updatePing(data.ping);
+    }
+    if ('initialized' in data) {
+      this.handleInitialzedResponse(data['initialized']);
+    }
+    if ('version' in data) {
+      this.handleVersionInfoResponse(data['version']);
+    }
   }
 
   handleInitialzedResponse(initialized) {
@@ -108,16 +113,27 @@ class Controllers {
   }
 
   updatePing(data) {
-    for (const controller in data) {
-      if (controller in data) {
+    for (const controller in this.controllers) {
+      if (controller in this.controllers) {
         const div =
             document.getElementById(`controllers-table-${controller}-ping`);
-        if (data[controller] === null) {
-          this.setStatus(div, FALSE, 'DISCONNECTED');
-          this.setStatusConnected(controller, FALSE, 'DISCONNECTED');
+        const div_mode_select =
+            document.getElementById(`status-table-${controller}-active`);
+        if (controller in data) {
+          if (data[controller] === null) {
+            this.setStatus(div, FALSE, 'DISCONNECTED');
+            this.setStatusConnected(controller, FALSE, 'DISCONNECTED');
+          } else if (data[controller] === 'disabled') {
+            div_mode_select.value = 'disabled';
+            this.setStatus(div, FALSE, 'DISABLED');
+            this.setStatusConnected(controller, FALSE, 'DISABLED');
+          } else {
+            this.setStatus(div, PLAIN, data[controller].toFixed(3));
+            this.setStatusConnected(controller, TRUE);
+          }
         } else {
-          this.setStatus(div, PLAIN, data[controller].toFixed(3));
-          this.setStatusConnected(controller, TRUE);
+          this.setStatus(div, FALSE, 'DISABLED');
+          this.setStatusConnected(controller, FALSE, 'DISABLED');
         }
       }
     }
@@ -143,53 +159,63 @@ class Controllers {
   }
 
   setStatusInitialized(name, value) {
-    this.status[name].initialized = value;
-    const div = document.getElementById(`status-table-${name}-initialized`);
-    this.setStatus(div, value);
+    if (name in this.status) {
+      this.status[name].initialized = value;
+      const div = document.getElementById(`status-table-${name}-initialized`);
+      this.setStatus(div, value);
+    }
   }
 
   setStatusVersion(name, value, text) {
-    this.status[name].version = value;
-    const div = document.getElementById(`status-table-${name}-version`);
-    this.setStatus(div, value, text);
+    if (name in this.status) {
+      this.status[name].version = value;
+      const div = document.getElementById(`status-table-${name}-version`);
+      this.setStatus(div, value, text);
+    }
   }
 
   setStatusHashMatch(name, value) {
-    this.status[name].hash_match = value;
-    const div = document.getElementById(`status-table-${name}-hashmatch`);
-    this.setStatus(div, value);
-    this.setOverallStatus(name);
+    if (name in this.status) {
+      this.status[name].hash_match = value;
+      const div = document.getElementById(`status-table-${name}-hashmatch`);
+      this.setStatus(div, value);
+      this.setOverallStatus(name);
+    }
   }
 
   setStatusConnected(name, value, text) {
-    this.status[name].connected = value;
-    const div = document.getElementById(`status-table-${name}-connected`);
-    this.setStatus(div, value, text);
-    this.setOverallStatus(name);
+    if (name in this.status) {
+      this.status[name].connected = value;
+      const div = document.getElementById(`status-table-${name}-connected`);
+      this.setStatus(div, value, text);
+      this.setOverallStatus(name);
+    }
   }
 
   setOverallStatus(name) {
-    let good = true;
-    let warn = false;
-    if (this.status[name].initialized === FALSE) {
-      good = false;
+    if (name in this.status) {
+      let good = true;
+      let warn = false;
+      if (this.status[name].initialized === FALSE) {
+        good = false;
+      }
+      if (this.status[name].version === ERROR) {
+        good = false;
+      }
+      if (this.status[name].version === WARNING) {
+        good = false;
+        warn = true;
+      }
+      if (this.status[name].hash_match === FALSE) {
+        good = false;
+        warn = true;
+      }
+      if (this.status[name].connected === FALSE) {
+        good = false;
+      }
+      const div = document.getElementById(`controllers-table-${name}-status`);
+      this.setStatus(div, good ? GOOD : warn ? WARNING : ERROR);
     }
-    if (this.status[name].version === ERROR) {
-      good = false;
-    }
-    if (this.status[name].version === WARNING) {
-      good = false;
-      warn = true;
-    }
-    if (this.status[name].hash_match === FALSE) {
-      good = false;
-      warn = true;
-    }
-    if (this.status[name].connected === FALSE) {
-      good = false;
-    }
-    const div = document.getElementById(`controllers-table-${name}-status`);
-    this.setStatus(div, good ? GOOD : warn ? WARNING : ERROR);
   }
 
   getNames() {
@@ -225,6 +251,10 @@ class Controllers {
 
   addRow(controller) {
     console.log('Adding controller', controller);
+    if (!(controller.url in this.urls)) {
+      this.urls[controller.url] = [];
+    }
+    this.urls[controller.url].push(controller.name);
     this.num_strips += 1;
     const id = 'controllers-table-' + controller.name;
 
@@ -274,10 +304,10 @@ class Controllers {
     cells[5].appendChild(ping);
     cells[6].appendChild(status);
 
-    this.addStatusRow(controller.name);
+    this.addStatusRow(controller.name, controller.active);
   }
 
-  addStatusRow(name) {
+  addStatusRow(name, initial_mode) {
     this.status[name] = {
       'initialized': UNKNOWN,
       'version': UNKNOWN,
@@ -295,6 +325,21 @@ class Controllers {
     const connected = document.createElement('div');
     const version = document.createElement('div');
     const hash_match = document.createElement('div');
+    const mode = createSelect(
+        id + '-active',
+        [
+          'active',
+          'disabled',
+        ],
+        initial_mode);
+    mode.addEventListener('input', () => {
+      this.changeMode(name, mode.value);
+      const url = this.controllers[name].url;
+      for (let i = 0; i < this.urls[url].length; i++) {
+        document.getElementById(`status-table-${this.urls[url][i]}-active`)
+            .value = mode.value;
+      }
+    });
     this.setStatus(initialized, UNKNOWN);
     this.setStatus(connected, UNKNOWN);
     this.setStatus(version, UNKNOWN);
@@ -310,5 +355,15 @@ class Controllers {
     cells[2].appendChild(connected);
     cells[3].appendChild(version);
     cells[4].appendChild(hash_match);
+    cells[5].appendChild(mode);
+  }
+
+  changeMode(name, mode) {
+    if (mode === 'active') {
+      fetch(`/enable?name=${name}`);
+    } else if (mode === 'noreconnect') {
+    } else if (mode === 'disabled') {
+      fetch(`/disable?name=${name}`);
+    }
   }
 }
