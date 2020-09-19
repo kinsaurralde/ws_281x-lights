@@ -33,6 +33,9 @@ html {
   --slider-thumb-width: 0.75vw;
   --slider-thumb-height: 1.25vw;
 
+  /* Connection Outline */
+  --connection-outline: 1vw;
+
   overflow: scroll;
   overflow-x: hidden;
 }
@@ -69,7 +72,7 @@ body {
   background: var(--body-background);
   color: var(--text-color);
   -webkit-user-select: none;
-  outline: 0vw solid red;
+  outline: var(--connection-outline) solid red;
 }
 
 input,
