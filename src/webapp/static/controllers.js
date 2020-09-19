@@ -4,6 +4,8 @@
 const TABLE_COLUMNS = 7;
 const STATUS_COLUMNS = 6;
 
+const BRIGHTNESS_DELAY_MS = 100;
+
 const GOOD = 'GOOD';
 const WARNING = 'WARNING';
 const ERROR = 'ERROR';
@@ -17,6 +19,9 @@ class Controllers {
     socket.on('update', (data) => {
       this.handleUpdate(data);
     });
+    socket.on('brightness', (data) => {
+      this.handleBrightness(data);
+    });
     const table = document.getElementById('controller-table');
     const status_table = document.getElementById('status-table');
     this.table = table.getElementsByTagName('tbody')[0];
@@ -26,7 +31,8 @@ class Controllers {
     this.num_controllers = 0;
     this.num_strips = 0;
     this.controllers = {};
-    this.brightness_link = [];
+    this.brightness_link = {};
+    this.brightness_values = {};
     this.fetchControllers();
     this.fetchInitialized();
     this.fetchVersionInfo();
@@ -73,6 +79,14 @@ class Controllers {
       if (name in initialized.initialized) {
         this.setStatusInitialized(
             name, initialized.initialized[name] ? TRUE : FALSE);
+      }
+    }
+  }
+
+  handleBrightness(data) {
+    for (let i = 0; i < data.length; i++) {
+      if (data[i].name in this.controllers) {
+        this.setBrightness(data[i].name, parseInt(data[i].value));
       }
     }
   }
@@ -230,27 +244,43 @@ class Controllers {
     }
   }
 
-  sendBrightness(name, value, index) {
-    if (this.brightness_link[index].checked) {
-      const values = [];
-      for (let i = 0; i < this.brightness_link.length; i++) {
-        if (this.brightness_link[i].checked) {
-          values.push({
-            'name': this.brightness_link[i].name,
-            'value': value,
-          });
-          this.brightness_link[i].slider.value = value;
-          this.brightness_link[i].text.textContent = value;
+  sendBrightness(name, value) {
+    if (this.brightness_link[name].checked) {
+      for (const controller in this.brightness_link) {
+        if (controller in this.brightness_link) {
+          if (this.brightness_link[controller].checked) {
+            this.brightness_values[controller] = value;
+            this.brightness_link[controller].slider.value = value;
+            this.brightness_link[controller].text.textContent = value;
+          }
         }
       }
-      socket.emit('set_brightness', values);
     } else {
-      socket.emit('set_brightness', [{'name': name, 'value': value}]);
+      this.brightness_link[name].text.textContent = value;
+      this.brightness_values[name] = value;
+    }
+    if (!this.controllers[name].brightness_wait) {
+      this.controllers[name].brightness_wait = true;
+      setTimeout(() => {
+        const values = [];
+        for (const name in this.brightness_values) {
+          if (name in this.brightness_values) {
+            values.push({
+              'name': name,
+              'value': this.brightness_values[name],
+            });
+          }
+        }
+        this.brightness_values = {};
+        this.controllers[name].brightness_wait = false;
+        socket.emit('set_brightness', values);
+      }, BRIGHTNESS_DELAY_MS);
     }
   }
 
   addRow(controller) {
     console.log('Adding controller', controller);
+    this.controllers[controller.name].brightness_wait = false;
     if (!(controller.url in this.urls)) {
       this.urls[controller.url] = [];
     }
@@ -258,7 +288,6 @@ class Controllers {
     this.num_strips += 1;
     const id = 'controllers-table-' + controller.name;
 
-    this.brightness_link.push(false);
     const box = createCheckBox(id + '-checkbox', false, null);
 
     const name = createSecondTitle(id + '-name', controller.name);
@@ -273,18 +302,17 @@ class Controllers {
     status.id = id + '-status';
     this.setStatus(status, UNKNOWN);
 
-    const index = this.num_strips - 1;
+    this.brightness_link[controller.name] = {
+      'checked': box.checked,
+      'name': controller.name,
+      'slider': brightness_slider,
+      'text': brightness_value,
+    };
     box.addEventListener('input', () => {
-      this.brightness_link[index] = {
-        'checked': box.checked,
-        'name': controller.name,
-        'slider': brightness_slider,
-        'text': brightness_value,
-      };
+      this.brightness_link[controller.name].checked = box.checked;
     });
     brightness_slider.addEventListener('input', () => {
-      brightness_value.textContent = brightness_slider.value;
-      this.sendBrightness(controller.name, brightness_slider.value, index);
+      this.sendBrightness(controller.name, brightness_slider.value);
     });
     brightness_value.className = 'section-title-secondary';
     brightness_value.textContent = controller.init.brightness;

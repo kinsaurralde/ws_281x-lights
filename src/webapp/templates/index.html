@@ -153,6 +153,7 @@
         window.animations = new Animations()
         window.colors = new Colors()
         window.groups = new Groups()
+        socket.emit("webpage_loaded")
       }
 
       function loadedControllers() {
