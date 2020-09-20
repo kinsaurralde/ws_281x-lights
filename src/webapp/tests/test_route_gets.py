@@ -34,6 +34,36 @@ def test_controllers(client):
     assert response.content_type == "application/json"
 
 
+def test_getversioninfo(client):
+    response = client.get("/getversioninfo")
+    assert response.status_code == 200
+    assert response.content_type == "application/json"
+
+
+def test_getinitialized(client):
+    response = client.get("/getinitialized")
+    assert response.status_code == 200
+    assert response.content_type == "application/json"
+
+
+def test_enable(client):
+    response = client.get("/enable")
+    assert response.status_code == 200
+    assert response.content_type == "application/json"
+
+
+def test_disable(client):
+    response = client.get("/disable")
+    assert response.status_code == 200
+    assert response.content_type == "application/json"
+
+
+def test_update(client):
+    response = client.get("/update")
+    assert response.status_code == 200
+    assert response.content_type == "text/html; charset=utf-8"
+
+
 def test_404(client):
     response = client.get("/thisroutedoesnotexist")
     assert response.status_code == 404

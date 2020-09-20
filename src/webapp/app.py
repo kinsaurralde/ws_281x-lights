@@ -173,6 +173,7 @@ def disableControllers():
 @app.route("/update")
 def update():
     emitUpdatedData()
+    return "Emitted"
 
 
 @socketio.on("connect")

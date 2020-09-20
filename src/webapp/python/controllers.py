@@ -40,6 +40,9 @@ class Controllers:
             self.initController(url, controller)
             controller["id"] = id_counter
 
+    def setNoSend(self, value):
+        self.nosend = value
+
     def initController(self, url, controller):
         if url in self.disabled:
             return
@@ -80,6 +83,8 @@ class Controllers:
         if name not in self.config:
             return [{"url": None, "id": name, "message": "Controller not found",}]
         url = self.config[name]["url"]
+        if url in self.disabled:
+            return [{"url": None, "id": name, "message": "Controller not enabled",}]
         if url not in self.disabled:
             self.disabled[url] = []
         if name not in self.disabled[url]:
@@ -194,9 +199,6 @@ class Controllers:
                         data[controller] = response[response_index]
         return {"fails": fails, "initialized": data}
 
-    def setNoSend(self, value):
-        self.nosend = value
-
     def send(self, commands):
         queue = {}
         fails = []
@@ -207,7 +209,7 @@ class Controllers:
                     {
                         "url": "localhost",
                         "id": controller_name,
-                        "message": "controller not found",
+                        "message": "Controller not found",
                     }
                 )
                 continue

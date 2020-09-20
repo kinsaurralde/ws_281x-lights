@@ -4,6 +4,7 @@ import app
 
 # from app import app as flask_app
 flask_app = app.app
+socket_io = app.socketio
 
 
 @pytest.fixture
@@ -20,3 +21,18 @@ def client(flask):
 @pytest.fixture
 def mocker(mocker):
     return mocker
+
+
+@pytest.fixture
+def socketio():
+    return socket_io
+
+
+@pytest.fixture
+def main():
+    return app
+
+
+@pytest.fixture
+def controller():
+    return app.controllers

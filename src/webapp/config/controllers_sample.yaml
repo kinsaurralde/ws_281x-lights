@@ -7,7 +7,7 @@ controllers:
       num_leds: 300
       milliwatts: 5000
       brightness: 100
-    active: false
+    active: 'active'
   - name: tester_a_1
     url: http://localhost:6000
     strip_id: 1
@@ -15,28 +15,28 @@ controllers:
       num_leds: 300
       milliwatts: 5000
       brightness: 100
-    active: false
+    active: 'active'
   - name: tester_b_0
-    url: http://localhost:6000
+    url: http://localhost:6001
     strip_id: 0
     init:
       num_leds: 300
       milliwatts: 100
       brightness: 100
-    active: false
+    active: 'disabled'
   - name: tester_b_1
-    url: http://localhost:6000
+    url: http://localhost:6001
     strip_id: 1
     init:
       num_leds: 300
       milliwatts: 100
       brightness: 100
-    active: false
+    active: 'disabled'
   - name: tester_c_0
-    url: http://localhost:6000
+    url: http://localhost:6002
     strip_id: 0
     init:
       num_leds: 60
       milliwatts: 5000
       brightness: 100
-    active: true
+    active: 'active'
