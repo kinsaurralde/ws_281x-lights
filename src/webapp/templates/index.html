@@ -139,20 +139,37 @@
       </table>
       <div class="space-5"></div>
       <div class="divider"></div>
-      <div>Webapp version:&nbsp;&nbsp;&nbsp;&nbsp;<span id="status-webapp-version"></span></div>
-      <div>Webapp esp hash:&nbsp;<span id="status-webapp-esphash"></span></div>
-      <div>Webapp rpi hash:&nbsp;&nbsp;&nbsp;<span id="status-webapp-rpihash"></span></div>
+      Webapp Connected:&nbsp;<span id="status-webapp-connected" class="red">False</span><br />
+      Webapp Version:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="status-webapp-version"></span><br />
+      Webapp esp hash:&nbsp;&nbsp;&nbsp;<span id="status-webapp-esphash"></span><br />
+      Webapp rpi hash:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="status-webapp-rpihash"></span><br />
     </div>
     <div class="divider"></div>
 
     <script>
-      var socket = io()
+      const socket = io()
+
+      const webapp_connected_div = document.getElementById("status-webapp-connected")
+
+      socket.on("connect", () => {
+        console.log("Connected")
+        document.documentElement.style.setProperty("--connection-outline", "0vw")
+        webapp_connected_div.textContent = "True"
+        webapp_connected_div.className = "green"
+      })
+      socket.on("disconnect", () => {
+        console.log("Disconnected")
+        document.documentElement.style.setProperty("--connection-outline", "1vw")
+        webapp_connected_div.textContent = "False"
+        webapp_connected_div.className = "red"
+      })
 
       window.onload = function () {
         window.controllers = new Controllers()
         window.animations = new Animations()
         window.colors = new Colors()
         window.groups = new Groups()
+        socket.emit("webpage_loaded")
       }
 
       function loadedControllers() {

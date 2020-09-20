@@ -17,7 +17,7 @@ try:
 except:
     import ruamel.yaml as yaml  # 3.7
 
-Payload.max_decode_packets = 50
+Payload.max_decode_packets = 100
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
@@ -179,7 +179,6 @@ def update():
 def connect():
     print("Client Connected:", request.remote_addr)
     socketio.emit("connection_response", room=request.sid)
-    emitUpdatedData()
 
 
 @socketio.on("disconnect")
@@ -187,9 +186,20 @@ def disconnect():
     print("Client Disconnected")
 
 
+@socketio.on("webpage_loaded")
+def webapgeLoaded():
+    emitUpdatedData()
+    last_brightness = controllers.getLastBrightness()
+    brightness = []
+    for name in last_brightness:
+        brightness.append({"name": name, "value": last_brightness[name]})
+    socketio.emit("brightness", brightness)
+
+
 @socketio.on("set_brightness")
 def setBrightness(json):
     controllers.brightness(json)
+    socketio.emit("brightness", json)
 
 
 def emitUpdatedData():
