@@ -97,12 +97,13 @@ class Controllers:
         url = self.config[name]["url"]
         if url not in self.disabled:
             return [{"url": None, "id": name, "message": "Controller not disabled",}]
-        self.urls[url] = self.disabled[url]
         self.disabled.pop(url)
         self.initController(url, self.config[name])
         return []
 
     def updateControllerLatencies(self, background=None):
+        if self.nosend:
+            return
         for url in self.latencies:
             if url in self.disabled:
                 self.latencies[url] = "disabled"

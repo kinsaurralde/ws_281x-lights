@@ -59,13 +59,15 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-VERSION_INFO = {
-    "major": MAJOR,
-    "minor": MINOR,
-    "patch": PATCH,
-    "esp_hash": ESP_HASH,
-    "rpi_hash": RPI_HASH,
-}
+
+def getVersionInfo():
+    return {
+        "major": MAJOR,
+        "minor": MINOR,
+        "patch": PATCH,
+        "esp_hash": ESP_HASH,
+        "rpi_hash": RPI_HASH,
+    }
 
 
 def getNosend():
@@ -217,7 +219,7 @@ if args.test:
     for i, controller in enumerate(controllers_config["controllers"]):
         controller["url"] = "http://localhost:" + str(6000 + i)
 
-controllers = python.Controllers(controllers_config, args.nosend, VERSION_INFO)
+controllers = python.Controllers(controllers_config, args.nosend, getVersionInfo())
 background = python.Background(socketio, controllers)
 
 if __name__ == "__main__":

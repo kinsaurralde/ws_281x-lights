@@ -35,4 +35,5 @@ def main():
 
 @pytest.fixture
 def controller():
+    app.controllers.nosend = True
     return app.controllers
