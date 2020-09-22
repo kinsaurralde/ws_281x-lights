@@ -366,3 +366,9 @@ def test_controller_initialized_invalid_strip(client, mocker, controller):
             "message": "Strip id does not exist on remote controller",
         }
     ]
+
+
+def test_background_thread(background, controller):
+    controller.nosend = True
+    background.startLoop()
+    background.active = False

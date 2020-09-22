@@ -24,16 +24,11 @@ def mocker(mocker):
 
 
 @pytest.fixture
-def socketio():
-    return socket_io
-
-
-@pytest.fixture
-def main():
-    return app
+def background():
+    return app.background
 
 
 @pytest.fixture
 def controller():
-    app.controllers.nosend = True
+    # app.controllers.nosend = True
     return app.controllers

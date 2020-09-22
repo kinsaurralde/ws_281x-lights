@@ -37,6 +37,7 @@ void handleLEDOn();
 void handleLEDOff();
 
 void updatePixels();
+void setArgs(AnimationArgs& args, JsonObject values);
 
 ESP8266WebServer server(80);
 
@@ -76,16 +77,16 @@ void setup() {
     Serial.print("IP address:\t");
     Serial.println(WiFi.localIP());  // Send the IP address of the ESP8266 to the computer
 
-    server.on("/", handleRoot);  // Call the 'handleRoot' function when a client requests URI "/"
-    server.on("/data", handleData);
+    server.on("/", handleRoot);
     server.on("/init", handleInit);
-    server.on("/getpixels", handleGetPixels);
-    server.on("/heapfree", handleFreeHeap);
+    server.on("/data", handleData);
     server.on("/brightness", handleBrightness);
+    server.on("/getpixels", handleGetPixels);
     server.on("/versioninfo", handleVersionInfo);
+    server.on("/heapfree", handleFreeHeap);
     server.on("/ledon", handleLEDOn);
     server.on("/ledoff", handleLEDOff);
-    server.onNotFound(handleNotFound);  // When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
+    server.onNotFound(handleNotFound);
 
     Serial.println("Setup strip 0 with " + String(MAX_LED_PER_STRIP) + " pixels on pin " + String(LED_PIN_0));
     neopixels.controllers[0] = &FastLED.addLeds<NEOPIXEL, LED_PIN_0>(neopixels.leds[0], MAX_LED_PER_STRIP);
@@ -97,7 +98,7 @@ void setup() {
 
     Serial.println("Started neopixels");
 
-    server.begin();  // Actually start the server
+    server.begin();  // Start the server
     Serial.println("HTTP server started");
     digitalWrite(BUILTINLED_A, LOW);
 }
@@ -108,6 +109,9 @@ void loop(void) {
     updatePixels();
 }
 
+/**
+ * Write leds to strip if enough time has passed since last write
+ */
 void updatePixels() {
     for (unsigned int i = 0; i < LED_STRIP_COUNT; i++) {
         if (neopixels.pixels[i]->canShow(millis())) {
@@ -128,6 +132,9 @@ void updatePixels() {
     }
 }
 
+/**
+ * Return 2D array containing values of each pixel on each strip 
+ */
 String printPixels() {
     String result = "[[";
     for (unsigned int i = 0; i < LED_STRIP_COUNT; i++) {
@@ -146,6 +153,9 @@ String printPixels() {
     return result;
 }
 
+/**
+ * Return array as string with values seperated by ','
+ */
 String arrayToString(unsigned int* array, unsigned int length) {
     String result = "";
     for (unsigned int i = 0; i < length; i++) {
@@ -157,23 +167,10 @@ String arrayToString(unsigned int* array, unsigned int length) {
     return result;
 }
 
-void handleRoot() {
-    server.send(200, "text/plain", "Hello!");  // Send HTTP status 200 (Ok) and send some text to the browser/client
-}
-
-void handleGetPixels() {
-    server.send(200, "application/json", printPixels());
-}
-
-void handleBrightness() {
-    String brightness = server.arg("value");
-    int id = server.arg("id").toInt();
-    if (brightness != "") {
-        neopixels.pixels[id]->setBrightness(brightness.toInt());
-    }
-    server.send(200, "text/plain", String(neopixels.pixels[id]->getBrightness()));
-}
-
+/**
+ * Set values of AnimationArgs object from JsonObject values.
+ * Although not checked, JsonObject should contain all of the AnimationArgs properties
+ */ 
 void setArgs(AnimationArgs& args, JsonObject values) {
     args.color = values["color"].as<int>();
     args.color_bg = values["color_bg"].as<int>();
@@ -194,9 +191,63 @@ void setArgs(AnimationArgs& args, JsonObject values) {
     }
 }
 
+/**
+ * Route: /
+ * Methods: GET
+ * 
+ * Should only be called for ping or connected check
+ */ 
+void handleRoot() {
+    server.send(200, "text/plain", "Hello!");
+}
+
+/**
+ * Route: /init
+ * Methods: GET, POST
+ * 
+ * POST JSON Properties:
+ *      - unsigned int id:              id of strip to initialize
+ *      - unsigned int init.brightness: initial brightness value
+ *      - unsigned int init.num_leds:   number of pixels on strip
+ *      - unsigned int init.milliwatts: maximum milliwatts (not implemented)
+ * 
+ * Initialze strip with brightness, number of leds, 
+ */
+void handleInit() {
+    if (server.hasArg("plain") == true) {  //Check if body received
+        StaticJsonDocument<1024> doc;
+        deserializeJson(doc, server.arg("plain"));
+        unsigned int id = doc["id"].as<unsigned int>();
+        unsigned int brightness = doc["init"]["brightness"].as<unsigned int>();
+        unsigned int num_leds = doc["init"]["num_leds"].as<unsigned int>();
+        unsigned int milliwatts = doc["init"]["milliwatts"].as<unsigned int>();
+        if (id < LED_STRIP_COUNT) {
+            neopixels.pixels[id]->initialize(num_leds, milliwatts, brightness, MAX_BRIGHTNESS);
+        }
+    }
+    const size_t CAPACITY = JSON_ARRAY_SIZE(LED_STRIP_COUNT);
+    StaticJsonDocument<CAPACITY> doc;
+    JsonArray array = doc.to<JsonArray>();
+    for (unsigned int i = 0; i < LED_STRIP_COUNT; i++) {
+        array.add(neopixels.pixels[i]->isInitialized());
+    }
+    String info;
+    serializeJson(doc, info);
+    server.send(200, "application/json", info);
+}
+
+/**
+ * Route: /data 
+ * Methods: POST
+ * 
+ * Parameters:
+ *      - Array of commands, command properties in docs
+ * 
+ * Run animation commands
+ */
 void handleData() {
     if (server.hasArg("plain") == false) {  //Check if body received
-        server.send(200, "text/plain", "Body not received");
+        server.send(200, "text/plain", "Use POST Method");
         return;
     }
     StaticJsonDocument<4096> doc;
@@ -233,29 +284,41 @@ void handleData() {
     server.send(200, "application/json", "[]");
 }
 
-void handleInit() {
-    if (server.hasArg("plain") == true) {  //Check if body received
-        StaticJsonDocument<1024> doc;
-        deserializeJson(doc, server.arg("plain"));
-        unsigned int id = doc["id"].as<unsigned int>();
-        unsigned int brightness = doc["init"]["brightness"].as<unsigned int>();
-        unsigned int num_leds = doc["init"]["num_leds"].as<unsigned int>();
-        unsigned int milliwatts = doc["init"]["milliwatts"].as<unsigned int>();
-        if (id < LED_STRIP_COUNT) {
-            neopixels.pixels[id]->initialize(num_leds, milliwatts, brightness, MAX_BRIGHTNESS);
-        }
+/**
+ * Route: /brightness
+ * Methods: GET
+ * 
+ * Query Parameters:
+ *      - unsigned integer id:    which strip to read/change
+ *      - unsigned integer value: new brightness value (optional)
+ * 
+ * Sets brightness of strip id to value (if exists) then returns current value
+ */
+void handleBrightness() {
+    String brightness = server.arg("value");
+    int id = server.arg("id").toInt();
+    if (brightness != "") {
+        neopixels.pixels[id]->setBrightness(brightness.toInt());
     }
-    const size_t CAPACITY = JSON_ARRAY_SIZE(LED_STRIP_COUNT);
-    StaticJsonDocument<CAPACITY> doc;
-    JsonArray array = doc.to<JsonArray>();
-    for (unsigned int i = 0; i < LED_STRIP_COUNT; i++) {
-        array.add(neopixels.pixels[i]->isInitialized());
-    }
-    String info;
-    serializeJson(doc, info);
-    server.send(200, "application/json", info);
+    server.send(200, "text/plain", String(neopixels.pixels[id]->getBrightness()));
 }
 
+/**
+ * Route: /getpixels 
+ * Methods: GET
+ * 
+ * Returns json array of each pixel for each strip
+ */
+void handleGetPixels() {
+    server.send(200, "application/json", printPixels());
+}
+
+/**
+ * Route: /versioninfo 
+ * Methods: GET
+ * 
+ * Return version info of this controller
+ */
 void handleVersionInfo() {
     StaticJsonDocument<512> doc;
     JsonObject obj = doc.to<JsonObject>();
@@ -269,20 +332,44 @@ void handleVersionInfo() {
     server.send(200, "application/json", info);
 }
 
+/**
+ * Route:
+ * Methods: GET
+ * 
+ * Returns number of free bytes in heap
+ */
 void handleFreeHeap() {
     server.send(200, "text/plain", String(ESP.getFreeHeap()));
 }
 
+/**
+ * Route:
+ * Methods: GET
+ * 
+ * Turns BUILTINLED_A on
+ */
 void handleLEDOn() {
     digitalWrite(BUILTINLED_A, LOW);
     server.send(200, "text/plain", "On");
 }
 
+/**
+ * Route:
+ * Methods: GET
+ * 
+ * Turns BUILTINLED_A off
+ */
 void handleLEDOff() {
     digitalWrite(BUILTINLED_A, HIGH);
     server.send(200, "text/plain", "Off");
 }
 
+/**
+ * Route: Any Invalid Route
+ * Methods: GET
+ * 
+ * Returns 404 message if route not found
+ */
 void handleNotFound() {
     server.send(404, "text/plain", "404: Not found");  // Send HTTP status 404 (Not Found) when there's no handler for the URI in the request
 }
