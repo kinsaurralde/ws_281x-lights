@@ -228,7 +228,7 @@ class Controllers:
             )
         for thread in threads:
             thread.join()
-        if self.send_counter % 25 == 0:
+        if self.send_counter % 25 == 0:  # pragma: no cover
             self.updateControllerLatencies()
         return fails
 
@@ -249,6 +249,8 @@ class Controllers:
     def brightness(self, requests):
         for request in requests:
             name = request["name"]
+            if name not in self.config:
+                continue
             value = request["value"]
             url = self.config[name]["url"]
             if url in self.disabled:

@@ -14,7 +14,7 @@ from version import *
 
 try:
     import yaml  # 3.6
-except:
+except:  # pragma: no cover
     import ruamel.yaml as yaml  # 3.7
 
 Payload.max_decode_packets = 100
@@ -215,14 +215,14 @@ animations_config = open_yaml("config/animations.yaml")
 colors_config = open_yaml("config/colors.yaml")
 controllers_config = open_yaml(args.config)
 
-if args.test:
+if args.test:  # pragma: no cover
     for i, controller in enumerate(controllers_config["controllers"]):
         controller["url"] = "http://localhost:" + str(6000 + i)
 
 controllers = python.Controllers(controllers_config, args.nosend, getVersionInfo())
 background = python.Background(socketio, controllers)
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     if args.background:
         background.startLoop()
     socketio.run(

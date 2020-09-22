@@ -29,6 +29,11 @@ def background():
 
 
 @pytest.fixture
+def socketio():
+    return socket_io.test_client(flask_app)
+
+
+@pytest.fixture
 def controller():
     # app.controllers.nosend = True
     return app.controllers
