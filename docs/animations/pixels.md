@@ -49,6 +49,13 @@ Set time inbetween frames.
 
 
 
+### Set Size
+``unsigned int Pixels::setSize(unsigned int size)``
+
+Sets the number of LED pixels.
+
+
+
 ### Size
 ``unsigned int Pixels::size()``
 
@@ -74,3 +81,17 @@ Sets brightness
 ``void Pixels::setIncrementSteps(unsigned int value = 1)``
 
 Sets how many frames to jump when ```increment()``` is called.
+
+
+
+### Initialize
+``void Pixels::initialize(unsigned int num_leds, unsigned int milliwatts, unsigned int brightness, unsigned int max_brightness=255)``
+
+Initialize strip with parameters
+
+
+
+### Is Initialized
+``bool Pixels::isInitialized()``
+
+Retrun whether initialized or not

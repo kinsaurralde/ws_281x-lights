@@ -83,7 +83,7 @@ to just test the webapp server with no coverage report.
 
 Currently only the webapp server has tests.
 
-A coverage report in HTML format is available at `src/webapp/htmlcov/index.html`
+A coverage report in HTML format is available at `src/webapp/htmlcov/index.html` after a test with coverage is run.
 
 ## Tools
 
@@ -165,15 +165,9 @@ Config file example (default value)
 ![Application Architecture](images/application_architecture.png)
 
 ## Todo
-- Controller brightness
 - Power consumption measurement and adjustment
 - SocketIO
-    - Controller ping on webpage
-    - Controller brighntess on webpage
-    - Controller connected on webpage
     - Webapp expected pixel colors
 - Add webapp to upload_rpi.py
-- Hide/Show sections on webpage
 - Tests for controllers
-- Verion numbers
 - Update README
