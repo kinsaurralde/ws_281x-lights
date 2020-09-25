@@ -89,6 +89,10 @@ extern "C" {
         p->initialize(num_leds, milliwatts, brightness, max_brightness);
     }
 
+    bool Pixels_isInitialized(Pixels* p) {
+        return p->isInitialized();
+    }
+
     Frame* Pixels_get(Pixels* p) {
         return p->get();
     }

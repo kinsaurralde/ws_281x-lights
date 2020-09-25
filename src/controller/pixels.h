@@ -3,6 +3,7 @@
 #ifndef PIXELS_H
 #define PIXELS_H
 
+
 class Pixels {
    private:
     bool initialized;
@@ -43,6 +44,7 @@ class Pixels {
     void setBrightness(unsigned int value);
     void setIncrementSteps(unsigned int value = 1);
     void initialize(unsigned int num_leds, unsigned int milliwatts, unsigned int brightness, unsigned int max_brightness=255);
+    bool isInitialized();
 
     Frame* get();
     void increment();

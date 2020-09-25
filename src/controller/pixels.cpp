@@ -11,7 +11,7 @@
     #include <iostream>
 #endif
 
-
+#define BRIGHTNESS_MUTLIPLIER 0.5   // value of 0.5 means half brightness
 
 Pixels::Pixels(unsigned int num_leds, unsigned int max_brightness) : num_leds(num_leds), max_brightness(max_brightness) {
     initialized = false;
@@ -104,8 +104,11 @@ unsigned int Pixels::size() {
  }
 
 void Pixels::setBrightness(unsigned int value) {
-    if (value <= 255 && value < max_brightness) {
+    value *= BRIGHTNESS_MUTLIPLIER;
+    if (value <= 255 && value <= max_brightness) {
         brightness = value;
+    } else {
+        brightness = max_brightness;
     }
 }
 
@@ -120,6 +123,10 @@ void Pixels::initialize(unsigned int num_leds, unsigned int milliwatts, unsigned
     setSize(num_leds);
     setBrightness(brightness);
     initialized = true;
+}
+
+bool Pixels::isInitialized() {
+    return initialized;
 }
 
 void Pixels::increment() {

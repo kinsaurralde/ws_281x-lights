@@ -44,6 +44,9 @@ class Colors {
           return [ranges[0].value, ranges[1].value, ranges[2].value];
         });
       }
+      for (let i = 0; i < num_edit / 2; i++) {
+        this.removeColor();
+      }
     });
   }
 

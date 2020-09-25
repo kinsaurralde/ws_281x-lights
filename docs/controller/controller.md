@@ -64,13 +64,6 @@ Initializes pixels with led_count, brightness, and maximum milliwatts
 
 Return: text (will probably change)
 
-### /getpixels
-**GET**
-
-Gets current color of both strip's pixels. 
-
-Return: 2D array
-
 ### /brightness
 **GET**
 
@@ -80,7 +73,26 @@ Query Params:
 * id:       which LED strip
 * value:    new brightness
 
-Return: int
+Return: int### /getpixels
+**GET**
+
+Gets current color of both strip's pixels. 
+
+Return: 2D array
+
+### /getpixels
+**GET**
+
+Gets current color of both strip's pixels. 
+
+Return: 2D array
+
+### /versioninfo
+**GET**
+
+Gets the version info of controller
+
+Return: Object
 
 ## ESP8266 Special Routes
 These special routes deal with ESP8266 hardware. 

@@ -8,6 +8,7 @@
     <meta name="description" content="LED Control" />
     <link rel="stylesheet" href="../static/main.css" />
     <link rel="stylesheet" href="../static/project.css" />
+    <script src="static/lib/socket.io.js"></script>
     <script defer src="../static/helpers.js"></script>
     <script defer src="../static/controllers.js"></script>
     <script defer src="../static/groups.js"></script>
@@ -34,6 +35,8 @@
             <th scope="col">Number of LEDs</th>
             <th scope="col">Max milliwatts</th>
             <th scope="col">Target Group ID</th>
+            <th scope="col">Ping (ms)</th>
+            <th scope="col">Status</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -111,12 +114,62 @@
       </div>
     </div>
 
+    <div class="divider"></div>
+    <div class="section-flex-no-border space-between">
+      <div class="section-title">Status</div>
+      <div>
+        <button type="button" onclick="showSection('section-status')">Show</button>
+        <button type="button" onclick="hideSection('section-status')">Hide</button>
+      </div>
+    </div>
+    <div id="section-status">
+      <div class="space-5"></div>
+      <table id="status-table">
+        <thead>
+          <tr>
+            <th scope="col">Controller</th>
+            <th scope="col">Initialized</th>
+            <th scope="col">Connected</th>
+            <th scope="col">Version</th>
+            <th scope="col">Hash match</th>
+            <th scope="col">Mode</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="space-5"></div>
+      <div class="divider"></div>
+      Webapp Connected:&nbsp;<span id="status-webapp-connected" class="red">False</span><br />
+      Webapp Version:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="status-webapp-version"></span><br />
+      Webapp esp hash:&nbsp;&nbsp;&nbsp;<span id="status-webapp-esphash"></span><br />
+      Webapp rpi hash:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="status-webapp-rpihash"></span><br />
+    </div>
+    <div class="divider"></div>
+
     <script>
+      const socket = io()
+
+      const webapp_connected_div = document.getElementById("status-webapp-connected")
+
+      socket.on("connect", () => {
+        console.log("Connected")
+        document.documentElement.style.setProperty("--connection-outline", "0vw")
+        webapp_connected_div.textContent = "True"
+        webapp_connected_div.className = "green"
+      })
+      socket.on("disconnect", () => {
+        console.log("Disconnected")
+        document.documentElement.style.setProperty("--connection-outline", "1vw")
+        webapp_connected_div.textContent = "False"
+        webapp_connected_div.className = "red"
+      })
+
       window.onload = function () {
         window.controllers = new Controllers()
         window.animations = new Animations()
         window.colors = new Colors()
         window.groups = new Groups()
+        socket.emit("webpage_loaded")
       }
 
       function loadedControllers() {

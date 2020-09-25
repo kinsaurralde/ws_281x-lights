@@ -6,17 +6,21 @@ from collections import OrderedDict
 
 from flask import Flask, json, render_template, request
 from flask_socketio import SocketIO
+from engineio.payload import Payload
 
-# from py.controllers import Controllers
 import python
+
+from version import *
 
 try:
     import yaml  # 3.6
-except:
+except:  # pragma: no cover
     import ruamel.yaml as yaml  # 3.7
 
+Payload.max_decode_packets = 100
+
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -45,8 +49,25 @@ parser.add_argument(
     help="Port to run server on (overrides config file)",
     default=5000,
 )
+parser.add_argument(
+    "-b",
+    "--background",
+    action="store_false",
+    help="Disable Background Information Thread",
+    default=True,
+)
 
 args = parser.parse_args()
+
+
+def getVersionInfo():
+    return {
+        "major": MAJOR,
+        "minor": MINOR,
+        "patch": PATCH,
+        "esp_hash": ESP_HASH,
+        "rpi_hash": RPI_HASH,
+    }
 
 
 def getNosend():
@@ -60,10 +81,12 @@ def open_yaml(path):
     return data
 
 
-def create_response(data):
-    ordered = OrderedDict(data)
+def create_response(data, ordered=False):
+    payload = data
+    if ordered:
+        payload = OrderedDict(data)
     response = app.response_class(
-        response=json.dumps(ordered, sort_keys=False),
+        response=json.dumps(payload, sort_keys=False),
         status=200,
         mimetype="application/json",
     )
@@ -122,7 +145,37 @@ def getcolors():
 
 @app.route("/getcontrollers")
 def getcontrollers():
-    return create_response(controllers.getConfig())
+    return create_response(controllers.getConfig(), True)
+
+
+@app.route("/getversioninfo")
+def getversioninfo():
+    return create_response(controllers.getControllerVersionInfo())
+
+
+@app.route("/getinitialized")
+def getinitialized():
+    return create_response(controllers.getControllerInitialized())
+
+
+@app.route("/enable")
+def enableControllers():
+    fails = controllers.enableController(request.args.get("name"))
+    emitUpdatedData()
+    return create_response({"error": len(fails) > 0, "message": fails})
+
+
+@app.route("/disable")
+def disableControllers():
+    fails = controllers.disableController(request.args.get("name"))
+    emitUpdatedData()
+    return create_response({"error": len(fails) > 0, "message": fails})
+
+
+@app.route("/update")
+def update():
+    emitUpdatedData()
+    return "Emitted"
 
 
 @socketio.on("connect")
@@ -136,17 +189,42 @@ def disconnect():
     print("Client Disconnected")
 
 
+@socketio.on("webpage_loaded")
+def webapgeLoaded():
+    emitUpdatedData()
+    last_brightness = controllers.getLastBrightness()
+    brightness = []
+    for name in last_brightness:
+        brightness.append({"name": name, "value": last_brightness[name]})
+    socketio.emit("brightness", brightness)
+
+
+@socketio.on("set_brightness")
+def setBrightness(json):
+    controllers.brightness(json)
+    socketio.emit("brightness", json)
+
+
+def emitUpdatedData():
+    background.updatePing()
+    background.updateData()
+    background.emitUpdate()
+
+
 animations_config = open_yaml("config/animations.yaml")
 colors_config = open_yaml("config/colors.yaml")
 controllers_config = open_yaml(args.config)
 
-if args.test:
+if args.test:  # pragma: no cover
     for i, controller in enumerate(controllers_config["controllers"]):
         controller["url"] = "http://localhost:" + str(6000 + i)
 
-controllers = python.Controllers(controllers_config, args.nosend)
+controllers = python.Controllers(controllers_config, args.nosend, getVersionInfo())
+background = python.Background(socketio, controllers)
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
+    if args.background:
+        background.startLoop()
     socketio.run(
         app, debug=args.debug, host="0.0.0.0", port=args.port, use_reloader=False
     )

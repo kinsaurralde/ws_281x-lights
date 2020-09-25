@@ -55,7 +55,7 @@ class List(ctypes.Structure):
         return self.lib.List_getCurrent(self.obj)
 
 
-MAX_BRIGHTNESS = 120
+MAX_BRIGHTNESS = 127
 
 class Pixels:
     def __init__(self, val):
@@ -71,6 +71,8 @@ class Pixels:
         self.lib.Pixels_setBrightness.argtypes = [ctypes.c_uint, ctypes.c_uint]
         self.lib.Pixels_setIncrementSteps.argtypes = [ctypes.c_uint, ctypes.c_uint]
         self.lib.Pixels_initialize.argtypes = [ctypes.c_void_p, ctypes.c_uint, ctypes.c_uint, ctypes.c_uint, ctypes.c_uint]
+        self.lib.Pixels_isInitialized.argtypes = [ctypes.c_void_p]
+        self.lib.Pixels_isInitialized.restype = ctypes.c_bool
         self.lib.Pixels_get.restype = ctypes.POINTER(Frame)
         self.lib.Pixels_color.argtypes = [ctypes.c_uint, AnimationArgs]
         self.lib.Pixels_wipe.argtypes = [ctypes.c_uint, AnimationArgs]
@@ -102,6 +104,9 @@ class Pixels:
 
     def initialize(self, num_leds, milliwatts, brightness, max_brightness):
         self.lib.Pixels_initialize(self.obj, num_leds, milliwatts, brightness, max_brightness)
+
+    def isInitialized(self):
+        return self.lib.Pixels_isInitialized(self.obj)
 
     def get(self):
         return self.lib.Pixels_get(self.obj)

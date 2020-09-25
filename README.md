@@ -165,15 +165,9 @@ Config file example (default value)
 ![Application Architecture](images/application_architecture.png)
 
 ## Todo
-- Controller brightness
 - Power consumption measurement and adjustment
 - SocketIO
-    - Controller ping on webpage
-    - Controller brighntess on webpage
-    - Controller connected on webpage
     - Webapp expected pixel colors
 - Add webapp to upload_rpi.py
-- Hide/Show sections on webpage
 - Tests for controllers
-- Verion numbers
 - Update README

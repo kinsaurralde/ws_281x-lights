@@ -28,12 +28,13 @@ def load_yaml(path):
 
 
 def send(device):
-    folder = None
+    folders = []
     if device["controller"]:
-        folder = args.buildfolder + "raspberrypi/"
-
-    if folder is not None:
-        # print(folder, device)
+        folders.append(args.buildfolder + "raspberrypi/")
+    if device["webapp"]:
+        folders.append(args.buildfolder + "webapp/")
+    for folder in folders:
+        print("Send to", folder, device)
         with tempfile.NamedTemporaryFile() as tf:
             tf.write(bytes("cd " + device["destination"] + "\n", "utf-8"))
             tf.write(bytes("put -r " + folder + "\n", "utf-8"))

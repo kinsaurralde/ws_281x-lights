@@ -1,4 +1,5 @@
 import time
+
 import ctypes
 import threading
 from rpi_ws281x import Adafruit_NeoPixel
@@ -82,11 +83,13 @@ class NeoPixels:
             self.updatePixels()
             self._sleep(self.delay_ms / 1000)
 
-    def handleBrightness(self, value=None):
-        for i in range(self.led_strip_count):
-            if value is not None:
-                self.pixels[i].setBrightness(value)
-        return self.pixels[0].getBrightness()
+    def handleBrightness(self, id, value=None):
+        print("Brightness", value, id)
+        id = int(id)
+        value = int(value)
+        if value is not None:
+            self.pixels[id].setBrightness(value)
+        return self.pixels[id].getBrightness()
 
     @staticmethod
     def setArgs(values):
@@ -132,6 +135,7 @@ class NeoPixels:
         for i in range(self.led_strip_count):
             if self.pixels[i].canShow(int(time.time() * 1000)):
                 self.pixels[i].increment()
+                self.strip[i].setBrightness(self.pixels[i].getBrightness())
                 data = self.pixels[i].get()
                 if not self.testing:
                     for j in range(self.led_count):
@@ -144,4 +148,11 @@ class NeoPixels:
     def init(self, values):
         print("Init strip", values)
         strip_id = values["id"]
-        self.pixels[strip_id].initialize(values["init"].get("num_leds", 60), values["init"].get("milliwatts", 1000), values["init"].get("brightness", 100), values["init"].get("max_brightness", 100))
+        self.pixels[strip_id].initialize(values["init"].get("num_leds", 60), values["init"].get("milliwatts", 1000), values["init"].get("brightness", 100), values["init"].get("max_brightness", 127))
+        return getInit()
+
+    def getInit(self):
+        strips = []
+        for i in range(self.led_strip_count):
+            strips.append(self.pixels[i].isInitialized())
+        return strips

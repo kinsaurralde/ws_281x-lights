@@ -36,6 +36,36 @@ def test_controllers(client):
     assert response.content_type == "text/html; charset=utf-8"
 
 
+def test_getversioninfo(client):
+    response = client.post("/getversioninfo")
+    assert response.status_code == 405
+    assert response.content_type == "text/html; charset=utf-8"
+
+
+def test_getinitialized(client):
+    response = client.post("/getinitialized")
+    assert response.status_code == 405
+    assert response.content_type == "text/html; charset=utf-8"
+
+
+def test_enable(client):
+    response = client.post("/enable")
+    assert response.status_code == 405
+    assert response.content_type == "text/html; charset=utf-8"
+
+
+def test_disable(client):
+    response = client.post("/disable")
+    assert response.status_code == 405
+    assert response.content_type == "text/html; charset=utf-8"
+
+
+def test_update(client):
+    response = client.post("/update")
+    assert response.status_code == 405
+    assert response.content_type == "text/html; charset=utf-8"
+
+
 def test_404(client):
     response = client.post("/thisroutedoesnotexist")
     assert response.status_code == 404
