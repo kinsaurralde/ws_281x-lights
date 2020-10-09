@@ -30,6 +30,13 @@ parser.add_argument(
     "-t", "--test", action="store_true", help="Testing mode (localtest)", default=False,
 )
 parser.add_argument(
+    "-s",
+    "--pixel-simulate",
+    action="store_true",
+    help="Simulate pixels",
+    default=False,
+)
+parser.add_argument(
     "--nosend",
     action="store_true",
     help="Dont send to controllers (For testing)",
@@ -178,6 +185,11 @@ def update():
     return "Emitted"
 
 
+@app.route("/getpixels")
+def getPixels():
+    return create_response(controllers.getPixels())
+
+
 @socketio.on("connect")
 def connect():
     print("Client Connected:", request.remote_addr)
@@ -219,7 +231,13 @@ if args.test:  # pragma: no cover
     for i, controller in enumerate(controllers_config["controllers"]):
         controller["url"] = "http://localhost:" + str(6000 + i)
 
-controllers = python.Controllers(controllers_config, args.nosend, getVersionInfo())
+controller_module = None
+if args.pixel_simulate:
+    import controller as controller_module
+
+controllers = python.Controllers(
+    controllers_config, args.nosend, getVersionInfo(), controller_module
+)
 background = python.Background(socketio, controllers)
 
 if __name__ == "__main__":  # pragma: no cover

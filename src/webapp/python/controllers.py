@@ -9,7 +9,7 @@ POST_TIMEOUT = 0.5
 
 
 class Controllers:
-    def __init__(self, config, nosend, version_info):
+    def __init__(self, config, nosend, version_info, controller_module):
         self.version_info = version_info
         self.nosend = nosend
         self.send_counter = 0
@@ -22,6 +22,8 @@ class Controllers:
         self.brightness_timer_active = False
         self.background_data = {}
         self.config = {}
+        self.controller_module = controller_module
+        self.controllers = {}
         self._setupConfig(config["controllers"])
         self.updateControllerLatencies()
 
@@ -34,11 +36,14 @@ class Controllers:
             self.latencies[url] = None
             if url not in self.urls:
                 self.urls[url] = []
+                if self.controller_module is not None:
+                    self.controllers[url] = self.controller_module.NeoPixels()
             self.urls[url].append(controller["name"])
             if controller["active"] == "disabled":
                 self.disableController(controller["name"])
             self.initController(url, controller)
             controller["id"] = id_counter
+        print(self.controllers)
 
     def setNoSend(self, value):
         self.nosend = value
@@ -52,6 +57,10 @@ class Controllers:
             url + "/init",
             {"id": controller["strip_id"], "init": controller["init"]},
         )
+        if url in self.controllers:
+            self.controllers[url].init(
+                {"id": controller["strip_id"], "init": controller["init"]}
+            )
 
     def _send(self, fails, url, payload=None, controller_id=None):
         thread = threading.Thread(
@@ -226,6 +235,8 @@ class Controllers:
             threads.append(
                 self._send(fails, url + "/data", queue[url], queue[url][0]["id"])
             )
+            if url in self.controllers:
+                self.controllers[url].handleData(queue[url])
         for thread in threads:
             thread.join()
         if self.send_counter % 25 == 0:  # pragma: no cover
@@ -263,3 +274,9 @@ class Controllers:
                 self.brightness_timer_active = True
                 thread = threading.Thread(target=self._brightness())
                 thread.start()
+
+    def getPixels(self):
+        result = {}
+        for i in self.controllers:
+            result[i] = self.controllers[i].getPixels()
+        return result
