@@ -72,6 +72,7 @@ def getVersionInfo():
         "major": MAJOR,
         "minor": MINOR,
         "patch": PATCH,
+        "label": LABEL,
         "esp_hash": ESP_HASH,
         "rpi_hash": RPI_HASH,
     }

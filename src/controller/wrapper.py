@@ -26,6 +26,7 @@ class List(ctypes.Structure):
         self.lib.List_getNext.restype = ctypes.c_uint
         self.lib.List_getCurrent.restype = ctypes.c_uint
         self.obj = self.lib.List_new(val)
+        super().__init__()
 
     def get(self, index):
         return self.lib.List_get(self.obj, index)
