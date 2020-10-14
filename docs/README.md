@@ -1,5 +1,11 @@
 # ws281x-led
 
+This project uses a webapp and either ESP8266s or raspberrypis to controll ws2812 or ws2815 LEDs.
+The webapp is hosted on a Flask webserver. It recieves commands from the website it hosts and uses
+its config information to send these commands to the correct controller. The webapp also uses
+SocketIO to communicate with the website clients which is used to update connected status and
+make changes to brightness broadcasted to all.
+
 Full documentation [here](https://kinsaurralde.github.io/ws_281x-lights/#/)
 
 ## Table of Contents
@@ -168,6 +174,4 @@ Config file example (default value)
 - Power consumption measurement and adjustment
 - SocketIO
     - Webapp expected pixel colors
-- Add webapp to upload_rpi.py
 - Tests for controllers
-- Update README

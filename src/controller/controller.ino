@@ -325,6 +325,7 @@ void handleVersionInfo() {
     obj["major"] = MAJOR;
     obj["minor"] = MINOR;
     obj["patch"] = PATCH;
+    obj["label"] = LABEL;
     obj["esp_hash"] = ESP_HASH;
     obj["rpi_hash"] = RPI_HASH;
     String info;

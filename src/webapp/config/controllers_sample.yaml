@@ -36,7 +36,7 @@ controllers:
     url: http://localhost:6002
     strip_id: 0
     init:
-      num_leds: 60
+      num_leds: 240
       milliwatts: 5000
       brightness: 100
     active: 'active'

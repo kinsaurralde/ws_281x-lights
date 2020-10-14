@@ -46,6 +46,12 @@ def test_getinitialized(client):
     assert response.content_type == "application/json"
 
 
+def test_getpixels(client):
+    response = client.get("/getpixels")
+    assert response.status_code == 200
+    assert response.content_type == "application/json"
+
+
 def test_enable(client):
     response = client.get("/enable")
     assert response.status_code == 200

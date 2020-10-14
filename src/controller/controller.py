@@ -1,17 +1,14 @@
 import time
 
-import ctypes
 import threading
 from rpi_ws281x import Adafruit_NeoPixel
-from wrapper import Pixels, AnimationArgs, Frame, List, LIB
+from wrapper import Pixels, AnimationArgs, List, LIB
 
 
 # Initial LED strip configuration:
 LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA = 10  # DMA channel to use for generating signal (try 10)
 LED_INVERT = False  # True to invert the signal (when using NPN transistor level shift)
-
-# TODO: multiple pixel strips
 
 
 class Animations:
@@ -41,7 +38,11 @@ class NeoPixels:
         self.led_count = led_count
         self.max_brightness = max_brightness
         self.pin = pin
+        self.watts_per_60 = watts_per_60
+        self.grb = grb
+        self.flipped = flipped
         self.testing = testing
+        self.max_watts = max_watts
         self.led_channel = self.pin in [13, 19, 41, 45, 53]
         self.led_strip_count = LIB.ledStripCount()
         self.strip = []
@@ -56,6 +57,10 @@ class NeoPixels:
     def _setup(self):
         for i in range(self.led_strip_count):
             self.pixels.append(Pixels(self.led_count))
+            args = AnimationArgs()
+            args.animation = Animations.color
+            args.color = 0
+            self.pixels[i].color(args)
             self.strip.append(Adafruit_NeoPixel(
                 self.led_count,
                 self.pin,
@@ -83,13 +88,13 @@ class NeoPixels:
             self.updatePixels()
             self._sleep(self.delay_ms / 1000)
 
-    def handleBrightness(self, id, value=None):
-        print("Brightness", value, id)
-        id = int(id)
+    def handleBrightness(self, strip_id, value=None):
+        print("Brightness", value, strip_id)
+        strip_id = int(strip_id)
         value = int(value)
         if value is not None:
-            self.pixels[id].setBrightness(value)
-        return self.pixels[id].getBrightness()
+            self.pixels[strip_id].setBrightness(value)
+        return self.pixels[strip_id].getBrightness()
 
     @staticmethod
     def setArgs(values):
@@ -145,14 +150,15 @@ class NeoPixels:
     def getPixels(self):
         return [list(self.pixels[0].get().contents.main), list(self.pixels[1].get().contents.main)]
 
-    def init(self, values):
-        print("Init strip", values)
-        strip_id = values["id"]
-        self.pixels[strip_id].initialize(values["init"].get("num_leds", 60), values["init"].get("milliwatts", 1000), values["init"].get("brightness", 100), values["init"].get("max_brightness", 127))
-        return getInit()
-
     def getInit(self):
         strips = []
         for i in range(self.led_strip_count):
             strips.append(self.pixels[i].isInitialized())
         return strips
+
+    def init(self, values):
+        print("Init strip", values)
+        strip_id = values["id"]
+        self.pixels[strip_id].initialize(values["init"].get("num_leds", 60), values["init"].get("milliwatts", 1000), values["init"].get("brightness", 100), values["init"].get("max_brightness", 127))
+        return self.getInit()
+

@@ -104,7 +104,8 @@ class Controllers {
     const major = version_info.webapp.major;
     const minor = version_info.webapp.minor;
     const patch = version_info.webapp.patch;
-    const version = `${major}.${minor}.${patch}`;
+    const label = version_info.webapp.label;
+    const version = `${major}.${minor}.${patch}_${label}`;
     const esp_hash = version_info.webapp.esp_hash;
     const rpi_hash = version_info.webapp.rpi_hash;
     document.getElementById('status-webapp-version').textContent = version;
