@@ -5,4 +5,4 @@
 #define PATCH 0
 
 #define ESP_HASH "9476dd56d2dad50ab9c3bc2070cd018db495d3f3"
-#define RPI_HASH "30430cb368f752df6049dafea9cb956a4145be4c"
+#define RPI_HASH "98ad044f6af18e1e3b5c4bd1171603e2418dc10f"

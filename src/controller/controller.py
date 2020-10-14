@@ -56,6 +56,10 @@ class NeoPixels:
     def _setup(self):
         for i in range(self.led_strip_count):
             self.pixels.append(Pixels(self.led_count))
+            args = AnimationArgs()
+            args.animation = Animations.color
+            args.color = 0
+            self.pixels[i].color(args)
             self.strip.append(Adafruit_NeoPixel(
                 self.led_count,
                 self.pin,

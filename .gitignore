@@ -3,6 +3,9 @@ node_modules/
 npn-debug.log
 src/webapp/config/controllers_*.yaml
 !src/webapp/config/controllers_sample.yaml
+src/webapp/controller.py
+src/webapp/wrapper.py
+src/webapp/pixels.so
 build/*
 .coverage
 htmlcov/

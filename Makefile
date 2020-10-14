@@ -69,8 +69,16 @@ all:
 	touch ${BUILD_DIR}esp8266/wifi_credentials.h
 	printf "#define WIFI_SSID \"ssid\"\n#define WIFI_PASSWORD \"password\"\n" > ${BUILD_DIR}esp8266/wifi_credentials.h
 
+	g++ -c -fPIC ${BUILD_RPI_SRC_DIR}pixels.cpp -o ${BUILD_RPI_SRC_DIR}pixels.o ${CPP_FLAGS}
+	g++ -c -fPIC ${BUILD_RPI_SRC_DIR}structs.cpp -o ${BUILD_RPI_SRC_DIR}structs.o ${CPP_FLAGS}
+	g++ -c -fPIC ${BUILD_RPI_SRC_DIR}extern.cpp -o ${BUILD_RPI_SRC_DIR}extern.o ${CPP_FLAGS}
+	g++ -shared -o ${BUILD_RPI_DIR}pixels.so ${BUILD_RPI_SRC_DIR}pixels.o ${BUILD_RPI_SRC_DIR}structs.o ${BUILD_RPI_SRC_DIR}extern.o ${CPP_FLAGS}
+	rm -f ${BUILD_RPI_SRC_DIR}*.o
+
 	# Copy to webapp
 	cp -r ${WEBAPP_DIR} ${BUILD_DIR}
+	cp ${CONTROLLERS_DIR}wrapper.py ${CONTROLLERS_DIR}controller.py ${BUILD_RPI_DIR}pixels.so ${BUILD_DIR}webapp/
+	cp ${CONTROLLERS_DIR}wrapper.py ${CONTROLLERS_DIR}controller.py ${BUILD_RPI_DIR}pixels.so ${WEBAPP_DIR}
 
 test:
 	make coverage
@@ -81,18 +89,14 @@ test_webapp:
 coverage:
 	cd src/webapp && coverage run --source=. -m pytest && coverage report && coverage html && cd ../../
 
-build: all
-	g++ -c -fPIC ${BUILD_RPI_SRC_DIR}pixels.cpp -o ${BUILD_RPI_SRC_DIR}pixels.o ${CPP_FLAGS}
-	g++ -c -fPIC ${BUILD_RPI_SRC_DIR}structs.cpp -o ${BUILD_RPI_SRC_DIR}structs.o ${CPP_FLAGS}
-	g++ -c -fPIC ${BUILD_RPI_SRC_DIR}extern.cpp -o ${BUILD_RPI_SRC_DIR}extern.o ${CPP_FLAGS}
-	g++ -shared -o ${BUILD_RPI_DIR}pixels.so ${BUILD_RPI_SRC_DIR}pixels.o ${BUILD_RPI_SRC_DIR}structs.o ${BUILD_RPI_SRC_DIR}extern.o ${CPP_FLAGS}
-	rm -f ${BUILD_RPI_SRC_DIR}*.o
-
 run_rpi: build
 	cd ${BUILD_RPI_DIR} && python3 controller_server.py --test && cd ../../
 
 run_app:
 	cd ${WEBAPP_DIR} && python3 app.py -d --config ${WEBAPP_CONFIG_ARG}
+
+run_app_simulate:
+	cd ${WEBAPP_DIR} && python3 app.py -d -s --config ${WEBAPP_CONFIG_ARG}
 
 run_app_nosend:
 	cd ${WEBAPP_DIR} && python3 app.py -d --nosend --config ${WEBAPP_CONFIG_ARG}
