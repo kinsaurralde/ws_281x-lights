@@ -150,14 +150,16 @@ docs:
 
 git:
 	make build
-	make test
 	make clean
+	make test
 	make lint
 	git status
 
 clean:
 	rm -fr ${BUILD_DIR}*
 	rm -f ${CONTROLLERS_DIR}*.so
+	rm -f ${WEBAPP_DIR}controller.py
+	rm -f ${WEBAPP_DIR}wrapper.py
 	find . -name __pycache__ -exec rm -rv {} +
 	find . -name .pytest_cache -exec rm -rv {} +
 	find . -name htmlcov -exec rm -rv {} +

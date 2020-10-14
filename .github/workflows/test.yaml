@@ -11,7 +11,7 @@ jobs:
       run: make setup
     - name: Build
       if: always()
-      run: make build
+      run: make
     - name: Test
       if: always()
       run: make test_webapp
