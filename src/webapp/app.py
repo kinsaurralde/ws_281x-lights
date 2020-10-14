@@ -239,7 +239,7 @@ if args.pixel_simulate:
 controllers = python.Controllers(
     controllers_config, args.nosend, getVersionInfo(), controller_module
 )
-background = python.Background(socketio, controllers)
+background = python.Background(socketio, controllers, args.pixel_simulate)
 
 if __name__ == "__main__":  # pragma: no cover
     if args.background:

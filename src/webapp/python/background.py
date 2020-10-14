@@ -3,11 +3,13 @@ import time
 
 
 class Background:
-    def __init__(self, socketio, controller):
+    def __init__(self, socketio, controller, pixels_simulate):
         self.socketio = socketio
         self.controller = controller
         self.active = True
+        self.pixels_simulate = pixels_simulate
         self.delay_ms = 50
+        self.pixel_interval = 3
         self.emit_delay_ms = 1000
         self.full_cycle = 12
         self.data = {}
@@ -40,5 +42,8 @@ class Background:
                 counter = 0
                 self.emitUpdate()
                 self.data = {}
+            if counter % self.pixel_interval == 0 and self.pixels_simulate:
+                pixels = self.controller.getPixels()
+                self.socketio.emit("pixels", pixels)
             time.sleep(self.delay_ms / 1000)
             counter += self.delay_ms
