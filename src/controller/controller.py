@@ -144,7 +144,13 @@ class NeoPixels:
                 data = self.pixels[i].get()
                 if not self.testing:
                     for j in range(self.led_count):
-                        self.strip[i].setPixelColor(j, data.contents.main[j])
+                        value = data.contents.main[j]
+                        if self.pixels[i].isGRB():
+                            r = (value >> 8) & 0xFF
+                            g = (value >> 16) & 0xFF
+                            b = value & 0xFF
+                            value = r << 16 | g << 8 | b
+                        self.strip[i].setPixelColor(j, value)
                     self.strip[i].show()
 
     def getPixels(self):
@@ -159,6 +165,6 @@ class NeoPixels:
     def init(self, values):
         print("Init strip", values)
         strip_id = values["id"]
-        self.pixels[strip_id].initialize(values["init"].get("num_leds", 60), values["init"].get("milliwatts", 1000), values["init"].get("brightness", 100), values["init"].get("max_brightness", 127))
+        self.pixels[strip_id].initialize(values["init"].get("num_leds", 60), values["init"].get("milliwatts", 1000), values["init"].get("brightness", 100), values["init"].get("max_brightness", 127), values["init".get("grb", False)])
         return self.getInit()
 

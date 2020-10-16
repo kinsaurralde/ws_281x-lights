@@ -74,6 +74,8 @@ class Pixels:
         self.lib.Pixels_initialize.argtypes = [ctypes.c_void_p, ctypes.c_uint, ctypes.c_uint, ctypes.c_uint, ctypes.c_uint]
         self.lib.Pixels_isInitialized.argtypes = [ctypes.c_void_p]
         self.lib.Pixels_isInitialized.restype = ctypes.c_bool
+        self.lib.Pixels_isGRB.argtypes = [ctypes.c_void_p]
+        self.lib.Pixels_isGRB.restype = ctypes.c_bool
         self.lib.Pixels_get.restype = ctypes.POINTER(Frame)
         self.lib.Pixels_color.argtypes = [ctypes.c_uint, AnimationArgs]
         self.lib.Pixels_wipe.argtypes = [ctypes.c_uint, AnimationArgs]
@@ -108,6 +110,9 @@ class Pixels:
 
     def isInitialized(self):
         return self.lib.Pixels_isInitialized(self.obj)
+
+    def isGRB(self):
+        return self.lib.Pixels_isGRB(self.obj)
 
     def get(self):
         return self.lib.Pixels_get(self.obj)

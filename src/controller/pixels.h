@@ -7,6 +7,7 @@
 class Pixels {
    private:
     bool initialized;
+    bool grb = true;
     unsigned int num_leds;
     unsigned int previous_show_time;
     unsigned int delay;
@@ -22,6 +23,7 @@ class Pixels {
     void setAll(int color);
 
     unsigned int rainbowWheel(unsigned int pos);
+    unsigned int setPixel(unsigned int id, unsigned int value);
     unsigned int rgbCombine(unsigned int r, unsigned int g, unsigned int b);
     unsigned int rgbGetR(unsigned int value);
     unsigned int rgbGetG(unsigned int value);
@@ -43,8 +45,9 @@ class Pixels {
     unsigned int getBrightness();
     void setBrightness(unsigned int value);
     void setIncrementSteps(unsigned int value = 1);
-    void initialize(unsigned int num_leds, unsigned int milliwatts, unsigned int brightness, unsigned int max_brightness=255);
+    void initialize(unsigned int num_leds, unsigned int milliwatts, unsigned int brightness, unsigned int max_brightness=255, bool grb=false);
     bool isInitialized();
+    bool isGRB();
 
     Frame* get();
     void increment();

@@ -93,6 +93,10 @@ extern "C" {
         return p->isInitialized();
     }
 
+    bool Pixels_isGRB(Pixels* p) {
+        return p->isGRB();
+    }
+
     Frame* Pixels_get(Pixels* p) {
         return p->get();
     }

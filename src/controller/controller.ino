@@ -118,7 +118,14 @@ void updatePixels() {
             neopixels.pixels[i]->increment();
             Frame* data = neopixels.pixels[i]->get();
             for (unsigned int j = 0; j < neopixels.pixels[i]->size(); j++) {
-                neopixels.leds[i][j] = (uint32_t) data->main[j];
+                unsigned int value = data->main[j];
+                if (neopixels.pixels[i]->isGRB()) {
+                    unsigned int r = (value >> 8) & 0xFF;
+                    unsigned int g = (value >> 16) & 0xFF;
+                    unsigned int b = value & 0xFF;
+                    value = r << 16 | g << 8 | b;
+                }
+                neopixels.leds[i][j] = (uint32_t) value;
             }
             neopixels.controllers[i]->showLeds(neopixels.pixels[i]->getBrightness());
             total_frame_counter += 1;
@@ -210,6 +217,7 @@ void handleRoot() {
  *      - unsigned int init.brightness: initial brightness value
  *      - unsigned int init.num_leds:   number of pixels on strip
  *      - unsigned int init.milliwatts: maximum milliwatts (not implemented)
+ *      - bool         init.grb:        grb mode
  * 
  * Initialze strip with brightness, number of leds, 
  */
@@ -221,8 +229,9 @@ void handleInit() {
         unsigned int brightness = doc["init"]["brightness"].as<unsigned int>();
         unsigned int num_leds = doc["init"]["num_leds"].as<unsigned int>();
         unsigned int milliwatts = doc["init"]["milliwatts"].as<unsigned int>();
+        unsigned int grb = doc["init"]["grb"].as<bool>();
         if (id < LED_STRIP_COUNT) {
-            neopixels.pixels[id]->initialize(num_leds, milliwatts, brightness, MAX_BRIGHTNESS);
+            neopixels.pixels[id]->initialize(num_leds, milliwatts, brightness, MAX_BRIGHTNESS, grb);
         }
     }
     const size_t CAPACITY = JSON_ARRAY_SIZE(LED_STRIP_COUNT);

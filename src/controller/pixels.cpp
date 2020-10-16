@@ -116,10 +116,11 @@ void Pixels::setIncrementSteps(unsigned int value) {
     increment_steps = value;
 }
 
-void Pixels::initialize(unsigned int num_leds, unsigned int milliwatts, unsigned int brightness, unsigned int max_brightness) {
+void Pixels::initialize(unsigned int num_leds, unsigned int milliwatts, unsigned int brightness, unsigned int max_brightness, bool grb) {
     if (max_brightness <= 255 && max_brightness < this->max_brightness) {
         this->max_brightness = max_brightness;
     }
+    this->grb = grb;
     setSize(num_leds);
     setBrightness(brightness);
     initialized = true;
@@ -127,6 +128,10 @@ void Pixels::initialize(unsigned int num_leds, unsigned int milliwatts, unsigned
 
 bool Pixels::isInitialized() {
     return initialized;
+}
+
+bool Pixels::isGRB() {
+    return grb;
 }
 
 void Pixels::increment() {
