@@ -165,6 +165,6 @@ class NeoPixels:
     def init(self, values):
         print("Init strip", values)
         strip_id = values["id"]
-        self.pixels[strip_id].initialize(values["init"].get("num_leds", 60), values["init"].get("milliwatts", 1000), values["init"].get("brightness", 100), values["init"].get("max_brightness", 127), values["init".get("grb", False)])
+        self.pixels[strip_id].initialize(values["init"].get("num_leds", 60), values["init"].get("milliwatts", 1000), values["init"].get("brightness", 100), values["init"].get("max_brightness", 127), values["init"].get("grb", False))
         return self.getInit()
 

@@ -6,4 +6,4 @@ PATCH = 0
 LABEL = "development"
 
 ESP_HASH = "e03bbc70526c721e9115bd0913ba16deb99911f5"
-RPI_HASH = "7622dc897061da0beefa3b54da37f286b91aead3"
+RPI_HASH = "9c4d8c9ea5fe6ef0baf4528bab0db500b46a2291"

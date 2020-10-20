@@ -71,7 +71,7 @@ class Pixels:
         self.lib.Pixels_getBrightness.restype = ctypes.c_uint
         self.lib.Pixels_setBrightness.argtypes = [ctypes.c_uint, ctypes.c_uint]
         self.lib.Pixels_setIncrementSteps.argtypes = [ctypes.c_uint, ctypes.c_uint]
-        self.lib.Pixels_initialize.argtypes = [ctypes.c_void_p, ctypes.c_uint, ctypes.c_uint, ctypes.c_uint, ctypes.c_uint]
+        self.lib.Pixels_initialize.argtypes = [ctypes.c_void_p, ctypes.c_uint, ctypes.c_uint, ctypes.c_uint, ctypes.c_uint, ctypes.c_bool]
         self.lib.Pixels_isInitialized.argtypes = [ctypes.c_void_p]
         self.lib.Pixels_isInitialized.restype = ctypes.c_bool
         self.lib.Pixels_isGRB.argtypes = [ctypes.c_void_p]
@@ -105,8 +105,8 @@ class Pixels:
     def setIncrementSteps(self, value):
         self.lib.Pixels_setIncrementSteps(self.obj, value)
 
-    def initialize(self, num_leds, milliwatts, brightness, max_brightness):
-        self.lib.Pixels_initialize(self.obj, num_leds, milliwatts, brightness, max_brightness)
+    def initialize(self, num_leds, milliwatts, brightness, max_brightness, grb):
+        self.lib.Pixels_initialize(self.obj, num_leds, milliwatts, brightness, max_brightness, grb)
 
     def isInitialized(self):
         return self.lib.Pixels_isInitialized(self.obj)

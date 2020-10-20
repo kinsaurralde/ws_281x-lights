@@ -85,8 +85,8 @@ extern "C" {
         p->setIncrementSteps(value);
     }
 
-    void Pixels_initialize(Pixels* p, unsigned int num_leds, unsigned int milliwatts, unsigned int brightness, unsigned int max_brightness) {
-        p->initialize(num_leds, milliwatts, brightness, max_brightness);
+    void Pixels_initialize(Pixels* p, unsigned int num_leds, unsigned int milliwatts, unsigned int brightness, unsigned int max_brightness, bool grb) {
+        p->initialize(num_leds, milliwatts, brightness, max_brightness, grb);
     }
 
     bool Pixels_isInitialized(Pixels* p) {
