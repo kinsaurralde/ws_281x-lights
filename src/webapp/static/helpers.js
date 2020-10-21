@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+/* eslint-disable no-unused-vars, no-redeclare */
 
 function createButton(id, text, onclick = null) {
   const button = document.createElement('button');

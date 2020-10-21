@@ -15,7 +15,26 @@
         "require-jsdoc": "off",
         "valid-jsdoc": "off",
         "camelcase": "off",
-        "no-empty": "warn",
-        "no-undef": "warn"
+        "no-empty": "warn"
+    },
+    "globals": {
+        "createButton": "readonly",
+        "createNumber": "readonly",
+        "createTextBox": "readonly",
+        "createSelect": "readonly",
+        "createRange": "readonly",
+        "createCheckBox": "readonly",
+        "createSecondTitle": "readonly",
+        "createSpaceS2": "readonly",
+        "createDivider": "readonly",
+        "createVDivider": "readonly",
+        "createSectionFlex": "readonly",
+        "createSectionFlexNoBorder": "readonly",
+        "getInputValue": "readonly",
+        "combineRGB": "readonly",
+        "createStatus": "readonly",
+        "showSection": "readonly",
+        "hideSection": "readonly",
+        "socket": "readonly"
     }
 }

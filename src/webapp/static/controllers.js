@@ -1,5 +1,5 @@
 /* exported Controllers */
-/* globals socket */
+/* globals loadedControllers */
 
 const TABLE_COLUMNS = 7;
 const STATUS_COLUMNS = 6;
@@ -391,6 +391,7 @@ class Controllers {
     if (mode === 'active') {
       fetch(`/enable?name=${name}`);
     } else if (mode === 'noreconnect') {
+      () => {};  // PASS
     } else if (mode === 'disabled') {
       fetch(`/disable?name=${name}`);
     }
