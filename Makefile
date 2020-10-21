@@ -103,8 +103,8 @@ run_app_simulate:
 run_app_nosend:
 	cd ${WEBAPP_DIR} && python3 app.py -d --nosend --config ${WEBAPP_CONFIG_ARG}
 
-run_local: build
-	cd ${TOOLS_DIR} && python3 -i localtest.py
+run_local: all
+	cd ${TOOLS_DIR} && sudo python3 -i localtest.py
 
 setup:
 	sudo apt update --fix-missing

@@ -79,6 +79,30 @@ function createSpaceS2() {
   return div;
 }
 
+function createDivider() {
+  const div = document.createElement('div');
+  div.className = 'divider';
+  return div;
+}
+
+function createVDivider() {
+  const div = document.createElement('div');
+  div.className = 'v-divider';
+  return div;
+}
+
+function createSectionFlex() {
+  const div = document.createElement('div');
+  div.className = 'section-flex';
+  return div;
+}
+
+function createSectionFlexNoBorder() {
+  const div = document.createElement('div');
+  div.className = 'section-flex-no-border';
+  return div;
+}
+
 function getInputValue(id, blank = null) {
   const div = document.getElementById(id);
   if (div == null) {

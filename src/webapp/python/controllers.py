@@ -184,6 +184,12 @@ class Controllers:
             "hash_match": hash_match,
         }
 
+    def getControllerSizes(self):
+        result = {}
+        for c in self.config:
+            result[c] = self.config[c]["init"]["num_leds"]
+        return result
+
     def getControllerInitialized(self):
         fails = []
         data = {}

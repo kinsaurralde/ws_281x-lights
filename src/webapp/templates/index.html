@@ -14,6 +14,8 @@
     <script defer src="../static/groups.js"></script>
     <script defer src="../static/animations.js"></script>
     <script defer src="../static/colors.js"></script>
+    <script defer src="../static/pixel_strip.js"></script>
+    <script defer src="../static/pixel_display.js"></script>
   </head>
 
   <body>
@@ -116,6 +118,18 @@
 
     <div class="divider"></div>
     <div class="section-flex-no-border space-between">
+      <div class="section-title">Display</div>
+      <div>
+        <button type="button" onclick="showSection('section-display')">Show</button>
+        <button type="button" onclick="hideSection('section-display')">Hide</button>
+      </div>
+    </div>
+    <div id="section-display">
+      <div id="pixel-display"></div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-flex-no-border space-between">
       <div class="section-title">Status</div>
       <div>
         <button type="button" onclick="showSection('section-status')">Show</button>
@@ -165,10 +179,12 @@
       })
 
       window.onload = function () {
+        hideSection("section-display")
         window.controllers = new Controllers()
         window.animations = new Animations()
         window.colors = new Colors()
         window.groups = new Groups()
+        window.pixel_display = new PixelDisplay()
         socket.emit("webpage_loaded")
       }
 

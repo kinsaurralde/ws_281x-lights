@@ -31,3 +31,11 @@
 .white {
   color: white;
 }
+
+.display-pixel {
+  width: 2.5vw;
+  height: 2.5vw;
+  margin: 0.15vw;
+  border-radius: 0.75vw;
+  border: 0.2vw solid var(--text-color);
+}

@@ -191,6 +191,14 @@ def getPixels():
     return create_response(controllers.getPixels())
 
 
+@app.route("/getpixelsimulate")
+def getPixelSimulate():
+    return {
+        "active": args.pixel_simulate,
+        "controllers": controllers.getControllerSizes(),
+    }
+
+
 @socketio.on("connect")
 def connect():
     print("Client Connected:", request.remote_addr)
