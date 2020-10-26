@@ -35,6 +35,7 @@
         "createStatus": "readonly",
         "showSection": "readonly",
         "hideSection": "readonly",
-        "socket": "readonly"
+        "socket": "readonly",
+        "splitRGB": "readonly"
     }
 }

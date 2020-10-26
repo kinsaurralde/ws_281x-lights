@@ -115,6 +115,14 @@ function combineRGB(r, g, b) {
   return ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF);
 }
 
+function splitRGB(value) {
+  return {
+    'r': value >> 16,
+    'g': (value >> 8) & 0xFF,
+    'b': value & 0xFF,
+  };
+}
+
 function createStatus() {
   return {
     'error': false,

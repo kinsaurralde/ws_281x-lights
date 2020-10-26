@@ -284,5 +284,7 @@ class Controllers:
     def getPixels(self):
         result = {}
         for i in self.controllers:
-            result[i] = self.controllers[i].getPixels()
+            pixels = self.controllers[i].getPixels()
+            for j in range(min(len(self.urls[i]), len(pixels))):
+                result[self.urls[i][j]] = pixels[j]
         return result

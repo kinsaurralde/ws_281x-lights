@@ -21,7 +21,7 @@ class PixelStrip {
     for (let i = 0; i < this.length; i++) {
       this.pixels.push(new Pixel(i));
     }
-    this.createPixelTable(30);
+    this.createPixelTable(60);
 
     title.classList.add('width-10');
     length.classList.add('width-10');
@@ -53,6 +53,12 @@ class PixelStrip {
       }
     }
   }
+
+  set(data) {
+    for (let i = 0; i < data.length && i < this.pixels.length; i++) {
+      this.pixels[i].setValue(data[i]);
+    }
+  }
 }
 
 class Pixel {
@@ -76,6 +82,11 @@ class Pixel {
     this.g = g;
     this.b = b;
     this.refresh();
+  }
+
+  setValue(value) {
+    const rgb = splitRGB(value);
+    this.set(rgb.r, rgb.g, rgb.b);
   }
 
   refresh() {

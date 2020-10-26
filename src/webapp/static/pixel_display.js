@@ -2,11 +2,14 @@
 /* globals PixelStrip */
 
 const MAX_PIXEL_VW = 70;
+const MIN_PIXEL_COLS = 10;   // If changed, also change HTML
+const MAX_PIXEL_COLS = 150;  // If changed, also change HTML
 
 class PixelDisplay {
   constructor() {
     socket.on('pixels', (data) => {
-      console.debug(data);
+      // console.debug(data);
+      this.set(data);
     });
     this.div = document.getElementById('pixel-display');
     this.num_controllers = 0;
@@ -32,7 +35,8 @@ class PixelDisplay {
     this.pixel_per_row = document.getElementById('pixel-display-pixel-per-row');
     this.pixel_per_row.addEventListener('input', () => {
       const value = this.pixel_per_row.value;
-      if (value != 'auto' && value >= 10 && value <= 150) {
+      if (value != 'auto' && value >= MIN_PIXEL_COLS &&
+          value <= MAX_PIXEL_COLS) {
         const pixel_width = MAX_PIXEL_VW / value;
         if (value >= 120) {
           document.documentElement.style.setProperty('--pixel-margin', '0');
@@ -66,5 +70,14 @@ class PixelDisplay {
 
   resizePixel(width) {
     document.documentElement.style.setProperty('--pixel-width', `${width}vw`);
+  }
+
+  set(data) {
+    console.debug('Set', data);
+    Object.keys(data).forEach((strip) => {
+      if (strip in this.controllers) {
+        this.pixel_strips[strip].set(data[strip]);
+      }
+    });
   }
 }
