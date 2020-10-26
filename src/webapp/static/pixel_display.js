@@ -1,5 +1,5 @@
 /* exported PixelDisplay */
-/* globals PixelStrip */
+/* globals PixelStrip  controllers */
 
 const MAX_PIXEL_VW = 70;
 const MIN_PIXEL_COLS = 10;   // If changed, also change HTML
@@ -28,38 +28,44 @@ class PixelDisplay {
           for (let i = 0; i < this.num_controllers; i++) {
             this.addPixelStrip(Object.keys(this.controllers)[i]);
           }
+          const activeControllers = controllers.getIsActive();
+          Object.keys(activeControllers).forEach((controller) => {
+            if (activeControllers[controller] != 'active') {
+              this.pixel_strips[controller].hide();
+            }
+          });
+          this.resize();
         });
   }
 
   setupEventListeners() {
     this.pixel_per_row = document.getElementById('pixel-display-pixel-per-row');
     this.pixel_per_row.addEventListener('input', () => {
-      const value = this.pixel_per_row.value;
-      if (value != 'auto' && value >= MIN_PIXEL_COLS &&
-          value <= MAX_PIXEL_COLS) {
-        const pixel_width = MAX_PIXEL_VW / value;
-        if (value >= 120) {
-          document.documentElement.style.setProperty('--pixel-margin', '0');
-        } else {
-          document.documentElement.style.setProperty(
-              '--pixel-margin', 'var(--pixel-margin-normal)');
-        }
-        this.resizeTables(this.pixel_per_row.value);
-        this.resizePixel(pixel_width);
-      }
+      this.resize();
     });
   }
 
   addPixelStrip(name) {
     const div = document.createElement('div');
-
     const controller = this.controllers[name];
     this.pixel_strips[name] = new PixelStrip(div, name, controller);
-
     div.className = 'section-flex';
-
-
     this.div.appendChild(div);
+  }
+
+  resize() {
+    const value = this.pixel_per_row.value;
+    if (value != 'auto' && value >= MIN_PIXEL_COLS && value <= MAX_PIXEL_COLS) {
+      const pixel_width = MAX_PIXEL_VW / value;
+      if (value >= 120) {
+        document.documentElement.style.setProperty('--pixel-margin', '0');
+      } else {
+        document.documentElement.style.setProperty(
+            '--pixel-margin', 'var(--pixel-margin-normal)');
+      }
+      this.resizeTables(this.pixel_per_row.value);
+      this.resizePixel(pixel_width);
+    }
   }
 
   resizeTables(width) {

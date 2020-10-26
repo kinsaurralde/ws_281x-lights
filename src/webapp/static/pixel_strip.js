@@ -5,7 +5,6 @@ class PixelStrip {
     this.div = div;
     this.name = name;
     this.length = length;
-    this.div = div;
     this.table;
     this.pixels = [];
     this.createDiv();
@@ -36,6 +35,14 @@ class PixelStrip {
     this.table.remove();
     this.createPixelTable(width);
     this.div.appendChild(this.table);
+  }
+
+  show() {
+    this.div.style.display = 'flex';
+  }
+
+  hide() {
+    this.div.style.display = 'none';
   }
 
   createPixelTable(width) {

@@ -237,6 +237,14 @@ class Controllers {
     return Object.keys(this.controllers);
   }
 
+  getIsActive() {
+    const result = {};
+    Object.keys(this.controllers).forEach((controller) => {
+      result[controller] = this.controllers[controller].active;
+    });
+    return result;
+  }
+
   setBrightness(name, value) {
     const id = `controllers-table-${name}-brightness-`;
     if (document.getElementById(id + 'slider') != null) {
