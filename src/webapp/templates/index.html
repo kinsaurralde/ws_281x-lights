@@ -124,6 +124,12 @@
         <button type="button" onclick="hideSection('section-display')">Hide</button>
       </div>
     </div>
+    <div class="divider"></div>
+    <div class="section-flex-no-border">
+      <div class="section-title-secondary">Pixels Per Row</div>
+      <div class="space-s-2"></div>
+      <input type="number" id="pixel-display-pixel-per-row" value="30" min="10" max="150" step="10" />
+    </div>
     <div id="section-display">
       <div id="pixel-display"></div>
     </div>
@@ -179,7 +185,7 @@
       })
 
       window.onload = function () {
-        hideSection("section-display")
+        //hideSection("section-display")
         window.controllers = new Controllers()
         window.animations = new Animations()
         window.colors = new Colors()

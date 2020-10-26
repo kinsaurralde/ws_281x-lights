@@ -6,6 +6,7 @@ class PixelStrip {
     this.name = name;
     this.length = length;
     this.div = div;
+    this.table;
     this.pixels = [];
     this.createDiv();
     console.log(`Created pixel strip ${this.name} of length ${this.length}`);
@@ -16,12 +17,11 @@ class PixelStrip {
     const title = createSecondTitle(`${id}-title-name`, this.name);
     const length =
         createSecondTitle(`${id}-title-length`, `${this.length} pixels`);
-    const pixels_div = createSectionFlexNoBorder();
 
     for (let i = 0; i < this.length; i++) {
       this.pixels.push(new Pixel(i));
-      pixels_div.appendChild(this.pixels[i].get());
     }
+    this.createPixelTable(30);
 
     title.classList.add('width-10');
     length.classList.add('width-10');
@@ -29,7 +29,29 @@ class PixelStrip {
     this.div.appendChild(createVDivider());
     this.div.appendChild(length);
     this.div.appendChild(createDivider());
-    this.div.appendChild(pixels_div);
+    this.div.appendChild(this.table);
+  }
+
+  resizeTable(width) {
+    this.table.remove();
+    this.createPixelTable(width);
+    this.div.appendChild(this.table);
+  }
+
+  createPixelTable(width) {
+    const height = Math.ceil(this.pixels.length / width);
+    this.table = document.createElement('table');
+    this.table.className = 'pixel-table';
+    for (let i = 0; i < height; i++) {
+      const row = this.table.insertRow();
+      for (let j = 0; j < width; j++) {
+        const pixel_id = i * width + j;
+        if (pixel_id < this.pixels.length) {
+          const cell = row.insertCell();
+          cell.appendChild(this.pixels[pixel_id].get());
+        }
+      }
+    }
   }
 }
 
