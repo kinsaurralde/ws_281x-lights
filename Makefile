@@ -98,7 +98,7 @@ run_app:
 	cd ${WEBAPP_DIR} && python3 app.py -d --config ${WEBAPP_CONFIG_ARG}
 
 run_app_simulate:
-	cd ${WEBAPP_DIR} && python3 app.py -d -s --config ${WEBAPP_CONFIG_ARG}
+	cd ${WEBAPP_DIR} && python3 app.py -s --config ${WEBAPP_CONFIG_ARG}
 
 run_app_nosend:
 	cd ${WEBAPP_DIR} && python3 app.py -d --nosend --config ${WEBAPP_CONFIG_ARG}

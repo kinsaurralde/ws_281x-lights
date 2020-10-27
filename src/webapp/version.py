@@ -5,5 +5,5 @@ MINOR = 1
 PATCH = 0
 LABEL = "development"
 
-ESP_HASH = "e03bbc70526c721e9115bd0913ba16deb99911f5"
-RPI_HASH = "9c4d8c9ea5fe6ef0baf4528bab0db500b46a2291"
+ESP_HASH = "1afb5b3f2ae14a994700bfabe4d321bbc37c0508"
+RPI_HASH = "1ad8da577f655e0a9daec4ee98b35c91af430495"

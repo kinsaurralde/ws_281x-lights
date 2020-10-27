@@ -224,7 +224,7 @@ void Pixels::pulse(AnimationArgs args) {
     unsigned int length = args.arg1;
     unsigned int spacing_length = args.arg2;
     unsigned int counter = length;
-    unsigned int counter_bg = spacing_length - 1;
+    unsigned int counter_bg = spacing_length;
     unsigned int expanded_size = args.arg4 > 0 ? args.arg4 : num_leds;
     delete incArgs.list;
     incArgs.list = new List(expanded_size);
@@ -234,14 +234,14 @@ void Pixels::pulse(AnimationArgs args) {
         if (counter > 0) {
             color = args.colors->getCurrent();
             counter -= 1;
+        } else if (counter_bg == 0) {
+            args.colors->incrementCounter();
+            color = args.colors->getCurrent();
+            counter = length - 1;
+            counter_bg = spacing_length;
         } else {
             if (args.color_bg >= 0) {
                 color = args.color_bg;
-            }
-            if (counter_bg == 0) {
-                counter = length;
-                counter_bg = spacing_length;
-                args.colors->incrementCounter();
             }
             counter_bg -= 1;
         }
@@ -271,6 +271,7 @@ void Pixels::wipe(AnimationArgs args) {
     incArgs.list = new List(num_leds);
     setAll(args.color_bg);
     data.main[args.arg6 ? (num_leds - 1) : 0] = args.color;
+    std::cout << (args.arg6 ? (num_leds - 1) : 0) << std::endl;
     incArgs.arg1 = args.arg1;
     incArgs.arg2 = ShiftMode::first_pixel_shift;
     incArgs.arg6 = args.arg6;

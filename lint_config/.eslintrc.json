@@ -36,6 +36,7 @@
         "showSection": "readonly",
         "hideSection": "readonly",
         "socket": "readonly",
-        "splitRGB": "readonly"
+        "splitRGB": "readonly",
+        "stringToBool": "readonly"
     }
 }

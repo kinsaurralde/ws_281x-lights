@@ -111,6 +111,16 @@ function getInputValue(id, blank = null) {
   return div.value;
 }
 
+function stringToBool(string) {
+  if (typeof string === 'boolean') {
+    return string;
+  }
+  if (string.toLowerCase() == 'true') {
+    return true;
+  }
+  return false;
+}
+
 function combineRGB(r, g, b) {
   return ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF);
 }
