@@ -1,5 +1,5 @@
 /* exported Controllers */
-/* globals socket */
+/* globals loadedControllers */
 
 const TABLE_COLUMNS = 7;
 const STATUS_COLUMNS = 6;
@@ -237,6 +237,14 @@ class Controllers {
     return Object.keys(this.controllers);
   }
 
+  getIsActive() {
+    const result = {};
+    Object.keys(this.controllers).forEach((controller) => {
+      result[controller] = this.controllers[controller].active;
+    });
+    return result;
+  }
+
   setBrightness(name, value) {
     const id = `controllers-table-${name}-brightness-`;
     if (document.getElementById(id + 'slider') != null) {
@@ -391,6 +399,7 @@ class Controllers {
     if (mode === 'active') {
       fetch(`/enable?name=${name}`);
     } else if (mode === 'noreconnect') {
+      () => {};  // PASS
     } else if (mode === 'disabled') {
       fetch(`/disable?name=${name}`);
     }

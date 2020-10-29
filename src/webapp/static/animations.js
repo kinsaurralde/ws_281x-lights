@@ -133,16 +133,17 @@ class Animations {
       payload.push({
         'animation': this.getAnimationNum(id + '-animation'),
         'color': color_list[0],
-        'color_bg': getInputValue(id + '-color_bg', 0),
+        'color_bg':
+            colors.getColorValue(getInputValue(id + '-color_bg', 'none')),
         'colors': colors_list,
         'arg1': getInputValue(id + '-arg1', 0),
         'arg2': getInputValue(id + '-arg2', 0),
         'arg3': getInputValue(id + '-arg3', 0),
         'arg4': getInputValue(id + '-arg4', 0),
         'arg5': getInputValue(id + '-arg5', 0),
-        'arg6': getInputValue(id + '-arg6', false),
-        'arg7': getInputValue(id + '-arg7', false),
-        'arg8': getInputValue(id + '-arg8', false),
+        'arg6': stringToBool(getInputValue(id + '-arg6', false)),
+        'arg7': stringToBool(getInputValue(id + '-arg7', false)),
+        'arg8': stringToBool(getInputValue(id + '-arg8', false)),
         'wait_ms': getInputValue(id + '-waitms', 0),
         'inc_steps': getInputValue(id + '-steps', 0),
         'id': ids[i],
@@ -161,7 +162,7 @@ class Animations {
         .then((response) => {
           console.debug('Animations Recieved', response);
           if (response.error) {
-            alert(`Failed to send to ${JSON.stringify(response.message)}`);
+            // alert(`Failed to send to ${JSON.stringify(response.message)}`);
           }
         });
   }

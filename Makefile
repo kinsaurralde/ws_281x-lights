@@ -98,13 +98,13 @@ run_app:
 	cd ${WEBAPP_DIR} && python3 app.py -d --config ${WEBAPP_CONFIG_ARG}
 
 run_app_simulate:
-	cd ${WEBAPP_DIR} && python3 app.py -d -s --config ${WEBAPP_CONFIG_ARG}
+	cd ${WEBAPP_DIR} && python3 app.py -s --config ${WEBAPP_CONFIG_ARG}
 
 run_app_nosend:
 	cd ${WEBAPP_DIR} && python3 app.py -d --nosend --config ${WEBAPP_CONFIG_ARG}
 
-run_local: build
-	cd ${TOOLS_DIR} && python3 -i localtest.py
+run_local: all
+	cd ${TOOLS_DIR} && sudo python3 -i localtest.py
 
 setup:
 	sudo apt update --fix-missing

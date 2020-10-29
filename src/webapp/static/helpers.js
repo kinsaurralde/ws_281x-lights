@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+/* eslint-disable no-unused-vars, no-redeclare */
 
 function createButton(id, text, onclick = null) {
   const button = document.createElement('button');
@@ -79,6 +79,30 @@ function createSpaceS2() {
   return div;
 }
 
+function createDivider() {
+  const div = document.createElement('div');
+  div.className = 'divider';
+  return div;
+}
+
+function createVDivider() {
+  const div = document.createElement('div');
+  div.className = 'v-divider';
+  return div;
+}
+
+function createSectionFlex() {
+  const div = document.createElement('div');
+  div.className = 'section-flex';
+  return div;
+}
+
+function createSectionFlexNoBorder() {
+  const div = document.createElement('div');
+  div.className = 'section-flex-no-border';
+  return div;
+}
+
 function getInputValue(id, blank = null) {
   const div = document.getElementById(id);
   if (div == null) {
@@ -87,8 +111,26 @@ function getInputValue(id, blank = null) {
   return div.value;
 }
 
+function stringToBool(string) {
+  if (typeof string === 'boolean') {
+    return string;
+  }
+  if (string.toLowerCase() == 'true') {
+    return true;
+  }
+  return false;
+}
+
 function combineRGB(r, g, b) {
   return ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF);
+}
+
+function splitRGB(value) {
+  return {
+    'r': value >> 16,
+    'g': (value >> 8) & 0xFF,
+    'b': value & 0xFF,
+  };
 }
 
 function createStatus() {

@@ -191,6 +191,28 @@ def getPixels():
     return create_response(controllers.getPixels())
 
 
+@app.route("/getpixelsimulate")
+def getPixelSimulate():
+    return {
+        "active": args.pixel_simulate,
+        "controllers": controllers.getControllerSizes(),
+    }
+
+
+@app.route("/setpixelemit")
+def setPixelInterval():
+    active = request.args.get("active")
+    interval = request.args.get("interval")
+    if active is not None:
+        background.setPixelsActive(active)
+    if interval is not None:
+        background.setPixelInterval(int(interval))
+    return {
+        "active": background.getPixelsActive(),
+        "interval": background.getPixelInterval(),
+    }
+
+
 @socketio.on("connect")
 def connect():
     print("Client Connected:", request.remote_addr)
