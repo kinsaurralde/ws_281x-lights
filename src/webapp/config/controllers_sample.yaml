@@ -7,6 +7,7 @@ controllers:
       num_leds: 300
       milliwatts: 5000
       brightness: 100
+      grb: false
     active: 'active'
   - name: tester_a_1
     url: http://localhost:6000
@@ -15,6 +16,7 @@ controllers:
       num_leds: 300
       milliwatts: 5000
       brightness: 100
+      grb: false
     active: 'active'
   - name: tester_b_0
     url: http://localhost:6001
@@ -23,6 +25,7 @@ controllers:
       num_leds: 300
       milliwatts: 100
       brightness: 100
+      grb: false
     active: 'disabled'
   - name: tester_b_1
     url: http://localhost:6001
@@ -31,12 +34,14 @@ controllers:
       num_leds: 300
       milliwatts: 100
       brightness: 100
+      grb: false
     active: 'disabled'
   - name: tester_c_0
     url: http://localhost:6002
     strip_id: 0
     init:
-      num_leds: 60
+      num_leds: 240
       milliwatts: 5000
       brightness: 100
+      grb: false
     active: 'active'

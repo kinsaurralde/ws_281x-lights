@@ -84,6 +84,12 @@ class Colors {
   }
 
   getColorValue(color) {
+    if (color === 'none') {
+      return -1;
+    }
+    if (!isNaN(color)) {
+      return parseInt(color);
+    }
     if (color in this.colors) {
       const color_list = this.colors[color]();
       console.log(`Color list ${color_list}`);

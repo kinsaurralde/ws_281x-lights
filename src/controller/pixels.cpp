@@ -116,10 +116,11 @@ void Pixels::setIncrementSteps(unsigned int value) {
     increment_steps = value;
 }
 
-void Pixels::initialize(unsigned int num_leds, unsigned int milliwatts, unsigned int brightness, unsigned int max_brightness) {
+void Pixels::initialize(unsigned int num_leds, unsigned int milliwatts, unsigned int brightness, unsigned int max_brightness, bool grb) {
     if (max_brightness <= 255 && max_brightness < this->max_brightness) {
         this->max_brightness = max_brightness;
     }
+    this->grb = grb;
     setSize(num_leds);
     setBrightness(brightness);
     initialized = true;
@@ -127,6 +128,10 @@ void Pixels::initialize(unsigned int num_leds, unsigned int milliwatts, unsigned
 
 bool Pixels::isInitialized() {
     return initialized;
+}
+
+bool Pixels::isGRB() {
+    return grb;
 }
 
 void Pixels::increment() {
@@ -219,7 +224,7 @@ void Pixels::pulse(AnimationArgs args) {
     unsigned int length = args.arg1;
     unsigned int spacing_length = args.arg2;
     unsigned int counter = length;
-    unsigned int counter_bg = spacing_length - 1;
+    unsigned int counter_bg = spacing_length;
     unsigned int expanded_size = args.arg4 > 0 ? args.arg4 : num_leds;
     delete incArgs.list;
     incArgs.list = new List(expanded_size);
@@ -229,14 +234,14 @@ void Pixels::pulse(AnimationArgs args) {
         if (counter > 0) {
             color = args.colors->getCurrent();
             counter -= 1;
+        } else if (counter_bg == 0) {
+            args.colors->incrementCounter();
+            color = args.colors->getCurrent();
+            counter = length - 1;
+            counter_bg = spacing_length;
         } else {
             if (args.color_bg >= 0) {
                 color = args.color_bg;
-            }
-            if (counter_bg == 0) {
-                counter = length;
-                counter_bg = spacing_length;
-                args.colors->incrementCounter();
             }
             counter_bg -= 1;
         }

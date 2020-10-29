@@ -1,5 +1,5 @@
 /* exported Controllers */
-/* globals socket */
+/* globals loadedControllers */
 
 const TABLE_COLUMNS = 7;
 const STATUS_COLUMNS = 6;
@@ -104,7 +104,8 @@ class Controllers {
     const major = version_info.webapp.major;
     const minor = version_info.webapp.minor;
     const patch = version_info.webapp.patch;
-    const version = `${major}.${minor}.${patch}`;
+    const label = version_info.webapp.label;
+    const version = `${major}.${minor}.${patch}_${label}`;
     const esp_hash = version_info.webapp.esp_hash;
     const rpi_hash = version_info.webapp.rpi_hash;
     document.getElementById('status-webapp-version').textContent = version;
@@ -234,6 +235,14 @@ class Controllers {
 
   getNames() {
     return Object.keys(this.controllers);
+  }
+
+  getIsActive() {
+    const result = {};
+    Object.keys(this.controllers).forEach((controller) => {
+      result[controller] = this.controllers[controller].active;
+    });
+    return result;
   }
 
   setBrightness(name, value) {
@@ -390,6 +399,7 @@ class Controllers {
     if (mode === 'active') {
       fetch(`/enable?name=${name}`);
     } else if (mode === 'noreconnect') {
+      () => {};  // PASS
     } else if (mode === 'disabled') {
       fetch(`/disable?name=${name}`);
     }

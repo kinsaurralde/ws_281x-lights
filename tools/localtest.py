@@ -43,7 +43,7 @@ def createControllerServer(port):
 
 def createWebappServer():
     print("Creating webapp server")
-    command = ["sudo", "python3", "app.py", "--test", "--debug"]
+    command = ["sudo", "python3", "app.py", "--test", "--debug", "-s"]
     subprocess.run(command, cwd=f"{args.buildfolder + 'webapp'}", check=True)
 
 
@@ -65,7 +65,8 @@ def setup():
         args.buildfolder + "webapp/config/controllers_" + webapp_config_name + ".yaml"
     )
     for i in range(len(webapp_config["controllers"])):
-        createControllerServer(6000 + i)
+        if webapp_config["controllers"][i]["active"] == "active":
+            createControllerServer(6000 + i)
     time.sleep(3)
     createWebappServer()
 

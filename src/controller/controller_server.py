@@ -122,6 +122,7 @@ def versioninfo():
         "major": version.MAJOR,
         "minor": version.MINOR,
         "patch": version.PATCH,
+        "label": version.LABEL,
         "esp_hash": version.ESP_HASH,
         "rpi_hash": version.RPI_HASH,
     })

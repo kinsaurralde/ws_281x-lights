@@ -48,6 +48,12 @@ def test_getinitialized(client):
     assert response.content_type == "text/html; charset=utf-8"
 
 
+def test_getpixels(client):
+    response = client.post("/getpixels")
+    assert response.status_code == 405
+    assert response.content_type == "text/html; charset=utf-8"
+
+
 def test_enable(client):
     response = client.post("/enable")
     assert response.status_code == 405
