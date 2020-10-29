@@ -3,6 +3,73 @@
 The webapp hosts the control webpage used to easily send commands to some or multiple controllers. 
 It also provides predictions of what each strip should look like (PLANNED).
 
+## Command Line Arguments
+
+### Debug
+**-d, --debug**
+
+Type: Switch (boolean)
+
+Default: False
+
+Use flask debug mode
+
+### Test
+**-t, --test**
+
+Type: Switch (boolean)
+
+Default: False
+
+Use testing mode:
+- replace controller urls with local host
+- used with localtest tool
+
+### Pixel Simulate
+**-s, --pixel-simulate**
+
+Type: Switch (boolean)
+
+Default: False
+
+Generate pixels to send to webpage
+
+### Nosend
+**--nosend**
+
+Type: Switch (boolean)
+
+Default: False
+
+Dont send to controllers
+
+### Config
+**-c, --config**
+
+Type: String
+
+Default: config/controllers_sample.yaml
+
+Location of controller config file
+
+### Port
+**-p, --port**
+
+Type: Integer
+
+Default: 5000
+
+Port to run webpage
+
+### Background
+**-b, --background**
+
+Type: Switch (boolean)
+
+Default: True
+
+Send updates in background thread. Keep on if using pixel simulate.
+
 ## Routes
 
 ### /

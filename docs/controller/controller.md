@@ -50,7 +50,7 @@ request although defaults will be used if a property is not present.
 Return: empty list (will probably change)
 
 ### /init
-**POST**
+**GET & POST**
 
 Initializes pixels with led_count, brightness, and maximum milliwatts
 
@@ -61,11 +61,14 @@ Initializes pixels with led_count, brightness, and maximum milliwatts
 | init.num_leds     | unsigned int              | number of pixels 
 | init.milliwatts   | unsigned int              | maximum power in milliwatts
 | init.brightness   | unsigned int              | starting brightness
+| init.grb          | bool                      | use grb mode
 
-Return: text (will probably change)
+Return (GET): array of booleans of which strips are initialized
+
+Return (POST): undefined
 
 ### /brightness
-**GET**
+**GET** 
 
 Sets brightness if query param value present. Then return current brightness.
 

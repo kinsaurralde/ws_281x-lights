@@ -2,7 +2,7 @@
 MAJOR				= 2
 MINOR				= 1
 PATCH				= 0
-LABEL				= development
+LABEL				= 
 
 # Paths
 

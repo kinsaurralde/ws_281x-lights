@@ -219,7 +219,7 @@ void handleRoot() {
  *      - unsigned int init.milliwatts: maximum milliwatts (not implemented)
  *      - bool         init.grb:        grb mode
  * 
- * Initialze strip with brightness, number of leds, 
+ * Initialze strip with brightness, number of leds, and grb mode
  */
 void handleInit() {
     if (server.hasArg("plain") == true) {  //Check if body received

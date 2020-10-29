@@ -3,7 +3,7 @@
 #define MAJOR 2
 #define MINOR 1
 #define PATCH 0
-#define LABEL "development"
+#define LABEL ""
 
-#define ESP_HASH "d4aff802b04793305ec9e398606fe10790925e2a"
+#define ESP_HASH "8371f6cb0271735ce8e95ff892133f83e945aec9"
 #define RPI_HASH "22653a1ed2ed59fbad59349a9a5ca7f89f06dd6b"
