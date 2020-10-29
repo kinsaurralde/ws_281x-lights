@@ -8,7 +8,6 @@ const MAX_PIXEL_COLS = 150;  // If changed, also change HTML
 class PixelDisplay {
   constructor() {
     socket.on('pixels', (data) => {
-      // console.debug(data);
       this.set(data);
     });
     this.div = document.getElementById('pixel-display');
@@ -82,7 +81,6 @@ class PixelDisplay {
   }
 
   set(data) {
-    console.debug('Set', data);
     Object.keys(data).forEach((strip) => {
       if (strip in this.controllers) {
         this.pixel_strips[strip].set(data[strip]);

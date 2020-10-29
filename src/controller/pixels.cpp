@@ -271,7 +271,6 @@ void Pixels::wipe(AnimationArgs args) {
     incArgs.list = new List(num_leds);
     setAll(args.color_bg);
     data.main[args.arg6 ? (num_leds - 1) : 0] = args.color;
-    std::cout << (args.arg6 ? (num_leds - 1) : 0) << std::endl;
     incArgs.arg1 = args.arg1;
     incArgs.arg2 = ShiftMode::first_pixel_shift;
     incArgs.arg6 = args.arg6;
