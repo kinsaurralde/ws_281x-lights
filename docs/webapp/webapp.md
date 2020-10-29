@@ -1,7 +1,7 @@
 # Webapp
 
 The webapp hosts the control webpage used to easily send commands to some or multiple controllers. 
-It also provides predictions of what each strip should look like (PLANNED).
+It can also simulate the animations and send to pixel display on website.
 
 ## Command Line Arguments
 
