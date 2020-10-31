@@ -1,8 +1,8 @@
 # Version Information
 MAJOR				= 2
-MINOR				= 1
+MINOR				= 2
 PATCH				= 0
-LABEL				= 
+LABEL				= development
 
 # Paths
 
@@ -19,7 +19,7 @@ BUILD_RPI_SRC_DIR	= ${BUILD_RPI_DIR}src/
 
 HTML_DIR			= ${WEBAPP_DIR}templates/
 CSSJS_DIR 			= ${WEBAPP_DIR}static/
-PY_FILES			= ${WEBAPP_DIR}*.py ${WEBAPP_DIR}tests/*.py ${WEBAPP_DIR}python/*.py tools/*
+PY_FILES			= ${WEBAPP_DIR}*.py ${WEBAPP_DIR}tests/*.py ${WEBAPP_DIR}modules/*.py tools/*
 
 # Lint commands
 

@@ -8,7 +8,7 @@ from flask import Flask, json, render_template, request
 from flask_socketio import SocketIO
 from engineio.payload import Payload
 
-import python
+import modules
 
 from version import *
 
@@ -258,10 +258,11 @@ controller_module = None
 if args.pixel_simulate:
     import controller as controller_module
 
-controllers = python.Controllers(
+controllers = modules.Controllers(
     controllers_config, args.nosend, getVersionInfo(), controller_module
 )
-background = python.Background(socketio, controllers, args.pixel_simulate)
+background = modules.Background(socketio, controllers, args.pixel_simulate)
+sequence = modules.Sequencer(controllers)
 
 if __name__ == "__main__":  # pragma: no cover
     if args.background:
