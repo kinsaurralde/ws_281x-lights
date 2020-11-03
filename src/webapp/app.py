@@ -213,6 +213,12 @@ def setPixelInterval():
     }
 
 
+@app.route("/sequence/<sequence>/<function>")
+def sequence(sequence, function):
+    sequencer.run(sequence, function)
+    return "Done"
+
+
 @socketio.on("connect")
 def connect():
     print("Client Connected:", request.remote_addr)
@@ -249,6 +255,7 @@ def emitUpdatedData():
 animations_config = open_yaml("config/animations.yaml")
 colors_config = open_yaml("config/colors.yaml")
 controllers_config = open_yaml(args.config)
+sequences_config = open_yaml("config/sequences.yaml")
 
 if args.test:  # pragma: no cover
     for i, controller in enumerate(controllers_config["controllers"]):
@@ -262,7 +269,7 @@ controllers = modules.Controllers(
     controllers_config, args.nosend, getVersionInfo(), controller_module
 )
 background = modules.Background(socketio, controllers, args.pixel_simulate)
-sequence = modules.Sequencer(controllers)
+sequencer = modules.Sequencer(controllers, sequences_config)
 
 if __name__ == "__main__":  # pragma: no cover
     if args.background:

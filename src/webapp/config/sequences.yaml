@@ -1,0 +1,9 @@
+---
+sequences:
+  - name: test
+    module: sequences.test
+    functions:
+      - test_a
+      - test_b
+      - test_c
+    active: true
