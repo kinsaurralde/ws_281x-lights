@@ -14,7 +14,8 @@
   background-color: var(--input-background);
 }
 
-#colors-noedit button {
+#colors-noedit button,
+#sequences-div button {
   margin: 0.25vh;
 }
 

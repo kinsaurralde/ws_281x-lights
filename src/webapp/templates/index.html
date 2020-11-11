@@ -14,6 +14,7 @@
     <script defer src="../static/groups.js"></script>
     <script defer src="../static/animations.js"></script>
     <script defer src="../static/colors.js"></script>
+    <script defer src="../static/sequences.js"></script>
     <script defer src="../static/pixel_strip.js"></script>
     <script defer src="../static/pixel_display.js"></script>
   </head>
@@ -116,6 +117,23 @@
       </div>
     </div>
 
+    <div class="divider"></div>
+    <div class="section-flex-no-border space-between">
+      <div class="section-title">Sequences</div>
+      <div>
+        <button type="button" onclick="showSection('section-sequences')">Show</button>
+        <button type="button" onclick="hideSection('section-sequences')">Hide</button>
+      </div>
+    </div>
+    <div id="section-sequences">
+      <div class="divider"></div>
+      <div id="sequences-div"></div>
+      <div>
+        <button type="button" id="sequences-add" class="width-10">Add Sequence</button>
+        <button type="button" id="sequences-remove" class="width-10">Remove Sequence</button>
+      </div>
+    </div>
+
     <div id="section-display-wrapper">
       <div class="divider"></div>
       <div class="section-flex-no-border space-between">
@@ -192,6 +210,7 @@
         window.colors = new Colors()
         window.groups = new Groups()
         window.pixel_display = new PixelDisplay()
+        window.sequences = new Sequences()
         socket.emit("webpage_loaded")
       }
 

@@ -219,6 +219,11 @@ def sequence(sequence, function):
     return "Done"
 
 
+@app.route("/getsequences")
+def getsequences():
+    return create_response(sequencer.getSequences())
+
+
 @socketio.on("connect")
 def connect():
     print("Client Connected:", request.remote_addr)

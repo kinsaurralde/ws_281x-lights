@@ -14,7 +14,10 @@ class Sequencer:
                 mod = importlib.import_module(s["module"])
                 sequence = mod.Sequence(self.add, s)
                 self.sequences[s["name"]] = sequence
-                print(sequence)
+        print(self.config)
+
+    def getSequences(self):
+        return self.config
 
     def add(self, args):
         print("SENDING", args)
