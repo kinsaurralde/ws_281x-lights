@@ -55,14 +55,18 @@ class Sequences {
     this.visible += 1;
     const row_num = this.num_custom;
     this.num_custom += 1;
+    const name = data.name;
     const id = 'sequences-' + row_num;
     const div = createSectionFlex();
-    const title = createSecondTitle(`${id}-name`, data.name);
+    const title = createSecondTitle(`${id}-name`, name);
     const functions = createSectionFlexNoBorder();
 
     for (let i = 0; i < data.functions.length; i++) {
       const button = createButton(
           `${id}-function-${data.functions[i]}`, data.functions[i]);
+      button.addEventListener('click', () => {
+        this.send(name, data.functions[i]);
+      });
       functions.appendChild(button);
     }
 
@@ -73,5 +77,9 @@ class Sequences {
     return;
   }
 
-  send(id, color) {}
+  send(sequence_name, function_name) {
+    console.log(
+        `Sequence Send: ${sequence_name} with function ${function_name}`);
+    fetch(`/sequence/${sequence_name}/${function_name}`);
+  }
 }
