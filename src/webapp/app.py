@@ -213,10 +213,21 @@ def setPixelInterval():
     }
 
 
-@app.route("/sequence/<sequence>/<function>")
-def sequence(sequence, function):
-    sequencer.run(sequence, function)
-    return "Done"
+@app.route("/sequence/<mode>/<sequence>/<function>")
+def sequenceStart(mode, sequence, function):
+    if mode == "start":
+        sequencer.run(sequence, function)
+    elif mode == "toggle":
+        sequencer.toggle(sequence, function)
+    elif mode == "stop":
+        sequencer.stop(sequence, function)
+    return "Sequence"
+
+
+@app.route("/sequence/stopall")
+def sequenceStopAll():
+    sequencer.stopAll()
+    return "Stopped"
 
 
 @app.route("/getsequences")

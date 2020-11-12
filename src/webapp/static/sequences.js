@@ -80,6 +80,6 @@ class Sequences {
   send(sequence_name, function_name) {
     console.log(
         `Sequence Send: ${sequence_name} with function ${function_name}`);
-    fetch(`/sequence/${sequence_name}/${function_name}`);
+    fetch(`/sequence/start/${sequence_name}/${function_name}`);
   }
 }

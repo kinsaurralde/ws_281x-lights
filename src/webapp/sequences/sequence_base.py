@@ -73,6 +73,9 @@ class SequenceBase:
         args.update(controller_args)
         self.send(args)
 
+    def hasFunction(self, name):
+        return name in self.function_table
+
     def run(self, function_name):
         if function_name in self.function_table:
             self.function_table[function_name]()

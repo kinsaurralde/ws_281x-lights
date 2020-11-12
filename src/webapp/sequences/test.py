@@ -26,5 +26,6 @@ class Sequence(SequenceBase):
 
     def test_b(self):
         self.wipe(**self.animation_presets['wipe_green'], controller_args=self.controller_presets['tester_a_0'])
-        time.sleep(10)
+        time.sleep(8)
         self.color(**self.animation_presets['color_blue'], controller_args=self.controller_presets['tester_a_0'])
+        time.sleep(2)
