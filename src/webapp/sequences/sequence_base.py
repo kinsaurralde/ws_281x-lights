@@ -1,9 +1,13 @@
+import time
+
 class SequenceBase:
-    def __init__(self, send, config) -> None:
+    def __init__(self, sequencer, send, config) -> None:
+        self.sequencer = sequencer
         self.send = send
         self.name = config["name"]
         self.functions_config = config["functions"]
         self.function_table = {}
+
         self._createFunctionTable()
 
     def _createFunctionTable(self):
@@ -36,6 +40,17 @@ class SequenceBase:
     @staticmethod
     def createControllerArgs(steps=1, wait_ms=40, strip_id=0):
         return {"inc_steps": int(steps), "wait_ms": int(wait_ms), "id": strip_id}
+
+    def sleep(self, value):
+        name = self.sequencer.thread_local.name
+        if name not in self.sequencer.active:
+            time.sleep(value)
+            return
+        end_time = time.time() + value
+        while time.time() < end_time:
+            time.sleep(0.01)
+            if not self.sequencer.checkActive(name):
+                break
 
     def color(self, color=0, controller_args=None):
         if controller_args is None:

@@ -9,13 +9,15 @@ class Sequencer:
         self.config = config
         self.sequences = {}
         self.active = {}
+        self.thread_local = threading.local()
+        self.thread_local.name = "Main"
         self._importSequences()
 
     def _importSequences(self):
         for s in self.config["sequences"]:
             if s["active"]:
                 mod = importlib.import_module(s["module"])
-                sequence = mod.Sequence(self.add, s)
+                sequence = mod.Sequence(self, self.add, s)
                 self.sequences[s["name"]] = sequence
         print(self.config)
 
@@ -29,15 +31,20 @@ class Sequencer:
     def _sequenceRunThread(self, name):
         if name not in self.active:
             return
+        self.thread_local.name = name
         sequence_name = self.active[name]["sequence_name"]
         function_name = self.active[name]["function_name"]
-        start_time = self.active[name]["start_time"]
         iterations = self.active[name]["iterations"]
         while iterations is None or iterations > 0:
             self.sequences[sequence_name].run(function_name)
-            if start_time != self.active[name]["start_time"]:
+            if not self.checkActive(name):
                 break
             iterations -= 1
+
+    def checkActive(self, name):
+        if name not in self.active:
+            return False
+        return self.active[name]["start_time"] == self.active[name]["saved_time"]
 
     def run(self, sequence_name, function_name, iterations=3):
         if sequence_name not in self.sequences:
@@ -50,6 +57,7 @@ class Sequencer:
         self.active[name] = {
             "thread": thread,
             "start_time": start_time,
+            "saved_time": start_time,
             "iterations": iterations,
             "sequence_name": sequence_name,
             "function_name": function_name,
