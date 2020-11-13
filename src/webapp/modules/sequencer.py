@@ -20,13 +20,11 @@ class Sequencer:
                 mod = importlib.import_module(s["module"])
                 sequence = mod.Sequence(self, self.add, s)
                 self.sequences[s["name"]] = sequence
-        print(self.config)
 
     def getSequences(self):
         return self.config
 
     def add(self, args):
-        print("SENDING", args)
         self.controller.send([args])
 
     def _sequenceRunThread(self, name):
@@ -49,7 +47,7 @@ class Sequencer:
             return False
         return self.active[name]["start_time"] == self.active[name]["saved_time"]
 
-    def run(self, sequence_name, function_name, iterations=3):
+    def run(self, sequence_name, function_name, iterations=1):
         if sequence_name not in self.sequences:
             return
         if not self.sequences[sequence_name].hasFunction(function_name):

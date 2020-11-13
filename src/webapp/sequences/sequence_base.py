@@ -16,7 +16,6 @@ class SequenceBase:
                 self.function_table[function] = getattr(self, function)
             except AttributeError:
                 print(f"Function {function} for sequence {self.name} does not exist!")
-        print(self.function_table)
 
     @staticmethod
     def createAnimationArgs():

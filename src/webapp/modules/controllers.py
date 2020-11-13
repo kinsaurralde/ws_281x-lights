@@ -24,6 +24,7 @@ class Controllers:
         self.config = {}
         self.controller_module = controller_module
         self.controllers = {}
+        self.alias = config.get("alias", {})
         self._setupConfig(config["controllers"])
         self.updateControllerLatencies()
 
@@ -215,9 +216,22 @@ class Controllers:
                         data[controller] = response[response_index]
         return {"fails": fails, "initialized": data}
 
+    def _replaceSendAlias(self, commands):
+        new_commands = []
+        for command in commands:
+            if command["id"] in self.alias:
+                new_command = command.copy()
+                for name in self.alias[command["id"]]:
+                    new_command["id"] = name
+                    new_commands.append(new_command.copy())
+            else:
+                new_commands.append(command)
+        return new_commands
+
     def send(self, commands):
         queue = {}
         fails = []
+        commands = self._replaceSendAlias(commands)
         for command in commands:
             controller_name = command["id"]
             if controller_name not in self.config:

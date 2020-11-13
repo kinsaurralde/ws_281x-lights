@@ -93,7 +93,6 @@ class Sequences {
   }
 
   startSequence(data) {
-    console.log('AD', data);
     const id = `sequences-function-${data.name}`;
     const button = document.getElementById(id);
     button.style.border = '0.1vw solid var(--highlight-color)';
