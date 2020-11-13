@@ -4,7 +4,8 @@ import time
 
 
 class Sequencer:
-    def __init__(self, controller, config):
+    def __init__(self, socketio, controller, config):
+        self.socketio = socketio
         self.controller = controller
         self.config = config
         self.sequences = {}
@@ -35,11 +36,13 @@ class Sequencer:
         sequence_name = self.active[name]["sequence_name"]
         function_name = self.active[name]["function_name"]
         iterations = self.active[name]["iterations"]
+        self.socketio.emit("start_sequence", {"name": name})
         while iterations is None or iterations > 0:
             self.sequences[sequence_name].run(function_name)
             if not self.checkActive(name):
                 break
             iterations -= 1
+        self.socketio.emit("stop_sequence", {"name": name})
 
     def checkActive(self, name):
         if name not in self.active:

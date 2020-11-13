@@ -285,7 +285,7 @@ controllers = modules.Controllers(
     controllers_config, args.nosend, getVersionInfo(), controller_module
 )
 background = modules.Background(socketio, controllers, args.pixel_simulate)
-sequencer = modules.Sequencer(controllers, sequences_config)
+sequencer = modules.Sequencer(socketio, controllers, sequences_config)
 
 if __name__ == "__main__":  # pragma: no cover
     if args.background:

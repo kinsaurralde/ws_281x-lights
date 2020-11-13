@@ -2,12 +2,19 @@
 
 class Sequences {
   constructor() {
+    socket.on('start_sequence', (data) => {
+      console.log('Start Sequence', data);
+      this.startSequence(data);
+    });
+    socket.on('stop_sequence', (data) => {
+      console.log('Stop Sequence', data);
+      this.stopSequence(data);
+    });
     this.div = document.getElementById('sequences-div');
     this.status = createStatus();
     this.visible = 0;
     this.num_custom = 0;
-    this.colors = {};
-    this.colors_list = {};
+    this.buttons = {};
     this.getSequences();
     this.setupEventListeners();
   }
@@ -33,7 +40,7 @@ class Sequences {
 
   addSequence() {
     if (this.visible < this.num_custom) {
-      document.getElementById(`colors-custom-${this.visible}`).style.display =
+      document.getElementById(`sequences-div-${this.visible}`).style.display =
           'flex';
       this.visible += 1;
     } else {
@@ -46,7 +53,7 @@ class Sequences {
       return;
     }
     this.visible -= 1;
-    document.getElementById(`colors-custom-${this.visible}`).style.display =
+    document.getElementById(`sequences-div-${this.visible}`).style.display =
         'none';
   }
 
@@ -62,11 +69,13 @@ class Sequences {
     const functions = createSectionFlexNoBorder();
 
     for (let i = 0; i < data.functions.length; i++) {
+      const function_name = data.functions[i];
       const button = createButton(
-          `${id}-function-${data.functions[i]}`, data.functions[i]);
+          `sequences-function-${name}-${function_name}`, function_name);
       button.addEventListener('click', () => {
-        this.send(name, data.functions[i]);
+        this.send(name, function_name);
       });
+      this.buttons[name] = button;
       functions.appendChild(button);
     }
 
@@ -81,5 +90,18 @@ class Sequences {
     console.log(
         `Sequence Send: ${sequence_name} with function ${function_name}`);
     fetch(`/sequence/start/${sequence_name}/${function_name}`);
+  }
+
+  startSequence(data) {
+    console.log('AD', data);
+    const id = `sequences-function-${data.name}`;
+    const button = document.getElementById(id);
+    button.style.border = '0.1vw solid var(--highlight-color)';
+  }
+
+  stopSequence(data) {
+    const id = `sequences-function-${data.name}`;
+    const button = document.getElementById(id);
+    button.style.border = '0.1vw solid var(--input-border)';
   }
 }
