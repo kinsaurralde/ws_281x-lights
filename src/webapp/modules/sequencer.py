@@ -4,10 +4,11 @@ import time
 
 
 class Sequencer:
-    def __init__(self, socketio, controller, config):
+    def __init__(self, socketio, controller, config, colors):
         self.socketio = socketio
         self.controller = controller
         self.config = config
+        self.colors = self._processColors(colors["colors"])
         self.sequences = {}
         self.active = {}
         self.thread_local = threading.local()
@@ -20,6 +21,15 @@ class Sequencer:
                 mod = importlib.import_module(s["module"])
                 sequence = mod.Sequence(self, self.add, s)
                 self.sequences[s["name"]] = sequence
+
+    @staticmethod
+    def _processColors(colors_config):
+        colors = {}
+        for i, color in enumerate(colors_config["edit"]):
+            colors[color["name"]] = colors_config["edit"][i]["value"]
+        for i, color in enumerate(colors_config["noedit"]):
+            colors[color["name"]] = colors_config["noedit"][i]["value"]
+        return colors
 
     def getSequences(self):
         return self.config

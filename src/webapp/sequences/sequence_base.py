@@ -3,6 +3,7 @@ import time
 class SequenceBase:
     def __init__(self, sequencer, send, config) -> None:
         self.sequencer = sequencer
+        self.colors = self.sequencer.colors
         self.send = send
         self.name = config["name"]
         self.functions_config = config["functions"]
@@ -20,11 +21,13 @@ class SequenceBase:
     @staticmethod
     def createAnimationArgs():
         return {
+            "id": "all",
             "animation": 0,
             "color": 0,
             "color_bg": 0,
             "colors": [],
             "wait_ms": 40,
+            "inc_steps": 1,
             "steps": 1,
             "arg1": 0,
             "arg2": 0,
@@ -37,8 +40,22 @@ class SequenceBase:
         }
 
     @staticmethod
-    def createControllerArgs(steps=1, wait_ms=40, strip_id=0):
-        return {"inc_steps": int(steps), "wait_ms": int(wait_ms), "id": strip_id}
+    def combineRGB(r, g, b):
+        return (int(r) & 0xFF) << 16 | (int(g) & 0xFF) << 8 | (int(b) & 0xFF)
+
+    def convertColor(self, color):
+        value = [0, 0, 0]
+        if isinstance(color, int):
+            return color
+        if color in self.colors:
+            value = self.colors[color]
+        return self.combineRGB(value[0], value[1], value[2])
+
+    def convertColors(self, colors):
+        result = []
+        for color in colors:
+            result.append(self.convertColor(color))
+        return result
 
     def sleep(self, value):
         name = self.sequencer.thread_local.name
@@ -51,40 +68,37 @@ class SequenceBase:
             if not self.sequencer.checkActive(name):
                 break
 
-    def color(self, color=0, controller_args=None):
-        if controller_args is None:
-            controller_args = self.createControllerArgs()
+    def color(self, controller_id="all", color=0):
         args = self.createAnimationArgs()
+        args["id"] = controller_id
         args["animation"] = 0
-        args["color"] = int(color)
-        args.update(controller_args)
+        args["color"] = self.convertColor(color)
+        args["wait_ms"] = 1000
         self.send(args)
 
-    def wipe(self, color=0, background=-1, reverse=False, controller_args=None):
-        if controller_args is None:
-            controller_args = self.createControllerArgs()
+    def wipe(self, controller_id="all", color=0, background=-1, shift_amount=1, reverse=False, wait_ms=40):
         args = self.createAnimationArgs()
+        args["id"] = controller_id
         args["animation"] = 1
-        args["color"] = int(color)
+        args["color"] = self.convertColor(color)
         args["color_bg"] = int(background)
-        args["arg1"] = int(controller_args["inc_steps"])
+        args["arg1"] = int(shift_amount)
         args["arg6"] = bool(reverse)
-        args.update(controller_args)
+        args["wait_ms"] = int(wait_ms)
         self.send(args)
 
-    def pulse(self, colors=[], background=-1, length=5, spacing=5, shift_amount=1, pattern_size=-1, reverse=False, controller_args=None):
-        if controller_args is None:
-            controller_args = self.createControllerArgs()
+    def pulse(self, controller_id="all", colors=["red", "blue", "green"], background=-1, length=5, spacing=5, shift_amount=1, pattern_size=-1, reverse=False, wait_ms=40):
         args = self.createAnimationArgs()
+        args["id"] = controller_id
         args["animation"] = 2
-        args["colors"] = colors
+        args["colors"] = self.convertColors(colors)
         args["color_bg"] = int(background)
         args["arg1"] = int(length)
         args["arg2"] = int(spacing)
         args["arg3"] = int(shift_amount)
         args["arg4"] = int(pattern_size)
         args["arg6"] = bool(reverse)
-        args.update(controller_args)
+        args["wait_ms"] = int(wait_ms)
         self.send(args)
 
     def hasFunction(self, name):
@@ -93,4 +107,16 @@ class SequenceBase:
     def run(self, function_name):
         if function_name in self.function_table:
             self.function_table[function_name]()
-    
+
+Preset = {
+    'color_blue': {
+        'color': 255
+    },
+    'wipe_green': {
+        'color': 65280
+    },
+    'wipe_green_r': {
+        'color': 65280,
+        'reverse': True
+    }
+}
