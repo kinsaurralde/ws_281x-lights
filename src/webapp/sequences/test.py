@@ -16,4 +16,13 @@ class Sequence(SequenceBase):
         self.sleep(4)
         self.color(**Preset['color_blue'])
         self.sleep(2)
+
+    def test_c(self):
+        self.cycle()
+
+    def test_d(self):
+        self.pulse()
+
+    def test_e(self):
+        self.rainbow()
         

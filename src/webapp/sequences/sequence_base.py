@@ -76,18 +76,19 @@ class SequenceBase:
         args["wait_ms"] = 1000
         self.send(args)
 
-    def wipe(self, controller_id="all", color=0, background=-1, shift_amount=1, reverse=False, wait_ms=40):
+    def wipe(self, controller_id="all", color=0, background=-1, shift_amount=1, reverse=False, wait_ms=40, steps=1):
         args = self.createAnimationArgs()
         args["id"] = controller_id
         args["animation"] = 1
         args["color"] = self.convertColor(color)
         args["color_bg"] = int(background)
-        args["arg1"] = int(shift_amount)
+        args["arg3"] = int(shift_amount)
         args["arg6"] = bool(reverse)
+        args["inc_steps"] = int(steps)
         args["wait_ms"] = int(wait_ms)
         self.send(args)
 
-    def pulse(self, controller_id="all", colors=["red", "blue", "green"], background=-1, length=5, spacing=5, shift_amount=1, pattern_size=-1, reverse=False, wait_ms=40):
+    def pulse(self, controller_id="all", colors=["red", "blue", "green"], background=-1, length=5, spacing=5, shift_amount=1, pattern_size=-1, reverse=False, wait_ms=40, steps=1):
         args = self.createAnimationArgs()
         args["id"] = controller_id
         args["animation"] = 2
@@ -98,6 +99,27 @@ class SequenceBase:
         args["arg3"] = int(shift_amount)
         args["arg4"] = int(pattern_size)
         args["arg6"] = bool(reverse)
+        args["inc_steps"] = int(steps)
+        args["wait_ms"] = int(wait_ms)
+        self.send(args)
+
+    def rainbow(self, controller_id="all", shift_amount=1, reverse=False, wait_ms=40, steps=1):
+        args = self.createAnimationArgs()
+        args["id"] = controller_id
+        args["animation"] = 3
+        args["arg3"] = int(shift_amount)
+        args["arg6"] = bool(reverse)
+        args["inc_steps"] = int(steps)
+        args["wait_ms"] = int(wait_ms)
+        self.send(args)
+
+    def cycle(self, controller_id="all", colors=["red", "blue", "green", "red"], steps_between_colors=100, wait_ms=40, steps=1):
+        args = self.createAnimationArgs()
+        args["id"] = controller_id
+        args["animation"] = 4
+        args["colors"] = self.convertColors(colors)
+        args["arg1"] = int(steps_between_colors)
+        args["inc_steps"] = int(steps)
         args["wait_ms"] = int(wait_ms)
         self.send(args)
 
