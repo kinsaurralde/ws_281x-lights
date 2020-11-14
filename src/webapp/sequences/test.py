@@ -22,6 +22,8 @@ class Sequence(SequenceBase):
 
     def test_d(self):
         self.pulse()
+        self.sleep(4)
+        self.pulse(**Preset['pulse_red'])
 
     def test_e(self):
         self.rainbow()

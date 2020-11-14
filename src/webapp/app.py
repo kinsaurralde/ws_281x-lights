@@ -89,7 +89,7 @@ def open_yaml(path):
     return data
 
 
-def create_response(data, ordered=False):
+def createResponse(data, ordered=False):
     payload = data
     if ordered:
         payload = OrderedDict(data)
@@ -107,7 +107,7 @@ def error_response(message):
         "error": True,
         "message": message,
     }
-    return create_response(data)
+    return createResponse(data)
 
 
 @app.errorhandler(404)
@@ -128,11 +128,11 @@ def handleData():
         data = json.loads(request.data)
     except ValueError:
         response = {"error": True, "message": "JSON Decode Error"}
-        return create_response(response)
+        return createResponse(response)
     controllers.setNoSend(getNosend())
     fails = controllers.send(data)
     response = {"error": len(fails) > 0, "message": fails}
-    return create_response(response)
+    return createResponse(response)
 
 
 @app.route("/docs")
@@ -143,41 +143,41 @@ def docs():
 
 @app.route("/getanimations")
 def getanimations():
-    return create_response(animations_config)
+    return createResponse(animations_config)
 
 
 @app.route("/getcolors")
 def getcolors():
-    return create_response(colors_config)
+    return createResponse(colors_config)
 
 
 @app.route("/getcontrollers")
 def getcontrollers():
-    return create_response(controllers.getConfig(), True)
+    return createResponse(controllers.getConfig(), True)
 
 
 @app.route("/getversioninfo")
 def getversioninfo():
-    return create_response(controllers.getControllerVersionInfo())
+    return createResponse(controllers.getControllerVersionInfo())
 
 
 @app.route("/getinitialized")
 def getinitialized():
-    return create_response(controllers.getControllerInitialized())
+    return createResponse(controllers.getControllerInitialized())
 
 
 @app.route("/enable")
 def enableControllers():
     fails = controllers.enableController(request.args.get("name"))
     emitUpdatedData()
-    return create_response({"error": len(fails) > 0, "message": fails})
+    return createResponse({"error": len(fails) > 0, "message": fails})
 
 
 @app.route("/disable")
 def disableControllers():
     fails = controllers.disableController(request.args.get("name"))
     emitUpdatedData()
-    return create_response({"error": len(fails) > 0, "message": fails})
+    return createResponse({"error": len(fails) > 0, "message": fails})
 
 
 @app.route("/update")
@@ -188,7 +188,7 @@ def update():
 
 @app.route("/getpixels")
 def getPixels():
-    return create_response(controllers.getPixels())
+    return createResponse(controllers.getPixels())
 
 
 @app.route("/getpixelsimulate")
@@ -213,15 +213,25 @@ def setPixelInterval():
     }
 
 
-@app.route("/sequence/<mode>/<sequence>/<function>")
-def sequenceStart(mode, sequence, function):
+@app.route("/sequence/<mode>")
+def sequenceHandler(mode):
+    sequence = request.args.get("sequence")
+    function = request.args.get("function")
+    iterations = request.args.get("iterations", 1)
+    response = {
+        "error": False,
+        "message": f"{mode} sequence {sequence} with function {function} {iterations} times",
+    }
+    fail = False
     if mode == "start":
-        sequencer.run(sequence, function)
+        fail = not sequencer.run(sequence, function, iterations)
     elif mode == "toggle":
-        sequencer.toggle(sequence, function)
+        # fail = not sequencer.toggle(sequence, function, iterations)
+        fail = True
     elif mode == "stop":
-        sequencer.stop(sequence, function)
-    return "Sequence"
+        fail = not sequencer.stop(sequence, function)
+    response["error"] = fail
+    return createResponse(response)
 
 
 @app.route("/sequence/stopall")
@@ -232,7 +242,7 @@ def sequenceStopAll():
 
 @app.route("/getsequences")
 def getsequences():
-    return create_response(sequencer.getSequences())
+    return createResponse(sequencer.getSequences())
 
 
 @socketio.on("connect")

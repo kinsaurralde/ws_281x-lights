@@ -66,7 +66,7 @@ class SequenceBase:
         while time.time() < end_time:
             time.sleep(0.01)
             if not self.sequencer.checkActive(name):
-                break
+                raise Exception("Early Exit")
 
     def color(self, controller_id="all", color=0):
         args = self.createAnimationArgs()
@@ -140,5 +140,8 @@ Preset = {
     'wipe_green_r': {
         'color': 65280,
         'reverse': True
+    },
+    'pulse_red': {
+        'colors': ["red"]
     }
 }

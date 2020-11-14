@@ -27,6 +27,10 @@ class Sequences {
         .addEventListener('click', () => {
           this.removeSequence();
         });
+    document.getElementById('sequences-stopall')
+        .addEventListener('click', () => {
+          fetch('/sequence/stopall');
+        });
   }
 
   getSequences() {
@@ -86,10 +90,14 @@ class Sequences {
     return;
   }
 
-  send(sequence_name, function_name) {
+  send(sequence_name, function_name, iterations = null) {
     console.log(
         `Sequence Send: ${sequence_name} with function ${function_name}`);
-    fetch(`/sequence/start/${sequence_name}/${function_name}`);
+    let parameters = `sequence=${sequence_name}&function=${function_name}`;
+    if (iterations != null) {
+      parameters += `&iterations=${iterations}`;
+    }
+    fetch(`/sequence/start?${parameters}`);
   }
 
   startSequence(data) {

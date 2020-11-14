@@ -45,12 +45,17 @@ class Sequencer:
         function_name = self.active[name]["function_name"]
         iterations = self.active[name]["iterations"]
         self.socketio.emit("start_sequence", {"name": name})
-        while iterations is None or iterations > 0:
-            self.sequences[sequence_name].run(function_name)
-            if not self.checkActive(name):
-                break
-            iterations -= 1
-        self.socketio.emit("stop_sequence", {"name": name})
+        try:
+            while iterations is None or iterations > 0:
+                self.sequences[sequence_name].run(function_name)
+                if not self.checkActive(name):
+                    break
+                if iterations is not None:
+                    iterations -= 1
+        except:
+            pass
+        finally:
+            self.socketio.emit("stop_sequence", {"name": name})
 
     def checkActive(self, name):
         if name not in self.active:
@@ -59,9 +64,9 @@ class Sequencer:
 
     def run(self, sequence_name, function_name, iterations=1):
         if sequence_name not in self.sequences:
-            return
+            return False
         if not self.sequences[sequence_name].hasFunction(function_name):
-            return
+            return False
         name = sequence_name + "-" + function_name
         start_time = time.time()
         thread = threading.Thread(target=self._sequenceRunThread, args=(name,))
@@ -74,19 +79,21 @@ class Sequencer:
             "function_name": function_name,
         }
         thread.start()
+        return True
 
-    def toggle(self, sequence_name, function_name, iterations=None):
-        pass
+    # def toggle(self, sequence_name, function_name, iterations=None):
+    #     return False
 
     def stop(self, sequence_name, function_name):
         if sequence_name not in self.sequences:
-            return
+            return False
         if not self.sequences[sequence_name].hasFunction(function_name):
-            return
+            return False
         name = sequence_name + "-" + function_name
         if name not in self.active:
-            return
+            return False
         self.active[name]["start_time"] = 0
+        return True
 
     def stopAll(self):
         for name in self.active:
