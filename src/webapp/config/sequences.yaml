@@ -1,7 +1,7 @@
 ---
 sequences:
   - name: test
-    module: sequences.test
+    module: sequences.sample
     functions:
       - test_a
       - test_b
@@ -9,4 +9,9 @@ sequences:
       - test_d
       - test_e
       - test_invalid
+    active: true
+  - name: christmas
+    module: sequences.christmas
+    functions:
+      - basic
     active: true
