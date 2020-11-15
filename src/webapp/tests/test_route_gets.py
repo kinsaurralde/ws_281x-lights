@@ -12,7 +12,7 @@ def test_data(client):
 
 def test_docs(client):
     response = client.get("/docs")
-    assert response.status_code == 200
+    assert response.status_code == 302
     assert response.content_type == "text/html; charset=utf-8"
 
 

@@ -3,6 +3,8 @@ import time
 
 
 class Background:
+    """Runs thread in background to provide webapps with updates / pixel status"""
+
     def __init__(self, socketio, controller, pixels_simulate):
         self.socketio = socketio
         self.controller = controller
@@ -17,34 +19,42 @@ class Background:
         self.start_time = time.time()
 
     def startLoop(self):
+        """Start background loop"""
         thread = threading.Thread(target=self._loop)
         thread.start()
 
     def updatePing(self):
+        """Update controller ping"""
         self.controller.updateControllerLatencies(self)
         self.data["ping"] = self.controller.getControllerLatencies()
 
     def updateData(self):
+        """Update background data"""
         self.data.update(self.controller.getBackgroundData())
 
     def emitUpdate(self):
+        """Emit update"""
         if len(self.data) > 0:
             self.socketio.emit("update", self.data)
 
-    def setPixelInterval(self, value):
+    def setPixelInterval(self, value: int):
+        """Set pixel_interval"""
         if value >= self.delay_ms:
             self.pixel_interval = value
 
-    def getPixelInterval(self):
+    def getPixelInterval(self) -> int:
+        """Get pixel interval"""
         return self.pixel_interval
 
-    def setPixelsActive(self, value):
+    def setPixelsActive(self, value: str):
+        """Set pixels_active"""
         if value == "true":
             self.pixels_active = True
         else:
             self.pixels_active = False
 
-    def getPixelsActive(self):
+    def getPixelsActive(self) -> bool:
+        """Return pixels_active"""
         return self.pixels_active
 
     def _loop(self):

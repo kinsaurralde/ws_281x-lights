@@ -4,6 +4,8 @@ import time
 
 
 class Sequencer:
+    """Handles running / stopping sequences"""
+
     def __init__(self, socketio, controller, config, colors):
         self.socketio = socketio
         self.controller = controller
@@ -15,54 +17,22 @@ class Sequencer:
         self.thread_local.name = "Main"
         self._importSequences()
 
-    def _importSequences(self):
-        for s in self.config["sequences"]:
-            if s["active"]:
-                mod = importlib.import_module(s["module"])
-                sequence = mod.Sequence(self, self.add, s)
-                self.sequences[s["name"]] = sequence
-
-    @staticmethod
-    def _processColors(colors_config):
-        colors = {}
-        for i, color in enumerate(colors_config["edit"]):
-            colors[color["name"]] = colors_config["edit"][i]["value"]
-        for i, color in enumerate(colors_config["noedit"]):
-            colors[color["name"]] = colors_config["noedit"][i]["value"]
-        return colors
-
-    def getSequences(self):
+    def getSequences(self) -> dict:
+        """Get sequence config"""
         return self.config
 
-    def add(self, args):
+    def add(self, args: dict):
+        """Send command to controllers"""
         self.controller.send([args])
 
-    def _sequenceRunThread(self, name):
-        if name not in self.active:
-            return
-        self.thread_local.name = name
-        sequence_name = self.active[name]["sequence_name"]
-        function_name = self.active[name]["function_name"]
-        iterations = self.active[name]["iterations"]
-        self.socketio.emit("start_sequence", {"name": name})
-        try:
-            while iterations is None or iterations > 0:
-                self.sequences[sequence_name].run(function_name)
-                if not self.checkActive(name):
-                    break
-                if iterations is not None:
-                    iterations -= 1
-        except:
-            pass
-        finally:
-            self.socketio.emit("stop_sequence", {"name": name})
-
-    def checkActive(self, name):
+    def checkActive(self, name: str) -> bool:
+        """Checks if sequence name is running"""
         if name not in self.active:
             return False
         return self.active[name]["start_time"] == self.active[name]["saved_time"]
 
-    def run(self, sequence_name, function_name, iterations=1):
+    def run(self, sequence_name: str, function_name: str, iterations: int = 1) -> bool:
+        """Run sequence"""
         if sequence_name not in self.sequences:
             return False
         if not self.sequences[sequence_name].hasFunction(function_name):
@@ -84,7 +54,8 @@ class Sequencer:
     # def toggle(self, sequence_name, function_name, iterations=None):
     #     return False
 
-    def stop(self, sequence_name, function_name):
+    def stop(self, sequence_name: str, function_name: str) -> bool:
+        """Stops sequence"""
         if sequence_name not in self.sequences:
             return False
         if not self.sequences[sequence_name].hasFunction(function_name):
@@ -96,5 +67,42 @@ class Sequencer:
         return True
 
     def stopAll(self):
+        """Stops all running sequences"""
         for name in self.active:
             self.active[name]["start_time"] = 0
+
+    def _sequenceRunThread(self, name: str):
+        if name not in self.active:
+            return
+        self.thread_local.name = name
+        sequence_name = self.active[name]["sequence_name"]
+        function_name = self.active[name]["function_name"]
+        iterations = self.active[name]["iterations"]
+        self.socketio.emit("start_sequence", {"name": name})
+        try:
+            while iterations is None or iterations > 0:
+                self.sequences[sequence_name].run(function_name)
+                if not self.checkActive(name):
+                    break
+                if iterations is not None:
+                    iterations -= 1
+        except:
+            pass
+        finally:
+            self.socketio.emit("stop_sequence", {"name": name})
+
+    def _importSequences(self):
+        for s in self.config["sequences"]:
+            if s["active"]:
+                mod = importlib.import_module(s["module"])
+                sequence = mod.Sequence(self, self.add, s)
+                self.sequences[s["name"]] = sequence
+
+    @staticmethod
+    def _processColors(colors_config) -> dict:
+        colors = {}
+        for i, color in enumerate(colors_config["edit"]):
+            colors[color["name"]] = colors_config["edit"][i]["value"]
+        for i, color in enumerate(colors_config["noedit"]):
+            colors[color["name"]] = colors_config["noedit"][i]["value"]
+        return colors

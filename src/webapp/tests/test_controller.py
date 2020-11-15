@@ -3,6 +3,8 @@ import requests
 
 
 class MockedResponse(requests.models.Response):
+    """Mocked Response"""
+
     def __init__(self, json_data, status_code):
         super().__init__()
         self._content = bytes(json_data)
