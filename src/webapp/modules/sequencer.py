@@ -70,6 +70,7 @@ class Sequencer:
         """Stops all running sequences"""
         for name in self.active:
             self.active[name]["start_time"] = 0
+            self.active[name]["thread"].join()
 
     def _sequenceRunThread(self, name: str):
         if name not in self.active:

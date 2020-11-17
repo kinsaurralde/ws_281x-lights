@@ -1,4 +1,5 @@
 def resetActive(sequencer):
+    sequencer.stopAll()
     sequencer.active = {}
 
 
