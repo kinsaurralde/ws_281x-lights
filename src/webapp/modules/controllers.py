@@ -286,7 +286,7 @@ class Controllers:
     ) -> dict:
         self.send_counter += 1
         if self.nosend:
-            print(f"Would have sent to {url}:\n{payload}")
+            # print(f"Would have sent to {url}:\n{payload}")
             fails.append(
                 {"url": url, "id": controller_id, "message": "No send is true"}
             )
@@ -305,6 +305,8 @@ class Controllers:
     def _replaceSendAlias(self, commands: list) -> list:
         new_commands = []
         for command in commands:
+            if "id" not in command:
+                continue
             if command["id"] in self.alias:
                 new_command = command.copy()
                 for name in self.alias[command["id"]]:

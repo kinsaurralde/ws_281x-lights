@@ -89,7 +89,7 @@ test_webapp:
 	cd src/webapp && python3 -m pytest && cd ../../
 
 coverage:
-	cd src/webapp && coverage run --source=. -m pytest && coverage report && coverage html && cd ../../
+	cd src/webapp && coverage run --source=. --omit="*/tests*,*/sequences*,version.py,conftest.py" -m pytest && coverage report && coverage html && cd ../../
 
 run_rpi: build
 	cd ${BUILD_RPI_DIR} && python3 controller_server.py --test && cd ../../
