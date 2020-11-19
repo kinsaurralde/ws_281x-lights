@@ -357,13 +357,13 @@ def sequenceHandler(mode):
 
         - sequence: name of sequence
         - function: name of function
-        - iterations: number of iterations (default: 1)
+        - iterations: number of iterations (default: None (infinite))
 
     Return: JSON
     """
     sequence = request.args.get("sequence")
     function = request.args.get("function")
-    iterations = request.args.get("iterations", 1)
+    iterations = request.args.get("iterations", None)
     response = {
         "error": False,
         "message": f"{mode} sequence {sequence} with function {function} {iterations} times",

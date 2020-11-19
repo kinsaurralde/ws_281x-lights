@@ -37,6 +37,8 @@ class Sequencer:
             return False
         if not self.sequences[sequence_name].hasFunction(function_name):
             return False
+        if iterations is not None:
+            iterations = int(iterations)
         name = sequence_name + "-" + function_name
         start_time = time.time()
         thread = threading.Thread(target=self._sequenceRunThread, args=(name,))

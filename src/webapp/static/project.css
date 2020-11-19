@@ -53,3 +53,12 @@
   border: none;
   background-color: var(--body-background);
 }
+
+.iter-selector {
+  border-color: rgb(0, 100, 0) !important;
+}
+
+.iter-selector:disabled {
+  text-decoration: line-through red;
+  border-color: rgb(100, 0, 0) !important;
+}

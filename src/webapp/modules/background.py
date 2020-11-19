@@ -11,7 +11,7 @@ class Background:
         self.active = True
         self.pixels_simulate = pixels_simulate
         self.delay_ms = 25
-        self.pixel_interval = 25
+        self.pixel_interval = 50
         self.pixels_active = self.pixels_simulate
         self.emit_delay_ms = 1000
         self.full_cycle = 12

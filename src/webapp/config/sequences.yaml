@@ -1,6 +1,6 @@
 ---
 sequences:
-  - name: test
+  - name: sample
     module: sequences.sample
     functions:
       - test_a

@@ -23,14 +23,14 @@ def test_run_invalid_sequence(sequencer):
 
 
 def test_run_invalid_function(sequencer):
-    assert not sequencer.run("test", "")
+    assert not sequencer.run("sample", "")
 
 
 def test_run(sequencer):
-    assert sequencer.run("test", "test_a")
+    assert sequencer.run("sample", "test_a")
     active = sequencer.active
-    assert "test-test_a" in active
-    assert sequencer.checkActive("test-test_a")
+    assert "sample-test_a" in active
+    assert sequencer.checkActive("sample-test_a")
     resetActive(sequencer)
 
 
@@ -39,24 +39,24 @@ def test_stop_invalid_sequence(sequencer):
 
 
 def test_stop_invalid_function(sequencer):
-    assert not sequencer.stop("test", "")
+    assert not sequencer.stop("sample", "")
 
 
 def test_stop_no_start(sequencer):
-    assert not sequencer.stop("test", "test_a")
+    assert not sequencer.stop("sample", "test_a")
 
 
 def test_stop(sequencer):
-    sequencer.run("test", "test_a")
-    assert sequencer.stop("test", "test_a")
-    assert sequencer.active["test-test_a"]["start_time"] == 0
+    sequencer.run("sample", "test_a")
+    assert sequencer.stop("sample", "test_a")
+    assert sequencer.active["sample-test_a"]["start_time"] == 0
     resetActive(sequencer)
 
 
 def test_stopall(sequencer):
-    sequencer.run("test", "test_a")
-    sequencer.run("test", "test_b")
-    sequencer.run("test", "test_c")
+    sequencer.run("sample", "test_a")
+    sequencer.run("sample", "test_b")
+    sequencer.run("sample", "test_c")
     sequencer.stopAll()
     for i in sequencer.active:
         assert sequencer.active[i]["start_time"] == 0

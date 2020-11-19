@@ -27,4 +27,7 @@ class Sequence(SequenceBase):
 
     def test_e(self):
         self.rainbow()
+        self.sleep(3)
+        self.color()
+        self.sleep(2)
         
