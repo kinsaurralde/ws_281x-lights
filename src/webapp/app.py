@@ -444,6 +444,7 @@ animations_config = open_yaml("config/animations.yaml")
 colors_config = open_yaml("config/colors.yaml")
 controllers_config = open_yaml(args.config)
 sequences_config = open_yaml("config/sequences.yaml")
+schedules_config = open_yaml("config/schedules.yaml")
 
 if args.test:  # pragma: no cover
     for i, controller in enumerate(controllers_config["controllers"]):
@@ -458,6 +459,7 @@ controllers = modules.Controllers(
 )
 background = modules.Background(socketio, controllers, args.pixel_simulate)
 sequencer = modules.Sequencer(socketio, controllers, sequences_config, colors_config)
+scheduler = modules.Scheduler(sequencer, schedules_config)
 
 if __name__ == "__main__":  # pragma: no cover
     if args.background:

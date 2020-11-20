@@ -1,6 +1,4 @@
-import time
-
-from sequences.sequence_base import SequenceBase, Preset
+from sequences.sequence_base import SequenceBase
 
 class Sequence(SequenceBase):
     def __init__(self, sequencer, send, config) -> None:
