@@ -407,6 +407,67 @@ def getsequences():
     return createResponse(sequencer.getSequences())
 
 
+@app.route("/schedule/<mode>")
+def scheduleHandler(mode):
+    """Start or Stop schedule
+
+    Route: /schedule/<mode>
+
+    Methods: GET
+
+    Mode:
+
+        - start
+        - stop
+
+    URL Parameters:
+
+        - schedule: name of schedule
+        - function: name of function
+
+    Return: JSON
+    """
+    schedule = request.args.get("schedule")
+    function = request.args.get("function")
+    response = {
+        "error": False,
+        "message": f"{mode} schedule {schedule} with function {function}",
+    }
+    fail = False
+    if mode == "start":
+        fail = not scheduler.start(schedule, function)
+    elif mode == "stop":
+        fail = not scheduler.stop(schedule, function)
+    response["error"] = fail
+    return createResponse(response)
+
+
+@app.route("/getschedules")
+def getSchedules():
+    """Get list of schedules
+
+    Route: /getschedules
+
+    Methods: GET
+
+    Return: JSON
+    """
+    return createResponse(scheduler.getSchedules())
+
+
+@app.route("/getactiveschedules")
+def getActiveSchedules():
+    """Get list of active schedules
+
+    Route: /getactiveschedules
+
+    Methods: GET
+
+    Return: JSON
+    """
+    return createResponse(scheduler.getActiveSchedules())
+
+
 @socketio.on("connect")
 def connect():
     print("Client Connected:", request.remote_addr)

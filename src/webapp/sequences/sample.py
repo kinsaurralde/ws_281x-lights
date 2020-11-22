@@ -6,6 +6,14 @@ class Sequence(SequenceBase):
     def __init__(self, sequencer, send, config) -> None:
         super().__init__(sequencer, send, config)
 
+    def off(self):
+        self.color()
+
+    def blink(self, colors=["red", "green"], delay=500):
+        for color in colors:
+            self.color(color=color)
+            self.sleep(delay / 1000)
+
     def test_a(self):
         self.pulse()
 
