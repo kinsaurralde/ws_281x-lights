@@ -82,7 +82,7 @@ class SequenceBase:
         args["animation"] = 1
         args["color"] = self.convertColor(color)
         args["color_bg"] = int(background)
-        args["arg3"] = int(shift_amount)
+        args["arg1"] = int(shift_amount)
         args["arg6"] = bool(reverse)
         args["inc_steps"] = int(steps)
         args["wait_ms"] = int(wait_ms)

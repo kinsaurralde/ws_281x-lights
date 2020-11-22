@@ -42,6 +42,9 @@ class Sequencer:
         name = sequence_name + "-" + function_name
         start_time = time.time()
         thread = threading.Thread(target=self._sequenceRunThread, args=(name,))
+        if name in self.active:
+            print("FOUND")
+            self.stop(sequence_name, function_name)
         self.active[name] = {
             "thread": thread,
             "start_time": start_time,
@@ -66,6 +69,8 @@ class Sequencer:
         if name not in self.active:
             return False
         self.active[name]["start_time"] = 0
+        self.active[name]["thread"].join()
+        self.active.pop(name)
         return True
 
     def stopAll(self):
@@ -90,7 +95,7 @@ class Sequencer:
                 if iterations is not None:
                     iterations -= 1
         except:
-            pass
+            print("Exiting", self.thread_local.name)
         finally:
             self.socketio.emit("stop_sequence", {"name": name})
 

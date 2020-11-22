@@ -245,16 +245,19 @@ class Controllers:
         id_counter = 0
         self.config = {}
         for controller in controllers:
-            self.config[controller["name"]] = controller
+            name = controller["name"]
+            if not controller["active"]:
+                continue
+            self.config[name] = controller
             url = controller["url"]
             self.latencies[url] = None
             if url not in self.urls:
                 self.urls[url] = []
                 if self.controller_module is not None:
                     self.controllers[url] = self.controller_module.NeoPixels()
-            self.urls[url].append(controller["name"])
+            self.urls[url].append(name)
             if controller["active"] == "disabled":
-                self.disableController(controller["name"])
+                self.disableController(name)
             self._initController(url, controller)
             controller["id"] = id_counter
 
@@ -286,7 +289,6 @@ class Controllers:
     ) -> dict:
         self.send_counter += 1
         if self.nosend:
-            # print(f"Would have sent to {url}:\n{payload}")
             fails.append(
                 {"url": url, "id": controller_id, "message": "No send is true"}
             )

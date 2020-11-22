@@ -1,3 +1,6 @@
+import pytest
+
+
 def resetActive(sequencer):
     sequencer.stopAll()
     sequencer.active = {}
@@ -49,7 +52,8 @@ def test_stop_no_start(sequencer):
 def test_stop(sequencer):
     sequencer.run("sample", "test_a")
     assert sequencer.stop("sample", "test_a")
-    assert sequencer.active["sample-test_a"]["start_time"] == 0
+    with pytest.raises(KeyError):
+        assert sequencer.active["sample-test_a"]["start_time"] == 0
     resetActive(sequencer)
 
 
