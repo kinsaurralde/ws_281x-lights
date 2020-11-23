@@ -43,7 +43,6 @@ class Sequencer:
         start_time = time.time()
         thread = threading.Thread(target=self._sequenceRunThread, args=(name,))
         if name in self.active:
-            print("FOUND")
             self.stop(sequence_name, function_name)
         self.active[name] = {
             "thread": thread,

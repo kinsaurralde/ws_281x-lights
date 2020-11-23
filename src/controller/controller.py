@@ -96,6 +96,10 @@ class NeoPixels:
             self.pixels[strip_id].setBrightness(value)
         return self.pixels[strip_id].getBrightness()
 
+    def handleShowDelay(self):
+        info = f"[{self.pixels[0].getDelay()},{self.pixels[1].getDelay()}]"
+        return info
+
     @staticmethod
     def setArgs(values):
         args = AnimationArgs()

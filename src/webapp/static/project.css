@@ -15,7 +15,8 @@
 }
 
 #colors-noedit button,
-#sequences-div button {
+#sequences-div button,
+#scheduler-div button {
   margin: 0.25vh;
 }
 

@@ -32,6 +32,7 @@ void handleFreeHeap();
 void handleGetPixels();
 void handleData();
 void handleBrightness();
+void handleShowDelay();
 void handleVersionInfo();
 void handleLEDOn();
 void handleLEDOff();
@@ -81,6 +82,7 @@ void setup() {
     server.on("/init", handleInit);
     server.on("/data", handleData);
     server.on("/brightness", handleBrightness);
+    server.on("/showdelay", handleShowDelay);
     server.on("/getpixels", handleGetPixels);
     server.on("/versioninfo", handleVersionInfo);
     server.on("/heapfree", handleFreeHeap);
@@ -310,6 +312,17 @@ void handleBrightness() {
         neopixels.pixels[id]->setBrightness(brightness.toInt());
     }
     server.send(200, "text/plain", String(neopixels.pixels[id]->getBrightness()));
+}
+
+/**
+ * Route: /showdelay
+ * Methods: GET
+ * 
+ * Returns delay of each strip
+ */
+void handleShowDelay() {
+    String info = "[" + String(neopixels.pixels[0]->getDelay()) + "," + String(neopixels.pixels[1]->getDelay()) + "]";
+    server.send(200, "text/plain", info);
 }
 
 /**

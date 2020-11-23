@@ -2,6 +2,18 @@
 
 class Sequences {
   constructor() {
+    this.div = document.getElementById('sequences-div');
+    this.status = createStatus();
+    this.num_custom = 0;
+    this.buttons = {};
+    this.getSequences();
+  }
+
+  setupEventListeners() {
+    document.getElementById('sequences-stopall')
+        .addEventListener('click', () => {
+          fetch('/sequence/stopall');
+        });
     socket.on('start_sequence', (data) => {
       console.log('Start Sequence', data);
       this.startSequence(data);
@@ -10,27 +22,6 @@ class Sequences {
       console.log('Stop Sequence', data);
       this.stopSequence(data);
     });
-    this.div = document.getElementById('sequences-div');
-    this.status = createStatus();
-    this.visible = 0;
-    this.num_custom = 0;
-    this.buttons = {};
-    this.getSequences();
-    this.setupEventListeners();
-  }
-
-  setupEventListeners() {
-    document.getElementById('sequences-add').addEventListener('click', () => {
-      this.addSequence();
-    });
-    document.getElementById('sequences-remove')
-        .addEventListener('click', () => {
-          this.removeSequence();
-        });
-    document.getElementById('sequences-stopall')
-        .addEventListener('click', () => {
-          fetch('/sequence/stopall');
-        });
   }
 
   getSequences() {
@@ -39,31 +30,12 @@ class Sequences {
       for (let i = 0; i < data.sequences.length; i++) {
         this.createSequence(data.sequences[i]);
       }
+      this.setupEventListeners();
     });
-  }
-
-  addSequence() {
-    if (this.visible < this.num_custom) {
-      document.getElementById(`sequences-div-${this.visible}`).style.display =
-          'flex';
-      this.visible += 1;
-    } else {
-      this.createSequence(`custom_${this.visible + 1}`, 255, 255, 255);
-    }
-  }
-
-  removeSequence() {
-    if (this.visible < 1) {
-      return;
-    }
-    this.visible -= 1;
-    document.getElementById(`sequences-div-${this.visible}`).style.display =
-        'none';
   }
 
   createSequence(data) {
     console.log('Create', data);
-    this.visible += 1;
     const row_num = this.num_custom;
     this.num_custom += 1;
     const name = data.name;

@@ -439,6 +439,8 @@ def scheduleHandler(mode):
     elif mode == "stop":
         fail = not scheduler.stop(schedule, function)
     response["error"] = fail
+    active_schedules = scheduler.getActiveSchedules()
+    socketio.emit("active_schedules", active_schedules)
     return createResponse(response)
 
 
@@ -452,6 +454,8 @@ def getSchedules():
 
     Return: JSON
     """
+    active_schedules = scheduler.getActiveSchedules()
+    socketio.emit("active_schedules", active_schedules)
     return createResponse(scheduler.getSchedules())
 
 
@@ -465,7 +469,9 @@ def getActiveSchedules():
 
     Return: JSON
     """
-    return createResponse(scheduler.getActiveSchedules())
+    active_schedules = scheduler.getActiveSchedules()
+    socketio.emit("active_schedules", active_schedules)
+    return createResponse(active_schedules)
 
 
 @socketio.on("connect")

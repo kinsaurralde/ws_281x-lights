@@ -8,7 +8,7 @@ class ScheduleFunctionBase:
         self.jobs = {}
         self.function_table = {}
         self._createFunctionTable()
-        self.start_all()
+        self.start_all(config["active"])
 
     def _createFunctionTable(self):
         for function in self.functions_config:
@@ -20,12 +20,16 @@ class ScheduleFunctionBase:
     def hasFunction(self, name):
         return name in self.function_table
 
-    def start_all(self):
+    def start_all(self, active=True):
+        if not active:
+            return False
         for function in self.function_table:
             self.start(function)
+        return True
 
     def start(self, function):
-        self.function_table[function]()
+        if function not in self.jobs:
+            self.function_table[function]()
 
     def stop(self, function):
         if function not in self.jobs:

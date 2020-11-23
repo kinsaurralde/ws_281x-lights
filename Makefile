@@ -123,6 +123,7 @@ setup:
 	pip3 install coverage
 	pip3 install pylint
 	pip3 install schedule
+	sudo pip3 install schedule
 	sudo pip3 install rpi_ws281x
 	sudo apt install screen
 	sudo pip3 install Flask

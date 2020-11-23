@@ -15,6 +15,7 @@
     <script defer src="../static/animations.js"></script>
     <script defer src="../static/colors.js"></script>
     <script defer src="../static/sequences.js"></script>
+    <script defer src="../static/schedules.js"></script>
     <script defer src="../static/pixel_strip.js"></script>
     <script defer src="../static/pixel_display.js"></script>
   </head>
@@ -129,9 +130,23 @@
       <div class="divider"></div>
       <div id="sequences-div"></div>
       <div>
-        <button type="button" id="sequences-add" class="width-10">Add Sequence</button>
-        <button type="button" id="sequences-remove" class="width-10">Remove Sequence</button>
         <button type="button" id="sequences-stopall">Stop All</button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-flex-no-border space-between">
+      <div class="section-title">Scheduler</div>
+      <div>
+        <button type="button" onclick="showSection('section-scheduler')">Show</button>
+        <button type="button" onclick="hideSection('section-scheduler')">Hide</button>
+      </div>
+    </div>
+    <div id="section-scheduler">
+      <div class="divider"></div>
+      <div id="scheduler-div"></div>
+      <div>
+        <!-- <button type="button" id="scheduler-stopall">Stop All</button> -->
       </div>
     </div>
 
@@ -223,6 +238,7 @@
         window.groups = new Groups()
         window.pixel_display = new PixelDisplay()
         window.sequences = new Sequences()
+        window.schedules = new Schedules()
         socket.emit("webpage_loaded")
       }
 

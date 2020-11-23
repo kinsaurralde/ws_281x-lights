@@ -88,6 +88,10 @@ void Pixels::setDelay(unsigned int value) {
     delay = value;
 }
 
+unsigned int Pixels::getDelay() {
+    return delay;
+}
+
 void Pixels::setSize(unsigned int size) {
     if (size > MAX_LED_PER_STRIP) {
         size = MAX_LED_PER_STRIP;

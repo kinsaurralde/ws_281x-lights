@@ -52,10 +52,9 @@ class Scheduler:
 
     def _importSchedules(self):
         for s in self.config["schedules"]:
-            if s["active"]:
-                mod = importlib.import_module(s["module"])
-                sched = mod.ScheduleFunction(schedule, self.sequencer, s)
-                self.schedules[s["name"]] = sched
+            mod = importlib.import_module(s["module"])
+            sched = mod.ScheduleFunction(schedule, self.sequencer, s)
+            self.schedules[s["name"]] = sched
 
     def _start_thread(self):
         thread = threading.Thread(target=self._schedule_thread)
