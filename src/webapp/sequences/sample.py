@@ -7,6 +7,7 @@ class Sequence(SequenceBase):
         super().__init__(sequencer, send, config)
 
     def off(self):
+        self.sequencer.stopAll(True)
         self.color()
 
     def blink(self, colors=["red", "green"], delay=500):

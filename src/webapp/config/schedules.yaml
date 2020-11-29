@@ -7,4 +7,4 @@ schedules:
       - test_b
       - test_c
       - test_invalid
-    active: false
+    active: true

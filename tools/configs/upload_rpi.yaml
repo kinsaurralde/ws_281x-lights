@@ -1,6 +1,6 @@
 ---
-- userhost: pi@rpi4.kinsaurralde.com      # user@hostname
-  key: "~/.ssh/rpi4"                      # path to ssh key
-  destination: "Files/test_rgb/"          # folder that files should be put into
+- userhost: pi@rpi2.kinsaurralde.com      # user@hostname
+  key: "~/.ssh/rpi2"                      # path to ssh key
+  destination: "Files/christmas_lights/"  # folder that files should be put into
   webapp: true                            # include webapp compenent
   controller: true                        # include controller component

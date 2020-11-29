@@ -72,9 +72,11 @@ class Sequencer:
         self.active.pop(name)
         return True
 
-    def stopAll(self):
+    def stopAll(self, exceptSelf=False):
         """Stops all running sequences"""
         for name in self.active:
+            if exceptSelf and name == self.thread_local.name:
+                continue
             self.active[name]["start_time"] = 0
             self.active[name]["thread"].join()
 

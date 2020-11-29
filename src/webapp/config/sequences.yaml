@@ -16,4 +16,5 @@ sequences:
     module: sequences.christmas
     functions:
       - basic
+      - home
     active: true
