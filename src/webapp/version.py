@@ -3,7 +3,7 @@
 MAJOR = 2
 MINOR = 2
 PATCH = 0
-LABEL = "development"
+LABEL = ""
 
 ESP_HASH = "27c4799a0e2d384bcd55ada40011633ba79b9c7e"
 RPI_HASH = "2293ec4fb886907f2ac6bd607c815379c31af5c8"
