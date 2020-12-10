@@ -48,4 +48,5 @@ def send(device):
 if __name__ == "__main__":
     devices = load_yaml(args.config)
     for device in devices:
-        send(device)
+        if device["active"]:
+            send(device)
