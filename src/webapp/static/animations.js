@@ -80,7 +80,9 @@ class Animations {
         label_cell.textContent = '';
         label_cell.textContent = 'Animation';
         input_cell.textContent = '';
-        input_cell.appendChild(this.createAnimationSelector(row_id, animation));
+        const selector = this.createAnimationSelector(row_id, animation);
+        selector.setAttribute('disabled', true);
+        input_cell.appendChild(selector);
       } else if (i == 12) {
         input_cell.appendChild(createNumber(row_id + '-waitms', 40));
       } else if (i == 13) {

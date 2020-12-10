@@ -100,6 +100,16 @@ def handleBrightness():
 
 
 # /**
+#  * Route: /showdelay
+#  * Methods: GET
+#  * 
+#  * Returns delay of each strip
+#  */
+@app.route("/showdelay")
+def handleShowDelay():
+    return create_response(neo.handleShowDelay())
+
+# /**
 #  * Route: /getpixels 
 #  * Methods: GET
 #  * 

@@ -105,9 +105,12 @@ class Controllers {
     const minor = version_info.webapp.minor;
     const patch = version_info.webapp.patch;
     const label = version_info.webapp.label;
-    const version = `${major}.${minor}.${patch}_${label}`;
+    let version = `${major}.${minor}.${patch}`;
     const esp_hash = version_info.webapp.esp_hash;
     const rpi_hash = version_info.webapp.rpi_hash;
+    if (label.length > 0) {
+      version += `_${label}`;
+    }
     document.getElementById('status-webapp-version').textContent = version;
     document.getElementById('status-webapp-esphash').textContent = esp_hash;
     document.getElementById('status-webapp-rpihash').textContent = rpi_hash;

@@ -1,5 +1,4 @@
 import pytest
-
 import app
 
 # from app import app as flask_app
@@ -35,5 +34,9 @@ def socketio():
 
 @pytest.fixture
 def controller():
-    # app.controllers.nosend = True
     return app.controllers
+
+
+@pytest.fixture
+def sequencer():
+    return app.sequencer

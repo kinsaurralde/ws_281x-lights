@@ -2,7 +2,8 @@
 
 disable=
     parse-error,
-    missing-docstring,
+    missing-function-docstring,
+    missing-module-docstring,
     invalid-name,
     redefined-outer-name,
     superfluous-parens,

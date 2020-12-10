@@ -1,0 +1,20 @@
+---
+sequences:
+  - name: sample
+    module: sequences.sample
+    functions:
+      - 'off'
+      - blink
+      - test_a
+      - test_b
+      - test_c
+      - test_d
+      - test_e
+      - test_invalid
+    active: true
+  - name: christmas
+    module: sequences.christmas
+    functions:
+      - basic
+      - home
+    active: true

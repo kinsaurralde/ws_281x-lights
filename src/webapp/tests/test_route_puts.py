@@ -72,6 +72,48 @@ def test_update(client):
     assert response.content_type == "text/html; charset=utf-8"
 
 
+def test_getpixelsimulate(client):
+    response = client.post("/getpixelsimulate")
+    assert response.status_code == 405
+    assert response.content_type == "text/html; charset=utf-8"
+
+
+def test_setpixelinterval(client):
+    response = client.post("/setpixelemit")
+    assert response.status_code == 405
+    assert response.content_type == "text/html; charset=utf-8"
+
+
+def test_sequencehandler_start(client):
+    response = client.post("/sequence/start")
+    assert response.status_code == 405
+    assert response.content_type == "text/html; charset=utf-8"
+
+
+def test_sequencehandler_toggle(client):
+    response = client.post("/sequence/toggle")
+    assert response.status_code == 405
+    assert response.content_type == "text/html; charset=utf-8"
+
+
+def test_sequencehandler_stop(client):
+    response = client.post("/sequence/stop")
+    assert response.status_code == 405
+    assert response.content_type == "text/html; charset=utf-8"
+
+
+def test_sequencestopall(client):
+    response = client.post("/sequence/stopall")
+    assert response.status_code == 405
+    assert response.content_type == "text/html; charset=utf-8"
+
+
+def test_getsequences(client):
+    response = client.post("/getsequences")
+    assert response.status_code == 405
+    assert response.content_type == "text/html; charset=utf-8"
+
+
 def test_404(client):
     response = client.post("/thisroutedoesnotexist")
     assert response.status_code == 404

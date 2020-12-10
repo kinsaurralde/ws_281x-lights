@@ -12,7 +12,7 @@ def test_data(client):
 
 def test_docs(client):
     response = client.get("/docs")
-    assert response.status_code == 200
+    assert response.status_code == 302
     assert response.content_type == "text/html; charset=utf-8"
 
 
@@ -68,6 +68,48 @@ def test_update(client):
     response = client.get("/update")
     assert response.status_code == 200
     assert response.content_type == "text/html; charset=utf-8"
+
+
+def test_getpixelsimulate(client):
+    response = client.get("/getpixelsimulate")
+    assert response.status_code == 200
+    assert response.content_type == "application/json"
+
+
+def test_setpixelinterval(client):
+    response = client.get("/setpixelemit")
+    assert response.status_code == 200
+    assert response.content_type == "application/json"
+
+
+def test_sequencehandler_start(client):
+    response = client.get("/sequence/start")
+    assert response.status_code == 200
+    assert response.content_type == "application/json"
+
+
+def test_sequencehandler_toggle(client):
+    response = client.get("/sequence/toggle")
+    assert response.status_code == 200
+    assert response.content_type == "application/json"
+
+
+def test_sequencehandler_stop(client):
+    response = client.get("/sequence/stop")
+    assert response.status_code == 200
+    assert response.content_type == "application/json"
+
+
+def test_sequencestopall(client):
+    response = client.get("/sequence/stopall")
+    assert response.status_code == 200
+    assert response.content_type == "text/html; charset=utf-8"
+
+
+def test_getsequences(client):
+    response = client.get("/getsequences")
+    assert response.status_code == 200
+    assert response.content_type == "application/json"
 
 
 def test_404(client):

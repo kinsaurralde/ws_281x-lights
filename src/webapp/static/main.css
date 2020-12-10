@@ -28,6 +28,7 @@ html {
   --input-border: var(--light-input-border);
   --input-background: var(--light-input-background);
   --border-color: var(--light-border-color);
+  --highlight-color: var(--color-yellow);
 
   /* Accessability */
   --slider-thumb-width: 0.75vw;

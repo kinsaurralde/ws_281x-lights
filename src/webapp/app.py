@@ -4,11 +4,11 @@ import argparse
 
 from collections import OrderedDict
 
-from flask import Flask, json, render_template, request
+from flask import Flask, json, render_template, request, redirect
 from flask_socketio import SocketIO
 from engineio.payload import Payload
 
-import python
+import modules
 
 from version import *
 
@@ -68,6 +68,7 @@ args = parser.parse_args()
 
 
 def getVersionInfo():
+    """Get version info"""
     return {
         "major": MAJOR,
         "minor": MINOR,
@@ -83,13 +84,15 @@ def getNosend():
 
 
 def open_yaml(path):
+    """Open yaml file and return as a dictionary"""
     data = {}
     with open(path) as open_file:
         data = yaml.safe_load(open_file)
     return data
 
 
-def create_response(data, ordered=False):
+def createResponse(data, ordered=False):
+    """Turn response into json"""
     payload = data
     if ordered:
         payload = OrderedDict(data)
@@ -103,11 +106,12 @@ def create_response(data, ordered=False):
 
 
 def error_response(message):
+    """Create error response"""
     data = {
         "error": True,
         "message": message,
     }
-    return create_response(data)
+    return createResponse(data)
 
 
 @app.errorhandler(404)
@@ -117,82 +121,191 @@ def page_not_found(e):
 
 @app.route("/")
 def index():
-    """Main control page"""
+    """Render main control page
+
+    Route: /
+
+    Methods: GET
+
+    Return: webpage
+    """
     return render_template("index.html")
 
 
 @app.route("/data", methods=["POST"])
 def handleData():
+    """Recieve JSON array of commands then send to controllers
+
+    Route: /data
+
+    Methods: POST
+
+    Return: JSON
+    """
     data = []
     try:
         data = json.loads(request.data)
     except ValueError:
         response = {"error": True, "message": "JSON Decode Error"}
-        return create_response(response)
+        return createResponse(response)
     controllers.setNoSend(getNosend())
     fails = controllers.send(data)
     response = {"error": len(fails) > 0, "message": fails}
-    return create_response(response)
+    return createResponse(response)
 
 
 @app.route("/docs")
 def docs():
-    """Documentation"""
-    return render_template("index.html")
+    """Redirect to documentation on Github
+
+    Route: /docs
+
+    Methods: GET
+
+    Return: redirect to webpage
+    """
+    return redirect("https://kinsaurralde.github.io/ws_281x-lights/#/")
 
 
 @app.route("/getanimations")
 def getanimations():
-    return create_response(animations_config)
+    """Return animations config
+    Route: /getanimations
+
+    Methods: GET
+
+    Return: JSON
+    """
+    return createResponse(animations_config)
 
 
 @app.route("/getcolors")
 def getcolors():
-    return create_response(colors_config)
+    """Return colors config
+
+    Route: /getcolors
+
+    Methods: GET
+
+    Return: JSON
+    """
+    return createResponse(colors_config)
 
 
 @app.route("/getcontrollers")
 def getcontrollers():
-    return create_response(controllers.getConfig(), True)
+    """Return controllers config
+
+    Route: /getcontrollers
+
+    Methods: GET
+
+    Return: JSON
+    """
+    return createResponse(controllers.getConfig(), True)
 
 
 @app.route("/getversioninfo")
 def getversioninfo():
-    return create_response(controllers.getControllerVersionInfo())
+    """Return controller version information
+
+    Route: /getversioninfo
+
+    Methods: GET
+
+    Return: JSON
+    """
+    return createResponse(controllers.getControllerVersionInfo())
 
 
 @app.route("/getinitialized")
 def getinitialized():
-    return create_response(controllers.getControllerInitialized())
+    """Return controller initialization status
+
+    Route: /getinitialized
+
+    Methods: GET
+
+    Return: JSON
+    """
+    return createResponse(controllers.getControllerInitialized())
 
 
 @app.route("/enable")
 def enableControllers():
+    """Enable selected controller
+
+    Route: /enable
+
+    Methods: GET
+
+    URL Parameters:
+
+        - name: controller name to enable
+
+    Return: JSON
+    """
     fails = controllers.enableController(request.args.get("name"))
     emitUpdatedData()
-    return create_response({"error": len(fails) > 0, "message": fails})
+    return createResponse({"error": len(fails) > 0, "message": fails})
 
 
 @app.route("/disable")
 def disableControllers():
+    """Disable selected controller
+
+    Route: /disable
+
+    Methods: GET
+
+    URL Parameters:
+
+        - name: controller name to disable
+
+    Return: JSON
+    """
     fails = controllers.disableController(request.args.get("name"))
     emitUpdatedData()
-    return create_response({"error": len(fails) > 0, "message": fails})
+    return createResponse({"error": len(fails) > 0, "message": fails})
 
 
 @app.route("/update")
 def update():
+    """Get update data (ping, etc)
+
+    Route: /update
+
+    Methods: GET
+
+    Return: String (undefined)
+    """
     emitUpdatedData()
     return "Emitted"
 
 
 @app.route("/getpixels")
 def getPixels():
-    return create_response(controllers.getPixels())
+    """Get current pixel colors (simulated)
+
+    Route: /getpixels
+
+    Methods: GET
+
+    Return: JSON
+    """
+    return createResponse(controllers.getPixels())
 
 
 @app.route("/getpixelsimulate")
 def getPixelSimulate():
+    """Get pixel simulate data
+
+    Route: /getpixelsimulate
+
+    Methods: GET
+
+    Return: JSON
+    """
     return {
         "active": args.pixel_simulate,
         "controllers": controllers.getControllerSizes(),
@@ -201,6 +314,19 @@ def getPixelSimulate():
 
 @app.route("/setpixelemit")
 def setPixelInterval():
+    """Set pixel emit config
+
+    Route: /setpixelemit
+
+    Methods: GET
+
+    URL Parameters:
+
+        - active: (bool) enable/disable pixel emit
+        - interval: (int) set time between emits in ms
+
+    Return: JSON
+    """
     active = request.args.get("active")
     interval = request.args.get("interval")
     if active is not None:
@@ -211,6 +337,141 @@ def setPixelInterval():
         "active": background.getPixelsActive(),
         "interval": background.getPixelInterval(),
     }
+
+
+@app.route("/sequence/<mode>")
+def sequenceHandler(mode):
+    """Start Stop or Toggle sequence
+
+    Route: /sequence/<mode>
+
+    Methods: GET
+
+    Mode:
+
+        - start
+        - toggle
+        - stop
+
+    URL Parameters:
+
+        - sequence: name of sequence
+        - function: name of function
+        - iterations: number of iterations (default: None (infinite))
+
+    Return: JSON
+    """
+    sequence = request.args.get("sequence")
+    function = request.args.get("function")
+    iterations = request.args.get("iterations", None)
+    response = {
+        "error": False,
+        "message": f"{mode} sequence {sequence} with function {function} {iterations} times",
+    }
+    fail = False
+    if mode == "start":
+        fail = not sequencer.run(sequence, function, iterations)
+    elif mode == "toggle":
+        # fail = not sequencer.toggle(sequence, function, iterations)
+        fail = True
+    elif mode == "stop":
+        fail = not sequencer.stop(sequence, function)
+    response["error"] = fail
+    return createResponse(response)
+
+
+@app.route("/sequence/stopall")
+def sequenceStopAll():
+    """Stop all running sequences
+
+    Route: /sequence/stopall
+
+    Methods: GET
+
+    Return: String (undefined)
+    """
+    sequencer.stopAll()
+    return "Stopped"
+
+
+@app.route("/getsequences")
+def getsequences():
+    """Get list of sequences
+
+    Route: /getsequences
+
+    Methods: GET
+
+    Return: JSON
+    """
+    return createResponse(sequencer.getSequences())
+
+
+@app.route("/schedule/<mode>")
+def scheduleHandler(mode):
+    """Start or Stop schedule
+
+    Route: /schedule/<mode>
+
+    Methods: GET
+
+    Mode:
+
+        - start
+        - stop
+
+    URL Parameters:
+
+        - schedule: name of schedule
+        - function: name of function
+
+    Return: JSON
+    """
+    schedule = request.args.get("schedule")
+    function = request.args.get("function")
+    response = {
+        "error": False,
+        "message": f"{mode} schedule {schedule} with function {function}",
+    }
+    fail = False
+    if mode == "start":
+        fail = not scheduler.start(schedule, function)
+    elif mode == "stop":
+        fail = not scheduler.stop(schedule, function)
+    response["error"] = fail
+    active_schedules = scheduler.getActiveSchedules()
+    socketio.emit("active_schedules", active_schedules)
+    return createResponse(response)
+
+
+@app.route("/getschedules")
+def getSchedules():
+    """Get list of schedules
+
+    Route: /getschedules
+
+    Methods: GET
+
+    Return: JSON
+    """
+    active_schedules = scheduler.getActiveSchedules()
+    socketio.emit("active_schedules", active_schedules)
+    return createResponse(scheduler.getSchedules())
+
+
+@app.route("/getactiveschedules")
+def getActiveSchedules():
+    """Get list of active schedules
+
+    Route: /getactiveschedules
+
+    Methods: GET
+
+    Return: JSON
+    """
+    active_schedules = scheduler.getActiveSchedules()
+    socketio.emit("active_schedules", active_schedules)
+    return createResponse(active_schedules)
 
 
 @socketio.on("connect")
@@ -249,6 +510,8 @@ def emitUpdatedData():
 animations_config = open_yaml("config/animations.yaml")
 colors_config = open_yaml("config/colors.yaml")
 controllers_config = open_yaml(args.config)
+sequences_config = open_yaml("config/sequences.yaml")
+schedules_config = open_yaml("config/schedules.yaml")
 
 if args.test:  # pragma: no cover
     for i, controller in enumerate(controllers_config["controllers"]):
@@ -258,10 +521,12 @@ controller_module = None
 if args.pixel_simulate:
     import controller as controller_module
 
-controllers = python.Controllers(
+controllers = modules.Controllers(
     controllers_config, args.nosend, getVersionInfo(), controller_module
 )
-background = python.Background(socketio, controllers, args.pixel_simulate)
+background = modules.Background(socketio, controllers, args.pixel_simulate)
+sequencer = modules.Sequencer(socketio, controllers, sequences_config, colors_config)
+scheduler = modules.Scheduler(sequencer, schedules_config)
 
 if __name__ == "__main__":  # pragma: no cover
     if args.background:

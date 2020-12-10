@@ -1,0 +1,10 @@
+---
+schedules:
+  - name: sample
+    module: schedules.sample
+    functions:
+      - test_a
+      - test_b
+      - test_c
+      - test_invalid
+    active: true

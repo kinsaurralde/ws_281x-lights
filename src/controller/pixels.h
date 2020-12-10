@@ -40,6 +40,7 @@ class Pixels {
 
     bool canShow(unsigned int ms = 0);
     void setDelay(unsigned int value);
+    unsigned int getDelay();
     void setSize(unsigned int size);
     unsigned int size();
     unsigned int getBrightness();

@@ -9,6 +9,8 @@ POST_TIMEOUT = 0.5
 
 
 class Controllers:
+    """Handles sending requests to controllers"""
+
     def __init__(self, config, nosend, version_info, controller_module):
         self.version_info = version_info
         self.nosend = nosend
@@ -24,71 +26,16 @@ class Controllers:
         self.config = {}
         self.controller_module = controller_module
         self.controllers = {}
+        self.alias = config.get("alias", {})
         self._setupConfig(config["controllers"])
         self.updateControllerLatencies()
 
-    def _setupConfig(self, controllers):
-        id_counter = 0
-        self.config = {}
-        for controller in controllers:
-            self.config[controller["name"]] = controller
-            url = controller["url"]
-            self.latencies[url] = None
-            if url not in self.urls:
-                self.urls[url] = []
-                if self.controller_module is not None:
-                    self.controllers[url] = self.controller_module.NeoPixels()
-            self.urls[url].append(controller["name"])
-            if controller["active"] == "disabled":
-                self.disableController(controller["name"])
-            self.initController(url, controller)
-            controller["id"] = id_counter
-        print(self.controllers)
-
-    def setNoSend(self, value):
+    def setNoSend(self, value: bool):
+        """Set nosend"""
         self.nosend = value
 
-    def initController(self, url, controller):
-        if url in self.disabled:
-            return
-        self.last_brightness[controller["name"]] = controller["init"]["brightness"]
-        self._send(
-            [],
-            url + "/init",
-            {"id": controller["strip_id"], "init": controller["init"]},
-        )
-        if url in self.controllers:
-            self.controllers[url].init(
-                {"id": controller["strip_id"], "init": controller["init"]}
-            )
-
-    def _send(self, fails, url, payload=None, controller_id=None):
-        thread = threading.Thread(
-            target=self._sending_thread, args=(fails, url, payload, controller_id)
-        )
-        thread.start()
-        return thread
-
-    def _sending_thread(self, fails, url, payload=None, controller_id=None):
-        self.send_counter += 1
-        if self.nosend:
-            print(f"Would have sent to {url}:\n{payload}")
-            fails.append(
-                {"url": url, "id": controller_id, "message": "No send is true"}
-            )
-            return None
-        try:
-            if payload is None:
-                return requests.get(url, timeout=GET_TIMEOUT)
-            return requests.post(url, data=json.dumps(payload), timeout=POST_TIMEOUT)
-        except requests.RequestException:
-            print(f"Failed to send to {url}")
-            fails.append(
-                {"url": url, "id": controller_id, "message": "Connection Error"}
-            )
-        return None
-
-    def disableController(self, name):
+    def disableController(self, name: str) -> list:
+        """Disable controller"""
         if name not in self.config:
             return [{"url": None, "id": name, "message": "Controller not found",}]
         url = self.config[name]["url"]
@@ -100,17 +47,19 @@ class Controllers:
             self.disabled[url].append(name)
         return []
 
-    def enableController(self, name):
+    def enableController(self, name: str) -> list:
+        """Enable controller"""
         if name not in self.config:
             return [{"url": None, "id": name, "message": "Controller not found",}]
         url = self.config[name]["url"]
         if url not in self.disabled:
             return [{"url": None, "id": name, "message": "Controller not disabled",}]
         self.disabled.pop(url)
-        self.initController(url, self.config[name])
+        self._initController(url, self.config[name])
         return []
 
     def updateControllerLatencies(self, background=None):
+        """Redetermine latency to controllers"""
         if self.nosend:
             return
         for url in self.latencies:
@@ -135,19 +84,22 @@ class Controllers:
                 self.latencies[url] = (previous + latency) / 2
         print("Controller Latencies", self.latencies)
 
-    def getControllerLatencies(self):
+    def getControllerLatencies(self) -> dict:
+        """Get controller latencies"""
         latency = {}
         for url in self.latencies:
             for controller in self.urls[url]:
                 latency[controller] = self.latencies[url]
         return latency
 
-    def getBackgroundData(self):
+    def getBackgroundData(self) -> dict:
+        """Get background data"""
         data = self.background_data
         self.background_data = {}
         return data
 
-    def getControllerVersionInfo(self):
+    def getControllerVersionInfo(self) -> dict:
+        """Get version info of controllers and webapp"""
         fails = []
         data = {}
         version_match = True
@@ -184,13 +136,15 @@ class Controllers:
             "hash_match": hash_match,
         }
 
-    def getControllerSizes(self):
+    def getControllerSizes(self) -> dict:
+        """Get number of leds on each controller"""
         result = {}
         for c in self.config:
             result[c] = self.config[c]["init"]["num_leds"]
         return result
 
-    def getControllerInitialized(self):
+    def getControllerInitialized(self) -> dict:
+        """Get whether controllers are initialzied"""
         fails = []
         data = {}
         for url in self.urls:
@@ -215,9 +169,11 @@ class Controllers:
                         data[controller] = response[response_index]
         return {"fails": fails, "initialized": data}
 
-    def send(self, commands):
+    def send(self, commands: list) -> list:
+        """Send commands to controllers"""
         queue = {}
         fails = []
+        commands = self._replaceSendAlias(commands)
         for command in commands:
             controller_name = command["id"]
             if controller_name not in self.config:
@@ -249,21 +205,16 @@ class Controllers:
             self.updateControllerLatencies()
         return fails
 
-    def getConfig(self):
+    def getConfig(self) -> dict:
+        """"Get controller config"""
         return self.config
 
-    def _brightness(self):
-        time.sleep(BRIGHTNESS_BUFFER_TIMER)
-        while len(self.brightness_queue) > 0:
-            name = list(self.brightness_queue.keys())[0]
-            self._send([], self.brightness_queue[name])
-            self.brightness_queue.pop(name)
-        self.brightness_timer_active = False
-
-    def getLastBrightness(self):
+    def getLastBrightness(self) -> int:
+        """Get last_brightness"""
         return self.last_brightness
 
-    def brightness(self, requests):
+    def brightness(self, requests: list):
+        """Change brightness of controllers"""
         for request in requests:
             name = request["name"]
             if name not in self.config:
@@ -281,10 +232,96 @@ class Controllers:
                 thread = threading.Thread(target=self._brightness())
                 thread.start()
 
-    def getPixels(self):
+    def getPixels(self) -> dict:
+        """Get current pixels (simulated)"""
         result = {}
         for i in self.controllers:
             pixels = self.controllers[i].getPixels()
             for j in range(min(len(self.urls[i]), len(pixels))):
                 result[self.urls[i][j]] = pixels[j]
         return result
+
+    def _setupConfig(self, controllers):
+        id_counter = 0
+        self.config = {}
+        for controller in controllers:
+            name = controller["name"]
+            if not controller["active"]:
+                continue
+            self.config[name] = controller
+            url = controller["url"]
+            self.latencies[url] = None
+            if url not in self.urls:
+                self.urls[url] = []
+                if self.controller_module is not None:
+                    self.controllers[url] = self.controller_module.NeoPixels()
+            self.urls[url].append(name)
+            if controller["active"] == "disabled":
+                self.disableController(name)
+            self._initController(url, controller)
+            controller["id"] = id_counter
+
+    def _initController(self, url: str, controller: dict):
+        if url in self.disabled:
+            return
+        self.last_brightness[controller["name"]] = controller["init"]["brightness"]
+        self._send(
+            [],
+            url + "/init",
+            {"id": controller["strip_id"], "init": controller["init"]},
+        )
+        if url in self.controllers:
+            self.controllers[url].init(
+                {"id": controller["strip_id"], "init": controller["init"]}
+            )
+
+    def _send(
+        self, fails: list, url: str, payload: dict = None, controller_id: str = None
+    ):
+        thread = threading.Thread(
+            target=self._sending_thread, args=(fails, url, payload, controller_id)
+        )
+        thread.start()
+        return thread
+
+    def _sending_thread(
+        self, fails: list, url: str, payload: dict = None, controller_id: str = None
+    ) -> dict:
+        self.send_counter += 1
+        if self.nosend:
+            fails.append(
+                {"url": url, "id": controller_id, "message": "No send is true"}
+            )
+            return None
+        try:
+            if payload is None:
+                return requests.get(url, timeout=GET_TIMEOUT)
+            return requests.post(url, data=json.dumps(payload), timeout=POST_TIMEOUT)
+        except requests.RequestException:
+            print(f"Failed to send to {url}")
+            fails.append(
+                {"url": url, "id": controller_id, "message": "Connection Error"}
+            )
+        return None
+
+    def _replaceSendAlias(self, commands: list) -> list:
+        new_commands = []
+        for command in commands:
+            if "id" not in command:
+                continue
+            if command["id"] in self.alias:
+                new_command = command.copy()
+                for name in self.alias[command["id"]]:
+                    new_command["id"] = name
+                    new_commands.append(new_command.copy())
+            else:
+                new_commands.append(command)
+        return new_commands
+
+    def _brightness(self):
+        time.sleep(BRIGHTNESS_BUFFER_TIMER)
+        while len(self.brightness_queue) > 0:
+            name = list(self.brightness_queue.keys())[0]
+            self._send([], self.brightness_queue[name])
+            self.brightness_queue.pop(name)
+        self.brightness_timer_active = False

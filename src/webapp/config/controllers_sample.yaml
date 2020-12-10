@@ -1,4 +1,19 @@
 ---
+alias:
+  all:
+    - tester_a_0
+    - tester_a_1
+    - tester_b_0
+    - tester_b_1
+    - tester_c_0
+  a:
+    - tester_a_0
+    - tester_a_1
+  b:
+    - tester_b_0
+    - tester_b_1
+  c:
+    - tester_c_0
 controllers:
   - name: tester_a_0
     url: http://localhost:6000

@@ -65,6 +65,10 @@ extern "C" {
         p->setDelay(value);
     }
 
+    unsigned int Pixels_getDelay(Pixels* p) {
+        return p->getDelay();
+    }
+
     void Pixels_setSize(Pixels* p, unsigned int value) {
         p->setSize(value);
     }

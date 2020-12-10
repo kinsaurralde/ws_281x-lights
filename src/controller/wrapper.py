@@ -66,6 +66,8 @@ class Pixels:
         self.lib.Pixels_canShow.argtypes = [ctypes.c_uint, ctypes.c_uint]
         self.lib.Pixels_canShow.restype = ctypes.c_bool
         self.lib.Pixels_setDelay.argtypes = [ctypes.c_uint, ctypes.c_uint]
+        self.lib.Pixels_getDelay.argtypes = [ctypes.c_void_p]
+        self.lib.Pixels_getDelay.restype = ctypes.c_uint
         self.lib.Pixels_setSize.argtypes = [ctypes.c_void_p, ctypes.c_uint]
         self.lib.Pixels_size.restype = ctypes.c_uint
         self.lib.Pixels_getBrightness.restype = ctypes.c_uint
@@ -89,6 +91,9 @@ class Pixels:
 
     def setDelay(self, value):
         self.lib.Pixels_setDelay(self.obj, value)
+
+    def getDelay(self):
+        return self.lib.Pixels_getDelay(self.obj)
 
     def setSize(self, value):
         self.lib.Pixels_setSize(self.obj, value)
