@@ -58,6 +58,7 @@ class Pixels {
     void wipe(AnimationArgs args);
     void rainbow(AnimationArgs args);
     void cycle(AnimationArgs args);
+    void randomCycle(AnimationArgs args);
 };
 
 #endif

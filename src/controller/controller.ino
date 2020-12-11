@@ -289,6 +289,9 @@ void handleData() {
             case Animation::cycle:
                 neopixels.pixels[id]->cycle(args);
                 break;
+            case Animation::random:
+                neopixels.pixels[id]->random(args);
+                break;
         }
         delete args.colors;
     }

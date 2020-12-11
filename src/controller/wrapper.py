@@ -84,6 +84,7 @@ class Pixels:
         self.lib.Pixels_pulse.argtypes = [ctypes.c_uint, AnimationArgs]
         self.lib.Pixels_rainbow.argtypes = [ctypes.c_uint, AnimationArgs]
         self.lib.Pixels_cycle.argtypes = [ctypes.c_uint, AnimationArgs]
+        self.lib.Pixels_randomCycle.argtypes = [ctypes.c_uint, AnimationArgs]
         self.obj = self.lib.Pixels_new(val, MAX_BRIGHTNESS)
 
     def canShow(self, ms):
@@ -139,6 +140,9 @@ class Pixels:
 
     def cycle(self, args):
         self.lib.Pixels_cycle(self.obj, args)
+
+    def randomCycle(self, args):
+        self.lib.Pixels_randomCycle(self.obj, args)
 
 
 class AnimationArgs(ctypes.Structure):

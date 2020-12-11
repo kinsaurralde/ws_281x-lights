@@ -5,5 +5,5 @@
 #define PATCH 0
 #define LABEL ""
 
-#define ESP_HASH "27c4799a0e2d384bcd55ada40011633ba79b9c7e"
-#define RPI_HASH "2293ec4fb886907f2ac6bd607c815379c31af5c8"
+#define ESP_HASH "317c31de069175dd3e153b364ecd7ed20163a39e"
+#define RPI_HASH "1c3a2024165b58974ce8235b9122ba92feb937dc"

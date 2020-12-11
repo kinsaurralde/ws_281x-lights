@@ -13,6 +13,21 @@
 
 #define BRIGHTNESS_MUTLIPLIER 0.5   // value of 0.5 means half brightness
 
+#define RED         16711680
+#define GREEN       65280
+#define BLUE        255
+#define YELLOW      16769280
+#define CYAN        65535
+#define MAGENTA     16711935
+#define ORANGE      16737280
+#define PURPLE      3604735
+#define TURQUOISE   65335
+#define PINK        16711735
+
+#define NUM_COLORS  10 
+
+static unsigned int COLORS[NUM_COLORS] = {RED, GREEN, BLUE, YELLOW, CYAN, MAGENTA, ORANGE, PURPLE, TURQUOISE, PINK};
+
 Pixels::Pixels(unsigned int num_leds, unsigned int max_brightness) : num_leds(num_leds), max_brightness(max_brightness) {
     initialized = false;
     brightness = 100;
@@ -318,6 +333,30 @@ void Pixels::cycle(AnimationArgs args) {
         for (unsigned int j = 0; j < steps; j++) {
             incArgs.list->set(i * steps + j, mixColors(args.colors->get(i), args.colors->get(i + 1), j * 100.0 / steps));
         }
+    }
+    setAll(incArgs.list->get(0));
+    incrementor = &Pixels::cycler;
+}
+
+/*
+    AnimationArgs:
+        arg1:           seed
+        arg2:           spacing length   
+*/
+void Pixels::randomCycle(AnimationArgs args) {
+    resetIncArgs(incArgs, 0, false);
+    unsigned int seed = args.arg1;
+    unsigned int list_size = NUM_COLORS * 5;
+    delete incArgs.list;
+    incArgs.list = new List(list_size);
+    srand(seed);
+    unsigned int previous_index = 0;
+    for (unsigned int i = 0; i < list_size; i++) {
+        unsigned int index = rand() % NUM_COLORS;
+        while (index == previous_index) {
+            index = rand() % NUM_COLORS;
+        }
+        incArgs.list->set(i, COLORS[index]);
     }
     setAll(incArgs.list->get(0));
     incrementor = &Pixels::cycler;
