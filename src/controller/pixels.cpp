@@ -341,7 +341,6 @@ void Pixels::cycle(AnimationArgs args) {
 /*
     AnimationArgs:
         arg1:           seed
-        arg2:           spacing length   
 */
 void Pixels::randomCycle(AnimationArgs args) {
     resetIncArgs(incArgs, 0, false);
@@ -360,4 +359,23 @@ void Pixels::randomCycle(AnimationArgs args) {
     }
     setAll(incArgs.list->get(0));
     incrementor = &Pixels::cycler;
+}
+
+/*
+    AnimationArgs:
+        arg6:           reverse incrementor     (true / false)
+        arg7:           reverse pixels          (true / false)
+*/
+void Pixels::reverser(AnimationArgs args) {
+    if (args.arg6) {
+        incArgs.arg6 = !incArgs.arg6;
+    }
+    if (args.arg7) {
+        unsigned int last_pixel = num_leds - 1;
+        for (unsigned int i; i < num_leds / 2; i++) {
+            unsigned int temp = data.main[i];
+            data.main[i] = data.main[last_pixel - i];
+            data.main[last_pixel - i] = temp;
+        }
+    }
 }

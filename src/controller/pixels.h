@@ -59,6 +59,7 @@ class Pixels {
     void rainbow(AnimationArgs args);
     void cycle(AnimationArgs args);
     void randomCycle(AnimationArgs args);
+    void reverser(AnimationArgs args);
 };
 
 #endif
