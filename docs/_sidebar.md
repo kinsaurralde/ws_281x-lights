@@ -35,6 +35,8 @@
         * [Wipe](animations/animations.md#Wipe)
         * [Rainbow](animations/animations.md#Rainbow)
         * [Cycle](animations/animations.md#Cycle)
+        * [randomCycle](animations/animations.md#randomCycle)
+        * [Reverser](animations/animations.md#Reverser)
 
 * Increment Functions
 
