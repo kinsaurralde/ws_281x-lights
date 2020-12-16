@@ -131,6 +131,10 @@ def index():
     """
     return render_template("index.html")
 
+@app.route("/mobile")
+def mobileIndex():
+    return render_template("mobile.html")
+
 
 @app.route("/data", methods=["POST"])
 def handleData():
