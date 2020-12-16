@@ -8,6 +8,7 @@
     <meta name="description" content="WS281X LED Control Panel" />
     <meta name="author" content="Kyle Insaurralde" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="manifest" href="../static/manifest.json" />
     <!-- <script src="../static/lib/inobounce.js"></script> -->
     <link rel="apple-touch-icon" sizes="192x192" href="../static/icons/icon-192x192.png" />
@@ -136,5 +137,17 @@
 
   <script>
     window.scroll(0, 1)
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register('./service-worker.js')
+        .then(function (registration) {
+          console.log('Service Worker Registered!');
+          return registration;
+        })
+        .catch(function (err) {
+          console.error('Unable to register service worker.', err);
+        });
+    }
   </script>
 </html>

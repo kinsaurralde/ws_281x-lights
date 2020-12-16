@@ -5,6 +5,7 @@ import argparse
 from collections import OrderedDict
 
 from flask import Flask, json, render_template, request, redirect
+from flask import send_from_directory
 from flask_socketio import SocketIO
 from engineio.payload import Payload
 
@@ -134,6 +135,18 @@ def index():
 @app.route("/mobile")
 def mobileIndex():
     return render_template("mobile.html")
+
+
+@app.route("/offline")
+def offline():
+    return render_template("offline.html")
+
+@app.route('/service-worker.js')
+def sw():
+    try:
+        return app.send_static_file('service_worker.js')
+    except Exception as e:
+        return e
 
 
 @app.route("/data", methods=["POST"])

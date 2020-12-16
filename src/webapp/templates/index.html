@@ -1,250 +1,264 @@
 <!DOCTYPE html>
 
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
 
-    <title>LED</title>
-    <meta name="description" content="LED Control" />
-    <link rel="stylesheet" href="../static/main.css" />
-    <link rel="stylesheet" href="../static/project.css" />
-    <script src="static/lib/socket.io.js"></script>
-    <script defer src="../static/helpers.js"></script>
-    <script defer src="../static/controllers.js"></script>
-    <script defer src="../static/groups.js"></script>
-    <script defer src="../static/animations.js"></script>
-    <script defer src="../static/colors.js"></script>
-    <script defer src="../static/sequences.js"></script>
-    <script defer src="../static/schedules.js"></script>
-    <script defer src="../static/pixel_strip.js"></script>
-    <script defer src="../static/pixel_display.js"></script>
-  </head>
+<head>
+  <meta charset="utf-8" />
 
-  <body>
-    <div class="divider"></div>
-    <div class="section-flex-no-border space-between">
-      <div class="section-title">Controllers</div>
-      <div>
-        <button type="button" onclick="showSection('section-controllers')">Show</button>
-        <button type="button" onclick="hideSection('section-controllers')">Hide</button>
-      </div>
-    </div>
-    <div class="space-1"></div>
-    <div id="section-controllers">
-      <table id="controller-table">
-        <thead>
-          <tr>
-            <th scope="col">Name</th>
-            <th scope="col">Brightness</th>
-            <th scope="col">Number of LEDs</th>
-            <th scope="col">Max milliwatts</th>
-            <th scope="col">Target Group ID</th>
-            <th scope="col">Ping (ms)</th>
-            <th scope="col">Status</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
+  <title>LED</title>
+  <meta name="description" content="LED Control" />
+  <link rel="stylesheet" href="../static/main.css" />
+  <link rel="stylesheet" href="../static/project.css" />
+  <script src="static/lib/socket.io.js"></script>
+  <script defer src="../static/helpers.js"></script>
+  <script defer src="../static/controllers.js"></script>
+  <script defer src="../static/groups.js"></script>
+  <script defer src="../static/animations.js"></script>
+  <script defer src="../static/colors.js"></script>
+  <script defer src="../static/sequences.js"></script>
+  <script defer src="../static/schedules.js"></script>
+  <script defer src="../static/pixel_strip.js"></script>
+  <script defer src="../static/pixel_display.js"></script>
+</head>
 
-    <div class="divider"></div>
-    <div class="section-flex-no-border space-between">
-      <div class="section-title">Custom Target Groups</div>
-      <div>
-        <button type="button" onclick="showSection('section-target-group')">Show</button>
-        <button type="button" onclick="hideSection('section-target-group')">Hide</button>
-      </div>
-    </div>
-    <div id="section-target-group">
-      <table id="groups-table"></table>
-    </div>
-
-    <div class="divider"></div>
-    <div class="section-flex-no-border space-between">
-      <div class="section-title">Colors</div>
-      <div>
-        <button type="button" onclick="showSection('section-colors')">Show</button>
-        <button type="button" onclick="hideSection('section-colors')">Hide</button>
-      </div>
-    </div>
-
-    <div id="section-colors">
-      <div class="divider"></div>
-      <div id="colors-noedit">
-        <input type="number" min="-1" value="-1" id="colors-noedit-target" />
-      </div>
-      <div class="divider"></div>
-      <div id="colors-edit"></div>
-      <div>
-        <button type="button" id="colors-add">Add Color</button>
-        <button type="button" id="colors-remove">Remove Color</button>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-    <div class="section-flex-no-border space-between">
-      <div class="section-title">Animations</div>
-      <div>
-        <button type="button" onclick="showSection('section-animations')">Show</button>
-        <button type="button" onclick="hideSection('section-animations')">Hide</button>
-      </div>
-    </div>
-    <div id="section-animations">
-      <div class="space-3"></div>
-      <div id="main-control">
-        <table id="animations-table">
-          <thead>
-            <tr>
-              <th scope="col">Animation</th>
-              <th scope="col">Color 1</th>
-              <th scope="col">Color 2</th>
-              <th scope="col">Colors</th>
-              <th scope="col">Arg1</th>
-              <th scope="col">Arg2</th>
-              <th scope="col">Arg3</th>
-              <th scope="col">Arg4</th>
-              <th scope="col">Arg5</th>
-              <th scope="col">Arg6</th>
-              <th scope="col">Arg7</th>
-              <th scope="col">Arg8</th>
-              <th scope="col">Wait ms</th>
-              <th scope="col">Steps</th>
-              <th scope="col">Target</th>
-              <th scope="col">Send</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-    <div class="section-flex-no-border space-between">
-      <div class="section-title">Sequences</div>
-      <div>
-        <button type="button" onclick="showSection('section-sequences')">Show</button>
-        <button type="button" onclick="hideSection('section-sequences')">Hide</button>
-      </div>
-    </div>
-    <div id="section-sequences">
-      <div class="divider"></div>
-      <div id="sequences-div"></div>
-      <div>
-        <button type="button" id="sequences-stopall">Stop All</button>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-    <div class="section-flex-no-border space-between">
-      <div class="section-title">Scheduler</div>
-      <div>
-        <button type="button" onclick="showSection('section-scheduler')">Show</button>
-        <button type="button" onclick="hideSection('section-scheduler')">Hide</button>
-      </div>
-    </div>
-    <div id="section-scheduler">
-      <div class="divider"></div>
-      <div id="scheduler-div"></div>
-      <div>
-        <!-- <button type="button" id="scheduler-stopall">Stop All</button> -->
-      </div>
-    </div>
-
-    <div id="section-display-wrapper">
-      <div class="divider"></div>
-      <div class="section-flex-no-border space-between">
-        <div class="section-title">Display</div>
-        <div>
-          <button type="button" onclick="showSection('section-display')">Show</button>
-          <button type="button" onclick="hideSection('section-display')">Hide</button>
-        </div>
-      </div>
-      <div class="divider"></div>
-      <div class="section-flex-no-border">
-        <div class="section-title-secondary">Pixels Per Row</div>
-        <div class="space-s-2"></div>
-        <input type="number" id="pixel-display-pixel-per-row" value="60" min="10" max="150" step="10" />
-      </div>
-      <div id="section-display">
-        <div id="pixel-display"></div>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-    <div class="section-flex-no-border space-between">
-      <div class="section-title">Status</div>
-      <div>
-        <button type="button" onclick="showSection('section-status')">Show</button>
-        <button type="button" onclick="hideSection('section-status')">Hide</button>
-      </div>
-    </div>
-    <div id="section-status">
-      <div class="space-5"></div>
-      <table id="status-table">
-        <thead>
-          <tr>
-            <th scope="col">Controller</th>
-            <th scope="col">Initialized</th>
-            <th scope="col">Connected</th>
-            <th scope="col">Version</th>
-            <th scope="col">Hash match</th>
-            <th scope="col">Mode</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-      <div class="space-5"></div>
-      <div class="divider"></div>
-      Webapp Connected:&nbsp;<span id="status-webapp-connected" class="red">False</span><br />
-      Webapp Version:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="status-webapp-version"></span><br />
-      Webapp esp hash:&nbsp;&nbsp;&nbsp;<span id="status-webapp-esphash"></span><br />
-      Webapp rpi hash:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="status-webapp-rpihash"></span><br />
-    </div>
-    <div class="divider"></div>
-
+<body>
+  <div class="divider"></div>
+  <div class="section-flex-no-border space-between">
+    <div class="section-title">Controllers</div>
     <div>
-      <button type="button" class="width-10" onclick="window.open('https://kinsaurralde.com')">kinsaurralde.com</button>
-      <button type="button" class="width-10" onclick="window.open('https://github.com/kinsaurralde/ws_281x-lights')">
-        Github
-      </button>
-      <button type="button" class="width-10" onclick="window.open('https://kinsaurralde.github.io/ws_281x-lights/#/')">
-        Documentation
-      </button>
+      <button type="button" onclick="showSection('section-controllers')">Show</button>
+      <button type="button" onclick="hideSection('section-controllers')">Hide</button>
+    </div>
+  </div>
+  <div class="space-1"></div>
+  <div id="section-controllers">
+    <table id="controller-table">
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Brightness</th>
+          <th scope="col">Number of LEDs</th>
+          <th scope="col">Max milliwatts</th>
+          <th scope="col">Target Group ID</th>
+          <th scope="col">Ping (ms)</th>
+          <th scope="col">Status</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="divider"></div>
+  <div class="section-flex-no-border space-between">
+    <div class="section-title">Custom Target Groups</div>
+    <div>
+      <button type="button" onclick="showSection('section-target-group')">Show</button>
+      <button type="button" onclick="hideSection('section-target-group')">Hide</button>
+    </div>
+  </div>
+  <div id="section-target-group">
+    <table id="groups-table"></table>
+  </div>
+
+  <div class="divider"></div>
+  <div class="section-flex-no-border space-between">
+    <div class="section-title">Colors</div>
+    <div>
+      <button type="button" onclick="showSection('section-colors')">Show</button>
+      <button type="button" onclick="hideSection('section-colors')">Hide</button>
+    </div>
+  </div>
+
+  <div id="section-colors">
+    <div class="divider"></div>
+    <div id="colors-noedit">
+      <input type="number" min="-1" value="-1" id="colors-noedit-target" />
     </div>
     <div class="divider"></div>
+    <div id="colors-edit"></div>
+    <div>
+      <button type="button" id="colors-add">Add Color</button>
+      <button type="button" id="colors-remove">Remove Color</button>
+    </div>
+  </div>
 
-    <script>
-      const socket = io()
+  <div class="divider"></div>
+  <div class="section-flex-no-border space-between">
+    <div class="section-title">Animations</div>
+    <div>
+      <button type="button" onclick="showSection('section-animations')">Show</button>
+      <button type="button" onclick="hideSection('section-animations')">Hide</button>
+    </div>
+  </div>
+  <div id="section-animations">
+    <div class="space-3"></div>
+    <div id="main-control">
+      <table id="animations-table">
+        <thead>
+          <tr>
+            <th scope="col">Animation</th>
+            <th scope="col">Color 1</th>
+            <th scope="col">Color 2</th>
+            <th scope="col">Colors</th>
+            <th scope="col">Arg1</th>
+            <th scope="col">Arg2</th>
+            <th scope="col">Arg3</th>
+            <th scope="col">Arg4</th>
+            <th scope="col">Arg5</th>
+            <th scope="col">Arg6</th>
+            <th scope="col">Arg7</th>
+            <th scope="col">Arg8</th>
+            <th scope="col">Wait ms</th>
+            <th scope="col">Steps</th>
+            <th scope="col">Target</th>
+            <th scope="col">Send</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
 
-      const webapp_connected_div = document.getElementById("status-webapp-connected")
+  <div class="divider"></div>
+  <div class="section-flex-no-border space-between">
+    <div class="section-title">Sequences</div>
+    <div>
+      <button type="button" onclick="showSection('section-sequences')">Show</button>
+      <button type="button" onclick="hideSection('section-sequences')">Hide</button>
+    </div>
+  </div>
+  <div id="section-sequences">
+    <div class="divider"></div>
+    <div id="sequences-div"></div>
+    <div>
+      <button type="button" id="sequences-stopall">Stop All</button>
+    </div>
+  </div>
 
-      socket.on("connect", () => {
-        console.log("Connected")
-        document.documentElement.style.setProperty("--connection-outline", "0vw")
-        webapp_connected_div.textContent = "True"
-        webapp_connected_div.className = "green"
-      })
-      socket.on("disconnect", () => {
-        console.log("Disconnected")
-        document.documentElement.style.setProperty("--connection-outline", "1vw")
-        webapp_connected_div.textContent = "False"
-        webapp_connected_div.className = "red"
-      })
+  <div class="divider"></div>
+  <div class="section-flex-no-border space-between">
+    <div class="section-title">Scheduler</div>
+    <div>
+      <button type="button" onclick="showSection('section-scheduler')">Show</button>
+      <button type="button" onclick="hideSection('section-scheduler')">Hide</button>
+    </div>
+  </div>
+  <div id="section-scheduler">
+    <div class="divider"></div>
+    <div id="scheduler-div"></div>
+    <div>
+      <!-- <button type="button" id="scheduler-stopall">Stop All</button> -->
+    </div>
+  </div>
 
-      window.onload = function () {
-        window.controllers = new Controllers()
-        window.animations = new Animations()
-        window.colors = new Colors()
-        window.groups = new Groups()
-        window.pixel_display = new PixelDisplay()
-        window.sequences = new Sequences()
-        window.schedules = new Schedules()
-        socket.emit("webpage_loaded")
-      }
+  <div id="section-display-wrapper">
+    <div class="divider"></div>
+    <div class="section-flex-no-border space-between">
+      <div class="section-title">Display</div>
+      <div>
+        <button type="button" onclick="showSection('section-display')">Show</button>
+        <button type="button" onclick="hideSection('section-display')">Hide</button>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="section-flex-no-border">
+      <div class="section-title-secondary">Pixels Per Row</div>
+      <div class="space-s-2"></div>
+      <input type="number" id="pixel-display-pixel-per-row" value="60" min="10" max="150" step="10" />
+    </div>
+    <div id="section-display">
+      <div id="pixel-display"></div>
+    </div>
+  </div>
 
-      function loadedControllers() {
-        groups.init(controllers.getNames())
-      }
-    </script>
-  </body>
+  <div class="divider"></div>
+  <div class="section-flex-no-border space-between">
+    <div class="section-title">Status</div>
+    <div>
+      <button type="button" onclick="showSection('section-status')">Show</button>
+      <button type="button" onclick="hideSection('section-status')">Hide</button>
+    </div>
+  </div>
+  <div id="section-status">
+    <div class="space-5"></div>
+    <table id="status-table">
+      <thead>
+        <tr>
+          <th scope="col">Controller</th>
+          <th scope="col">Initialized</th>
+          <th scope="col">Connected</th>
+          <th scope="col">Version</th>
+          <th scope="col">Hash match</th>
+          <th scope="col">Mode</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div class="space-5"></div>
+    <div class="divider"></div>
+    Webapp Connected:&nbsp;<span id="status-webapp-connected" class="red">False</span><br />
+    Webapp Version:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="status-webapp-version"></span><br />
+    Webapp esp hash:&nbsp;&nbsp;&nbsp;<span id="status-webapp-esphash"></span><br />
+    Webapp rpi hash:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="status-webapp-rpihash"></span><br />
+  </div>
+  <div class="divider"></div>
+
+  <div>
+    <button type="button" class="width-10" onclick="window.open('https://kinsaurralde.com')">kinsaurralde.com</button>
+    <button type="button" class="width-10" onclick="window.open('https://github.com/kinsaurralde/ws_281x-lights')">
+      Github
+    </button>
+    <button type="button" class="width-10" onclick="window.open('https://kinsaurralde.github.io/ws_281x-lights/#/')">
+      Documentation
+    </button>
+  </div>
+  <div class="divider"></div>
+
+  <script>
+    const socket = io()
+
+    const webapp_connected_div = document.getElementById("status-webapp-connected")
+
+    socket.on("connect", () => {
+      console.log("Connected")
+      document.documentElement.style.setProperty("--connection-outline", "0vw")
+      webapp_connected_div.textContent = "True"
+      webapp_connected_div.className = "green"
+    })
+    socket.on("disconnect", () => {
+      console.log("Disconnected")
+      document.documentElement.style.setProperty("--connection-outline", "1vw")
+      webapp_connected_div.textContent = "False"
+      webapp_connected_div.className = "red"
+    })
+
+    window.onload = function () {
+      window.controllers = new Controllers()
+      window.animations = new Animations()
+      window.colors = new Colors()
+      window.groups = new Groups()
+      window.pixel_display = new PixelDisplay()
+      window.sequences = new Sequences()
+      window.schedules = new Schedules()
+      socket.emit("webpage_loaded")
+    }
+
+    function loadedControllers() {
+      groups.init(controllers.getNames())
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register('./service-worker.js')
+        .then(function (registration) {
+          console.log('Service Worker Registered!');
+          return registration;
+        })
+        .catch(function (err) {
+          console.error('Unable to register service worker.', err);
+        });
+    }
+  </script>
+</body>
+
 </html>
