@@ -506,6 +506,10 @@ def emitUpdatedData():
     background.updateData()
     background.emitUpdate()
 
+@app.route("/test")
+def test():
+    return render_template("test.html")
+
 
 animations_config = open_yaml("config/animations.yaml")
 colors_config = open_yaml("config/colors.yaml")
