@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+import time
 import argparse
 
 from collections import OrderedDict
@@ -134,7 +135,7 @@ def index():
 
 @app.route("/mobile")
 def mobileIndex():
-    return render_template("mobile.html")
+    return render_template("mobile.html", timestamp=int(time.time()), colors=colors_config)
 
 
 @app.route("/offline")

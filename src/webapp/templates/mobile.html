@@ -11,6 +11,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="manifest" href="../static/manifest.json" />
     <!-- <script src="../static/lib/inobounce.js"></script> -->
+    <script src="../static/helpers.js"></script>
+    <script src="../static/pwa.js"></script>
     <link rel="apple-touch-icon" sizes="192x192" href="../static/icons/icon-192x192.png" />
     <link rel="stylesheet" href="../static/main.css" />
     <link rel="stylesheet" href="../static/mobile.css" />
@@ -51,24 +53,13 @@
       <div class="mobile-section">
         <div class="mobile-section-body">
           <div class="mobile-section-title">Colors</div>
-          <div class="mobile-container">
-            <div class="mobile-color-box" style="background-color: black;"></div>
-            <div class="mobile-color-box" style="background-color: red;"></div>
-            <div class="mobile-color-box" style="background-color: green;"></div>
-            <div class="mobile-color-box" style="background-color: blue;"></div>
-            <div class="mobile-color-box" style="background-color: yellow;"></div>
-            <div class="mobile-color-box" style="background-color: magenta;"></div>
-            <div class="mobile-color-box" style="background-color: cyan;"></div>
-            <div class="mobile-color-box" style="background-color: purple;"></div>
-            <div class="mobile-color-box" style="background-color: orange;"></div>
-            <div class="mobile-color-box" style="background-color: turquoise;"></div>
-            <div class="mobile-color-box" style="background-color: hotpink;"></div>
-            <div class="mobile-color-box" style="background-color: black;"></div>
-            <div class="mobile-color-box" style="background-color: black;"></div>
-            <div class="mobile-color-box" style="background-color: black;"></div>
-            <div class="mobile-color-box" style="background-color: black;"></div>
-            <div class="mobile-color-box" style="background-color: black;"></div>
-            <div class="mobile-color-box" style="background-color: black;"></div>
+            <div class="mobile-container">
+              {% for c in colors["colors"]["noedit"] %}
+                {% set r = c["value"][0] %}
+                {% set g = c["value"][1] %}
+                {% set b = c["value"][2] %}
+                <div class="mobile-color-box" style="background-color: rgb({{r}}, {{g}}, {{b}});" onclick="simpleColor({{r}}, {{g}}, {{b}})"></div>
+              {% endfor %}
           </div>
         </div>
         <span class="mobile-section-expand">
@@ -118,14 +109,14 @@
         <div class="mobile-section-body">
           <div class="mobile-section-title">Other</div>
           <div class="mobile-container">
-            <div class="mobile-box mobile-box-wide"></div>
-            <div class="mobile-box mobile-box-wide"></div>
-            <div class="mobile-box mobile-box-wide"></div>
-            <div class="mobile-box mobile-box-wide"></div>
-            <div class="mobile-box mobile-box-wide"></div>
-            <div class="mobile-box mobile-box-wide"></div>
-            <div class="mobile-box mobile-box-wide"></div>
-            <div class="mobile-box mobile-box-wide"></div>
+            <div class="mobile-button-box">Timestamp:<br>{{timestamp}}</div>
+            <div class="mobile-button-box"></div>
+            <div class="mobile-button-box"></div>
+            <div class="mobile-button-box"></div>
+            <div class="mobile-button-box"></div>
+            <div class="mobile-button-box"></div>
+            <div class="mobile-button-box"></div>
+            <div class="mobile-button-box"></div>
           </div>
         </div>
         <span class="mobile-section-expand">
