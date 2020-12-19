@@ -66,3 +66,34 @@ animations:
     arg1: 
       label: Steps between colors
       default: 50
+presets:
+  - name: 'Blue Pulse'
+    args:
+      animation: 2
+      colors: [255]
+      arg1: 20
+      arg2: 20
+      inc_steps: 2
+  - name: Rainbow
+    args:
+      animation: 3
+  - name: Cycle
+    args:
+      animation: 4
+      colors: [16711680, 65280, 255]
+      color_bg: -1
+      arg1: 50
+  - name: 'Green Wipe F'
+    args:
+      animation: 1
+      color: 65280
+      color_bg: -1
+      arg1: 1
+      arg6: false
+  - name: 'Red Wipe R'
+    args:
+      animation: 1
+      color: 16711680
+      color_bg: -1
+      arg1: 1
+      arg6: true

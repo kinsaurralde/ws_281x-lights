@@ -1,8 +1,8 @@
 # Version Information
 MAJOR				= 2
 MINOR				= 2
-PATCH				= 0
-LABEL				= 
+PATCH				= 1
+LABEL				= pwa
 
 # Paths
 
@@ -99,7 +99,7 @@ run_app:
 	cd ${WEBAPP_DIR} && python3 app.py -d --config ${WEBAPP_CONFIG_ARG}
 
 run_app_simulate:
-	cd ${WEBAPP_DIR} && python3 app.py -s --config ${WEBAPP_CONFIG_ARG}
+	cd ${WEBAPP_DIR} && python3 app.py -d -s --config ${WEBAPP_CONFIG_ARG}
 
 run_app_nosend:
 	cd ${WEBAPP_DIR} && python3 app.py -d --nosend --config ${WEBAPP_CONFIG_ARG}
@@ -135,9 +135,9 @@ node_modules:
 
 lint: all clean
 	${PRETTIER} ${PRETTIER_CONIG} --write ${CSSJS_DIR}*.css
-	${PRETTIER} ${PRETTIER_CONIG} --write ${HTML_DIR}*.html
+	${PRETTIER} ${PRETTIER_CONIG} --parser html --write ${HTML_DIR}*.html*
 	find src/ -iname *.js | xargs ${CLANG_FORMAT} -i
-	${HTML_VALIDATE} ${HTML_VALIDATE_CONFG} ${HTML_DIR}*.html
+	${HTML_VALIDATE} ${HTML_VALIDATE_CONFG} ${HTML_DIR}*.html*
 	${ESLINT} ${ESLINT_CONFIG} ${CSSJS_DIR}*.js
 	python3 -m black ${PY_FILES}
 	python3 -m pylint ${PYLINT_CONFIG} ${PY_FILES}

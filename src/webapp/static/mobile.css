@@ -4,6 +4,10 @@ body {
   overflow: hidden;
 }
 
+#main-page {
+  height: 100vh;
+}
+
 .mobile-section {
   height: 16vh;
   display: flex;

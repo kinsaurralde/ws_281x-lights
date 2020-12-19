@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+
+    <title>WS281X LEDs</title>
+    <meta name="description" content="WS281X LED Control Panel" />
+    <meta name="author" content="Kyle Insaurralde" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="manifest" href="../static/manifest.json" />
+    <!-- <script src="../static/lib/inobounce.js"></script> -->
+    <script src="../static/helpers.js"></script>
+    <script src="../static/pwa.js"></script>
+    <link
+      rel="apple-touch-icon"
+      sizes="192x192"
+      href="../static/icons/icon-192x192.png"
+    />
+    <link rel="stylesheet" href="../static/main.css" />
+    <link rel="stylesheet" href="../static/mobile.css" />
+  </head>
+
+  <body>
+    <div id="main-page">
+      <div class="mobile-section-divider"></div>
+      <div class="mobile-section">
+        <div class="mobile-section-body">
+          <div class="mobile-section-title">Controllers</div>
+          <div class="mobile-container">
+            <button
+              type="button"
+              class="mobile-button-box"
+              style="border-color: green;"
+            >
+              tester_a<br />10.351 ms
+            </button>
+            <button
+              type="button"
+              class="mobile-button-box"
+              style="border-color: red;"
+            >
+              tester_b<br />ERROR
+            </button>
+            <button
+              type="button"
+              class="mobile-button-box"
+              style="border-color: green;"
+            >
+              tester_c<br />103.587 ms
+            </button>
+            <button
+              type="button"
+              class="mobile-button-box"
+              style="border-color: yellow;"
+            >
+              tester_c<br />123.781 ms
+            </button>
+            <div class="mobile-blank-box"></div>
+            <div class="mobile-blank-box"></div>
+            <div class="mobile-blank-box"></div>
+            <div class="mobile-blank-box"></div>
+          </div>
+        </div>
+        <span class="mobile-section-expand">
+          <img
+            class="mobile-expand-icon"
+            src="../static/icons/right_arrow.png"
+            alt="Expand Controllers Section"
+          />
+        </span>
+      </div>
+      <div class="mobile-section-divider"></div>
+      <div class="mobile-section">
+        <div class="mobile-section-body">
+          <div class="mobile-section-title">Brightness</div>
+          <input
+            type="range"
+            class="mobile-brightness-slider"
+            id="main-brightness-slider"
+            min="0"
+            max="255"
+          />
+        </div>
+        <span class="mobile-section-expand">
+          <img
+            class="mobile-expand-icon"
+            src="../static/icons/right_arrow.png"
+            alt="Expand Brightness Section"
+          />
+        </span>
+      </div>
+      <div class="mobile-section-divider"></div>
+      <div class="mobile-section">
+        <div class="mobile-section-body">
+          <div class="mobile-section-title">Colors</div>
+          <div class="mobile-container">
+            {% for c in colors["colors"]["noedit"] %} {% set r = c["value"][0]
+            %} {% set g = c["value"][1] %} {% set b = c["value"][2] %}
+            <div
+              class="mobile-color-box"
+              style="background-color: rgb({{r}}, {{g}}, {{b}});"
+              onclick="simpleColor({{r}}, {{g}}, {{b}})"
+            ></div>
+            {% endfor %} {% for i in range(colors["colors"]["noedit"]|length, 7)
+            %}
+            <div class="mobile-blank-box"></div>
+            {% endfor %}
+          </div>
+        </div>
+        <span class="mobile-section-expand">
+          <img
+            class="mobile-expand-icon"
+            src="../static/icons/right_arrow.png"
+            alt="Expand Colors Section"
+          />
+        </span>
+      </div>
+      <div class="mobile-section-divider"></div>
+      <div class="mobile-section">
+        <div class="mobile-section-body">
+          <div class="mobile-section-title">Animations</div>
+          <div class="mobile-container">
+            {% for animation in animation_presets %}
+            <button
+              type="button"
+              class="mobile-button-box"
+              onclick="simpleAnimation({{animation['args']}})"
+            >
+              {{animation["name"]}}
+            </button>
+            {% endfor %} {% for i in range(animation_presets|length, 7) %}
+            <div class="mobile-blank-box"></div>
+            {% endfor %}
+          </div>
+        </div>
+        <span class="mobile-section-expand">
+          <img
+            class="mobile-expand-icon"
+            src="../static/icons/right_arrow.png"
+            alt="Expand Animations Section"
+          />
+        </span>
+      </div>
+      <div class="mobile-section-divider"></div>
+      <div class="mobile-section">
+        <div class="mobile-section-body">
+          <div class="mobile-section-title">Sequences</div>
+          {{animation_presets}}
+          <div class="mobile-container"></div>
+        </div>
+        <span class="mobile-section-expand">
+          <img
+            class="mobile-expand-icon"
+            src="../static/icons/right_arrow.png"
+            alt="Expand Sequences Section"
+          />
+        </span>
+      </div>
+      <div class="mobile-section-divider"></div>
+      <div class="mobile-section">
+        <div class="mobile-section-body">
+          <div class="mobile-section-title">Other</div>
+          <div class="mobile-container">
+            <div class="mobile-button-box">Timestamp:<br />{{timestamp}}</div>
+            <div class="mobile-button-box"></div>
+            <div class="mobile-button-box"></div>
+            <div class="mobile-button-box"></div>
+            <div class="mobile-button-box"></div>
+            <div class="mobile-button-box"></div>
+            <div class="mobile-button-box"></div>
+            <div class="mobile-button-box"></div>
+          </div>
+        </div>
+        <span class="mobile-section-expand">
+          <img
+            class="mobile-expand-icon"
+            src="../static/icons/right_arrow.png"
+            alt="Expand Other Section"
+          />
+        </span>
+      </div>
+    </div>
+  </body>
+
+  <script>
+    const False = false
+    const True = true
+
+    window.scroll(0, 1)
+
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("./service-worker.js")
+        .then(function (registration) {
+          console.log("Service Worker Registered!")
+          return registration
+        })
+        .catch(function (err) {
+          console.error("Unable to register service worker.", err)
+        })
+    }
+  </script>
+</html>
