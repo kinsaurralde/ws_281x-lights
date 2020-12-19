@@ -130,7 +130,7 @@ def index():
 
     Return: webpage
     """
-    return render_template("index.html.jinja")
+    return render_template("index.html")
 
 
 @app.route("/mobile")
@@ -140,6 +140,7 @@ def mobileIndex():
         timestamp=int(time.time()),
         colors=colors_config,
         animation_presets=animations_config["presets"],
+        sequences=sequences_config,
     )
 
 

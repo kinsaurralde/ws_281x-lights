@@ -8,6 +8,7 @@ class SequenceBase:
         self.name = config["name"]
         self.functions_config = config["functions"]
         self.function_table = {}
+        self.total_time = 0
 
         self._createFunctionTable()
 
@@ -59,6 +60,7 @@ class SequenceBase:
 
     def sleep(self, value):
         name = self.sequencer.thread_local.name
+        self.total_time += value
         if name not in self.sequencer.active:
             time.sleep(value)
             return
@@ -127,8 +129,11 @@ class SequenceBase:
         return name in self.function_table
 
     def run(self, function_name):
+        self.total_time = 0
         if function_name in self.function_table:
             self.function_table[function_name]()
+        if self.total_time < 1:
+            raise Exception("Loop too short")
 
 Preset = {
     'color_blue': {

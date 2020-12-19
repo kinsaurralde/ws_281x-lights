@@ -1,4 +1,4 @@
-/* exported simpleColor simpleAnimation */
+/* exported simpleColor simpleAnimation simpleSequence stopAllSequences */
 
 function createAnimationArgs() {
   return {
@@ -41,4 +41,12 @@ function simpleAnimation(args) {
     }
   }
   send([payload]);
+}
+
+function simpleSequence(sequence_name, function_name) {
+  fetch(`/sequence/start?sequence=${sequence_name}&function=${function_name}`);
+}
+
+function stopAllSequences() {
+  fetch('/sequence/stopall');
 }

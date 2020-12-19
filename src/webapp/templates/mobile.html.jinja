@@ -150,8 +150,25 @@
       <div class="mobile-section">
         <div class="mobile-section-body">
           <div class="mobile-section-title">Sequences</div>
-          {{animation_presets}}
-          <div class="mobile-container"></div>
+          <div class="mobile-container">
+            <button
+              type="button"
+              class="mobile-button-box"
+              onclick="stopAllSequences()"
+            >
+              Stop All
+            </button>
+            {% for sequence in sequences['sequences'] %} {% for s in
+            sequence['functions'] %}
+            <button
+              type="button"
+              class="mobile-button-box"
+              onclick="simpleSequence('{{sequence['name']}}', '{{s}}')"
+            >
+              {{sequence['name']}}<br />{{s}}
+            </button>
+            {% endfor %} {% endfor %}
+          </div>
         </div>
         <span class="mobile-section-expand">
           <img
