@@ -22,9 +22,9 @@ class PixelDisplay {
     fetch('/getpixelsimulate')
         .then((response) => response.json())
         .then((data) => {
-          if (!data.active) {
-            hideSection('section-display-wrapper');
-          }
+          // if (!data.active) {
+          //   hideSection('section-display-wrapper');
+          // }
           this.controllers = data['controllers'];
           this.num_controllers = Object.keys(this.controllers).length;
           for (let i = 0; i < this.num_controllers; i++) {

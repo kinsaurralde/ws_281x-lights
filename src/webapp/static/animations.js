@@ -156,6 +156,7 @@ class Animations {
       return;
     }
     console.log('Sending', payload);
+    simulator.handleData(payload);
     fetch('/data', {
       method: 'post',
       body: JSON.stringify(payload),

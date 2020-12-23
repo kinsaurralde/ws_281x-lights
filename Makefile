@@ -38,6 +38,13 @@ WEBAPP_CONFIG_ARG	= "config/controllers_sample.yaml"
 ESP_HASH			= $(shell sha1sum ${CONTROLLERS_DIR}controller.ino ${CONTROLLERS_DIR}pixels* ${CONTROLLERS_DIR}structs* | sha1sum | head -c 40)
 RPI_HASH			= $(shell sha1sum ${CONTROLLERS_DIR}*.py ${CONTROLLERS_DIR}pixels* ${CONTROLLERS_DIR}structs* | sha1sum | head -c 40)
 
+WASM_ARGS			= -Os -s ASSERTIONS=1 -s LLD_REPORT_UNDEFINED --no-entry
+
+WASM_LIST			= '_maxLEDPerStrip', '_ledStripCount', '_List_new', '_List_setCounter', '_List_getCounter', '_List_set', '_List_get'
+WASM_PIXELS			= '_Pixels_new', '_Pixels_size', '_Pixels_getBrightness', '_Pixels_setBrightness', '_Pixels_get', '_Pixels_increment', '_Pixels_animation', '_createAnimationArgs'
+
+WASM_EXPORTED		= -s "EXPORTED_FUNCTIONS=[${WASM_LIST}, ${WASM_PIXELS}]" -s "EXTRA_EXPORTED_RUNTIME_METHODS=['getValue']"
+
 all:
 	# Create Directories
 	mkdir -p ${BUILD_ESP8266_DIR}
@@ -168,3 +175,5 @@ clean:
 	find . -name htmlcov -exec rm -rv {} +
 	find . -name .coverage -exec rm -rv {} +
 	
+wasm:
+	em++ ${WASM_ARGS} ${WASM_EXPORTED} -o ${WEBAPP_DIR}static/pixels/pixels.js ${CONTROLLERS_DIR}extern.cpp ${CONTROLLERS_DIR}structs.cpp ${CONTROLLERS_DIR}pixels.cpp
