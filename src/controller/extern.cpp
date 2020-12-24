@@ -127,6 +127,12 @@ void Pixels_animation(Pixels* p, AnimationArgs& args) {
         case Animation::cycle:
             p->cycle(args);
             break;
+        case Animation::randomCycle:
+            p->randomCycle(args);
+            break;
+        case Animation::reverser:
+            p->reverser(args);
+            break;
     }
 }
 
@@ -179,5 +185,13 @@ void Pixels_rainbow(Pixels* p, AnimationArgs args) {
 
 void Pixels_cycle(Pixels* p, AnimationArgs args) {
     p->cycle(args);
+}
+
+void Pixels_randomCycle(Pixels* p, AnimationArgs args) {
+    p->randomCycle(args);
+}
+
+void Pixels_reverser(Pixels* p, AnimationArgs args) {
+    p->reverser(args);
 }
 }

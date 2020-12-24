@@ -35,7 +35,9 @@ enum Animation {
     wipe,
     pulse,
     rainbow,
-    cycle
+    cycle,
+    randomCycle,
+    reverser
 };
 
 enum ShiftMode {

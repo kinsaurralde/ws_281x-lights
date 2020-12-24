@@ -1,8 +1,8 @@
 # Version Information
 MAJOR				= 2
 MINOR				= 2
-PATCH				= 0
-LABEL				= 
+PATCH				= 1
+LABEL				= simulate
 
 # Paths
 
@@ -19,7 +19,8 @@ BUILD_RPI_SRC_DIR	= ${BUILD_RPI_DIR}src/
 BUILD_ESP8266_DIR	= ${BUILD_DIR}esp8266/controller/
 
 HTML_DIR			= ${WEBAPP_DIR}templates/
-CSSJS_DIR 			= ${WEBAPP_DIR}static/
+CSS_DIR 			= ${WEBAPP_DIR}static/css/
+JS_FILES			= ${WEBAPP_DIR}static/*.js ${WEBAPP_DIR}static/main/*.js
 PY_FILES			= ${WEBAPP_DIR}*.py ${WEBAPP_DIR}tests/*.py ${WEBAPP_DIR}modules/*.py tools/*
 
 # Lint commands
@@ -141,11 +142,11 @@ node_modules:
 	npm install clang-format prettier html-validate eslint eslint-config-defaults eslint-config-google
 
 lint: all clean
-	${PRETTIER} ${PRETTIER_CONIG} --write ${CSSJS_DIR}*.css
+	${PRETTIER} ${PRETTIER_CONIG} --write ${CSS_DIR}*.css
 	${PRETTIER} ${PRETTIER_CONIG} --write ${HTML_DIR}*.html
 	find src/ -iname *.js | xargs ${CLANG_FORMAT} -i
 	${HTML_VALIDATE} ${HTML_VALIDATE_CONFG} ${HTML_DIR}*.html
-	${ESLINT} ${ESLINT_CONFIG} ${CSSJS_DIR}*.js
+	${ESLINT} ${ESLINT_CONFIG} ${JS_FILES}
 	python3 -m black ${PY_FILES}
 	python3 -m pylint ${PYLINT_CONFIG} ${PY_FILES}
 

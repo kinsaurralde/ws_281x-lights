@@ -2,8 +2,8 @@
 
 #define MAJOR 2
 #define MINOR 2
-#define PATCH 0
-#define LABEL ""
+#define PATCH 1
+#define LABEL "simulate"
 
-#define ESP_HASH "27c4799a0e2d384bcd55ada40011633ba79b9c7e"
-#define RPI_HASH "2293ec4fb886907f2ac6bd607c815379c31af5c8"
+#define ESP_HASH "9a9f6cb8655adb932aac940497c22c1752f98f54"
+#define RPI_HASH "fa98c7ba94f20158c70642184199f381ffba44b8"

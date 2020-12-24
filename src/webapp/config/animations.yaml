@@ -30,6 +30,8 @@ animations:
     arg6: 
       label: Reverse
       default: false
+    wait_ms: 40
+    steps: 3 
   Pulse:
     colors:
       label: Colors
@@ -59,6 +61,8 @@ animations:
     arg6: 
       label: Reverse
       default: false
+    wait_ms: 50
+    steps: 2
   Cycle:
     colors: 
       label: Colors
@@ -66,3 +70,18 @@ animations:
     arg1: 
       label: Steps between colors
       default: 50
+  randomCycle:
+    arg1:
+      label: Seed
+      default: 0
+    wait_ms: 250
+  reverser:
+    arg6:
+      label: Reverse Animation
+      default: true
+    arg7:
+      label: Reverse Pixels
+      default: false
+    wait_ms: none
+    steps: none
+
