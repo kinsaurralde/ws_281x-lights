@@ -1,7 +1,7 @@
 # Version Information
 MAJOR				= 2
 MINOR				= 2
-PATCH				= 2
+PATCH				= 0
 LABEL				= 
 
 # Paths
