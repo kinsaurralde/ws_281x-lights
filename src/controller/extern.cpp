@@ -111,7 +111,6 @@ void Pixels_increment(Pixels* p) {
 }
 
 void Pixels_animation(Pixels* p, AnimationArgs& args) {
-    std::cout << "ANIMATION: " << args.animation << std::endl;
     switch (args.animation) {
         case Animation::color:
             p->color(args);
@@ -148,6 +147,7 @@ AnimationArgs* createAnimationArgs(
     AnimationArgs* args = new AnimationArgs();
     args->animation = animation;
     args->color = color;
+    args->colors = colors;
     args->color_bg = color_bg;
     args->wait_ms = wait_ms;
     args->arg1 = arg1;

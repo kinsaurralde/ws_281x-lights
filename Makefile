@@ -40,7 +40,7 @@ RPI_HASH			= $(shell sha1sum ${CONTROLLERS_DIR}*.py ${CONTROLLERS_DIR}pixels* ${
 
 WASM_ARGS			= -Os -s ASSERTIONS=1 -s LLD_REPORT_UNDEFINED --no-entry
 
-WASM_LIST			= '_maxLEDPerStrip', '_ledStripCount', '_List_new', '_List_setCounter', '_List_getCounter', '_List_set', '_List_get'
+WASM_LIST			= '_maxLEDPerStrip', '_ledStripCount', '_List_new', '_List_setCounter', '_List_getCounter', '_List_set', '_List_get', '_List_size'
 WASM_PIXELS			= '_Pixels_new', '_Pixels_size', '_Pixels_getBrightness', '_Pixels_setBrightness', '_Pixels_get', '_Pixels_increment', '_Pixels_animation', '_createAnimationArgs'
 
 WASM_EXPORTED		= -s "EXPORTED_FUNCTIONS=[${WASM_LIST}, ${WASM_PIXELS}]" -s "EXTRA_EXPORTED_RUNTIME_METHODS=['getValue']"
@@ -84,7 +84,6 @@ all:
 	g++ -c -fPIC ${BUILD_RPI_SRC_DIR}extern.cpp -o ${BUILD_RPI_SRC_DIR}extern.o ${CPP_FLAGS}
 	g++ -shared -o ${BUILD_RPI_DIR}pixels.so ${BUILD_RPI_SRC_DIR}pixels.o ${BUILD_RPI_SRC_DIR}structs.o ${BUILD_RPI_SRC_DIR}extern.o ${CPP_FLAGS}
 	rm -f ${BUILD_RPI_SRC_DIR}*.o
-	make wasm
 
 	# Copy to webapp
 	cp -r ${WEBAPP_DIR} ${BUILD_DIR}
@@ -180,3 +179,6 @@ wasm:
 	echo "If em++: not found, run"
 	echo "cd sdk/emsdk/ && source ./emsdk_env.sh"
 	em++ ${WASM_ARGS} ${WASM_EXPORTED} -o ${WEBAPP_DIR}static/pixels/pixels.js ${CONTROLLERS_DIR}extern.cpp ${CONTROLLERS_DIR}structs.cpp ${CONTROLLERS_DIR}pixels.cpp
+
+wasm-optimized:
+	em++ ${WASM_ARGS} -O3 ${WASM_EXPORTED} -o ${WEBAPP_DIR}static/pixels/pixels.js ${CONTROLLERS_DIR}extern.cpp ${CONTROLLERS_DIR}structs.cpp ${CONTROLLERS_DIR}pixels.cpp

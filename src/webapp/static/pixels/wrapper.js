@@ -73,8 +73,8 @@ class AnimationArgs {
 
   get() {
     return _createAnimationArgs(
-        this.animation, this.color, this.color_bg, this.colors, this.wait_ms,
-        this.arg1, this.arg2, this.arg3, this.arg4, this.arg5, this.arg6,
-        this.arg7, this.arg8);
+        this.animation, this.color, this.color_bg, this.colors.obj,
+        this.wait_ms, this.arg1, this.arg2, this.arg3, this.arg4, this.arg5,
+        this.arg6, this.arg7, this.arg8);
   }
 }

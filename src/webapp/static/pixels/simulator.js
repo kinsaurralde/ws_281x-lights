@@ -28,6 +28,9 @@ class Simulator {
     args.arg7 = values.arg7;
     args.arg8 = values.arg8;
     const colors_list = new List(values.colors.length);
+    for (let i = 0; i < values.colors.length; i++) {
+      colors_list.set(i, values.colors[i]);
+    }
     args.colors = colors_list;
     return args;
   }
@@ -70,7 +73,6 @@ class Simulator {
     this.intervalId = setInterval(function() {
       self.refresh();
     }, 1000 / this.frame_rate);
-    alert('START');
   }
 
   stop() {
