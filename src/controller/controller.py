@@ -17,6 +17,8 @@ class Animations:
     pulse = 2
     rainbow = 3
     cycle = 4
+    randomCycle = 5
+    reverser = 6
 
 
 class NeoPixels:
@@ -139,6 +141,10 @@ class NeoPixels:
                 self.pixels[pixels_id].rainbow(args)
             elif args.animation == Animations.cycle:
                 self.pixels[pixels_id].cycle(args)
+            elif args.animation == Animations.randomCycle:
+                self.pixels[pixels_id].randomCycle(args)
+            elif args.animation == Animations.reverser:
+                self.pixels[pixels_id].reverser(args)
 
     def updatePixels(self):
         for i in range(self.led_strip_count):
