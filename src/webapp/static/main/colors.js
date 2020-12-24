@@ -92,7 +92,6 @@ class Colors {
     }
     if (color in this.colors) {
       const color_list = this.colors[color]();
-      console.log(`Color list ${color_list}`);
       if (color_list === undefined) {
         this.status.error = true;
         this.status.message = `Invalid color ${color}`;

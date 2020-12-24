@@ -125,7 +125,6 @@ class Animations {
 
   getAnimationNum(id) {
     const div = document.getElementById(id);
-    console.log(div.value);
     return Object.keys(this.animations).indexOf(div.value);
   }
 
@@ -142,7 +141,6 @@ class Animations {
     colors.status = createStatus();
     const color_input = getInputValue(id + '-color', 'black');
     const color_list = this.getColorsList(color_input.split(','));
-    console.log(color_list);
     const colors_input = getInputValue(id + '-colors', 'red, green, blue');
     const colors_list = this.getColorsList(colors_input.split(','));
     const ids = groups.getStripsFromGroup(getInputValue(id + '-target', 0));
