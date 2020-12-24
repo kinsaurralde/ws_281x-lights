@@ -84,9 +84,25 @@ class Animations {
         selector.setAttribute('disabled', true);
         input_cell.appendChild(selector);
       } else if (i == 12) {
-        input_cell.appendChild(createNumber(row_id + '-waitms', 40));
+        let value = 40;
+        if ('wait_ms' in this.animations[animation]) {
+          const new_value = this.animations[animation]['wait_ms'];
+          if (new_value == 'none') {
+            continue;
+          }
+          value = parseInt(new_value);
+        }
+        input_cell.appendChild(createNumber(row_id + '-waitms', value));
       } else if (i == 13) {
-        input_cell.appendChild(createNumber(row_id + '-steps', 1));
+        let value = 1;
+        if ('steps' in this.animations[animation]) {
+          const new_value = this.animations[animation]['steps'];
+          if (new_value == 'none') {
+            continue;
+          }
+          value = parseInt(new_value);
+        }
+        input_cell.appendChild(createNumber(row_id + '-steps', value));
       } else if (i == 14) {
         input_cell.appendChild(createNumber(row_id + '-target', -1));
       } else if (i == 15) {
@@ -109,7 +125,6 @@ class Animations {
 
   getAnimationNum(id) {
     const div = document.getElementById(id);
-    console.log(div.value);
     return Object.keys(this.animations).indexOf(div.value);
   }
 
@@ -126,7 +141,6 @@ class Animations {
     colors.status = createStatus();
     const color_input = getInputValue(id + '-color', 'black');
     const color_list = this.getColorsList(color_input.split(','));
-    console.log(color_list);
     const colors_input = getInputValue(id + '-colors', 'red, green, blue');
     const colors_list = this.getColorsList(colors_input.split(','));
     const ids = groups.getStripsFromGroup(getInputValue(id + '-target', 0));

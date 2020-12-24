@@ -120,3 +120,28 @@ AnimationArgs:
 ```
 
 Incrementor: [Cycler][Cycler]
+
+### randomCycle
+``void Pixels::randomCycle(AnimationArgs args)``
+
+Switches all pixels between random colors.
+
+```cpp
+AnimationArgs:
+    arg1:           seed for random number generator
+```
+
+Incrementor: [Cycler][Cycler]
+
+### Reverser
+``void Pixels::reverser(AnimationArgs args)``
+
+Reverse increment direction, pixels positions, or both
+
+```cpp
+AnimationArgs:
+    arg6:           reverse incrementor     (true / false)
+    arg7:           reverse pixels          (true / false)
+```
+
+Incrementor: Does not change current incrementor

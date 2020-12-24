@@ -128,4 +128,12 @@ extern "C" {
     void Pixels_cycle(Pixels* p, AnimationArgs args) {
         p->cycle(args);
     }
+
+    void Pixels_randomCycle(Pixels* p, AnimationArgs args) {
+        p->randomCycle(args);
+    }
+
+    void Pixels_reverser(Pixels* p, AnimationArgs args) {
+        p->reverser(args);
+    }
 }
