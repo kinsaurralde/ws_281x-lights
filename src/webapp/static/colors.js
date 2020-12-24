@@ -1,5 +1,5 @@
 /* exported Colors */
-/* globals groups */
+/* globals groups simulator */
 
 class Colors {
   constructor() {
@@ -201,6 +201,7 @@ class Colors {
       });
     }
     console.log('Sending', payload);
+    simulator.handleData(payload);
     fetch('/data', {method: 'post', body: JSON.stringify(payload)});
   }
 }

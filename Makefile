@@ -84,6 +84,7 @@ all:
 	g++ -c -fPIC ${BUILD_RPI_SRC_DIR}extern.cpp -o ${BUILD_RPI_SRC_DIR}extern.o ${CPP_FLAGS}
 	g++ -shared -o ${BUILD_RPI_DIR}pixels.so ${BUILD_RPI_SRC_DIR}pixels.o ${BUILD_RPI_SRC_DIR}structs.o ${BUILD_RPI_SRC_DIR}extern.o ${CPP_FLAGS}
 	rm -f ${BUILD_RPI_SRC_DIR}*.o
+	make wasm
 
 	# Copy to webapp
 	cp -r ${WEBAPP_DIR} ${BUILD_DIR}
@@ -159,7 +160,6 @@ docs:
 	docsify serve docs
 
 git:
-	make build
 	make clean
 	make test
 	make lint
@@ -176,4 +176,7 @@ clean:
 	find . -name .coverage -exec rm -rv {} +
 	
 wasm:
+	./sdk/emsdk/emsdk activate > /dev/null
+	echo "If em++: not found, run"
+	echo "cd sdk/emsdk/ && source ./emsdk_env.sh"
 	em++ ${WASM_ARGS} ${WASM_EXPORTED} -o ${WEBAPP_DIR}static/pixels/pixels.js ${CONTROLLERS_DIR}extern.cpp ${CONTROLLERS_DIR}structs.cpp ${CONTROLLERS_DIR}pixels.cpp

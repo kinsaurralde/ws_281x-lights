@@ -2,37 +2,37 @@ const ARRAY_OFFSET_AMOUNT = 4;
 
 class Pixels {
   constructor(num_pixels = 300, max_brightness = 127) {
-    self.num_pixels = num_pixels;
-    self.obj = _Pixels_new(num_pixels, max_brightness);
+    this.num_pixels = num_pixels;
+    this.obj = _Pixels_new(num_pixels, max_brightness);
   }
 
   size() {
-    return _Pixels_size(self.obj);
+    return _Pixels_size(this.obj);
   }
 
   get() {
-    const frame_pointer = _Pixels_get(self.obj);
-    const frame = new Frame(self.num_pixels);
-    for (let i = 0; i < self.num_pixels; i++) {
-      frame.main[i] = getValue(frame_pointer + i * ARRAY_OFFSET_AMOUNT, "i32");
+    const frame_pointer = _Pixels_get(this.obj);
+    const frame = new Frame(this.num_pixels);
+    for (let i = 0; i < this.num_pixels; i++) {
+      frame.main[i] = getValue(frame_pointer + i * ARRAY_OFFSET_AMOUNT, 'i32');
     }
     return frame;
   }
 
   getBrightness() {
-    return _Pixels_getBrightness(self.obj);
+    return _Pixels_getBrightness(this.obj);
   }
 
   setBrightness(value) {
-    _Pixels_setBrightness(self.obj, value);
+    _Pixels_setBrightness(this.obj, value);
   }
 
   animation(args) {
-    _Pixels_animation(self.obj, args);
+    _Pixels_animation(this.obj, args);
   }
 
   increment() {
-    _Pixels_increment(self.obj);
+    _Pixels_increment(this.obj);
   }
 }
 
@@ -73,19 +73,8 @@ class AnimationArgs {
 
   get() {
     return _createAnimationArgs(
-      this.animation,
-      this.color,
-      this.color_bg,
-      this.colors,
-      this.wait_ms,
-      this.arg1,
-      this.arg2,
-      this.arg3,
-      this.arg4,
-      this.arg5,
-      this.arg6,
-      this.arg7,
-      this.arg8
-    );
+        this.animation, this.color, this.color_bg, this.colors, this.wait_ms,
+        this.arg1, this.arg2, this.arg3, this.arg4, this.arg5, this.arg6,
+        this.arg7, this.arg8);
   }
 }

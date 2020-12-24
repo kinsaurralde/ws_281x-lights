@@ -1,5 +1,5 @@
 /* exported Animations */
-/* globals groups colors */
+/* globals groups colors simulator */
 
 class Animations {
   constructor() {

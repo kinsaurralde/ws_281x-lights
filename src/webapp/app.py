@@ -506,6 +506,7 @@ def emitUpdatedData():
     background.updateData()
     background.emitUpdate()
 
+
 @app.route("/test")
 def test():
     return render_template("test.html")

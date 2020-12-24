@@ -23,9 +23,6 @@ Pixels::Pixels(unsigned int num_leds, unsigned int max_brightness) : num_leds(nu
     incrementor = &Pixels::nothing;
     incArgs.list = new List();
     memset(&data, 0, MAX_LED_PER_STRIP);
-    for (int i = 0; i < num_leds; i++) {
-        data.main[i] = i;
-    }
 }
 
 Frame* Pixels::get() {
