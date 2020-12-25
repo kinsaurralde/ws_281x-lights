@@ -8,7 +8,6 @@ class PixelStrip {
     this.table;
     this.pixels = [];
     this.createDiv();
-    console.log(`Created pixel strip ${this.name} of length ${this.length}`);
   }
 
   createDiv() {

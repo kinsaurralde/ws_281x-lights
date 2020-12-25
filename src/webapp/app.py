@@ -30,13 +30,6 @@ parser.add_argument(
     "-t", "--test", action="store_true", help="Testing mode (localtest)", default=False,
 )
 parser.add_argument(
-    "-s",
-    "--pixel-simulate",
-    action="store_true",
-    help="Simulate pixels",
-    default=False,
-)
-parser.add_argument(
     "--nosend",
     action="store_true",
     help="Dont send to controllers (For testing)",
@@ -296,49 +289,6 @@ def getPixels():
     return createResponse(controllers.getPixels())
 
 
-@app.route("/getpixelsimulate")
-def getPixelSimulate():
-    """Get pixel simulate data
-
-    Route: /getpixelsimulate
-
-    Methods: GET
-
-    Return: JSON
-    """
-    return {
-        "active": args.pixel_simulate,
-        "controllers": controllers.getControllerSizes(),
-    }
-
-
-@app.route("/setpixelemit")
-def setPixelInterval():
-    """Set pixel emit config
-
-    Route: /setpixelemit
-
-    Methods: GET
-
-    URL Parameters:
-
-        - active: (bool) enable/disable pixel emit
-        - interval: (int) set time between emits in ms
-
-    Return: JSON
-    """
-    active = request.args.get("active")
-    interval = request.args.get("interval")
-    if active is not None:
-        background.setPixelsActive(active)
-    if interval is not None:
-        background.setPixelInterval(int(interval))
-    return {
-        "active": background.getPixelsActive(),
-        "interval": background.getPixelInterval(),
-    }
-
-
 @app.route("/sequence/<mode>")
 def sequenceHandler(mode):
     """Start Stop or Toggle sequence
@@ -522,14 +472,8 @@ if args.test:  # pragma: no cover
     for i, controller in enumerate(controllers_config["controllers"]):
         controller["url"] = "http://localhost:" + str(6000 + i)
 
-controller_module = None
-if args.pixel_simulate:
-    import controller as controller_module
-
-controllers = modules.Controllers(
-    controllers_config, args.nosend, getVersionInfo(), controller_module
-)
-background = modules.Background(socketio, controllers, args.pixel_simulate)
+controllers = modules.Controllers(controllers_config, args.nosend, getVersionInfo())
+background = modules.Background(socketio, controllers)
 sequencer = modules.Sequencer(socketio, controllers, sequences_config, colors_config)
 scheduler = modules.Scheduler(sequencer, schedules_config)
 

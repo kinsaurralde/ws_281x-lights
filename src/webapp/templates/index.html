@@ -249,6 +249,7 @@
 
       function loadedControllers() {
         groups.init(controllers.getNames())
+        pixel_display.init(controllers.getSizes(), controllers.getIsActive())
         simulator.init(controllers.getNames())
       }
     </script>

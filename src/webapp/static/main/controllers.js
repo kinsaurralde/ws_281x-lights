@@ -62,7 +62,7 @@ class Controllers {
   }
 
   handleUpdate(data) {
-    console.debug(data);
+    console.debug('Update', data);
     if ('ping' in data) {
       this.updatePing(data.ping);
     }
@@ -240,6 +240,14 @@ class Controllers {
     return Object.keys(this.controllers);
   }
 
+  getSizes() {
+    const result = {};
+    Object.keys(this.controllers).forEach((controller) => {
+      result[controller] = this.controllers[controller].init.num_leds;
+    });
+    return result;
+  }
+
   getIsActive() {
     const result = {};
     Object.keys(this.controllers).forEach((controller) => {
@@ -291,7 +299,7 @@ class Controllers {
   }
 
   addRow(controller) {
-    console.log('Adding controller', controller);
+    console.debug('Adding controller', controller);
     this.controllers[controller.name].brightness_wait = false;
     if (!(controller.url in this.urls)) {
       this.urls[controller.url] = [];

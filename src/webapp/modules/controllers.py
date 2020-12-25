@@ -11,7 +11,7 @@ POST_TIMEOUT = 0.5
 class Controllers:
     """Handles sending requests to controllers"""
 
-    def __init__(self, config, nosend, version_info, controller_module):
+    def __init__(self, config, nosend, version_info):
         self.version_info = version_info
         self.nosend = nosend
         self.send_counter = 0
@@ -24,8 +24,7 @@ class Controllers:
         self.brightness_timer_active = False
         self.background_data = {}
         self.config = {}
-        self.controller_module = controller_module
-        self.controllers = {}
+        # self.controllers = {}
         self.alias = config.get("alias", {})
         self._setupConfig(config["controllers"])
         self.updateControllerLatencies()
@@ -197,8 +196,8 @@ class Controllers:
             threads.append(
                 self._send(fails, url + "/data", queue[url], queue[url][0]["id"])
             )
-            if url in self.controllers:
-                self.controllers[url].handleData(queue[url])
+            # if url in self.controllers:
+            #     self.controllers[url].handleData(queue[url])
         for thread in threads:
             thread.join()
         if self.send_counter % 25 == 0:  # pragma: no cover
@@ -235,10 +234,11 @@ class Controllers:
     def getPixels(self) -> dict:
         """Get current pixels (simulated)"""
         result = {}
-        for i in self.controllers:
-            pixels = self.controllers[i].getPixels()
-            for j in range(min(len(self.urls[i]), len(pixels))):
-                result[self.urls[i][j]] = pixels[j]
+        fails = []
+        for url in self.urls:
+            response = self._sending_thread(fails, url + "/getpixels")
+            if response is not None:
+                result[url] = response.json()
         return result
 
     def _setupConfig(self, controllers):
@@ -253,8 +253,6 @@ class Controllers:
             self.latencies[url] = None
             if url not in self.urls:
                 self.urls[url] = []
-                if self.controller_module is not None:
-                    self.controllers[url] = self.controller_module.NeoPixels()
             self.urls[url].append(name)
             if controller["active"] == "disabled":
                 self.disableController(name)
@@ -270,10 +268,10 @@ class Controllers:
             url + "/init",
             {"id": controller["strip_id"], "init": controller["init"]},
         )
-        if url in self.controllers:
-            self.controllers[url].init(
-                {"id": controller["strip_id"], "init": controller["init"]}
-            )
+        # if url in self.controllers:
+        #     self.controllers[url].init(
+        #         {"id": controller["strip_id"], "init": controller["init"]}
+        #     )
 
     def _send(
         self, fails: list, url: str, payload: dict = None, controller_id: str = None

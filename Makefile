@@ -1,7 +1,7 @@
 # Version Information
 MAJOR				= 2
-MINOR				= 2
-PATCH				= 1
+MINOR				= 3
+PATCH				= 0
 LABEL				= simulate
 
 # Paths
@@ -29,6 +29,7 @@ CLANG_FORMAT		= node_modules/clang-format/bin/linux_x64/clang-format --style=Goo
 ESLINT				= node_modules/eslint/bin/eslint.js
 HTML_VALIDATE		= node_modules/html-validate/bin/html-validate.js
 PRETTIER			= node_modules/prettier/bin-prettier.js
+UGLIFYJS			= node_modules/uglify-js/bin/uglifyjs
 PRETTIER_CONIG		= --config lint_config/.prettierrc.json
 HTML_VALIDATE_CONFG = --config lint_config/.htmlvalidate.json
 ESLINT_CONFIG		= --config lint_config/.eslintrc.json
@@ -88,8 +89,6 @@ all:
 
 	# Copy to webapp
 	cp -r ${WEBAPP_DIR} ${BUILD_DIR}
-	cp ${CONTROLLERS_DIR}wrapper.py ${CONTROLLERS_DIR}controller.py ${BUILD_RPI_DIR}pixels.so ${BUILD_DIR}webapp/
-	cp ${CONTROLLERS_DIR}wrapper.py ${CONTROLLERS_DIR}controller.py ${BUILD_RPI_DIR}pixels.so ${WEBAPP_DIR}
 
 test:
 	make coverage
@@ -105,9 +104,6 @@ run_rpi: build
 
 run_app:
 	cd ${WEBAPP_DIR} && python3 app.py -d --config ${WEBAPP_CONFIG_ARG}
-
-run_app_simulate:
-	cd ${WEBAPP_DIR} && python3 app.py -s --config ${WEBAPP_CONFIG_ARG}
 
 run_app_nosend:
 	cd ${WEBAPP_DIR} && python3 app.py -d --nosend --config ${WEBAPP_CONFIG_ARG}
@@ -139,16 +135,24 @@ setup:
 	sudo pip3 install ruamel.yaml 
 
 node_modules:
-	npm install clang-format prettier html-validate eslint eslint-config-defaults eslint-config-google
+	npm install clang-format prettier html-validate eslint eslint-config-defaults eslint-config-google uglify-js
 
 lint: all clean
 	${PRETTIER} ${PRETTIER_CONIG} --write ${CSS_DIR}*.css
 	${PRETTIER} ${PRETTIER_CONIG} --write ${HTML_DIR}*.html
 	find src/ -iname *.js | xargs ${CLANG_FORMAT} -i
+	${UGLIFYJS} ${WEBAPP_DIR}static/pixels/pixels.js --compress > ${BUILD_DIR}a.tmp
+	${UGLIFYJS} ${WEBAPP_DIR}static/lib/socket.io.js --compress > ${BUILD_DIR}b.tmp
+	mv ${BUILD_DIR}a.tmp ${WEBAPP_DIR}static/pixels/pixels.js
+	mv ${BUILD_DIR}b.tmp ${WEBAPP_DIR}static/lib/socket.io.js
 	${HTML_VALIDATE} ${HTML_VALIDATE_CONFG} ${HTML_DIR}*.html
-	${ESLINT} ${ESLINT_CONFIG} ${JS_FILES}
+	${ESLINT} --fix ${ESLINT_CONFIG} ${JS_FILES}
 	python3 -m black ${PY_FILES}
 	python3 -m pylint ${PYLINT_CONFIG} ${PY_FILES}
+
+lol:
+	${UGLIFYJS} ${WEBAPP_DIR}static/pixels/pixels.js --compress > a.tmp
+	${UGLIFYJS} ${WEBAPP_DIR}static/lib/socket.io.js --compress > b.tmp
 
 upload_rpi: all
 	cd tools &&	python3 upload_rpi.py

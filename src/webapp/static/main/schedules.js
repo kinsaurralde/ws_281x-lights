@@ -9,10 +9,6 @@ class Schedules {
   }
 
   setupEventListeners() {
-    // document.getElementById('scheduler-stopall')
-    //     .addEventListener('click', () => {
-    //       fetch('/schedule/stopall');
-    //     });
     socket.on('active_schedules', (data) => {
       this.setActiveSchedules(data);
     });
@@ -29,7 +25,7 @@ class Schedules {
   }
 
   createSchedule(data) {
-    console.log('Create', data);
+    console.debug('Create', data);
     const row_num = this.num_custom;
     this.num_custom += 1;
     const name = data.name;
@@ -74,7 +70,6 @@ class Schedules {
   }
 
   setActiveSchedules(data) {
-    console.log('ACTIVE:', data);
     for (const key of Object.keys(this.buttons)) {
       this.buttons[key].style.border = '0.1vw solid var(--input-border)';
     }
