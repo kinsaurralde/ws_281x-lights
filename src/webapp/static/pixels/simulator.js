@@ -9,7 +9,6 @@ class Simulator {
     for (let i = 0; i < controllers.length; i++) {
       this.pixel_strips[controllers[i]] = new SimulatedPixels(controllers[i]);
     }
-    console.log(this.pixel_strips);
     this.start();
   }
 

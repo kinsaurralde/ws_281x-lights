@@ -1,7 +1,7 @@
 # Version Information
 MAJOR				= 2
-MINOR				= 2
-PATCH				= 1
+MINOR				= 3
+PATCH				= 0
 LABEL				= simulate
 
 # Paths
@@ -88,8 +88,6 @@ all:
 
 	# Copy to webapp
 	cp -r ${WEBAPP_DIR} ${BUILD_DIR}
-	cp ${CONTROLLERS_DIR}wrapper.py ${CONTROLLERS_DIR}controller.py ${BUILD_RPI_DIR}pixels.so ${BUILD_DIR}webapp/
-	cp ${CONTROLLERS_DIR}wrapper.py ${CONTROLLERS_DIR}controller.py ${BUILD_RPI_DIR}pixels.so ${WEBAPP_DIR}
 
 test:
 	make coverage
@@ -105,9 +103,6 @@ run_rpi: build
 
 run_app:
 	cd ${WEBAPP_DIR} && python3 app.py -d --config ${WEBAPP_CONFIG_ARG}
-
-run_app_simulate:
-	cd ${WEBAPP_DIR} && python3 app.py -s --config ${WEBAPP_CONFIG_ARG}
 
 run_app_nosend:
 	cd ${WEBAPP_DIR} && python3 app.py -d --nosend --config ${WEBAPP_CONFIG_ARG}
@@ -146,7 +141,7 @@ lint: all clean
 	${PRETTIER} ${PRETTIER_CONIG} --write ${HTML_DIR}*.html
 	find src/ -iname *.js | xargs ${CLANG_FORMAT} -i
 	${HTML_VALIDATE} ${HTML_VALIDATE_CONFG} ${HTML_DIR}*.html
-	${ESLINT} ${ESLINT_CONFIG} ${JS_FILES}
+	${ESLINT} --fix ${ESLINT_CONFIG} ${JS_FILES}
 	python3 -m black ${PY_FILES}
 	python3 -m pylint ${PYLINT_CONFIG} ${PY_FILES}
 

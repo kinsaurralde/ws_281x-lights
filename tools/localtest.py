@@ -43,7 +43,7 @@ def createControllerServer(port):
 
 def createWebappServer():
     print("Creating webapp server")
-    command = ["sudo", "python3", "app.py", "--test", "--debug", "-s"]
+    command = ["sudo", "python3", "app.py", "--test", "--debug"]
     subprocess.run(command, cwd=f"{args.buildfolder + 'webapp'}", check=True)
 
 
