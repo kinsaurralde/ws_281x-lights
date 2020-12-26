@@ -2,7 +2,7 @@
 
 #define MAJOR 2
 #define MINOR 2
-#define PATCH 1
+#define PATCH 0
 #define LABEL ""
 
 #define ESP_HASH "9a9f6cb8655adb932aac940497c22c1752f98f54"

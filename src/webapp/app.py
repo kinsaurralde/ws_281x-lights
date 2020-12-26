@@ -306,10 +306,10 @@ def getPixelSimulate():
 
     Return: JSON
     """
-    return {
+    return createResponse({
         "active": args.pixel_simulate,
         "controllers": controllers.getControllerSizes(),
-    }
+    })
 
 
 @app.route("/setpixelemit")
