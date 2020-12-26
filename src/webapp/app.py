@@ -468,11 +468,13 @@ controllers_config = open_yaml(args.config)
 sequences_config = open_yaml("config/sequences.yaml")
 schedules_config = open_yaml("config/schedules.yaml")
 
+version_info = getVersionInfo()
+
 if args.test:  # pragma: no cover
     for i, controller in enumerate(controllers_config["controllers"]):
         controller["url"] = "http://localhost:" + str(6000 + i)
 
-controllers = modules.Controllers(controllers_config, args.nosend, getVersionInfo())
+controllers = modules.Controllers(controllers_config, args.nosend, version_info, socketio)
 background = modules.Background(socketio, controllers)
 sequencer = modules.Sequencer(socketio, controllers, sequences_config, colors_config)
 scheduler = modules.Scheduler(sequencer, schedules_config)

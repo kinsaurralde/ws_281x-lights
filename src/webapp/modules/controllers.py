@@ -11,8 +11,9 @@ POST_TIMEOUT = 0.5
 class Controllers:
     """Handles sending requests to controllers"""
 
-    def __init__(self, config, nosend, version_info):
+    def __init__(self, config, nosend, version_info, socketio):
         self.version_info = version_info
+        self.socketio = socketio
         self.nosend = nosend
         self.send_counter = 0
         self.urls = {}
@@ -173,6 +174,7 @@ class Controllers:
         queue = {}
         fails = []
         commands = self._replaceSendAlias(commands)
+        self.socketio.emit("handleData", commands)
         for command in commands:
             controller_name = command["id"]
             if controller_name not in self.config:
@@ -196,8 +198,6 @@ class Controllers:
             threads.append(
                 self._send(fails, url + "/data", queue[url], queue[url][0]["id"])
             )
-            # if url in self.controllers:
-            #     self.controllers[url].handleData(queue[url])
         for thread in threads:
             thread.join()
         if self.send_counter % 25 == 0:  # pragma: no cover
@@ -268,10 +268,6 @@ class Controllers:
             url + "/init",
             {"id": controller["strip_id"], "init": controller["init"]},
         )
-        # if url in self.controllers:
-        #     self.controllers[url].init(
-        #         {"id": controller["strip_id"], "init": controller["init"]}
-        #     )
 
     def _send(
         self, fails: list, url: str, payload: dict = None, controller_id: str = None

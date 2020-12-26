@@ -3,6 +3,11 @@ class Simulator {
     this.pixel_strips = {};
     this.intervalId = 0;
     this.frame_rate = 50;
+
+    socket.on('handleData', (data) => {
+      console.debug("Handle Data", data);
+      this.handleData(data);
+    });
   }
 
   init(controllers) {
