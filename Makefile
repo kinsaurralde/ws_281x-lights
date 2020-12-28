@@ -113,7 +113,7 @@ run_local: all
 
 setup:
 	sudo apt update --fix-missing
-	sudo apt install nodejs node-gyp
+	sudo apt install nodejs-dev node-gyp
 	sudo apt install npm 
 	make node_modules
 	sudo npm i docsify-cli -g
