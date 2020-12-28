@@ -1,5 +1,5 @@
 /* exported Colors */
-/* globals groups simulator */
+/* globals groups */
 
 class Colors {
   constructor() {

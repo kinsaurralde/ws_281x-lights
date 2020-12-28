@@ -218,6 +218,32 @@ void Pixels::cycler() {
     setAll(incArgs.list->getNext());
 }
 
+void Pixels::animation(AnimationArgs args) {
+    switch (args.animation) {
+        case Animation::color:
+            color(args);
+            break;
+        case Animation::wipe:
+            wipe(args);
+            break;
+        case Animation::pulse:
+            pulse(args);
+            break;
+        case Animation::rainbow:
+            rainbow(args);
+            break;
+        case Animation::cycle:
+            cycle(args);
+            break;
+        case Animation::randomCycle:
+            randomCycle(args);
+            break;
+        case Animation::reverser:
+            reverser(args);
+            break;
+    }
+}
+
 /*
     AnimationArgs:
         color:          color

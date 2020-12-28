@@ -5,7 +5,7 @@ class Simulator {
     this.frame_rate = 50;
 
     socket.on('handleData', (data) => {
-      console.debug("Handle Data", data);
+      console.debug('Handle Data', data);
       this.handleData(data);
     });
   }

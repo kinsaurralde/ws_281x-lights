@@ -1,5 +1,5 @@
 /* exported Animations */
-/* globals groups colors simulator */
+/* globals groups colors*/
 
 class Animations {
   constructor() {
@@ -171,7 +171,6 @@ class Animations {
       return;
     }
     console.log('Sending', payload);
-    // simulator.handleData(payload);
     fetch('/data', {
       method: 'post',
       body: JSON.stringify(payload),

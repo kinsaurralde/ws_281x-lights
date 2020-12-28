@@ -474,7 +474,9 @@ if args.test:  # pragma: no cover
     for i, controller in enumerate(controllers_config["controllers"]):
         controller["url"] = "http://localhost:" + str(6000 + i)
 
-controllers = modules.Controllers(controllers_config, args.nosend, version_info, socketio)
+controllers = modules.Controllers(
+    controllers_config, args.nosend, version_info, socketio
+)
 background = modules.Background(socketio, controllers)
 sequencer = modules.Sequencer(socketio, controllers, sequences_config, colors_config)
 scheduler = modules.Scheduler(sequencer, schedules_config)

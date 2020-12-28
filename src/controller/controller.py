@@ -62,7 +62,7 @@ class NeoPixels:
             args = AnimationArgs()
             args.animation = Animations.color
             args.color = 0
-            self.pixels[i].color(args)
+            self.pixels[i].animation(args)
             self.strip.append(Adafruit_NeoPixel(
                 self.led_count,
                 self.pin,
@@ -118,7 +118,7 @@ class NeoPixels:
         args.arg7 = bool(values["arg7"])
         args.arg8 = bool(values["arg8"])
         colors_list = List(len(values["colors"]))
-        args.colors = colors_list.obj
+        args.colors = colors_list
         for i in range(colors_list.size()):
             colors_list.set(i, int(values["colors"][i]))
         return args
@@ -131,20 +131,7 @@ class NeoPixels:
             if args.wait_ms > 0:
                 self.pixels[pixels_id].setDelay(args.wait_ms)
             print(f"Run Animation {args.animation} on id {pixels_id}")
-            if args.animation == Animations.color:
-                self.pixels[pixels_id].color(args)
-            elif args.animation == Animations.wipe:
-                self.pixels[pixels_id].wipe(args)
-            elif args.animation == Animations.pulse:
-                self.pixels[pixels_id].pulse(args)
-            elif args.animation == Animations.rainbow:
-                self.pixels[pixels_id].rainbow(args)
-            elif args.animation == Animations.cycle:
-                self.pixels[pixels_id].cycle(args)
-            elif args.animation == Animations.randomCycle:
-                self.pixels[pixels_id].randomCycle(args)
-            elif args.animation == Animations.reverser:
-                self.pixels[pixels_id].reverser(args)
+            self.pixels[pixels_id].animation(args)
 
     def updatePixels(self):
         for i in range(self.led_strip_count):

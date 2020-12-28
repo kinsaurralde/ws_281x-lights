@@ -53,6 +53,8 @@ class Pixels {
     Frame* get();
     void increment();
 
+    void animation(AnimationArgs args); // External
+
     void color(AnimationArgs args);
     void pulse(AnimationArgs args);
     void wipe(AnimationArgs args);

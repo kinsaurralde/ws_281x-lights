@@ -182,7 +182,7 @@ clean:
 wasm:
 	./sdk/emsdk/emsdk activate > /dev/null
 	echo "If em++: not found, run"
-	echo "cd sdk/emsdk/ && source ./emsdk_env.sh"
+	echo "cd sdk/emsdk/ && source ./emsdk_env.sh && cd ../../"
 	em++ ${WASM_ARGS} ${WASM_EXPORTED} -o ${WEBAPP_DIR}static/pixels/pixels.js ${CONTROLLERS_DIR}extern.cpp ${CONTROLLERS_DIR}structs.cpp ${CONTROLLERS_DIR}pixels.cpp
 
 wasm-optimized:

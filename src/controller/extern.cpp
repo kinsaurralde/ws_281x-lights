@@ -110,30 +110,8 @@ void Pixels_increment(Pixels* p) {
     p->increment();
 }
 
-void Pixels_animation(Pixels* p, AnimationArgs& args) {
-    switch (args.animation) {
-        case Animation::color:
-            p->color(args);
-            break;
-        case Animation::wipe:
-            p->wipe(args);
-            break;
-        case Animation::pulse:
-            p->pulse(args);
-            break;
-        case Animation::rainbow:
-            p->rainbow(args);
-            break;
-        case Animation::cycle:
-            p->cycle(args);
-            break;
-        case Animation::randomCycle:
-            p->randomCycle(args);
-            break;
-        case Animation::reverser:
-            p->reverser(args);
-            break;
-    }
+void Pixels_animation(Pixels* p, AnimationArgs* args) {
+    p->animation(*args);
 }
 
 AnimationArgs* createAnimationArgs(
@@ -165,33 +143,5 @@ AnimationArgs* createAnimationArgs(
     args->arg7 = arg7;
     args->arg8 = arg8;
     return args;
-}
-
-void Pixels_color(Pixels* p, AnimationArgs args) {
-    p->color(args);
-}
-
-void Pixels_wipe(Pixels* p, AnimationArgs args) {
-    p->wipe(args);
-}
-
-void Pixels_pulse(Pixels* p, AnimationArgs args) {
-    p->pulse(args);
-}
-
-void Pixels_rainbow(Pixels* p, AnimationArgs args) {
-    p->rainbow(args);
-}
-
-void Pixels_cycle(Pixels* p, AnimationArgs args) {
-    p->cycle(args);
-}
-
-void Pixels_randomCycle(Pixels* p, AnimationArgs args) {
-    p->randomCycle(args);
-}
-
-void Pixels_reverser(Pixels* p, AnimationArgs args) {
-    p->reverser(args);
 }
 }

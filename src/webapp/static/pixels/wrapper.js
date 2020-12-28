@@ -66,9 +66,9 @@ class AnimationArgs {
     this.arg3 = 0;
     this.arg4 = 0;
     this.arg5 = 0;
-    this.arg6 = 0;
-    this.arg7 = 0;
-    this.arg8 = 0;
+    this.arg6 = false;
+    this.arg7 = false;
+    this.arg8 = false;
   }
 
   get() {
