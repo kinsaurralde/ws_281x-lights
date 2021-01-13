@@ -43,7 +43,7 @@ RPI_HASH			= $(shell sha1sum ${CONTROLLERS_DIR}*.py ${CONTROLLERS_DIR}pixels* ${
 WASM_ARGS			= -Os -s ASSERTIONS=1 -s LLD_REPORT_UNDEFINED --no-entry
 
 WASM_LIST			= '_maxLEDPerStrip', '_ledStripCount', '_List_new', '_List_setCounter', '_List_getCounter', '_List_set', '_List_get', '_List_size'
-WASM_PIXELS			= '_Pixels_new', '_Pixels_size', '_Pixels_getBrightness', '_Pixels_setBrightness', '_Pixels_get', '_Pixels_increment', '_Pixels_animation', '_createAnimationArgs'
+WASM_PIXELS			= '_Pixels_new', '_Pixels_size', '_Pixels_getBrightness', '_Pixels_setBrightness', '_Pixels_get', '_Pixels_increment', '_Pixels_animation', '_createAnimationArgs', '_Pixels_getCurrentState'
 
 WASM_EXPORTED		= -s "EXPORTED_FUNCTIONS=[${WASM_LIST}, ${WASM_PIXELS}]" -s "EXTRA_EXPORTED_RUNTIME_METHODS=['getValue']"
 

@@ -114,6 +114,10 @@ void Pixels_animation(Pixels* p, AnimationArgs* args) {
     p->animation(*args);
 }
 
+int* Pixels_getCurrentState(Pixels* p) {
+    return p->getCurrentState();
+}
+
 AnimationArgs* createAnimationArgs(
     Animation animation,
     int color,

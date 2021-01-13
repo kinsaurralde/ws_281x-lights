@@ -40,6 +40,12 @@ enum Animation {
     reverser
 };
 
+enum Incrementor {
+    nothing,
+    shifter,
+    cycler
+};
+
 enum ShiftMode {
     blank_shift,
     first_pixel_shift,

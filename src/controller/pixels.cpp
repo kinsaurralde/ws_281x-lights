@@ -2,6 +2,8 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <string>
+
 #include "structs.h"
 #include "pixels.h"
 
@@ -89,9 +91,9 @@ unsigned int Pixels::mixColors(unsigned int color_1, unsigned int color_2, unsig
 }
 
 bool Pixels::canShow(unsigned int time) {
-    if (!initialized) {
-        return false;
-    }
+    // if (!initialized) {
+    //     return false;
+    // }
     if (time - delay >= previous_show_time) {
         previous_show_time = time;
         return true;
@@ -152,14 +154,31 @@ bool Pixels::isInitialized() {
 bool Pixels::isGRB() {
     return grb;
 }
+    
+int* Pixels::getCurrentState() {
+    int* state = new int[10];
+    state[0] = incFunctionName;
+    state[1] = incArgs.arg1;
+    state[2] = incArgs.arg2;
+    state[3] = incArgs.arg3;
+    state[4] = incArgs.arg4;
+    state[5] = incArgs.arg5;
+    state[6] = incArgs.arg6;
+    state[7] = incArgs.arg7;
+    state[8] = incArgs.arg8;
+    state[9] = (int) incArgs.list;
+    return state;
+}
 
 void Pixels::increment() {
+    this->total_steps += increment_steps;
     for (unsigned int i = 0; i < increment_steps; i++) {
         (this->*incrementor)();
     }
 }
 
 void Pixels::nothing() {
+    incFunctionName = Incrementor::nothing;
     return;
 }
 
@@ -171,6 +190,7 @@ void Pixels::nothing() {
         list:           expanded pixels         (required for loop mode)
 */
 void Pixels::shifter() {
+    incFunctionName = Incrementor::shifter;
     unsigned int amount = incArgs.arg1;
     unsigned int mode = incArgs.arg2;
     bool reverse = incArgs.arg6;
@@ -215,10 +235,13 @@ void Pixels::shifter() {
         colors:         color list and counter
 */
 void Pixels::cycler() {
+    incFunctionName = Incrementor::cycler;
     setAll(incArgs.list->getNext());
 }
 
-void Pixels::animation(AnimationArgs args) {
+void Pixels::animation(AnimationArgs args, unsigned int wait_ms) {
+    this->wait_ms = wait_ms;    // value not used (only stored for return)
+    this->total_steps = 0;
     switch (args.animation) {
         case Animation::color:
             color(args);
