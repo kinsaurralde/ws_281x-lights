@@ -52,7 +52,7 @@ class Pixels {
     void setDelay(unsigned int value);
     unsigned int getDelay();
     void setSize(unsigned int size);
-    unsigned int size();
+    unsigned int size(); // External
     unsigned int getBrightness(); // External
     void setBrightness(unsigned int value); // External
     void setIncrementSteps(unsigned int value = 1);
@@ -64,7 +64,7 @@ class Pixels {
     void increment(); // External
     void animation(AnimationArgs args, unsigned int wait_ms=40); // External
 
-    int* getCurrentState();
+    long* getCurrentState(); // External
 };
 
 #endif

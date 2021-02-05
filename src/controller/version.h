@@ -5,5 +5,5 @@
 #define PATCH 0
 #define LABEL "simulate"
 
-#define ESP_HASH "f6191a81515012c48d01d82357860336102493d1"
-#define RPI_HASH "8c7ba1ec778c9863b83072979f7e9542f2881fd7"
+#define ESP_HASH "bcbfabfeced926ad1daefc4e6fef6cd9772e9848"
+#define RPI_HASH "188db312299bb386a360dccfa7e9c1e370a92768"

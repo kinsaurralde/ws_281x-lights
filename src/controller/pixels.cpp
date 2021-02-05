@@ -155,8 +155,8 @@ bool Pixels::isGRB() {
     return grb;
 }
     
-int* Pixels::getCurrentState() {
-    int* state = new int[10];
+long* Pixels::getCurrentState() {
+    long* state = new long[10];
     state[0] = incFunctionName;
     state[1] = incArgs.arg1;
     state[2] = incArgs.arg2;
@@ -166,7 +166,7 @@ int* Pixels::getCurrentState() {
     state[6] = incArgs.arg6;
     state[7] = incArgs.arg7;
     state[8] = incArgs.arg8;
-    state[9] = (int) incArgs.list;
+    state[9] = (long) incArgs.list;
     return state;
 }
 

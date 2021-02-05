@@ -1,4 +1,4 @@
-const ARRAY_OFFSET_AMOUNT = 4;
+const ARRAY_OFFSET_AMOUNT = 8;
 
 class Pixels {
   constructor(num_pixels = 300, max_brightness = 127) {
@@ -47,14 +47,15 @@ class Pixels {
     incArgs.arg6 = getValue(state_pointer + 6 * ARRAY_OFFSET_AMOUNT, 'i32');
     incArgs.arg7 = getValue(state_pointer + 7 * ARRAY_OFFSET_AMOUNT, 'i32');
     incArgs.arg8 = getValue(state_pointer + 8 * ARRAY_OFFSET_AMOUNT, 'i32');
-    const list_pointer = getValue(state_pointer + 9 * ARRAY_OFFSET_AMOUNT, 'i32');
+    const list_pointer =
+        getValue(state_pointer + 9 * ARRAY_OFFSET_AMOUNT, 'i32');
     incArgs.list = new List(list_pointer, false);
     return incArgs;
   }
 }
 
 class List {
-  constructor(value, create=true) {
+  constructor(value, create = true) {
     if (create) {
       this.length = value;
       this.obj = _List_new(this.length);

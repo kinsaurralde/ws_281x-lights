@@ -83,7 +83,7 @@ class Pixels:
         self.lib.createAnimationArgs.argtypes = [ctypes.c_uint, ctypes.c_int, ctypes.c_int, ctypes.c_void_p, ctypes.c_uint, ctypes.c_uint, ctypes.c_uint, ctypes.c_uint, ctypes.c_int, ctypes.c_int, ctypes.c_bool, ctypes.c_bool, ctypes.c_bool]
         self.lib.createAnimationArgs.restype = ctypes.c_void_p
         self.lib.Pixels_getCurrentState.argtypes = [ctypes.c_void_p]
-        self.lib.Pixels_getCurrentState.restype = ctypes.c_int
+        self.lib.Pixels_getCurrentState.restype = ctypes.c_long
         self.obj = self.lib.Pixels_new(val, MAX_BRIGHTNESS)
 
     def canShow(self, ms):
