@@ -13,3 +13,4 @@ __pycache__/
 wifi_credentials.h
 notes.txt
 tmp/
+logs/

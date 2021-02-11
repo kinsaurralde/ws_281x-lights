@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+import logging
 import argparse
 
 from collections import OrderedDict
@@ -18,6 +19,17 @@ except:  # pragma: no cover
     import ruamel.yaml as yaml  # 3.7
 
 Payload.max_decode_packets = 100
+
+logging.basicConfig(level=logging.WARNING)
+logging.debug('This is a debug message')
+logging.info('This is an info message')
+logging.warning('This is a warning message')
+logging.error('This is an error message')
+logging.critical('This is a critical message')
+
+file_handler = logging.FileHandler('logs/werkzeug.log', mode='w')
+werkzeug_logger = logging.getLogger('werkzeug')
+werkzeug_logger.addHandler(file_handler)
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")

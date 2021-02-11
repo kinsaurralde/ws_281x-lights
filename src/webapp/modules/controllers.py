@@ -3,6 +3,8 @@ import time
 import threading
 import requests
 
+from modules.manager import ControllerManager
+
 BRIGHTNESS_BUFFER_TIMER = 0.01
 GET_TIMEOUT = 0.3
 POST_TIMEOUT = 0.5
@@ -25,8 +27,8 @@ class Controllers:
         self.brightness_timer_active = False
         self.background_data = {}
         self.config = {}
-        # self.controllers = {}
         self.alias = config.get("alias", {})
+        self.manager = ControllerManager(socketio, config["controllers"], self.alias)
         self._setupConfig(config["controllers"])
         self.updateControllerLatencies()
 
@@ -175,34 +177,37 @@ class Controllers:
         fails = []
         commands = self._replaceSendAlias(commands)
         self.socketio.emit("handleData", commands)
+        session_id = self.manager.startSession()
         for command in commands:
             controller_name = command["id"]
-            if controller_name not in self.config:
-                fails.append(
-                    {
-                        "url": "localhost",
-                        "id": controller_name,
-                        "message": "Controller not found",
-                    }
-                )
-                continue
             command["id"] = self.config[controller_name]["strip_id"]
-            url = self.config[controller_name]["url"]
-            if url in self.disabled:
-                continue
-            if url not in queue:
-                queue[url] = []
-            queue[url].append(command)
-        threads = []
-        for url in queue:
-            threads.append(
-                self._send(fails, url + "/data", queue[url], queue[url][0]["id"])
-            )
-        for thread in threads:
-            thread.join()
-        if self.send_counter % 25 == 0:  # pragma: no cover
-            self.updateControllerLatencies()
-        return fails
+            self.manager.send(controller_name, "/data", command, True, session_id)
+        #     if controller_name not in self.config:
+        #         fails.append(
+        #             {
+        #                 "url": "localhost",
+        #                 "id": controller_name,
+        #                 "message": "Controller not found",
+        #             }
+        #         )
+        #         continue
+        #     command["id"] = self.config[controller_name]["strip_id"]
+        #     url = self.config[controller_name]["url"]
+        #     if url in self.disabled:
+        #         continue
+        #     if url not in queue:
+        #         queue[url] = []
+        #     queue[url].append(command)
+        # threads = []
+        # for url in queue:
+        #     threads.append(
+        #         self._send(fails, url + "/data", queue[url], queue[url][0]["id"])
+        #     )
+        # for thread in threads:
+        #     thread.join()
+        # if self.send_counter % 25 == 0:  # pragma: no cover
+        #     self.updateControllerLatencies()
+        return self.manager.endSession(session_id)
 
     def getConfig(self) -> dict:
         """"Get controller config"""
