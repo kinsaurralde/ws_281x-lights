@@ -45,9 +45,7 @@ def test_invalid_controller(client):
     assert response.status_code == 200
     assert response.content_type == "application/json"
     assert response.get_json()["error"]
-    assert response.get_json()["message"] == [
-        {"id": 0, "message": "Controller not found", "url": "localhost"}
-    ]
+    assert response.get_json()["message"] == [{"id": 0, "message": "Controller not found", "url": "localhost"}]
 
 
 def test_valid_controller(client):
@@ -67,7 +65,7 @@ def test_disabled_controller(client):
     assert response.status_code == 200
     assert response.content_type == "application/json"
     assert not response.get_json()["error"]
-    assert response.get_json()["message"] == []
+    assert response.get_json()["message"] == {}
 
 
 def test_failed_to_send(client, mocker):
@@ -106,9 +104,7 @@ def test_enable_controller_no_arg(client):
     assert response.status_code == 200
     assert response.content_type == "application/json"
     assert response.get_json()["error"]
-    assert response.get_json()["message"] == [
-        {"id": None, "message": "Controller not found", "url": None}
-    ]
+    assert response.get_json()["message"] == [{"id": None, "message": "Controller not found", "url": None}]
 
 
 def test_enable_controller_wrong_name(client):
@@ -117,9 +113,7 @@ def test_enable_controller_wrong_name(client):
     assert response.status_code == 200
     assert response.content_type == "application/json"
     assert response.get_json()["error"]
-    assert response.get_json()["message"] == [
-        {"id": "doesnt_exist", "message": "Controller not found", "url": None}
-    ]
+    assert response.get_json()["message"] == [{"id": "doesnt_exist", "message": "Controller not found", "url": None}]
 
 
 def test_enable_controller_already_enabled(client):
@@ -128,9 +122,7 @@ def test_enable_controller_already_enabled(client):
     assert response.status_code == 200
     assert response.content_type == "application/json"
     assert response.get_json()["error"]
-    assert response.get_json()["message"] == [
-        {"id": "tester_a_0", "message": "Controller not disabled", "url": None}
-    ]
+    assert response.get_json()["message"] == [{"id": "tester_a_0", "message": "Controller not disabled", "url": None}]
 
 
 def test_enable_controller(client, controller):
@@ -148,9 +140,7 @@ def test_enable_controller(client, controller):
     assert response.status_code == 200
     assert response.content_type == "application/json"
     assert response.get_json()["error"]
-    assert response.get_json()["message"] == [
-        {"id": "tester_b_0", "message": "Controller not disabled", "url": None}
-    ]
+    assert response.get_json()["message"] == [{"id": "tester_b_0", "message": "Controller not disabled", "url": None}]
     # Reset and make sure state same as before test
     resetControllerEnable(client)
     assert start_disabled == dictToString(controller.disabled)
@@ -169,9 +159,7 @@ def test_enable_controller_second_strip(client):
     assert response.status_code == 200
     assert response.content_type == "application/json"
     assert response.get_json()["error"]
-    assert response.get_json()["message"] == [
-        {"id": "tester_b_1", "message": "Controller not disabled", "url": None}
-    ]
+    assert response.get_json()["message"] == [{"id": "tester_b_1", "message": "Controller not disabled", "url": None}]
     resetControllerEnable(client)
 
 
@@ -181,9 +169,7 @@ def test_disable_controller_no_arg(client):
     assert response.status_code == 200
     assert response.content_type == "application/json"
     assert response.get_json()["error"]
-    assert response.get_json()["message"] == [
-        {"id": None, "message": "Controller not found", "url": None}
-    ]
+    assert response.get_json()["message"] == [{"id": None, "message": "Controller not found", "url": None}]
 
 
 def test_disable_controller_wrong_name(client):
@@ -192,9 +178,7 @@ def test_disable_controller_wrong_name(client):
     assert response.status_code == 200
     assert response.content_type == "application/json"
     assert response.get_json()["error"]
-    assert response.get_json()["message"] == [
-        {"id": "doesnt_exist", "message": "Controller not found", "url": None}
-    ]
+    assert response.get_json()["message"] == [{"id": "doesnt_exist", "message": "Controller not found", "url": None}]
 
 
 def test_disable_controller_already_disabled(client):
@@ -203,9 +187,7 @@ def test_disable_controller_already_disabled(client):
     assert response.status_code == 200
     assert response.content_type == "application/json"
     assert response.get_json()["error"]
-    assert response.get_json()["message"] == [
-        {"id": "tester_b_0", "message": "Controller not enabled", "url": None}
-    ]
+    assert response.get_json()["message"] == [{"id": "tester_b_0", "message": "Controller not enabled", "url": None}]
 
 
 def test_disable_controller(client, controller):
@@ -223,9 +205,7 @@ def test_disable_controller(client, controller):
     assert response.status_code == 200
     assert response.content_type == "application/json"
     assert response.get_json()["error"]
-    assert response.get_json()["message"] == [
-        {"id": "tester_a_0", "message": "Controller not enabled", "url": None}
-    ]
+    assert response.get_json()["message"] == [{"id": "tester_a_0", "message": "Controller not enabled", "url": None}]
     resetControllerEnable(client)
     assert start_disabled == dictToString(controller.disabled)
     assert start_urls == dictToString(controller.urls)
@@ -243,9 +223,7 @@ def test_disable_controller_second_strip(client):
     assert response.status_code == 200
     assert response.content_type == "application/json"
     assert response.get_json()["error"]
-    assert response.get_json()["message"] == [
-        {"id": "tester_a_1", "message": "Controller not enabled", "url": None}
-    ]
+    assert response.get_json()["message"] == [{"id": "tester_a_1", "message": "Controller not enabled", "url": None}]
     resetControllerEnable(client)
 
 
@@ -259,9 +237,7 @@ def test_controller_version_info(client, mocker, controller):
         "rpi_hash": "testing",
     }
     controller.version_info = version_info
-    mocker.patch(
-        "requests.get", return_value=MockedResponse(dictToString(version_info), 200)
-    )
+    mocker.patch("requests.get", return_value=MockedResponse(dictToString(version_info), 200))
     response = client.get("/getversioninfo")
     print("Response", response.get_json())
     json_data = response.get_json()
@@ -291,9 +267,7 @@ def test_controller_version_info_no_hashmatch(client, mocker, controller):
         "rpi_hash": "wrong",
     }
     controller.version_info = version_info_2
-    mocker.patch(
-        "requests.get", return_value=MockedResponse(dictToString(version_info), 200)
-    )
+    mocker.patch("requests.get", return_value=MockedResponse(dictToString(version_info), 200))
     response = client.get("/getversioninfo")
     print("Response", response.get_json())
     json_data = response.get_json()
@@ -323,9 +297,7 @@ def test_controller_version_info_no_versionmatch(client, mocker, controller):
         "rpi_hash": "testing",
     }
     controller.version_info = version_info_2
-    mocker.patch(
-        "requests.get", return_value=MockedResponse(dictToString(version_info), 200)
-    )
+    mocker.patch("requests.get", return_value=MockedResponse(dictToString(version_info), 200))
     response = client.get("/getversioninfo")
     print("Response", response.get_json())
     json_data = response.get_json()
@@ -340,9 +312,7 @@ def test_controller_version_info_no_versionmatch(client, mocker, controller):
 
 def test_controller_initialized(client, mocker, controller):
     controller.nosend = False
-    mocker.patch(
-        "requests.get", return_value=MockedResponse(dictToString([True, True]), 200)
-    )
+    mocker.patch("requests.get", return_value=MockedResponse(dictToString([True, True]), 200))
     response = client.get("/getinitialized")
     print("Response", response.get_json())
     json_data = response.get_json()
@@ -362,11 +332,7 @@ def test_controller_initialized_invalid_strip(client, mocker, controller):
     assert response.status_code == 200
     assert response.content_type == "application/json"
     assert json_data["fails"] == [
-        {
-            "url": "http://localhost:6000",
-            "id": 1,
-            "message": "Strip id does not exist on remote controller",
-        }
+        {"url": "http://localhost:6000", "id": 1, "message": "Strip id does not exist on remote controller",}
     ]
 
 

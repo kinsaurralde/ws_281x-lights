@@ -20,53 +20,39 @@ except:  # pragma: no cover
 
 Payload.max_decode_packets = 100
 
-logging.basicConfig(level=logging.WARNING)
-logging.debug('This is a debug message')
-logging.info('This is an info message')
-logging.warning('This is a warning message')
-logging.error('This is an error message')
-logging.critical('This is a critical message')
-
-file_handler = logging.FileHandler('logs/werkzeug.log', mode='w')
-werkzeug_logger = logging.getLogger('werkzeug')
-werkzeug_logger.addHandler(file_handler)
+LOG_FORMAT = "%(asctime)s %(levelname)-8s [%(name)-26s:%(funcName)-26s] %(message)s"
+logging.basicConfig(format=LOG_FORMAT, level=logging.WARNING, datefmt="%Y-%m-%d %H:%M:%S")
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
 
+werkzeug_handler = logging.FileHandler("logs/werkzeug.log", mode="w")
+werkzeug_logger = logging.getLogger("werkzeug")
+werkzeug_logger.addHandler(werkzeug_handler)
+werkzeug_logger.propagate = False
+log_file_handler = logging.FileHandler("logs/app.log", mode="w")
+log_file_handler.setFormatter(logging.Formatter(LOG_FORMAT))
+logging.root.addHandler(log_file_handler)
+
+log = logging.getLogger(__name__)
+log.info("STARTED APP SERVER")
+
 parser = argparse.ArgumentParser()
-parser.add_argument(
-    "-d", "--debug", action="store_true", help="Debug mode", default=False
-)
+parser.add_argument("-d", "--debug", action="store_true", help="Debug mode", default=False)
 parser.add_argument(
     "-t", "--test", action="store_true", help="Testing mode (localtest)", default=False,
 )
 parser.add_argument(
-    "--nosend",
-    action="store_true",
-    help="Dont send to controllers (For testing)",
-    default=False,
+    "--nosend", action="store_true", help="Dont send to controllers (For testing)", default=False,
 )
 parser.add_argument(
-    "-c",
-    "--config",
-    type=str,
-    help="Path to controller config",
-    default="config/controllers_sample.yaml",
+    "-c", "--config", type=str, help="Path to controller config", default="config/controllers_sample.yaml",
 )
 parser.add_argument(
-    "-p",
-    "--port",
-    type=int,
-    help="Port to run server on (overrides config file)",
-    default=5000,
+    "-p", "--port", type=int, help="Port to run server on (overrides config file)", default=5000,
 )
 parser.add_argument(
-    "-b",
-    "--background",
-    action="store_false",
-    help="Disable Background Information Thread",
-    default=True,
+    "-b", "--background", action="store_false", help="Disable Background Information Thread", default=True,
 )
 
 args = parser.parse_args()
@@ -102,9 +88,7 @@ def createResponse(data, ordered=False):
     if ordered:
         payload = OrderedDict(data)
     response = app.response_class(
-        response=json.dumps(payload, sort_keys=False),
-        status=200,
-        mimetype="application/json",
+        response=json.dumps(payload, sort_keys=False), status=200, mimetype="application/json",
     )
     response.headers["Access-Control-Allow-Origin"] = "*"
     return response
@@ -117,6 +101,20 @@ def error_response(message):
         "message": message,
     }
     return createResponse(data)
+
+
+@app.before_request
+def before_request():
+    log.info(f"[{request.remote_addr}] {request.method} - {request.path}")
+
+
+@app.after_request
+def after_request(response):
+    log.info(
+        f"[{request.remote_addr}] {request.method} - {request.path}"
+        f" -> {response.status_code} {response.content_type}"
+    )
+    return response
 
 
 @app.errorhandler(404)
@@ -155,6 +153,7 @@ def handleData():
         return createResponse(response)
     controllers.setNoSend(getNosend())
     fails = controllers.send(data)
+    log.critical(f"Fails: {fails}")
     response = {"error": len(fails) > 0, "message": fails}
     return createResponse(response)
 
@@ -438,13 +437,13 @@ def getActiveSchedules():
 
 @socketio.on("connect")
 def connect():
-    print("Client Connected:", request.remote_addr)
+    log.info(f"Client Connected: {request.remote_addr}")
     socketio.emit("connection_response", room=request.sid)
 
 
 @socketio.on("disconnect")
 def disconnect():
-    print("Client Disconnected")
+    log.info(f"Client Disconnected: {request.remote_addr}")
 
 
 @socketio.on("webpage_loaded")
@@ -486,9 +485,7 @@ if args.test:  # pragma: no cover
     for i, controller in enumerate(controllers_config["controllers"]):
         controller["url"] = "http://localhost:" + str(6000 + i)
 
-controllers = modules.Controllers(
-    controllers_config, args.nosend, version_info, socketio
-)
+controllers = modules.Controllers(controllers_config, args.nosend, version_info, socketio)
 background = modules.Background(socketio, controllers)
 sequencer = modules.Sequencer(socketio, controllers, sequences_config, colors_config)
 scheduler = modules.Scheduler(sequencer, schedules_config)
@@ -496,6 +493,4 @@ scheduler = modules.Scheduler(sequencer, schedules_config)
 if __name__ == "__main__":  # pragma: no cover
     if args.background:
         background.startLoop()
-    socketio.run(
-        app, debug=args.debug, host="0.0.0.0", port=args.port, use_reloader=False
-    )
+    socketio.run(app, debug=args.debug, host="0.0.0.0", port=args.port, use_reloader=False)

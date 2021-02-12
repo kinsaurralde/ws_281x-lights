@@ -15,4 +15,9 @@ disable=
     too-many-instance-attributes,
     too-many-arguments,
     anomalous-backslash-in-string,
-    wildcard-import
+    wildcard-import,
+    logging-format-interpolation,
+    broad-except
+
+[FORMAT]
+max-line-length=120

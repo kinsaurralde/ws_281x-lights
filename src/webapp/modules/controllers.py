@@ -1,6 +1,7 @@
 import json
 import time
 import threading
+import logging
 import requests
 
 from modules.manager import ControllerManager
@@ -8,6 +9,9 @@ from modules.manager import ControllerManager
 BRIGHTNESS_BUFFER_TIMER = 0.01
 GET_TIMEOUT = 0.3
 POST_TIMEOUT = 0.5
+
+log = logging.getLogger(__name__)
+log.setLevel("DEBUG")
 
 
 class Controllers:
@@ -26,10 +30,10 @@ class Controllers:
         self.brightness_queue = {}
         self.brightness_timer_active = False
         self.background_data = {}
-        self.config = {}
+        self.controllers = {}
         self.alias = config.get("alias", {})
-        self.manager = ControllerManager(socketio, config["controllers"], self.alias)
         self._setupConfig(config["controllers"])
+        self.manager = ControllerManager(socketio, self.controllers, self.alias)
         self.updateControllerLatencies()
 
     def setNoSend(self, value: bool):
@@ -38,9 +42,9 @@ class Controllers:
 
     def disableController(self, name: str) -> list:
         """Disable controller"""
-        if name not in self.config:
+        if name not in self.controllers:
             return [{"url": None, "id": name, "message": "Controller not found",}]
-        url = self.config[name]["url"]
+        url = self.controllers[name]["url"]
         if url in self.disabled:
             return [{"url": None, "id": name, "message": "Controller not enabled",}]
         if url not in self.disabled:
@@ -51,13 +55,13 @@ class Controllers:
 
     def enableController(self, name: str) -> list:
         """Enable controller"""
-        if name not in self.config:
+        if name not in self.controllers:
             return [{"url": None, "id": name, "message": "Controller not found",}]
-        url = self.config[name]["url"]
+        url = self.controllers[name]["url"]
         if url not in self.disabled:
             return [{"url": None, "id": name, "message": "Controller not disabled",}]
         self.disabled.pop(url)
-        self._initController(url, self.config[name])
+        self._initController(url, self.controllers[name])
         return []
 
     def updateControllerLatencies(self, background=None):
@@ -76,15 +80,13 @@ class Controllers:
                 latency = float((end_time - start_time) * 1000)
                 previous = self.latencies[url]
                 if not isinstance(previous, float):
-                    self.background_data[
-                        "initialized"
-                    ] = self.getControllerInitialized()
+                    self.background_data["initialized"] = self.getControllerInitialized()
                     self.background_data["version"] = self.getControllerVersionInfo()
                     if background is not None and previous is None:
                         background.updateData()
                     previous = latency
                 self.latencies[url] = (previous + latency) / 2
-        print("Controller Latencies", self.latencies)
+        log.debug(f"Controller Latencies {self.latencies}")
 
     def getControllerLatencies(self) -> dict:
         """Get controller latencies"""
@@ -121,9 +123,7 @@ class Controllers:
                 or response["patch"] != self.version_info["patch"]
             ):
                 version_match = False
-                fails.append(
-                    {"url": url, "id": "version", "message": "Version doesnt match"}
-                )
+                fails.append({"url": url, "id": "version", "message": "Version doesnt match"})
             if (
                 response["esp_hash"] != self.version_info["esp_hash"]
                 or response["rpi_hash"] != self.version_info["rpi_hash"]
@@ -141,8 +141,8 @@ class Controllers:
     def getControllerSizes(self) -> dict:
         """Get number of leds on each controller"""
         result = {}
-        for c in self.config:
-            result[c] = self.config[c]["init"]["num_leds"]
+        for c in self.controllers:
+            result[c] = self.controllers[c]["init"]["num_leds"]
         return result
 
     def getControllerInitialized(self) -> dict:
@@ -156,9 +156,9 @@ class Controllers:
             if response is None:
                 continue
             response = response.json()
-            for controller in self.config:
-                if self.config[controller]["url"] == url:
-                    response_index = int(self.config[controller]["strip_id"])
+            for controller in self.controllers:
+                if self.controllers[controller]["url"] == url:
+                    response_index = int(self.controllers[controller]["strip_id"])
                     if response_index < 0 or response_index >= len(response):
                         fails.append(
                             {
@@ -173,16 +173,20 @@ class Controllers:
 
     def send(self, commands: list) -> list:
         """Send commands to controllers"""
-        queue = {}
-        fails = []
         commands = self._replaceSendAlias(commands)
         self.socketio.emit("handleData", commands)
         session_id = self.manager.startSession()
         for command in commands:
             controller_name = command["id"]
-            command["id"] = self.config[controller_name]["strip_id"]
-            self.manager.send(controller_name, "/data", command, True, session_id)
-        #     if controller_name not in self.config:
+            if controller_name not in self.controllers:
+                log.error(f"Controller name: {controller_name} {self.controllers}")
+                continue
+            if self.controllers[controller_name]["url"] in self.disabled:
+                log.info(f"Not sending to controller {controller_name} because it is disabled")
+                continue
+            command["id"] = self.controllers[controller_name]["strip_id"]
+            self.manager.send(controller_name, "/data", "GET", command, True, session_id)
+        #     if controller_name not in self.controllers:
         #         fails.append(
         #             {
         #                 "url": "localhost",
@@ -191,8 +195,8 @@ class Controllers:
         #             }
         #         )
         #         continue
-        #     command["id"] = self.config[controller_name]["strip_id"]
-        #     url = self.config[controller_name]["url"]
+        #     command["id"] = self.controllers[controller_name]["strip_id"]
+        #     url = self.controllers[controller_name]["url"]
         #     if url in self.disabled:
         #         continue
         #     if url not in queue:
@@ -211,7 +215,7 @@ class Controllers:
 
     def getConfig(self) -> dict:
         """"Get controller config"""
-        return self.config
+        return self.controllers
 
     def getLastBrightness(self) -> int:
         """Get last_brightness"""
@@ -221,15 +225,13 @@ class Controllers:
         """Change brightness of controllers"""
         for request in requests:
             name = request["name"]
-            if name not in self.config:
+            if name not in self.controllers:
                 continue
             value = request["value"]
-            url = self.config[name]["url"]
+            url = self.controllers[name]["url"]
             if url in self.disabled:
                 continue
-            self.brightness_queue[name] = (
-                url + f"/brightness?value={value}&id={self.config[name]['strip_id']}"
-            )
+            self.brightness_queue[name] = url + f"/brightness?value={value}&id={self.controllers[name]['strip_id']}"
             self.last_brightness[name] = value
             if not self.brightness_timer_active:
                 self.brightness_timer_active = True
@@ -248,12 +250,12 @@ class Controllers:
 
     def _setupConfig(self, controllers):
         id_counter = 0
-        self.config = {}
+        self.controllers = {}
         for controller in controllers:
             name = controller["name"]
             if not controller["active"]:
                 continue
-            self.config[name] = controller
+            self.controllers[name] = controller
             url = controller["url"]
             self.latencies[url] = None
             if url not in self.urls:
@@ -269,38 +271,26 @@ class Controllers:
             return
         self.last_brightness[controller["name"]] = controller["init"]["brightness"]
         self._send(
-            [],
-            url + "/init",
-            {"id": controller["strip_id"], "init": controller["init"]},
+            [], url + "/init", {"id": controller["strip_id"], "init": controller["init"]},
         )
 
-    def _send(
-        self, fails: list, url: str, payload: dict = None, controller_id: str = None
-    ):
-        thread = threading.Thread(
-            target=self._sending_thread, args=(fails, url, payload, controller_id)
-        )
+    def _send(self, fails: list, url: str, payload: dict = None, controller_id: str = None):
+        thread = threading.Thread(target=self._sending_thread, args=(fails, url, payload, controller_id))
         thread.start()
         return thread
 
-    def _sending_thread(
-        self, fails: list, url: str, payload: dict = None, controller_id: str = None
-    ) -> dict:
+    def _sending_thread(self, fails: list, url: str, payload: dict = None, controller_id: str = None) -> dict:
         self.send_counter += 1
         if self.nosend:
-            fails.append(
-                {"url": url, "id": controller_id, "message": "No send is true"}
-            )
+            fails.append({"url": url, "id": controller_id, "message": "No send is true"})
             return None
         try:
             if payload is None:
                 return requests.get(url, timeout=GET_TIMEOUT)
             return requests.post(url, data=json.dumps(payload), timeout=POST_TIMEOUT)
         except requests.RequestException:
-            print(f"Failed to send to {url}")
-            fails.append(
-                {"url": url, "id": controller_id, "message": "Connection Error"}
-            )
+            log.warning(f"Failed to send to {url}")
+            fails.append({"url": url, "id": controller_id, "message": "Connection Error"})
         return None
 
     def _replaceSendAlias(self, commands: list) -> list:

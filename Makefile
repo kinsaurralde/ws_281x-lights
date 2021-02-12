@@ -103,7 +103,7 @@ run_rpi: build
 	cd ${BUILD_RPI_DIR} && python3 controller_server.py --test && cd ../../
 
 run_app:
-	cd ${WEBAPP_DIR} && python3 app.py -d --config ${WEBAPP_CONFIG_ARG}
+	cd ${WEBAPP_DIR} && python3 app.py --config ${WEBAPP_CONFIG_ARG}
 
 run_app_nosend:
 	cd ${WEBAPP_DIR} && python3 app.py -d --nosend --config ${WEBAPP_CONFIG_ARG}
@@ -147,7 +147,7 @@ lint: all clean
 	mv ${BUILD_DIR}b.tmp ${WEBAPP_DIR}static/lib/socket.io.js
 	${HTML_VALIDATE} ${HTML_VALIDATE_CONFG} ${HTML_DIR}*.html
 	${ESLINT} --fix ${ESLINT_CONFIG} ${JS_FILES}
-	python3 -m black ${PY_FILES}
+	python3 -m black --line-length 120 ${PY_FILES}
 	python3 -m pylint ${PYLINT_CONFIG} ${PY_FILES}
 
 lol:
