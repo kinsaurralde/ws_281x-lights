@@ -34,7 +34,8 @@ log_file_handler = logging.FileHandler("logs/app.log", mode="w")
 log_file_handler.setFormatter(logging.Formatter(LOG_FORMAT))
 logging.root.addHandler(log_file_handler)
 
-log = logging.getLogger(__name__)
+log = logging.getLogger("app")
+log.setLevel("DEBUG")
 log.info("STARTED APP SERVER")
 
 parser = argparse.ArgumentParser()
@@ -53,6 +54,9 @@ parser.add_argument(
 )
 parser.add_argument(
     "-b", "--background", action="store_false", help="Disable Background Information Thread", default=True,
+)
+parser.add_argument(
+    "--nostart", action="store_true", help="Disable Background Information Thread", default=False,
 )
 
 args = parser.parse_args()
@@ -82,14 +86,40 @@ def open_yaml(path):
     return data
 
 
-def createResponse(data, ordered=False):
+def getRequestResponseStatus(responses):
+    for response in responses:
+        if not responses[response].good:
+            return False
+    return True
+
+
+def responsesToDict(responses):
+    result = {}
+    for response in responses:
+        result[response] = responses[response].__dict__
+    return result
+
+
+def responseTemplate(good=False, type="", message="", payload={}):
+    return {"good": good, "type": type, "message": message, "payload": payload}
+
+
+def createResponse(payload, ordered=False):
     """Turn response into json"""
-    payload = data
     if ordered:
-        payload = OrderedDict(data)
-    response = app.response_class(
-        response=json.dumps(payload, sort_keys=False), status=200, mimetype="application/json",
-    )
+        payload = OrderedDict(payload)
+    try:
+        payload = json.dumps(payload, sort_keys=False)
+    except TypeError:
+        payload = json.dumps(
+            {
+                "good": False,
+                "type": "serialization_error",
+                "message": "Failed to serialize response into JSON",
+                "payload": {},
+            }
+        )
+    response = app.response_class(response=payload, status=200, mimetype="application/json",)
     response.headers["Access-Control-Allow-Origin"] = "*"
     return response
 
@@ -149,12 +179,13 @@ def handleData():
     try:
         data = json.loads(request.data)
     except ValueError:
-        response = {"error": True, "message": "JSON Decode Error"}
-        return createResponse(response)
+        return createResponse(responseTemplate(good=False, type="json_error", message="JSON Decode Error"))
     controllers.setNoSend(getNosend())
-    fails = controllers.send(data)
-    log.critical(f"Fails: {fails}")
-    response = {"error": len(fails) > 0, "message": fails}
+    responses = controllers.send(data)
+    response = responseTemplate(
+        good=getRequestResponseStatus(responses), type="request_response", payload=responsesToDict(responses)
+    )
+    response["error"] = not response["good"]
     return createResponse(response)
 
 
@@ -490,7 +521,7 @@ background = modules.Background(socketio, controllers)
 sequencer = modules.Sequencer(socketio, controllers, sequences_config, colors_config)
 scheduler = modules.Scheduler(sequencer, schedules_config)
 
-if __name__ == "__main__":  # pragma: no cover
+if __name__ == "__main__" and not args.nostart:  # pragma: no cover
     if args.background:
         background.startLoop()
     socketio.run(app, debug=args.debug, host="0.0.0.0", port=args.port, use_reloader=False)
