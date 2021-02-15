@@ -102,8 +102,11 @@ coverage:
 run_rpi: build
 	cd ${BUILD_RPI_DIR} && python3 controller_server.py --test && cd ../../
 
-run_app:
+run_app: clean_logs
 	cd ${WEBAPP_DIR} && python3 app.py --config ${WEBAPP_CONFIG_ARG}
+
+run_interactive:
+	cd ${WEBAPP_DIR} && python3 -i app.py --config ${WEBAPP_CONFIG_ARG} --nostart --noschedule
 
 run_app_nosend:
 	cd ${WEBAPP_DIR} && python3 app.py -d --nosend --config ${WEBAPP_CONFIG_ARG}
@@ -127,6 +130,8 @@ setup:
 	pip3 install coverage
 	pip3 install pylint
 	pip3 install schedule
+	pip3 install coloredlogs
+	sudo pip3 install coloredlogs
 	sudo pip3 install schedule
 	sudo pip3 install rpi_ws281x
 	sudo apt install screen
@@ -169,7 +174,10 @@ git:
 	make lint
 	git status
 
-clean:
+clean_logs:
+	rm -f ${WEBAPP_DIR}logs/*
+
+clean: clean_logs
 	rm -fr ${BUILD_DIR}*
 	rm -f ${CONTROLLERS_DIR}*.so
 	rm -f ${WEBAPP_DIR}controller.py

@@ -5,10 +5,12 @@ import argparse
 
 from collections import OrderedDict
 
+from logging.handlers import RotatingFileHandler
 from flask import Flask, json, render_template, request, redirect
 from flask_socketio import SocketIO
 from engineio.payload import Payload
 
+import coloredlogs
 import modules
 
 from version import *
@@ -20,21 +22,31 @@ except:  # pragma: no cover
 
 Payload.max_decode_packets = 100
 
+MAX_LOG_BYTES = 4000000
+
 LOG_FORMAT = "%(asctime)s %(levelname)-8s [%(name)-26s:%(funcName)-26s] %(message)s"
-logging.basicConfig(format=LOG_FORMAT, level=logging.WARNING, datefmt="%Y-%m-%d %H:%M:%S")
+logging.basicConfig(format=LOG_FORMAT, level=logging.DEBUG, datefmt="%Y-%m-%d %H:%M:%S")
+logging.setLoggerClass(modules.CustomLogger)
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
 
-werkzeug_handler = logging.FileHandler("logs/werkzeug.log", mode="w")
+werkzeug_handler = RotatingFileHandler("logs/werkzeug.log", mode="w", maxBytes=MAX_LOG_BYTES, backupCount=2)
 werkzeug_logger = logging.getLogger("werkzeug")
 werkzeug_logger.addHandler(werkzeug_handler)
 werkzeug_logger.propagate = False
-log_file_handler = logging.FileHandler("logs/app.log", mode="w")
-log_file_handler.setFormatter(logging.Formatter(LOG_FORMAT))
-logging.root.addHandler(log_file_handler)
+
+logging.getLogger("urllib3.connectionpool").setLevel("WARNING")
 
 log = logging.getLogger("app")
+coloredlogs.DEFAULT_LEVEL_STYLES["info"] = {"color": "black", "bold": True}
+coloredlogs.install(level="DEBUG", fmt=LOG_FORMAT, logger=log)
+log_file_handler = RotatingFileHandler("logs/app.log", mode="w", maxBytes=MAX_LOG_BYTES, backupCount=3)
+log_color_file_handler = RotatingFileHandler("logs/app-color.log", mode="w", maxBytes=MAX_LOG_BYTES, backupCount=3)
+log_file_handler.setFormatter(logging.Formatter(LOG_FORMAT))
+log_color_file_handler.setFormatter(coloredlogs.ColoredFormatter(fmt=LOG_FORMAT))
+logging.root.addHandler(log_file_handler)
+logging.root.addHandler(log_color_file_handler)
 log.setLevel("DEBUG")
 log.info("STARTED APP SERVER")
 
@@ -56,8 +68,12 @@ parser.add_argument(
     "-b", "--background", action="store_false", help="Disable Background Information Thread", default=True,
 )
 parser.add_argument(
-    "--nostart", action="store_true", help="Disable Background Information Thread", default=False,
+    "--nostart", action="store_true", help="Dont start app", default=False,
 )
+parser.add_argument(
+    "--noschedule", action="store_true", help="Dont start scheduler", default=False,
+)
+
 
 args = parser.parse_args()
 
@@ -86,13 +102,6 @@ def open_yaml(path):
     return data
 
 
-def getRequestResponseStatus(responses):
-    for response in responses:
-        if not responses[response].good:
-            return False
-    return True
-
-
 def responsesToDict(responses):
     result = {}
     for response in responses:
@@ -100,8 +109,8 @@ def responsesToDict(responses):
     return result
 
 
-def responseTemplate(good=False, type="", message="", payload={}):
-    return {"good": good, "type": type, "message": message, "payload": payload}
+def responseTemplate(good=False, rtype="", message="", payload={}):  # pylint: disable=dangerous-default-value
+    return {"good": good, "type": rtype, "message": message, "payload": payload}
 
 
 def createResponse(payload, ordered=False):
@@ -135,15 +144,19 @@ def error_response(message):
 
 @app.before_request
 def before_request():
-    log.info(f"[{request.remote_addr}] {request.method} - {request.path}")
+    log.notice(f"[{request.remote_addr}] {request.method} - {request.path}")
 
 
 @app.after_request
 def after_request(response):
-    log.info(
+    s = (
         f"[{request.remote_addr}] {request.method} - {request.path}"
         f" -> {response.status_code} {response.content_type}"
     )
+    if response.status_code == 200:
+        log.success(s)
+    else:
+        log.error(s)
     return response
 
 
@@ -179,12 +192,12 @@ def handleData():
     try:
         data = json.loads(request.data)
     except ValueError:
-        return createResponse(responseTemplate(good=False, type="json_error", message="JSON Decode Error"))
+        return createResponse(responseTemplate(good=False, rtype="json_error", message="JSON Decode Error"))
     controllers.setNoSend(getNosend())
     responses = controllers.send(data)
     all_good = responses["all_good"]
     request_responses = responses["responses"]
-    response = responseTemplate(all_good, type="request_response", payload=responsesToDict(request_responses))
+    response = responseTemplate(all_good, rtype="request_response", payload=responsesToDict(request_responses))
     response["error"] = not all_good
     return createResponse(response)
 
@@ -468,13 +481,13 @@ def getActiveSchedules():
 
 @socketio.on("connect")
 def connect():
-    log.info(f"Client Connected: {request.remote_addr}")
+    log.notice(f"Client Connected: {request.remote_addr}")
     socketio.emit("connection_response", room=request.sid)
 
 
 @socketio.on("disconnect")
 def disconnect():
-    log.info(f"Client Disconnected: {request.remote_addr}")
+    log.notice(f"Client Disconnected: {request.remote_addr}")
 
 
 @socketio.on("webpage_loaded")
@@ -520,6 +533,9 @@ controllers = modules.Controllers(controllers_config, args.nosend, version_info,
 background = modules.Background(socketio, controllers)
 sequencer = modules.Sequencer(socketio, controllers, sequences_config, colors_config)
 scheduler = modules.Scheduler(sequencer, schedules_config)
+
+if not args.noschedule:
+    scheduler.start_thread()
 
 if __name__ == "__main__" and not args.nostart:  # pragma: no cover
     if args.background:

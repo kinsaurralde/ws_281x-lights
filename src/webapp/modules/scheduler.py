@@ -12,8 +12,9 @@ class Scheduler:
         self.sequencer = sequencer
         self.schedules = {}
         self.config = config
+        self.active = False
+        self.thread = None
         self._importSchedules()
-        self._start_thread()
 
     def getSchedules(self):
         return self.config
@@ -56,7 +57,8 @@ class Scheduler:
             sched = mod.ScheduleFunction(schedule, self.sequencer, s)
             self.schedules[s["name"]] = sched
 
-    def _start_thread(self):
-        thread = threading.Thread(target=self._schedule_thread)
-        thread.setDaemon(True)
-        thread.start()
+    def start_thread(self):
+        if not self.active:
+            self.thread = threading.Thread(target=self._schedule_thread)
+            self.thread.setDaemon(True)
+            self.thread.start()

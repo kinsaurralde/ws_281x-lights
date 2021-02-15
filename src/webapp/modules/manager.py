@@ -1,24 +1,15 @@
 import json
 import threading
 import logging
-import coloredlogs
 import requests
+
+from .extras import RequestResponse
 
 GET_TIMEOUT = 0.3
 POST_TIMEOUT = 0.5
 
 log = logging.getLogger(__name__)
 log.setLevel("DEBUG")
-
-
-class RequestResponse:
-    def __init__(self, response, message="", url="", controller_id="") -> None:
-        self.good = False if response is None else True
-        self.has_response = True if self.good and not isinstance(response, bool) else False
-        self.response = response
-        self.message = message
-        self.url = url
-        self.controller_id = controller_id
 
 
 class ControllerManager:
@@ -38,6 +29,12 @@ class ControllerManager:
         self.sessions[session_id] = {"threads": [], "response": {}}
         self.session_counter += 1
         return session_id
+
+    def addToSession(self, session_id: int, request_response=None) -> bool:
+        if session_id not in self.sessions or request_response is None:
+            return False
+        self.sessions[session_id]["response"][request_response.controller_id] = request_response
+        return True
 
     def endSession(self, session_id: int) -> dict:
         """Remove session_id from self.sessions and return
@@ -60,17 +57,21 @@ class ControllerManager:
             if not result[controller_id].good:
                 has_error = True
                 error_controllers.append(controller_id)
-        return {"all_good": not has_error, "responses": result, "errors": error_controllers}
+        full = {"all_good": not has_error, "responses": result, "errors": error_controllers}
+        log.debug(f"End session {session_id}: {full}")
+        return full
 
-    def send(self, url: str, controller_id="", path="/", method="GET", payload=None, session_id=0, threaded=False) -> RequestResponse:
-        """Make either GET or POST request to controller. 
-        
-        If threaded is False, session_id is not used. For either threading option, a RequestResponse is returned. 
+    def send(
+        self, url: str, controller_id="", path="", method="GET", payload=None, session_id=0, threaded=False
+    ) -> RequestResponse:
+        """Make either GET or POST request to controller.
+
+        If threaded is False, session_id is not used. For either threading option, a RequestResponse is returned.
         RequestResponse contains information about the request and the response, including if an error occured.
-        In non threaded mode, the returned RequestResponse contains the response and possible error from the actual request.
+        In non threaded mode, the RequestResponse contains the response and possible error from the actual request.
         In threaded mode, RequestResponse error refers to whether the thread (not the request) was started correctly.
-        The RequestResponse from the actual thread will be stored in the current session and is retrieved when the session has ended.
-        If session_id is not the default value, it is asumed threaded is True. 
+        RequestResponse from actual thread will be stored in the current session and is retrieved when session ends.
+        If session_id is not the default value, it is asumed threaded is True.
         This means callers do not need to set threaded if a session_id is provided.
         """
         url += path
@@ -107,6 +108,7 @@ class ControllerManager:
                 error_reason = f"Invalid method: {method}"
             if response.status_code != 200:
                 log.warning(f"Recieved response code {response.status_code} from {url} with payload {payload}")
+                log.debug(f"Error response is {response.text}")
         except requests.exceptions.Timeout as e:
             error_reason = "Timeout: {e}"
         except requests.RequestException as e:

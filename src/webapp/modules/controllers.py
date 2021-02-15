@@ -1,10 +1,9 @@
-import json
 import time
 import threading
 import logging
-import requests
 
-from modules.manager import ControllerManager
+from .manager import ControllerManager
+from .extras import RequestResponse
 
 BRIGHTNESS_BUFFER_TIMER = 0.01
 GET_TIMEOUT = 0.3
@@ -183,7 +182,9 @@ class Controllers:
             controller_name = command["id"]
             url = self.getUrl(controller_name)
             if url is None:
-                log.error(f"Controller {controller_name} does not exist")
+                err_msg = f"Controller {controller_name} does not exist"
+                log.error(err_msg)
+                self.manager.addToSession(session_id, RequestResponse(None, err_msg, controller_id=controller_name))
                 continue
             if url in self.disabled:
                 log.info(f"Not sending to controller {controller_name} because it is disabled")
@@ -252,18 +253,24 @@ class Controllers:
         responses = self.manager.endSession(session_id)
         if not responses["all_good"]:
             for controller in responses["errors"]:
-                log.error(f"Failed to initialize controller {controller} because {responses['responses'][controller].message}")
+                log.error(
+                    f"Failed to initialize controller {controller} because {responses['responses'][controller].message}"
+                )
 
     def _initController(self, controller_id: str, session_id=0):
         url = self.getUrl(controller_id)
         if url is None:
-            log.critical(f"Setup attempted to initialze controller {controller_id} which does not exist in Controllers.controllers: {self.controllers}")
+            log.critical(
+                f"Setup attempted to initialze controller {controller_id}"
+                f"which does not exist in Controllers.controllers: {self.controllers}"
+            )
+            return
         if url in self.disabled:
             return
         controller = self.controllers[controller_id]
         self.last_brightness[controller["name"]] = controller["init"]["brightness"]
         init_values = {"id": controller["strip_id"], "init": controller["init"]}
-        response = self.manager.send(url, controller_id, "/path", "POST", init_values, session_id)
+        response = self.manager.send(url, controller_id, "/init", "POST", init_values, session_id)
         if not response.good:
             log.error(f"Failed to initialize controller {response.controller_id} because {response.message}")
 
@@ -283,7 +290,7 @@ class Controllers:
 
     def getUrl(self, controller_id: str) -> str:
         """Return url of controller id or None if controller_id does not exist
-        
+
         Callers of this function should check for None response which means controller does not exist
         """
         # If controller_id is an alias, convert to acutal id
