@@ -1,6 +1,7 @@
 import json
 import threading
 import logging
+import coloredlogs
 import requests
 
 GET_TIMEOUT = 0.3
@@ -10,24 +11,32 @@ log = logging.getLogger(__name__)
 log.setLevel("DEBUG")
 
 
+class RequestResponse:
+    def __init__(self, response, message="", url="", controller_id="") -> None:
+        self.good = False if response is None else True
+        self.has_response = True if self.good and not isinstance(response, bool) else False
+        self.response = response
+        self.message = message
+        self.url = url
+        self.controller_id = controller_id
+
+
 class ControllerManager:
     """Handles sending to controllers"""
 
-    def __init__(self, socketio, controllers, alias) -> None:
-        self.session_counter = 1
+    def __init__(self, socketio) -> None:
+        self.session_counter = 0
         self.sessions = {}
-        self.controllers = controllers
-        self.alias = alias
         self.sio = socketio
         self.callbacks = {}
         self.startSession()
-        print(self.controllers)
 
     def startSession(self) -> int:
         """Create space for threads and messages in self.sessions and return key"""
         # Assign session_id and add to self.sessions
         session_id = self.session_counter
         self.sessions[session_id] = {"threads": [], "response": {}}
+        self.session_counter += 1
         return session_id
 
     def endSession(self, session_id: int) -> dict:
@@ -44,46 +53,37 @@ class ControllerManager:
         # Return session messages and remove from self.sessions
         result = self.sessions[session_id]["response"]
         self.sessions.pop(session_id)
-        return result
+        # Check if any responses were not good
+        has_error = False
+        error_controllers = []
+        for controller_id in result:
+            if not result[controller_id].good:
+                has_error = True
+                error_controllers.append(controller_id)
+        return {"all_good": not has_error, "responses": result, "errors": error_controllers}
 
-    def send(self, controller_id: int, path: str, method="GET", payload=None, threaded=True, session_id=0) -> tuple:
-        """Make either GET or POST request to controller. If threaded == true start thread and return.
-
-        If threaded is True, first value in return tuple is whether session_id is valid and second value is None
-        If threaded is False, first value in return tuple indicates if an error occured. If and error occured,
-        return value is the error reason else it is the response object.
+    def send(self, url: str, controller_id="", path="/", method="GET", payload=None, session_id=0, threaded=False) -> RequestResponse:
+        """Make either GET or POST request to controller. 
+        
+        If threaded is False, session_id is not used. For either threading option, a RequestResponse is returned. 
+        RequestResponse contains information about the request and the response, including if an error occured.
+        In non threaded mode, the returned RequestResponse contains the response and possible error from the actual request.
+        In threaded mode, RequestResponse error refers to whether the thread (not the request) was started correctly.
+        The RequestResponse from the actual thread will be stored in the current session and is retrieved when the session has ended.
+        If session_id is not the default value, it is asumed threaded is True. 
+        This means callers do not need to set threaded if a session_id is provided.
         """
-        # Convert aliased controller_id to url
-        controller_url = self.getUrl(controller_id)
-        # Check if controller exists
-        if controller_url is None:
-            error_message = f"Controller {controller_id} does not exist"
-            log.error(error_message)
-            return RequestResponse(None, error_message, controller_id=controller_id)
-        url = controller_url + path
-        if threaded:
+        url += path
+        if threaded or session_id != 0:
             if session_id not in self.sessions:
                 return RequestResponse(None, f"Session ID {session_id} is not valid", url, controller_id)
             # Create new thread and add to sessions
-            thread = threading.Thread(target=self._send_thread, args=("GET", url, payload, controller_id, session_id))
+            thread = threading.Thread(target=self._send_thread, args=(method, url, payload, controller_id, session_id))
             thread.start()
             self.sessions[session_id]["threads"].append(thread)
             return RequestResponse(True, f"Started Send Thread", url, controller_id)
         # Directly return response from non threading request
         return self._send_thread(method, url, payload, controller_id)
-
-    def getUrl(self, controller_id: str) -> str:
-        """Return url of controller id or None if controller_id does not exist
-        
-        Callers of this function should check for None response
-        """
-        # If controller_id is an alias, convert to acutal id
-        if controller_id in self.alias:
-            controller_id = self.alias[controller_id]
-        # Return url if controller_id exists
-        if controller_id in self.controllers:
-            return self.controllers[controller_id]["url"]
-        return None
 
     def onconnectCallback(self, callback_function) -> None:
         """Set the callback function for the onconnect event"""
@@ -97,6 +97,7 @@ class ControllerManager:
         """Make request to url with given method. If error occurs, record error_message in self.sessions"""
         error_reason = ""
         response = None
+        log.debug(f"Sending {method} {url}")
         try:
             if method == "GET":
                 response = requests.get(url, timeout=GET_TIMEOUT)
@@ -104,6 +105,8 @@ class ControllerManager:
                 response = requests.post(url, data=json.dumps(payload), timeout=POST_TIMEOUT)
             else:
                 error_reason = f"Invalid method: {method}"
+            if response.status_code != 200:
+                log.warning(f"Recieved response code {response.status_code} from {url} with payload {payload}")
         except requests.exceptions.Timeout as e:
             error_reason = "Timeout: {e}"
         except requests.RequestException as e:
@@ -117,13 +120,3 @@ class ControllerManager:
         error_message = f"Failed to send to {url} because {error_reason}"
         log.error(error_message)
         return result
-
-
-class RequestResponse:
-    def __init__(self, response, message="", url="", controller_id="") -> None:
-        self.good = False if response is None else True
-        self.has_response = True if self.good and not isinstance(response, bool) else False
-        self.response = response
-        self.message = message
-        self.url = url
-        self.controller_id = controller_id

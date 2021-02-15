@@ -182,10 +182,10 @@ def handleData():
         return createResponse(responseTemplate(good=False, type="json_error", message="JSON Decode Error"))
     controllers.setNoSend(getNosend())
     responses = controllers.send(data)
-    response = responseTemplate(
-        good=getRequestResponseStatus(responses), type="request_response", payload=responsesToDict(responses)
-    )
-    response["error"] = not response["good"]
+    all_good = responses["all_good"]
+    request_responses = responses["responses"]
+    response = responseTemplate(all_good, type="request_response", payload=responsesToDict(request_responses))
+    response["error"] = not all_good
     return createResponse(response)
 
 
