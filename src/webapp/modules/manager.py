@@ -20,6 +20,7 @@ class ControllerManager:
         self.sessions = {}
         self.sio = socketio
         self.callbacks = {}
+        self.nosend = False
         self.startSession()
 
     def startSession(self) -> int:
@@ -94,19 +95,24 @@ class ControllerManager:
         """Set the callback function for the ondisconnect event"""
         self.callbacks["ondisconnect"] = callback_function
 
+    def setNoSend(self, value: bool) -> None:
+        self.nosend = value
+
     def _send_thread(self, method: str, url: str, payload: object, controller_id: str, session_id=0) -> object:
         """Make request to url with given method. If error occurs, record error_message in self.sessions"""
         error_reason = ""
         response = None
         log.debug(f"Sending {method} {url}")
         try:
-            if method == "GET":
+            if self.nosend:
+                error_reason = "No send is true"
+            elif method == "GET":
                 response = requests.get(url, timeout=GET_TIMEOUT)
             elif method == "POST":
                 response = requests.post(url, data=json.dumps(payload), timeout=POST_TIMEOUT)
             else:
                 error_reason = f"Invalid method: {method}"
-            if response.status_code != 200:
+            if response is not None and response.status_code != 200:
                 log.warning(f"Recieved response code {response.status_code} from {url} with payload {payload}")
                 log.debug(f"Error response is {response.text}")
         except requests.exceptions.Timeout as e:

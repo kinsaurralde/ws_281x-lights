@@ -39,15 +39,17 @@ def resetControllerEnable(client):
     client.get("/disable?name=tester_b_0")
     client.get("/enable?name=tester_a_0")
 
-def check_standard_response(response, is_error, mtype=None, payload_len=0, message_len=0):
+
+def check_standard_response(response, is_error, mtype=None, payload_len=0, message=None):
     response = response.get_json()
     assert "error" in response
     assert "message" in response
     assert "payload" in response
     assert "type" in response
     assert response["error"] == is_error
-    assert len(response["message"]) == message_len
     assert len(response["payload"]) == payload_len
+    if message is not None:
+        assert response["message"] == message
     if mtype is not None:
         assert response["type"] == mtype
 
@@ -67,6 +69,7 @@ def test_valid_controller(client):
     assert response.status_code == 200
     assert response.content_type == "application/json"
     check_standard_response(response, False, "request_response", 1)
+
 
 def test_disabled_controller(client):
     command = makeCommand()
@@ -96,10 +99,6 @@ def test_args_nosend_true(client, mocker, controller):
     print("Response", response.get_json())
     assert response.status_code == 200
     assert response.content_type == "application/json"
-    # assert response.get_json()["error"]
-    # assert response.get_json()["message"] == [
-    #     {"id": 0, "message": "No send is true", "url": "http://localhost:6000/data"}
-    # ]
     check_standard_response(response, True, "request_response", 1)
     mocker.patch("app.getNosend", return_value=False)
     controller.setNoSend(False)
@@ -110,9 +109,7 @@ def test_enable_controller_no_arg(client):
     print("Response", response.get_json())
     assert response.status_code == 200
     assert response.content_type == "application/json"
-    # assert response.get_json()["error"]
-    # assert response.get_json()["message"] == [{"id": None, "message": "Controller not found", "url": None}]
-    check_standard_response(response, True, "request_response", 1)
+    check_standard_response(response, True, "enable_controller", 3, "Controller not found")
 
 
 def test_enable_controller_wrong_name(client):
@@ -120,9 +117,7 @@ def test_enable_controller_wrong_name(client):
     print("Response", response.get_json())
     assert response.status_code == 200
     assert response.content_type == "application/json"
-    # assert response.get_json()["error"]
-    # assert response.get_json()["message"] == [{"id": "doesnt_exist", "message": "Controller not found", "url": None}]
-    check_standard_response(response, True, "request_response", 1)
+    check_standard_response(response, True, "enable_controller", 3, "Controller not found")
 
 
 def test_enable_controller_already_enabled(client):
@@ -130,9 +125,7 @@ def test_enable_controller_already_enabled(client):
     print("Response", response.get_json())
     assert response.status_code == 200
     assert response.content_type == "application/json"
-    # assert response.get_json()["error"]
-    # assert response.get_json()["message"] == [{"id": "tester_a_0", "message": "Controller not disabled", "url": None}]
-    check_standard_response(response, True, "request_response", 1)
+    check_standard_response(response, True, "enable_controller", 3, "Controller not disabled")
 
 
 def test_enable_controller(client, controller):
@@ -142,17 +135,13 @@ def test_enable_controller(client, controller):
     print("Response", response.get_json())
     assert response.status_code == 200
     assert response.content_type == "application/json"
-    # assert not response.get_json()["error"]
-    # assert response.get_json()["message"] == []
-    check_standard_response(response, True, "request_response", 0)
+    check_standard_response(response, False, "enable_controller", 3, "Enabled controller")
     # Test that controller enabled by trying again and checking error
     response = client.get("/enable?name=tester_b_0")
     print("Response", response.get_json())
     assert response.status_code == 200
     assert response.content_type == "application/json"
-    # assert response.get_json()["error"]
-    # assert response.get_json()["message"] == [{"id": "tester_b_0", "message": "Controller not disabled", "url": None}]
-    check_standard_response(response, True, "request_response", 1)
+    check_standard_response(response, True, "enable_controller", 3, "Controller not disabled")
     # Reset and make sure state same as before test
     resetControllerEnable(client)
     assert start_disabled == dictToString(controller.disabled)
@@ -164,14 +153,12 @@ def test_enable_controller_second_strip(client):
     print("Response", response.get_json())
     assert response.status_code == 200
     assert response.content_type == "application/json"
-    assert not response.get_json()["error"]
-    assert response.get_json()["message"] == []
+    check_standard_response(response, False, "enable_controller", 3, "Enabled controller")
     response = client.get("/enable?name=tester_b_1")
     print("Response", response.get_json())
     assert response.status_code == 200
     assert response.content_type == "application/json"
-    assert response.get_json()["error"]
-    assert response.get_json()["message"] == [{"id": "tester_b_1", "message": "Controller not disabled", "url": None}]
+    check_standard_response(response, True, "enable_controller", 3, "Controller not disabled")
     resetControllerEnable(client)
 
 
@@ -180,8 +167,7 @@ def test_disable_controller_no_arg(client):
     print("Response", response.get_json())
     assert response.status_code == 200
     assert response.content_type == "application/json"
-    assert response.get_json()["error"]
-    assert response.get_json()["message"] == [{"id": None, "message": "Controller not found", "url": None}]
+    check_standard_response(response, True, "disable_controller", 3, "Controller not found")
 
 
 def test_disable_controller_wrong_name(client):
@@ -189,8 +175,7 @@ def test_disable_controller_wrong_name(client):
     print("Response", response.get_json())
     assert response.status_code == 200
     assert response.content_type == "application/json"
-    assert response.get_json()["error"]
-    assert response.get_json()["message"] == [{"id": "doesnt_exist", "message": "Controller not found", "url": None}]
+    check_standard_response(response, True, "disable_controller", 3, "Controller not found")
 
 
 def test_disable_controller_already_disabled(client):
@@ -198,8 +183,7 @@ def test_disable_controller_already_disabled(client):
     print("Response", response.get_json())
     assert response.status_code == 200
     assert response.content_type == "application/json"
-    assert response.get_json()["error"]
-    assert response.get_json()["message"] == [{"id": "tester_b_0", "message": "Controller not enabled", "url": None}]
+    check_standard_response(response, True, "disable_controller", 3, "Controller not enabled")
 
 
 def test_disable_controller(client, controller):
@@ -209,15 +193,12 @@ def test_disable_controller(client, controller):
     print("Response", response.get_json())
     assert response.status_code == 200
     assert response.content_type == "application/json"
-    assert not response.get_json()["error"]
-    assert response.get_json()["message"] == []
     # Test that controller disabled by trying again and checking error
     response = client.get("/disable?name=tester_a_0")
     print("Response", response.get_json())
     assert response.status_code == 200
     assert response.content_type == "application/json"
-    assert response.get_json()["error"]
-    assert response.get_json()["message"] == [{"id": "tester_a_0", "message": "Controller not enabled", "url": None}]
+    check_standard_response(response, True, "disable_controller", 3, "Controller not enabled")
     resetControllerEnable(client)
     assert start_disabled == dictToString(controller.disabled)
     assert start_urls == dictToString(controller.urls)
@@ -228,14 +209,11 @@ def test_disable_controller_second_strip(client):
     print("Response", response.get_json())
     assert response.status_code == 200
     assert response.content_type == "application/json"
-    assert not response.get_json()["error"]
-    assert response.get_json()["message"] == []
+    check_standard_response(response, False, "disable_controller", 3, "Disabled controller")
     response = client.get("/disable?name=tester_a_1")
-    print("Response", response.get_json())
     assert response.status_code == 200
     assert response.content_type == "application/json"
-    assert response.get_json()["error"]
-    assert response.get_json()["message"] == [{"id": "tester_a_1", "message": "Controller not enabled", "url": None}]
+    check_standard_response(response, True, "disable_controller", 3, "Controller not enabled")
     resetControllerEnable(client)
 
 

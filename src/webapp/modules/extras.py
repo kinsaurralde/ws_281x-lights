@@ -20,6 +20,7 @@ class CustomLogger(getLoggerClass()):
         if self.isEnabledFor(SUCCESS):
             self._log(SUCCESS, msg, args, **kwargs)
 
+
 class RequestResponse:
     """Contains response fields and error status"""
 

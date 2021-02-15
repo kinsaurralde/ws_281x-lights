@@ -39,30 +39,31 @@ class Controllers:
     def setNoSend(self, value: bool):
         """Set nosend"""
         self.nosend = value
+        self.manager.setNoSend(value)
 
     def disableController(self, name: str) -> list:
         """Disable controller"""
         if name not in self.controllers:
-            return [{"url": None, "id": name, "message": "Controller not found",}]
+            return {"error": True, "id": name, "message": "Controller not found"}
         url = self.controllers[name]["url"]
         if url in self.disabled:
-            return [{"url": None, "id": name, "message": "Controller not enabled",}]
+            return {"error": True, "id": name, "message": "Controller not enabled"}
         if url not in self.disabled:
             self.disabled[url] = []
         if name not in self.disabled[url]:
             self.disabled[url].append(name)
-        return []
+        return {"error": False, "id": name, "message": "Disabled controller"}
 
     def enableController(self, name: str) -> list:
         """Enable controller"""
         if name not in self.controllers:
-            return [{"url": None, "id": name, "message": "Controller not found",}]
+            return {"error": True, "id": name, "message": "Controller not found"}
         url = self.controllers[name]["url"]
         if url not in self.disabled:
-            return [{"url": None, "id": name, "message": "Controller not disabled",}]
+            return {"error": True, "id": name, "message": "Controller not disabled"}
         self.disabled.pop(url)
         self._initController(url, self.controllers[name])
-        return []
+        return {"error": False, "id": name, "message": "Enabled controller"}
 
     def updateControllerLatencies(self, background=None):
         """Redetermine latency to controllers"""

@@ -109,8 +109,8 @@ def responsesToDict(responses):
     return result
 
 
-def responseTemplate(good=False, rtype="", message="", payload={}):  # pylint: disable=dangerous-default-value
-    return {"good": good, "type": rtype, "message": message, "payload": payload}
+def responseTemplate(good=False, mtype="", message="", payload={}):  # pylint: disable=dangerous-default-value
+    return {"good": good, "type": mtype, "message": message, "payload": payload, "error": not good}
 
 
 def createResponse(payload, ordered=False):
@@ -192,13 +192,12 @@ def handleData():
     try:
         data = json.loads(request.data)
     except ValueError:
-        return createResponse(responseTemplate(good=False, rtype="json_error", message="JSON Decode Error"))
+        return createResponse(responseTemplate(good=False, mtype="json_error", message="JSON Decode Error"))
     controllers.setNoSend(getNosend())
     responses = controllers.send(data)
     all_good = responses["all_good"]
     request_responses = responses["responses"]
-    response = responseTemplate(all_good, rtype="request_response", payload=responsesToDict(request_responses))
-    response["error"] = not all_good
+    response = responseTemplate(all_good, mtype="request_response", payload=responsesToDict(request_responses))
     return createResponse(response)
 
 
@@ -293,9 +292,10 @@ def enableControllers():
 
     Return: JSON
     """
-    fails = controllers.enableController(request.args.get("name"))
+    result = controllers.enableController(request.args.get("name"))
     emitUpdatedData()
-    return createResponse({"error": len(fails) > 0, "message": fails})
+    response = responseTemplate(not result["error"], "enable_controller", result["message"], result)
+    return createResponse(response)
 
 
 @app.route("/disable")
@@ -312,9 +312,10 @@ def disableControllers():
 
     Return: JSON
     """
-    fails = controllers.disableController(request.args.get("name"))
+    result = controllers.disableController(request.args.get("name"))
     emitUpdatedData()
-    return createResponse({"error": len(fails) > 0, "message": fails})
+    response = responseTemplate(not result["error"], "disable_controller", result["message"], result)
+    return createResponse(response)
 
 
 @app.route("/update")
