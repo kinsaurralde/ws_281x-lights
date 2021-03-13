@@ -24,7 +24,7 @@ class Controllers:
         self.urls = {}
         self.inactive = {}
         self.disabled = {}
-        self.latencies = {}
+        self.rtt = {}
         self.last_brightness = {}
         self.brightness_queue = {}
         self.brightness_timer_active = False
@@ -34,7 +34,7 @@ class Controllers:
         self._setupConfig(config["controllers"])
         self.manager = ControllerManager(self)
         self._initControllers()
-        self.updateControllerLatencies()
+        self.updateControllerRTT()
 
     def setNoSend(self, value: bool):
         """Set nosend"""
@@ -65,37 +65,27 @@ class Controllers:
         self._initController(url, self.controllers[name])
         return {"error": False, "id": name, "message": "Enabled controller"}
 
-    def updateControllerLatencies(self, background=None):
-        """Redetermine latency to controllers"""
+    def updateControllerRTT(self):
         if self.nosend:
             return
-        for url in self.latencies:
+        for url in self.rtt:
             if url in self.disabled:
-                self.latencies[url] = "disabled"
+                self.rtt[url] = False
                 continue
-            start_time = time.time()
-            if not self.manager.send(url, url).good:
-                self.latencies[url] = None
-            else:
-                end_time = time.time()
-                latency = float((end_time - start_time) * 1000)
-                previous = self.latencies[url]
-                if not isinstance(previous, float):
-                    self.background_data["initialized"] = self.getControllerInitialized()
-                    self.background_data["version"] = self.getControllerVersionInfo()
-                    if background is not None and previous is None:
-                        background.updateData()
-                    previous = latency
-                self.latencies[url] = (previous + latency) / 2
-        log.debug(f"Controller Latencies {self.latencies}")
+            rtt = self.manager.getRTT(url)
+            if rtt is None:
+                self.updateControllerVersionInfo()
+                self.updateControllerInitialized()
+            self.rtt[url] = rtt
+        return
 
-    def getControllerLatencies(self) -> dict:
+    def getControllerRTT(self) -> dict:
         """Get controller latencies"""
-        latency = {}
-        for url in self.latencies:
+        rtt = {}
+        for url in self.rtt:
             for controller in self.urls[url]:
-                latency[controller] = self.latencies[url]
-        return latency
+                rtt[controller] = self.rtt[url]
+        return rtt
 
     def getBackgroundData(self) -> dict:
         """Get background data"""
@@ -103,9 +93,22 @@ class Controllers:
         self.background_data = {}
         return data
 
-    def getControllerVersionInfo(self) -> dict:
+    def getControllerVersionInfo(self):
+        return self.background_data.get("version", {})
+
+    def getControllerInitialzed(self):
+        return self.background_data.get("initialized", {})
+
+    def checkVersionMatch(self, r) -> bool:
+        v = self.version_info
+        return v["major"] == r["major"] and v["minor"] == r["minor"] and v["patch"] == r["patch"]
+
+    def checkHashMatch(self, r) -> bool:
+        v = self.version_info
+        return v["esp_hash"] == r["esp_hash"] and v["rpi_hash"] == r["rpi_hash"]
+
+    def updateControllerVersionInfo(self) -> None:
         """Get version info of controllers and webapp"""
-        fails = []
         data = {}
         version_match = True
         hash_match = True
@@ -119,22 +122,12 @@ class Controllers:
             response = response.response.json()
             for controller in self.urls[url]:
                 data[controller] = response
-            if (
-                response["major"] != self.version_info["major"]
-                or response["minor"] != self.version_info["minor"]
-                or response["patch"] != self.version_info["patch"]
-            ):
+            if not self.checkVersionMatch(response):
                 version_match = False
-                fails.append({"url": url, "id": "version", "message": "Version doesnt match"})
-            if (
-                response["esp_hash"] != self.version_info["esp_hash"]
-                or response["rpi_hash"] != self.version_info["rpi_hash"]
-            ):
+            if not self.checkHashMatch(response):
                 hash_match = False
-                fails.append({"url": url, "id": "hash", "message": "Hash doesnt match"})
-        return {
+        self.background_data["version"] = {
             "versioninfo": data,
-            "fails": fails,
             "webapp": self.version_info,
             "version_match": version_match,
             "hash_match": hash_match,
@@ -147,9 +140,8 @@ class Controllers:
             result[c] = self.controllers[c]["init"]["num_leds"]
         return result
 
-    def getControllerInitialized(self) -> dict:
+    def updateControllerInitialized(self) -> None:
         """Get whether controllers are initialzied"""
-        fails = []
         data = {}
         for url in self.urls:
             if url in self.disabled:
@@ -162,17 +154,9 @@ class Controllers:
             for controller in self.controllers:
                 if self.controllers[controller]["url"] == url:
                     response_index = int(self.controllers[controller]["strip_id"])
-                    if response_index < 0 or response_index >= len(response):
-                        fails.append(
-                            {
-                                "url": url,
-                                "id": response_index,
-                                "message": "Strip id does not exist on remote controller",
-                            }
-                        )
-                    else:
+                    if 0 <= response_index < len(response):
                         data[controller] = response[response_index]
-        return {"fails": fails, "initialized": data}
+        self.background_data["initialized"] = {"initialized": data}
 
     def send(self, commands: list) -> list:
         """Send commands to controllers"""
@@ -239,7 +223,7 @@ class Controllers:
                 continue
             self.controllers[name] = controller
             url = controller["url"]
-            self.latencies[url] = None
+            self.rtt[url] = None
             if url not in self.urls:
                 self.urls[url] = []
             self.urls[url].append(name)

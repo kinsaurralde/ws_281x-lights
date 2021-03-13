@@ -1,4 +1,5 @@
 import json
+import time
 import threading
 import logging
 import requests
@@ -63,6 +64,15 @@ class ControllerManager:
         full = {"all_good": not has_error, "responses": result, "errors": error_controllers}
         log.debug(f"End session {session_id}: {full}")
         return full
+
+    def getRTT(self, url):
+        start_time = time.time()
+        result = self._send_thread("GET", url, payload={}, controller_id=url)
+        end_time = time.time()
+        if result.good:
+            return end_time - start_time
+        log.warning(f"Failed to get RTT of {url}")
+        return None
 
     def send(
         self, url: str, controller_id="", path="", method="GET", payload=None, session_id=0, threaded=False

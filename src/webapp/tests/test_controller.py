@@ -233,7 +233,6 @@ def test_controller_version_info(client, mocker, controller):
     json_data = response.get_json()
     assert response.status_code == 200
     assert response.content_type == "application/json"
-    assert json_data["fails"] == []
     assert json_data["version_match"]
     assert json_data["hash_match"]
     assert len(json_data["versioninfo"]) == 3  # Len equals num enabled controllers
@@ -263,7 +262,6 @@ def test_controller_version_info_no_hashmatch(client, mocker, controller):
     json_data = response.get_json()
     assert response.status_code == 200
     assert response.content_type == "application/json"
-    assert len(json_data["fails"]) > 0
     assert json_data["version_match"]
     assert not json_data["hash_match"]
     assert len(json_data["versioninfo"]) == 3  # Len equals num enabled controllers
@@ -293,7 +291,6 @@ def test_controller_version_info_no_versionmatch(client, mocker, controller):
     json_data = response.get_json()
     assert response.status_code == 200
     assert response.content_type == "application/json"
-    assert len(json_data["fails"]) > 0
     assert not json_data["version_match"]
     assert json_data["hash_match"]
     assert len(json_data["versioninfo"]) == 3  # Len equals num enabled controllers
@@ -308,7 +305,6 @@ def test_controller_initialized(client, mocker, controller):
     json_data = response.get_json()
     assert response.status_code == 200
     assert response.content_type == "application/json"
-    assert json_data["fails"] == []
     for name in json_data["initialized"]:
         assert json_data["initialized"][name]
 
@@ -318,12 +314,8 @@ def test_controller_initialized_invalid_strip(client, mocker, controller):
     mocker.patch("requests.get", return_value=MockedResponse(dictToString([True]), 200))
     response = client.get("/getinitialized")
     print("Response", response.get_json())
-    json_data = response.get_json()
     assert response.status_code == 200
     assert response.content_type == "application/json"
-    assert json_data["fails"] == [
-        {"url": "http://localhost:6000", "id": 1, "message": "Strip id does not exist on remote controller",}
-    ]
 
 
 def test_background_thread(background, controller):

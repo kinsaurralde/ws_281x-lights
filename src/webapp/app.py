@@ -262,6 +262,7 @@ def getversioninfo():
 
     Return: JSON
     """
+    controllers.updateControllerVersionInfo()
     return createResponse(controllers.getControllerVersionInfo())
 
 
@@ -275,7 +276,8 @@ def getinitialized():
 
     Return: JSON
     """
-    return createResponse(controllers.getControllerInitialized())
+    controllers.updateControllerInitialized()
+    return createResponse(controllers.getControllerInitialzed())
 
 
 @app.route("/enable")

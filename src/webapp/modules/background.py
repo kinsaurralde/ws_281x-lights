@@ -9,6 +9,7 @@ class Background:
         self.socketio = socketio
         self.controller = controller
         self.active = True
+        self.thread = None
         self.delay_ms = 100
         # self.pixel_interval = 50
         self.emit_delay_ms = 1000
@@ -18,13 +19,13 @@ class Background:
 
     def startLoop(self):
         """Start background loop"""
-        thread = threading.Thread(target=self._loop)
-        thread.start()
+        self.thread = threading.Thread(target=self._loop)
+        self.thread.start()
 
     def updatePing(self):
         """Update controller ping"""
-        self.controller.updateControllerLatencies(self)
-        self.data["ping"] = self.controller.getControllerLatencies()
+        self.controller.updateControllerRTT()
+        self.data["ping"] = self.controller.getControllerRTT()
 
     def updateData(self):
         """Update background data"""
