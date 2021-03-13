@@ -15,10 +15,12 @@ log.setLevel("DEBUG")
 class ControllerManager:
     """Handles sending to controllers"""
 
-    def __init__(self, socketio) -> None:
+    def __init__(self, controller) -> None:
+        self.controller = controller
         self.session_counter = 0
         self.sessions = {}
-        self.sio = socketio
+        self.sio = self.controller.socketio
+        self.latency = {}
         self.callbacks = {}
         self.nosend = False
         self.startSession()

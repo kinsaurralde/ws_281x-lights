@@ -32,7 +32,7 @@ class Controllers:
         self.controllers = {}
         self.alias = config.get("alias", {})
         self._setupConfig(config["controllers"])
-        self.manager = ControllerManager(socketio)
+        self.manager = ControllerManager(self)
         self._initControllers()
         self.updateControllerLatencies()
 
