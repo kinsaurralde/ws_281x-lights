@@ -17,6 +17,8 @@ disable=
     anomalous-backslash-in-string,
     wildcard-import,
     logging-format-interpolation,
+    f-string-without-interpolation,
+    logging-fstring-interpolation,
     broad-except
 
 [FORMAT]

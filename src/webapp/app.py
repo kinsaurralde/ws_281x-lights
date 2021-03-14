@@ -32,7 +32,7 @@ logging.setLoggerClass(modules.CustomLogger)
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
 
-werkzeug_handler = RotatingFileHandler("logs/werkzeug.log", mode="w", maxBytes=MAX_LOG_BYTES, backupCount=2)
+werkzeug_handler = RotatingFileHandler("logs/werkzeug.log", mode="a", maxBytes=MAX_LOG_BYTES, backupCount=2)
 werkzeug_logger = logging.getLogger("werkzeug")
 werkzeug_logger.addHandler(werkzeug_handler)
 werkzeug_logger.propagate = False
