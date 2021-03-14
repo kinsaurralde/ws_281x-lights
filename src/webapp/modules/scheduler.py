@@ -1,8 +1,12 @@
 import time
 import threading
+import logging
 import importlib
 
 import schedule
+
+log = logging.getLogger(__name__)
+log.setLevel("DEBUG")
 
 
 class Scheduler:
@@ -48,7 +52,7 @@ class Scheduler:
             try:
                 schedule.run_pending()
             except:
-                print("Excpetion on scheduled task")
+                log.error(f"Exception on scheduled task")
             time.sleep(1)
 
     def _importSchedules(self):

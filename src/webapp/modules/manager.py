@@ -67,7 +67,7 @@ class ControllerManager:
 
     def getRTT(self, url):
         start_time = time.time()
-        result = self._send_thread("GET", url, payload={}, controller_id=url)
+        result = self._send_thread("GET", url, payload={}, controller_id=url, logs=False)
         end_time = time.time()
         if result.good:
             return end_time - start_time
@@ -110,11 +110,14 @@ class ControllerManager:
     def setNoSend(self, value: bool) -> None:
         self.nosend = value
 
-    def _send_thread(self, method: str, url: str, payload: object, controller_id: str, session_id=0) -> object:
+    def _send_thread(
+        self, method: str, url: str, payload: object, controller_id: str, session_id=0, logs=True
+    ) -> object:
         """Make request to url with given method. If error occurs, record error_message in self.sessions"""
         error_reason = ""
         response = None
-        log.debug(f"Sending {method} {url}")
+        if logs:
+            log.debug(f"Sending {method} {url}")
         try:
             if self.nosend:
                 error_reason = "No send is true"
@@ -125,8 +128,9 @@ class ControllerManager:
             else:
                 error_reason = f"Invalid method: {method}"
             if response is not None and response.status_code != 200:
-                log.warning(f"Recieved response code {response.status_code} from {url} with payload {payload}")
-                log.debug(f"Error response is {response.text}")
+                if logs:
+                    log.warning(f"Recieved response code {response.status_code} from {url} with payload {payload}")
+                    log.debug(f"Error response is {response.text}")
         except requests.exceptions.Timeout as e:
             error_reason = "Timeout: {e}"
         except requests.RequestException as e:
@@ -138,5 +142,6 @@ class ControllerManager:
         if result.good:
             return result
         error_message = f"Failed to send to {url} because {error_reason}"
-        log.error(error_message)
+        if logs:
+            log.error(error_message)
         return result

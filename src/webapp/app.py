@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+import time
 import logging
 import argparse
 
@@ -41,8 +42,8 @@ logging.getLogger("urllib3.connectionpool").setLevel("WARNING")
 log = logging.getLogger("app")
 coloredlogs.DEFAULT_LEVEL_STYLES["info"] = {"color": "black", "bold": True}
 coloredlogs.install(level="DEBUG", fmt=LOG_FORMAT, logger=log)
-log_file_handler = RotatingFileHandler("logs/app.log", mode="w", maxBytes=MAX_LOG_BYTES, backupCount=3)
-log_color_file_handler = RotatingFileHandler("logs/app-color.log", mode="w", maxBytes=MAX_LOG_BYTES, backupCount=3)
+log_file_handler = RotatingFileHandler("logs/app.log", mode="a", maxBytes=MAX_LOG_BYTES, backupCount=3)
+log_color_file_handler = RotatingFileHandler("logs/app-color.log", mode="a", maxBytes=MAX_LOG_BYTES, backupCount=3)
 log_file_handler.setFormatter(logging.Formatter(LOG_FORMAT))
 log_color_file_handler.setFormatter(coloredlogs.ColoredFormatter(fmt=LOG_FORMAT))
 logging.root.addHandler(log_file_handler)
@@ -486,6 +487,9 @@ def getActiveSchedules():
 def connect():
     log.notice(f"Client Connected: {request.remote_addr}")
     socketio.emit("connection_response", room=request.sid)
+    time.sleep(1)
+    active_schedules = scheduler.getActiveSchedules()
+    socketio.emit("active_schedules", active_schedules)
 
 
 @socketio.on("disconnect")

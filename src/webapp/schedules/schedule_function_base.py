@@ -1,3 +1,8 @@
+import logging
+
+log = logging.getLogger(__name__)
+log.setLevel("DEBUG")
+
 class ScheduleFunctionBase:
     def __init__(self, scheduler, sequencer, config):
         self.scheduler = scheduler
@@ -15,7 +20,7 @@ class ScheduleFunctionBase:
             try:
                 self.function_table[function] = getattr(self, function)
             except AttributeError:
-                print(f"Function {function} for schedule {self.name} does not exist!")
+                log.info(f"Function {function} for schedule {self.name} does not exist!")
 
     def hasFunction(self, name):
         return name in self.function_table

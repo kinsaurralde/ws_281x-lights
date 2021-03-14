@@ -73,7 +73,7 @@ class Controllers:
                 self.rtt[url] = False
                 continue
             rtt = self.manager.getRTT(url)
-            if rtt is None:
+            if self.rtt[url] is None and rtt is not None:
                 self.updateControllerVersionInfo()
                 self.updateControllerInitialized()
             self.rtt[url] = rtt
