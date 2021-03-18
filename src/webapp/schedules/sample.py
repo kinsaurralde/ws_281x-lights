@@ -15,7 +15,7 @@ class ScheduleFunction(ScheduleFunctionBase):
         self.sequencer.run("sample", "off", 1)
 
     def test_a(self):
-        self.add("test_a", self.s.every(.05).minutes.do(self.job_a))
+        self.add("test_a", self.s.every(5).minutes.do(self.job_a))
 
     def test_b(self):
         self.add("test_b", self.s.every().day.at("17:30").do(self.job_b))

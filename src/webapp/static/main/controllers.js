@@ -141,7 +141,7 @@ class Controllers {
           if (data[controller] === null) {
             this.setStatus(div, FALSE, 'DISCONNECTED');
             this.setStatusConnected(controller, FALSE, 'DISCONNECTED');
-          } else if (data[controller] === 'disabled') {
+          } else if (data[controller] === false) {
             div_mode_select.value = 'disabled';
             this.setStatus(div, FALSE, 'DISABLED');
             this.setStatusConnected(controller, FALSE, 'DISABLED');

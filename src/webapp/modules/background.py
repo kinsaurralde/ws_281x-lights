@@ -9,6 +9,7 @@ class Background:
         self.socketio = socketio
         self.controller = controller
         self.active = True
+        self.thread = None
         self.delay_ms = 100
         # self.pixel_interval = 50
         self.emit_delay_ms = 1000
@@ -18,13 +19,13 @@ class Background:
 
     def startLoop(self):
         """Start background loop"""
-        thread = threading.Thread(target=self._loop)
-        thread.start()
+        self.thread = threading.Thread(target=self._loop)
+        self.thread.start()
 
     def updatePing(self):
         """Update controller ping"""
-        self.controller.updateControllerLatencies(self)
-        self.data["ping"] = self.controller.getControllerLatencies()
+        self.controller.updateControllerRTT()
+        self.data["ping"] = self.controller.getControllerRTT()
 
     def updateData(self):
         """Update background data"""
@@ -34,26 +35,6 @@ class Background:
         """Emit update"""
         if len(self.data) > 0:
             self.socketio.emit("update", self.data)
-
-    # def setPixelInterval(self, value: int):
-    #     """Set pixel_interval"""
-    #     if value >= self.delay_ms:
-    #         self.pixel_interval = value
-
-    # def getPixelInterval(self) -> int:
-    #     """Get pixel interval"""
-    #     return self.pixel_interval
-
-    # def setPixelsActive(self, value: str):
-    #     """Set pixels_active"""
-    #     if value == "true":
-    #         self.pixels_active = True
-    #     else:
-    #         self.pixels_active = False
-
-    # def getPixelsActive(self) -> bool:
-    #     """Return pixels_active"""
-    #     return self.pixels_active
 
     def _loop(self):
         counter = 0
@@ -67,12 +48,5 @@ class Background:
                 counter = 0
                 self.emitUpdate()
                 self.data = {}
-            # if (
-            #     counter % self.pixel_interval == 0
-            #     and self.pixels_simulate
-            #     and self.pixels_active
-            # ):
-            #     pixels = self.controller.getPixels()
-            #     self.socketio.emit("pixels", pixels)
             time.sleep(self.delay_ms / 1000)
             counter += self.delay_ms

@@ -10,15 +10,9 @@ except:
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "-c",
-    "--config",
-    type=str,
-    help="Path to config file",
-    default="configs/upload_rpi.yaml",
+    "-c", "--config", type=str, help="Path to config file", default="configs/upload_rpi.yaml",
 )
-parser.add_argument(
-    "-b", "--buildfolder", type=str, help="Path to buildfolder", default="../build/"
-)
+parser.add_argument("-b", "--buildfolder", type=str, help="Path to buildfolder", default="../build/")
 args = parser.parse_args()
 
 
@@ -40,8 +34,7 @@ def send(device):
             tf.write(bytes("put -r " + folder + "\n", "utf-8"))
             tf.flush()
             subprocess.run(  # pylint: disable=no-member
-                ["sftp", "-i", device["key"], "-b", tf.name, device["userhost"]],
-                check=True,
+                ["sftp", "-i", device["key"], "-b", tf.name, device["userhost"]], check=True,
             )
 
 

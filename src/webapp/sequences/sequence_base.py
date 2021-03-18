@@ -1,4 +1,8 @@
 import time
+import logging
+
+log = logging.getLogger(__name__)
+log.setLevel("DEBUG")
 
 class SequenceBase:
     def __init__(self, sequencer, send, config) -> None:
@@ -16,7 +20,7 @@ class SequenceBase:
             try:
                 self.function_table[function] = getattr(self, function)
             except AttributeError:
-                print(f"Function {function} for sequence {self.name} does not exist!")
+                log.info(f"Function {function} for sequence {self.name} does not exist!")
 
     @staticmethod
     def createAnimationArgs():
