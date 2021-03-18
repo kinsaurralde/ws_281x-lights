@@ -1,4 +1,4 @@
-const ARRAY_OFFSET_AMOUNT = 8;
+const ARRAY_OFFSET_AMOUNT = 4;
 
 class Pixels {
   constructor(num_pixels = 300, max_brightness = 127) {
