@@ -117,10 +117,6 @@ run_local: all
 setup:
 	sudo apt update --fix-missing
 	sudo apt-get update
-	sudo apt-get install libnode-dev nodejs-dev node-gyp libssl1.0-dev
-	sudo apt install npm 
-	make node_modules
-	sudo npm i docsify-cli -g
 	sudo apt install pylint
 	sudo apt install python3-pip
 	pip3 install eventlet
@@ -139,6 +135,10 @@ setup:
 	sudo pip3 install Flask
 	sudo pip3 install flask_socketio
 	sudo pip3 install ruamel.yaml 
+	sudo apt-get install libnode-dev nodejs-dev node-gyp libssl1.0-dev
+	sudo apt install npm 
+	make node_modules
+	sudo npm i docsify-cli -g
 
 node_modules:
 	npm install clang-format prettier html-validate eslint eslint-config-defaults eslint-config-google uglify-js
