@@ -115,8 +115,8 @@ run_local: all
 	cd ${TOOLS_DIR} && sudo python3 -i localtest.py
 
 setup:
-	apt-get update
 	sudo apt update --fix-missing
+	sudo apt-get update
 	sudo apt-get install libnode-dev nodejs-dev node-gyp libssl1.0-dev
 	sudo apt install npm 
 	make node_modules
