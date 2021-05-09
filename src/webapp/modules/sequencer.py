@@ -1,6 +1,11 @@
 import importlib
 import threading
 import time
+import logging
+
+
+log = logging.getLogger(__name__)
+log.setLevel("DEBUG")
 
 
 class Sequencer:
@@ -55,9 +60,6 @@ class Sequencer:
         thread.start()
         return True
 
-    # def toggle(self, sequence_name, function_name, iterations=None):
-    #     return False
-
     def stop(self, sequence_name: str, function_name: str) -> bool:
         """Stops sequence"""
         if sequence_name not in self.sequences:
@@ -96,7 +98,7 @@ class Sequencer:
                 if iterations is not None:
                     iterations -= 1
         except:
-            print("Exiting", self.thread_local.name)
+            log.error(f"Exiting {self.thread_local.name}")
         finally:
             self.socketio.emit("stop_sequence", {"name": name})
 

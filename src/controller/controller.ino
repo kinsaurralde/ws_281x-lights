@@ -273,29 +273,7 @@ void handleData() {
             neopixels.pixels[id]->setDelay(args.wait_ms);
         }
         Serial.println("Run animation " + String(args.animation) + " on id " + String(id));
-        switch (args.animation) {
-            case Animation::color:
-                neopixels.pixels[id]->color(args);
-                break;
-            case Animation::wipe:
-                neopixels.pixels[id]->wipe(args);
-                break;
-            case Animation::pulse:
-                neopixels.pixels[id]->pulse(args);
-                break;
-            case Animation::rainbow:
-                neopixels.pixels[id]->rainbow(args);
-                break;
-            case Animation::cycle:
-                neopixels.pixels[id]->cycle(args);
-                break;
-            case Animation::randomCycle:
-                neopixels.pixels[id]->randomCycle(args);
-                break;
-            case Animation::reverser:
-                neopixels.pixels[id]->reverser(args);
-                break;
-        }
+        neopixels.pixels[id]->animation(args);
         delete args.colors;
     }
     server.send(200, "application/json", "[]");

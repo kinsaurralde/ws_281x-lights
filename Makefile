@@ -1,6 +1,6 @@
 # Version Information
 MAJOR				= 2
-MINOR				= 2
+MINOR				= 3
 PATCH				= 1
 LABEL				= pwa
 
@@ -29,6 +29,7 @@ CLANG_FORMAT		= node_modules/clang-format/bin/linux_x64/clang-format --style=Goo
 ESLINT				= node_modules/eslint/bin/eslint.js
 HTML_VALIDATE		= node_modules/html-validate/bin/html-validate.js
 PRETTIER			= node_modules/prettier/bin-prettier.js
+UGLIFYJS			= node_modules/uglify-js/bin/uglifyjs
 PRETTIER_CONIG		= --config lint_config/.prettierrc.json
 HTML_VALIDATE_CONFG = --config lint_config/.htmlvalidate.json
 ESLINT_CONFIG		= --config lint_config/.eslintrc.json
@@ -38,6 +39,13 @@ WEBAPP_CONFIG_ARG	= "config/controllers_sample.yaml"
 
 ESP_HASH			= $(shell sha1sum ${CONTROLLERS_DIR}controller.ino ${CONTROLLERS_DIR}pixels* ${CONTROLLERS_DIR}structs* | sha1sum | head -c 40)
 RPI_HASH			= $(shell sha1sum ${CONTROLLERS_DIR}*.py ${CONTROLLERS_DIR}pixels* ${CONTROLLERS_DIR}structs* | sha1sum | head -c 40)
+
+WASM_ARGS			= -Os -s ASSERTIONS=1 -s LLD_REPORT_UNDEFINED --no-entry
+
+WASM_LIST			= '_maxLEDPerStrip', '_ledStripCount', '_List_new', '_List_setCounter', '_List_getCounter', '_List_set', '_List_get', '_List_size'
+WASM_PIXELS			= '_Pixels_new', '_Pixels_size', '_Pixels_getBrightness', '_Pixels_setBrightness', '_Pixels_get', '_Pixels_increment', '_Pixels_animation', '_createAnimationArgs', '_Pixels_getCurrentState'
+
+WASM_EXPORTED		= -s "EXPORTED_FUNCTIONS=[${WASM_LIST}, ${WASM_PIXELS}]" -s "EXTRA_EXPORTED_RUNTIME_METHODS=['getValue']"
 
 all:
 	# Create Directories
@@ -81,8 +89,6 @@ all:
 
 	# Copy to webapp
 	cp -r ${WEBAPP_DIR} ${BUILD_DIR}
-	cp ${CONTROLLERS_DIR}wrapper.py ${CONTROLLERS_DIR}controller.py ${BUILD_RPI_DIR}pixels.so ${BUILD_DIR}webapp/
-	cp ${CONTROLLERS_DIR}wrapper.py ${CONTROLLERS_DIR}controller.py ${BUILD_RPI_DIR}pixels.so ${WEBAPP_DIR}
 
 test:
 	make coverage
@@ -96,11 +102,14 @@ coverage:
 run_rpi: build
 	cd ${BUILD_RPI_DIR} && python3 controller_server.py --test && cd ../../
 
-run_app:
-	cd ${WEBAPP_DIR} && python3 app.py -d --config ${WEBAPP_CONFIG_ARG}
+run_app: clean_logs
+	cd ${WEBAPP_DIR} && python3 app.py --config ${WEBAPP_CONFIG_ARG}
 
 run_app_simulate:
 	cd ${WEBAPP_DIR} && python3 app.py -d -s --config ${WEBAPP_CONFIG_ARG}
+
+run_interactive:
+	cd ${WEBAPP_DIR} && python3 -i app.py --config ${WEBAPP_CONFIG_ARG} --nostart --noschedule
 
 run_app_nosend:
 	cd ${WEBAPP_DIR} && python3 app.py -d --nosend --config ${WEBAPP_CONFIG_ARG}
@@ -110,10 +119,7 @@ run_local: all
 
 setup:
 	sudo apt update --fix-missing
-	sudo apt install nodejs
-	sudo apt install npm
-	make node_modules
-	sudo npm i docsify-cli -g
+	sudo apt-get update
 	sudo apt install pylint
 	sudo apt install python3-pip
 	pip3 install eventlet
@@ -124,24 +130,38 @@ setup:
 	pip3 install coverage
 	pip3 install pylint
 	pip3 install schedule
+	pip3 install coloredlogs
+	sudo pip3 install coloredlogs
 	sudo pip3 install schedule
 	sudo pip3 install rpi_ws281x
 	sudo apt install screen
 	sudo pip3 install Flask
 	sudo pip3 install flask_socketio
 	sudo pip3 install ruamel.yaml 
+	sudo apt-get install libnode-dev nodejs-dev node-gyp libssl1.0-dev
+	sudo apt install npm 
+	make node_modules
+	sudo npm i docsify-cli -g
 
 node_modules:
-	npm install clang-format prettier html-validate eslint eslint-config-defaults eslint-config-google
+	npm install clang-format prettier html-validate eslint eslint-config-defaults eslint-config-google uglify-js
 
 lint: all clean
 	${PRETTIER} ${PRETTIER_CONIG} --write ${CSS_DIR}*.css
 	${PRETTIER} ${PRETTIER_CONIG} --write ${HTML_DIR}*.html
 	find src/ -iname *.js | xargs ${CLANG_FORMAT} -i
+	${UGLIFYJS} ${WEBAPP_DIR}static/pixels/pixels.js --compress > ${BUILD_DIR}a.tmp
+	${UGLIFYJS} ${WEBAPP_DIR}static/lib/socket.io.js --compress > ${BUILD_DIR}b.tmp
+	mv ${BUILD_DIR}a.tmp ${WEBAPP_DIR}static/pixels/pixels.js
+	mv ${BUILD_DIR}b.tmp ${WEBAPP_DIR}static/lib/socket.io.js
 	${HTML_VALIDATE} ${HTML_VALIDATE_CONFG} ${HTML_DIR}*.html
-	${ESLINT} ${ESLINT_CONFIG} ${JS_FILES}
-	python3 -m black ${PY_FILES}
+	${ESLINT} --fix ${ESLINT_CONFIG} ${JS_FILES}
+	python3 -m black --line-length 120 ${PY_FILES}
 	python3 -m pylint ${PYLINT_CONFIG} ${PY_FILES}
+
+lol:
+	${UGLIFYJS} ${WEBAPP_DIR}static/pixels/pixels.js --compress > a.tmp
+	${UGLIFYJS} ${WEBAPP_DIR}static/lib/socket.io.js --compress > b.tmp
 
 upload_rpi: all
 	cd tools &&	python3 upload_rpi.py
@@ -153,13 +173,15 @@ docs:
 	docsify serve docs
 
 git:
-	make build
 	make clean
 	make test
 	make lint
 	git status
 
-clean:
+clean_logs:
+	rm -f ${WEBAPP_DIR}logs/*
+
+clean: clean_logs
 	rm -fr ${BUILD_DIR}*
 	rm -f ${CONTROLLERS_DIR}*.so
 	rm -f ${WEBAPP_DIR}controller.py
@@ -169,3 +191,11 @@ clean:
 	find . -name htmlcov -exec rm -rv {} +
 	find . -name .coverage -exec rm -rv {} +
 	
+wasm:
+	./sdk/emsdk/emsdk activate > /dev/null
+	echo "If em++: not found, run"
+	echo "cd sdk/emsdk/ && source ./emsdk_env.sh && cd ../../"
+	em++ ${WASM_ARGS} ${WASM_EXPORTED} -o ${WEBAPP_DIR}static/pixels/pixels.js ${CONTROLLERS_DIR}extern.cpp ${CONTROLLERS_DIR}structs.cpp ${CONTROLLERS_DIR}pixels.cpp
+
+wasm-optimized:
+	em++ ${WASM_ARGS} -O3 ${WASM_EXPORTED} -o ${WEBAPP_DIR}static/pixels/pixels.js ${CONTROLLERS_DIR}extern.cpp ${CONTROLLERS_DIR}structs.cpp ${CONTROLLERS_DIR}pixels.cpp

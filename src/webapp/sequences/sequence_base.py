@@ -1,4 +1,8 @@
 import time
+import logging
+
+log = logging.getLogger(__name__)
+log.setLevel("DEBUG")
 
 class SequenceBase:
     def __init__(self, sequencer, send, config) -> None:
@@ -17,7 +21,7 @@ class SequenceBase:
             try:
                 self.function_table[function] = getattr(self, function)
             except AttributeError:
-                print(f"Function {function} for sequence {self.name} does not exist!")
+                log.info(f"Function {function} for sequence {self.name} does not exist!")
 
     @staticmethod
     def createAnimationArgs():
@@ -123,6 +127,23 @@ class SequenceBase:
         args["arg1"] = int(steps_between_colors)
         args["inc_steps"] = int(steps)
         args["wait_ms"] = int(wait_ms)
+        self.send(args)
+
+    def randomCycle(self, controller_id="all", seed=0, wait_ms=250, steps=1):
+        args = self.createAnimationArgs()
+        args["id"] = controller_id
+        args["animation"] = 5
+        args["arg1"] = int(seed)
+        args["inc_steps"] = int(steps)
+        args["wait_ms"] = int(wait_ms)
+        self.send(args)
+
+    def reverser(self, controller_id="all", reverse_animation=True, reverse_pixels=False):
+        args = self.createAnimationArgs()
+        args["id"] = controller_id
+        args["animation"] = 6
+        args["arg6"] = bool(reverse_animation)
+        args["arg7"] = bool(reverse_pixels)
         self.send(args)
 
     def hasFunction(self, name):

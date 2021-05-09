@@ -18,6 +18,10 @@
     <script defer src="../static/main/schedules.js"></script>
     <script defer src="../static/main/pixel_strip.js"></script>
     <script defer src="../static/main/pixel_display.js"></script>
+
+    <script src="../static/pixels/simulator.js"></script>
+    <script src="../static/pixels/pixels.js"></script>
+    <script src="../static/pixels/wrapper.js"></script>
   </head>
 
   <body>
@@ -273,11 +277,14 @@
         window.pixel_display = new PixelDisplay()
         window.sequences = new Sequences()
         window.schedules = new Schedules()
+        window.simulator = new Simulator()
         socket.emit("webpage_loaded")
       }
 
       function loadedControllers() {
         groups.init(controllers.getNames())
+        pixel_display.init(controllers.getSizes(), controllers.getIsActive())
+        simulator.init(controllers.getNames())
       }
 
       if ("serviceWorker" in navigator) {

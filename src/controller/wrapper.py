@@ -79,13 +79,11 @@ class Pixels:
         self.lib.Pixels_isGRB.argtypes = [ctypes.c_void_p]
         self.lib.Pixels_isGRB.restype = ctypes.c_bool
         self.lib.Pixels_get.restype = ctypes.POINTER(Frame)
-        self.lib.Pixels_color.argtypes = [ctypes.c_uint, AnimationArgs]
-        self.lib.Pixels_wipe.argtypes = [ctypes.c_uint, AnimationArgs]
-        self.lib.Pixels_pulse.argtypes = [ctypes.c_uint, AnimationArgs]
-        self.lib.Pixels_rainbow.argtypes = [ctypes.c_uint, AnimationArgs]
-        self.lib.Pixels_cycle.argtypes = [ctypes.c_uint, AnimationArgs]
-        self.lib.Pixels_randomCycle.argtypes = [ctypes.c_uint, AnimationArgs]
-        self.lib.Pixels_reverser.argtypes = [ctypes.c_uint, AnimationArgs]
+        self.lib.Pixels_animation.argtypes = [ctypes.c_uint, ctypes.c_void_p]
+        self.lib.createAnimationArgs.argtypes = [ctypes.c_uint, ctypes.c_int, ctypes.c_int, ctypes.c_void_p, ctypes.c_uint, ctypes.c_uint, ctypes.c_uint, ctypes.c_uint, ctypes.c_int, ctypes.c_int, ctypes.c_bool, ctypes.c_bool, ctypes.c_bool]
+        self.lib.createAnimationArgs.restype = ctypes.c_void_p
+        self.lib.Pixels_getCurrentState.argtypes = [ctypes.c_void_p]
+        self.lib.Pixels_getCurrentState.restype = ctypes.c_long
         self.obj = self.lib.Pixels_new(val, MAX_BRIGHTNESS)
 
     def canShow(self, ms):
@@ -127,41 +125,26 @@ class Pixels:
     def increment(self):
         self.lib.Pixels_increment(self.obj)
 
-    def color(self, args):
-        self.lib.Pixels_color(self.obj, args)
+    def animation(self, args):
+        args_pointer = self.lib.createAnimationArgs(args.animation, args.color, args.color_bg, args.colors.obj, args.wait_ms, args.arg1, args.arg2, args.arg3, args.arg4, args.arg5, args.arg6, args.arg7, args.arg8)
+        self.lib.Pixels_animation(self.obj, args_pointer)
 
-    def wipe(self, args):
-        self.lib.Pixels_wipe(self.obj, args)
-
-    def pulse(self, args):
-        self.lib.Pixels_pulse(self.obj, args)
-
-    def rainbow(self, args):
-        self.lib.Pixels_rainbow(self.obj, args)
-
-    def cycle(self, args):
-        self.lib.Pixels_cycle(self.obj, args)
-
-    def randomCycle(self, args):
-        self.lib.Pixels_randomCycle(self.obj, args)
-
-    def reverser(self, args):
-        self.lib.Pixels_reverser(self.obj, args)
+    def getCurrentState(self):
+        state_pointer = self.lib.Pixels_getCurrentState()
 
 
-class AnimationArgs(ctypes.Structure):
-    _fields_ = [
-        ("animation", ctypes.c_uint),
-        ("color", ctypes.c_int),
-        ("color_bg", ctypes.c_int),
-        ("colors", ctypes.c_void_p),
-        ("wait_ms", ctypes.c_uint),
-        ("arg1", ctypes.c_uint),
-        ("arg2", ctypes.c_uint),
-        ("arg3", ctypes.c_uint),
-        ("arg4", ctypes.c_int),
-        ("arg5", ctypes.c_int),
-        ("arg6", ctypes.c_bool),
-        ("arg7", ctypes.c_bool),
-        ("arg8", ctypes.c_bool),
-    ]
+class AnimationArgs:
+    def __init__(self):
+        self.animation = 0
+        self.color = 0
+        self.color_bg = 0
+        self.colors = List(0)
+        self.wait_ms = 0
+        self.arg1 = 0
+        self.arg2 = 0
+        self.arg3 = 0
+        self.arg4 = 0
+        self.arg5 = 0
+        self.arg6 = False
+        self.arg7 = False
+        self.arg8 = False

@@ -28,6 +28,27 @@ class Sequence(SequenceBase):
         self.pulse(**PULSE)
         self.sleep(10)
 
+    def new(self):
+        self.randomCycle(wait_ms=400)
+        self.sleep(12)
+        max_seconds = 3
+        self.pulse(**RED_GREEN_ALTERATE)
+        for i in range(max_seconds):
+            self.sleep(max_seconds - i)
+            self.reverser(reverse_animation=True, reverse_pixels=False)
+            self.sleep(max_seconds - i)
+            self.reverser(reverse_animation=True, reverse_pixels=False)
+        self.rainbow(steps=5)
+        self.sleep(12)
+        for _ in range(6):
+            self.wipe(steps=12, color="green", reverse=False)
+            self.sleep(1)
+            self.wipe(steps=12, color="red", reverse=True)
+            self.sleep(1)
+        self.cycle(steps=6)
+        self.sleep(12)
+
+
 
     
 RED_GREEN_ALTERATE = {
@@ -67,5 +88,4 @@ PULSE = {
     "length": 10,
     "spacing": 10,
     "wait_ms": 60
-}
-        
+}      

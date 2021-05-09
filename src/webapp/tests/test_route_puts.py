@@ -72,18 +72,6 @@ def test_update(client):
     assert response.content_type == "text/html; charset=utf-8"
 
 
-def test_getpixelsimulate(client):
-    response = client.post("/getpixelsimulate")
-    assert response.status_code == 405
-    assert response.content_type == "text/html; charset=utf-8"
-
-
-def test_setpixelinterval(client):
-    response = client.post("/setpixelemit")
-    assert response.status_code == 405
-    assert response.content_type == "text/html; charset=utf-8"
-
-
 def test_sequencehandler_start(client):
     response = client.post("/sequence/start")
     assert response.status_code == 405

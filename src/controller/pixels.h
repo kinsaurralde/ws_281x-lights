@@ -16,6 +16,9 @@ class Pixels {
     unsigned int max_brightness;
     unsigned int max_milliwatts;
     unsigned int increment_steps;
+    unsigned int wait_ms;
+    unsigned int total_steps;
+    unsigned int incFunctionName;
     void (Pixels::*incrementor)(void);
     IncrementArgs incArgs;
     Frame data;
@@ -34,25 +37,6 @@ class Pixels {
     void shifter();
     void cycler();
 
-   public:
-    Pixels(unsigned int num_leds, unsigned int max_brightness);
-
-
-    bool canShow(unsigned int ms = 0);
-    void setDelay(unsigned int value);
-    unsigned int getDelay();
-    void setSize(unsigned int size);
-    unsigned int size();
-    unsigned int getBrightness();
-    void setBrightness(unsigned int value);
-    void setIncrementSteps(unsigned int value = 1);
-    void initialize(unsigned int num_leds, unsigned int milliwatts, unsigned int brightness, unsigned int max_brightness=255, bool grb=false);
-    bool isInitialized();
-    bool isGRB();
-
-    Frame* get();
-    void increment();
-
     void color(AnimationArgs args);
     void pulse(AnimationArgs args);
     void wipe(AnimationArgs args);
@@ -60,6 +44,27 @@ class Pixels {
     void cycle(AnimationArgs args);
     void randomCycle(AnimationArgs args);
     void reverser(AnimationArgs args);
+
+   public:
+    Pixels(unsigned int num_leds, unsigned int max_brightness); // External
+
+    bool canShow(unsigned int ms = 0);
+    void setDelay(unsigned int value);
+    unsigned int getDelay();
+    void setSize(unsigned int size);
+    unsigned int size(); // External
+    unsigned int getBrightness(); // External
+    void setBrightness(unsigned int value); // External
+    void setIncrementSteps(unsigned int value = 1);
+    void initialize(unsigned int num_leds, unsigned int milliwatts, unsigned int brightness, unsigned int max_brightness=255, bool grb=false);
+    bool isInitialized();
+    bool isGRB();
+
+    Frame* get(); // External
+    void increment(); // External
+    void animation(AnimationArgs args, unsigned int wait_ms=40); // External
+
+    long* getCurrentState(); // External
 };
 
 #endif
