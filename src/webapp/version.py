@@ -3,7 +3,7 @@
 MAJOR = 2
 MINOR = 3
 PATCH = 0
-LABEL = "simulate"
+LABEL = ""
 
 ESP_HASH = "bcbfabfeced926ad1daefc4e6fef6cd9772e9848"
 RPI_HASH = "188db312299bb386a360dccfa7e9c1e370a92768"
