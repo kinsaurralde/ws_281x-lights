@@ -17,4 +17,5 @@ sequences:
     functions:
       - basic
       - home
+      - new
     active: true

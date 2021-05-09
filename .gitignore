@@ -12,3 +12,6 @@ htmlcov/
 __pycache__/
 wifi_credentials.h
 notes.txt
+tmp/
+src/webapp/logs/*.log
+.vscode

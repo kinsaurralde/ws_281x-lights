@@ -1,5 +1,5 @@
 /* exported Animations */
-/* globals groups colors */
+/* globals groups colors*/
 
 class Animations {
   constructor() {
@@ -94,15 +94,16 @@ class Animations {
         }
         input_cell.appendChild(createNumber(row_id + '-waitms', value));
       } else if (i == 13) {
-        let value = 1;
+        const steps_div = createNumber(row_id + '-steps', 1);
         if ('steps' in this.animations[animation]) {
           const new_value = this.animations[animation]['steps'];
           if (new_value == 'none') {
-            continue;
+            steps_div.readOnly = true;
+          } else {
+            steps_div.value = parseInt(new_value);
           }
-          value = parseInt(new_value);
         }
-        input_cell.appendChild(createNumber(row_id + '-steps', value));
+        input_cell.appendChild(steps_div);
       } else if (i == 14) {
         input_cell.appendChild(createNumber(row_id + '-target', -1));
       } else if (i == 15) {

@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 import json
+import time
+import logging
 import argparse
 
 from collections import OrderedDict
 
+from logging.handlers import RotatingFileHandler
 from flask import Flask, json, render_template, request, redirect
 from flask_socketio import SocketIO
 from engineio.payload import Payload
 
+import coloredlogs
 import modules
 
 from version import *
@@ -19,50 +23,58 @@ except:  # pragma: no cover
 
 Payload.max_decode_packets = 100
 
+MAX_LOG_BYTES = 4000000
+
+LOG_FORMAT = "%(asctime)s %(levelname)-8s [%(name)-26s:%(funcName)-26s] %(message)s"
+logging.basicConfig(format=LOG_FORMAT, level=logging.DEBUG, datefmt="%Y-%m-%d %H:%M:%S")
+logging.setLoggerClass(modules.CustomLogger)
+
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
 
+werkzeug_handler = RotatingFileHandler("logs/werkzeug.log", mode="a", maxBytes=MAX_LOG_BYTES, backupCount=2)
+werkzeug_logger = logging.getLogger("werkzeug")
+werkzeug_logger.addHandler(werkzeug_handler)
+werkzeug_logger.propagate = False
+
+logging.getLogger("urllib3.connectionpool").setLevel("WARNING")
+
+log = logging.getLogger("app")
+coloredlogs.DEFAULT_LEVEL_STYLES["info"] = {"color": "black", "bold": True}
+coloredlogs.install(level="DEBUG", fmt=LOG_FORMAT, logger=log)
+log_file_handler = RotatingFileHandler("logs/app.log", mode="a", maxBytes=MAX_LOG_BYTES, backupCount=3)
+log_color_file_handler = RotatingFileHandler("logs/app-color.log", mode="a", maxBytes=MAX_LOG_BYTES, backupCount=3)
+log_file_handler.setFormatter(logging.Formatter(LOG_FORMAT))
+log_color_file_handler.setFormatter(coloredlogs.ColoredFormatter(fmt=LOG_FORMAT))
+logging.root.addHandler(log_file_handler)
+logging.root.addHandler(log_color_file_handler)
+log.setLevel("DEBUG")
+log.info("STARTED APP SERVER")
+
 parser = argparse.ArgumentParser()
-parser.add_argument(
-    "-d", "--debug", action="store_true", help="Debug mode", default=False
-)
+parser.add_argument("-d", "--debug", action="store_true", help="Debug mode", default=False)
 parser.add_argument(
     "-t", "--test", action="store_true", help="Testing mode (localtest)", default=False,
 )
 parser.add_argument(
-    "-s",
-    "--pixel-simulate",
-    action="store_true",
-    help="Simulate pixels",
-    default=False,
+    "--nosend", action="store_true", help="Dont send to controllers (For testing)", default=False,
 )
 parser.add_argument(
-    "--nosend",
-    action="store_true",
-    help="Dont send to controllers (For testing)",
-    default=False,
+    "-c", "--config", type=str, help="Path to controller config", default="config/controllers_sample.yaml",
 )
 parser.add_argument(
-    "-c",
-    "--config",
-    type=str,
-    help="Path to controller config",
-    default="config/controllers_sample.yaml",
+    "-p", "--port", type=int, help="Port to run server on (overrides config file)", default=5000,
 )
 parser.add_argument(
-    "-p",
-    "--port",
-    type=int,
-    help="Port to run server on (overrides config file)",
-    default=5000,
+    "-b", "--background", action="store_false", help="Disable Background Information Thread", default=True,
 )
 parser.add_argument(
-    "-b",
-    "--background",
-    action="store_false",
-    help="Disable Background Information Thread",
-    default=True,
+    "--nostart", action="store_true", help="Dont start app", default=False,
 )
+parser.add_argument(
+    "--noschedule", action="store_true", help="Dont start scheduler", default=False,
+)
+
 
 args = parser.parse_args()
 
@@ -91,16 +103,33 @@ def open_yaml(path):
     return data
 
 
-def createResponse(data, ordered=False):
+def responsesToDict(responses):
+    result = {}
+    for response in responses:
+        result[response] = responses[response].__dict__
+    return result
+
+
+def responseTemplate(good=False, mtype="", message="", payload={}):  # pylint: disable=dangerous-default-value
+    return {"good": good, "type": mtype, "message": message, "payload": payload, "error": not good}
+
+
+def createResponse(payload, ordered=False):
     """Turn response into json"""
-    payload = data
     if ordered:
-        payload = OrderedDict(data)
-    response = app.response_class(
-        response=json.dumps(payload, sort_keys=False),
-        status=200,
-        mimetype="application/json",
-    )
+        payload = OrderedDict(payload)
+    try:
+        payload = json.dumps(payload, sort_keys=False)
+    except TypeError:
+        payload = json.dumps(
+            {
+                "good": False,
+                "type": "serialization_error",
+                "message": "Failed to serialize response into JSON",
+                "payload": {},
+            }
+        )
+    response = app.response_class(response=payload, status=200, mimetype="application/json",)
     response.headers["Access-Control-Allow-Origin"] = "*"
     return response
 
@@ -112,6 +141,24 @@ def error_response(message):
         "message": message,
     }
     return createResponse(data)
+
+
+@app.before_request
+def before_request():
+    log.notice(f"[{request.remote_addr}] {request.method} - {request.path}")
+
+
+@app.after_request
+def after_request(response):
+    s = (
+        f"[{request.remote_addr}] {request.method} - {request.path}"
+        f" -> {response.status_code} {response.content_type}"
+    )
+    if response.status_code == 200:
+        log.success(s)
+    else:
+        log.error(s)
+    return response
 
 
 @app.errorhandler(404)
@@ -146,11 +193,12 @@ def handleData():
     try:
         data = json.loads(request.data)
     except ValueError:
-        response = {"error": True, "message": "JSON Decode Error"}
-        return createResponse(response)
+        return createResponse(responseTemplate(good=False, mtype="json_error", message="JSON Decode Error"))
     controllers.setNoSend(getNosend())
-    fails = controllers.send(data)
-    response = {"error": len(fails) > 0, "message": fails}
+    responses = controllers.send(data)
+    all_good = responses["all_good"]
+    request_responses = responses["responses"]
+    response = responseTemplate(all_good, mtype="request_response", payload=responsesToDict(request_responses))
     return createResponse(response)
 
 
@@ -215,6 +263,7 @@ def getversioninfo():
 
     Return: JSON
     """
+    controllers.updateControllerVersionInfo()
     return createResponse(controllers.getControllerVersionInfo())
 
 
@@ -228,7 +277,8 @@ def getinitialized():
 
     Return: JSON
     """
-    return createResponse(controllers.getControllerInitialized())
+    controllers.updateControllerInitialized()
+    return createResponse(controllers.getControllerInitialzed())
 
 
 @app.route("/enable")
@@ -245,9 +295,10 @@ def enableControllers():
 
     Return: JSON
     """
-    fails = controllers.enableController(request.args.get("name"))
+    result = controllers.enableController(request.args.get("name"))
     emitUpdatedData()
-    return createResponse({"error": len(fails) > 0, "message": fails})
+    response = responseTemplate(not result["error"], "enable_controller", result["message"], result)
+    return createResponse(response)
 
 
 @app.route("/disable")
@@ -264,9 +315,10 @@ def disableControllers():
 
     Return: JSON
     """
-    fails = controllers.disableController(request.args.get("name"))
+    result = controllers.disableController(request.args.get("name"))
     emitUpdatedData()
-    return createResponse({"error": len(fails) > 0, "message": fails})
+    response = responseTemplate(not result["error"], "disable_controller", result["message"], result)
+    return createResponse(response)
 
 
 @app.route("/update")
@@ -294,49 +346,6 @@ def getPixels():
     Return: JSON
     """
     return createResponse(controllers.getPixels())
-
-
-@app.route("/getpixelsimulate")
-def getPixelSimulate():
-    """Get pixel simulate data
-
-    Route: /getpixelsimulate
-
-    Methods: GET
-
-    Return: JSON
-    """
-    return createResponse({
-        "active": args.pixel_simulate,
-        "controllers": controllers.getControllerSizes(),
-    })
-
-
-@app.route("/setpixelemit")
-def setPixelInterval():
-    """Set pixel emit config
-
-    Route: /setpixelemit
-
-    Methods: GET
-
-    URL Parameters:
-
-        - active: (bool) enable/disable pixel emit
-        - interval: (int) set time between emits in ms
-
-    Return: JSON
-    """
-    active = request.args.get("active")
-    interval = request.args.get("interval")
-    if active is not None:
-        background.setPixelsActive(active)
-    if interval is not None:
-        background.setPixelInterval(int(interval))
-    return {
-        "active": background.getPixelsActive(),
-        "interval": background.getPixelInterval(),
-    }
 
 
 @app.route("/sequence/<mode>")
@@ -476,13 +485,16 @@ def getActiveSchedules():
 
 @socketio.on("connect")
 def connect():
-    print("Client Connected:", request.remote_addr)
+    log.notice(f"Client Connected: {request.remote_addr}")
     socketio.emit("connection_response", room=request.sid)
+    time.sleep(1)
+    active_schedules = scheduler.getActiveSchedules()
+    socketio.emit("active_schedules", active_schedules)
 
 
 @socketio.on("disconnect")
 def disconnect():
-    print("Client Disconnected")
+    log.notice(f"Client Disconnected: {request.remote_addr}")
 
 
 @socketio.on("webpage_loaded")
@@ -507,30 +519,32 @@ def emitUpdatedData():
     background.emitUpdate()
 
 
+@app.route("/test")
+def test():
+    return render_template("test.html")
+
+
 animations_config = open_yaml("config/animations.yaml")
 colors_config = open_yaml("config/colors.yaml")
 controllers_config = open_yaml(args.config)
 sequences_config = open_yaml("config/sequences.yaml")
 schedules_config = open_yaml("config/schedules.yaml")
 
+version_info = getVersionInfo()
+
 if args.test:  # pragma: no cover
     for i, controller in enumerate(controllers_config["controllers"]):
         controller["url"] = "http://localhost:" + str(6000 + i)
 
-controller_module = None
-if args.pixel_simulate:
-    import controller as controller_module
-
-controllers = modules.Controllers(
-    controllers_config, args.nosend, getVersionInfo(), controller_module
-)
-background = modules.Background(socketio, controllers, args.pixel_simulate)
+controllers = modules.Controllers(controllers_config, args.nosend, version_info, socketio)
+background = modules.Background(socketio, controllers)
 sequencer = modules.Sequencer(socketio, controllers, sequences_config, colors_config)
 scheduler = modules.Scheduler(sequencer, schedules_config)
 
-if __name__ == "__main__":  # pragma: no cover
+if not args.noschedule:
+    scheduler.start_thread()
+
+if __name__ == "__main__" and not args.nostart:  # pragma: no cover
     if args.background:
         background.startLoop()
-    socketio.run(
-        app, debug=args.debug, host="0.0.0.0", port=args.port, use_reloader=False
-    )
+    socketio.run(app, debug=args.debug, host="0.0.0.0", port=args.port, use_reloader=False)

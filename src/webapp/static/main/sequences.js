@@ -35,7 +35,7 @@ class Sequences {
   }
 
   createSequence(data) {
-    console.log('Create', data);
+    console.debug('Create', data);
     const row_num = this.num_custom;
     this.num_custom += 1;
     const name = data.name;

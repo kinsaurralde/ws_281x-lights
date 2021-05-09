@@ -14,30 +14,23 @@ class PixelDisplay {
     this.num_controllers = 0;
     this.controllers = {};
     this.pixel_strips = {};
-    this.fetchSimulate();
     this.setupEventListeners();
   }
 
-  fetchSimulate() {
-    fetch('/getpixelsimulate')
-        .then((response) => response.json())
-        .then((data) => {
-          if (!data.active) {
-            hideSection('section-display-wrapper');
-          }
-          this.controllers = data['controllers'];
-          this.num_controllers = Object.keys(this.controllers).length;
-          for (let i = 0; i < this.num_controllers; i++) {
-            this.addPixelStrip(Object.keys(this.controllers)[i]);
-          }
-          const activeControllers = controllers.getIsActive();
-          Object.keys(activeControllers).forEach((controller) => {
-            if (activeControllers[controller] != 'active') {
-              this.pixel_strips[controller].hide();
-            }
-          });
-          this.resize();
-        });
+  init(sizes, active) {
+    this.controllers = sizes;
+    this.controllers_active = active;
+    this.num_controllers = Object.keys(this.controllers).length;
+    for (let i = 0; i < this.num_controllers; i++) {
+      this.addPixelStrip(Object.keys(this.controllers)[i]);
+    }
+    const activeControllers = controllers.getIsActive();
+    Object.keys(activeControllers).forEach((controller) => {
+      if (activeControllers[controller] != 'active') {
+        this.pixel_strips[controller].hide();
+      }
+    });
+    this.resize();
   }
 
   setupEventListeners() {

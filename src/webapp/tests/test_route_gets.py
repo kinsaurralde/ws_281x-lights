@@ -70,18 +70,6 @@ def test_update(client):
     assert response.content_type == "text/html; charset=utf-8"
 
 
-def test_getpixelsimulate(client):
-    response = client.get("/getpixelsimulate")
-    assert response.status_code == 200
-    assert response.content_type == "application/json"
-
-
-def test_setpixelinterval(client):
-    response = client.get("/setpixelemit")
-    assert response.status_code == 200
-    assert response.content_type == "application/json"
-
-
 def test_sequencehandler_start(client):
     response = client.get("/sequence/start")
     assert response.status_code == 200
