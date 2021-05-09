@@ -292,11 +292,14 @@
           .register("./service-worker.js")
           .then(function (registration) {
             console.log("Service Worker Registered!")
+            alert("A")
             return registration
           })
           .catch(function (err) {
             console.error("Unable to register service worker.", err)
           })
+      } else {
+        alert("B")
       }
     </script>
   </body>

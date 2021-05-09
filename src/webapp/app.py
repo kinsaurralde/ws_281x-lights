@@ -197,7 +197,7 @@ def offline():
 
 @app.route("/service-worker.js")
 def sw():
-    return app.send_static_file("service_worker.js")
+    return app.send_static_file("service-worker.js")
 
 
 @app.route("/data", methods=["POST"])

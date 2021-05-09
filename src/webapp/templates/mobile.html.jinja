@@ -13,7 +13,6 @@
     />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <link rel="manifest" href="../static/manifest.json" />
-    <!-- <script src="../static/lib/inobounce.js"></script> -->
     <script src="../static/helpers.js"></script>
     <script src="../static/pwa.js"></script>
     <link
@@ -21,8 +20,8 @@
       sizes="192x192"
       href="../static/icons/icon-192x192.png"
     />
-    <link rel="stylesheet" href="../static/main.css" />
-    <link rel="stylesheet" href="../static/mobile.css" />
+    <link rel="stylesheet" href="../static/css/main.css" />
+    <link rel="stylesheet" href="../static/css/mobile.css" />
   </head>
 
   <body>
@@ -30,7 +29,7 @@
       <div class="mobile-section-divider"></div>
       <div class="mobile-section">
         <div class="mobile-section-body">
-          <div class="mobile-section-title">Controllers</div>
+          <div class="mobile-section-title">Controllerss</div>
           <div class="mobile-container">
             <button
               type="button"
@@ -183,8 +182,8 @@
         <div class="mobile-section-body">
           <div class="mobile-section-title">Other</div>
           <div class="mobile-container">
-            <div class="mobile-button-box">Timestamp:<br />{{timestamp}}</div>
-            <div class="mobile-button-box"></div>
+            <div class="mobile-button-box" id="other-timestamp">Timestamp:<br />{{timestamp}}</div>
+            <div class="mobile-button-box" id="other-sw"></div>
             <div class="mobile-button-box"></div>
             <div class="mobile-button-box"></div>
             <div class="mobile-button-box"></div>
@@ -207,9 +206,8 @@
   <script>
     const False = false
     const True = true
-
-    window.scroll(0, 1)
-
+    document.getElementById("other-sw").textContent = "LOL";
+    alert("HI");
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
         .register("./service-worker.js")
@@ -220,6 +218,11 @@
         .catch(function (err) {
           console.error("Unable to register service worker.", err)
         })
+      alert("A")
+      document.getElementById("other-sw").textContent = "Supported";
+    } else {
+      alert("B")
+      document.getElementById("other-sw").textContent = "Not Supported";
     }
   </script>
 </html>
