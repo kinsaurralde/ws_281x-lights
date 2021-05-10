@@ -390,3 +390,20 @@ th {
 tr:nth-child(even) {
   background-color: var(--input-background);
 }
+
+/* Color buttons */
+
+.color-button {
+  color: blue;
+  border-color: blue;
+}
+
+.color-button:hover {
+  color: yellow;
+  border-color: yellow;
+}
+
+.color-button:active {
+  color: green;
+  border-color: green;
+}

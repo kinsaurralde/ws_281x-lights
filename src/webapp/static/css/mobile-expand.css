@@ -1,0 +1,47 @@
+#expanded {
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 83vh;
+}
+
+#expanded-container {
+  width: 100%;
+  height: 100%;
+}
+
+#close-expanded-button {
+  width: 100%;
+  height: 100%;
+  font-size: 10vh;
+  background-color: black;
+  border: 5px solid;
+}
+
+.expanded-area {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+#expanded-brightness-area {
+  background-color: red;
+}
+
+#expanded-color-area {
+  background-color: green;
+}
+
+#expanded-animations-area {
+  background-color: yellow;
+}
+
+#expanded-sequences-area {
+  background-color: purple;
+}
+
+#expanded-other-area {
+  background-color: orange;
+}

@@ -1,3 +1,8 @@
+html {
+  --display-toggle-value: flex;
+  --expand-display-toggle-value: none;
+}
+
 body {
   margin: 0;
   height: 100%;
@@ -89,4 +94,16 @@ body {
   /* width: 5vw!important; */
   width: calc(var(--slider-thumb-width) * 12) !important;
   height: 10vh !important;
+}
+
+/* Exp
+
+/* Toggle from JS */
+
+.display-toggle {
+  display: var(--display-toggle-value);
+}
+
+.expand-display-toggle {
+  display: var(--expand-display-toggle-value);
 }
