@@ -1,3 +1,11 @@
+html {
+  --expanded-color-value: rgb(0, 0, 0);
+  --expanded-color-value-inverted: rgb(255, 255, 255);
+  --expanded-color-r-percent: 80%;
+  --expanded-color-g-percent: 80%;
+  --expanded-color-b-percent: 80%;
+}
+
 #expanded {
   flex-direction: column;
   justify-content: space-between;
@@ -14,13 +22,13 @@
   width: 100%;
   height: 100%;
   font-size: 10vh;
-  background-color: black;
+  background-color: var(--body-background);
   border: 5px solid;
 }
 
 .expanded-area {
   display: none;
-  justify-content: center;
+  flex-wrap: wrap;
   align-items: center;
   width: 100%;
   height: 100%;
@@ -28,10 +36,6 @@
 
 #expanded-brightness-area {
   background-color: red;
-}
-
-#expanded-color-area {
-  background-color: green;
 }
 
 #expanded-animations-area {

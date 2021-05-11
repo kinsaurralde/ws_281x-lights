@@ -14,8 +14,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <link rel="manifest" href="../static/manifest.json" />
     <script defer src="../static/helpers.js"></script>
-    <script defer src="../static/pwa/colors.js"></script>
     <script defer src="../static/pwa/pwa.js"></script>
+    <script defer src="../static/pwa/colors.js"></script>
     <link
       rel="apple-touch-icon"
       sizes="192x192"
@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="../static/css/main.css" />
     <link rel="stylesheet" href="../static/css/mobile.css" />
     <link rel="stylesheet" href="../static/css/mobile-expand.css" />
+    <link rel="stylesheet" href="../static/css/mobile-colors.css" />
   </head>
 
   <body>
@@ -31,7 +32,7 @@
       <div class="mobile-section-divider"></div>
       <div class="mobile-section" id="section-controllers">
         <div class="mobile-section-body">
-          <div class="mobile-section-title">Controllerss</div>
+          <div class="mobile-section-title">Controllers</div>
           <div class="mobile-container">
             <button
               type="button"
@@ -213,7 +214,19 @@
           </div>
           <!-- Color -->
           <div class="expanded-area" id="expanded-color-area">
-          
+            <div id="expanded-color-sliders">
+              <input type="range" id="expanded-color-r-slider" min="0" max="255">
+              <input type="range" id="expanded-color-g-slider" min="0" max="255">
+              <input type="range" id="expanded-color-b-slider" min="0" max="255">
+            </div>
+            <div id="expanded-color-display-container">
+              <div id="expanded-color-display"><div id="expanded-color-send-text">Send</div></div>
+              <div id="expanded-color-text">255, 255, 255</div>
+            </div>
+            <div id="expanded-color-settings-container">
+              <div>Live:</div>
+              <input type="checkbox" id="expanded-color-live" checked>
+            </div>
           </div>
           <!-- Animations -->
           <div class="expanded-area" id="expanded-animations-area">
