@@ -24,30 +24,36 @@ class Colors {
   }
 
   getColors() {
-    fetch('/getcolors').then((response) => response.json()).then((colors) => {
-      this.colors_data = colors.colors;
-      const num_noedit = Object.keys(this.colors_data.noedit).length;
-      for (let i = 0; i < num_noedit; i++) {
-        const color = this.colors_data.noedit[i];
-        this.addNoedit(color);
-        this.addColorFromConfig(color.name, () => {
-          return color.value;
+    fetch('/getcolors')
+        .then((response) => response.json())
+        .then((colors) => {
+          this.colors_data = colors.colors;
+          const num_noedit = Object.keys(this.colors_data.noedit).length;
+          for (let i = 0; i < num_noedit; i++) {
+            const color = this.colors_data.noedit[i];
+            this.addNoedit(color);
+            this.addColorFromConfig(color.name, () => {
+              return color.value;
+            });
+          }
+          const num_edit = Object.keys(this.colors_data.edit).length;
+          for (let i = 0; i < num_edit; i++) {
+            const color = this.colors_data.edit[i];
+            const ranges = this.addEditable(
+                color.name,
+                color.value[0],
+                color.value[1],
+                color.value[2],
+                color.visible,
+            );
+            this.addColorFromConfig(color.name, () => {
+              return [ranges[0].value, ranges[1].value, ranges[2].value];
+            });
+          }
+          for (let i = 0; i < num_edit / 2; i++) {
+            this.removeColor();
+          }
         });
-      }
-      const num_edit = Object.keys(this.colors_data.edit).length;
-      for (let i = 0; i < num_edit; i++) {
-        const color = this.colors_data.edit[i];
-        const ranges = this.addEditable(
-            color.name, color.value[0], color.value[1], color.value[2],
-            color.visible);
-        this.addColorFromConfig(color.name, () => {
-          return [ranges[0].value, ranges[1].value, ranges[2].value];
-        });
-      }
-      for (let i = 0; i < num_edit / 2; i++) {
-        this.removeColor();
-      }
-    });
   }
 
   addColorFromConfig(color, getValue) {
@@ -56,8 +62,7 @@ class Colors {
 
   addColor() {
     if (this.visible < this.num_custom) {
-      document.getElementById(`colors-custom-${this.visible}`).style.display =
-          'flex';
+      document.getElementById(`colors-custom-${this.visible}`).style.display = 'flex';
       this.visible += 1;
     } else {
       this.addEditable(`custom_${this.visible + 1}`, 255, 255, 255);
@@ -69,15 +74,12 @@ class Colors {
       return;
     }
     this.visible -= 1;
-    document.getElementById(`colors-custom-${this.visible}`).style.display =
-        'none';
+    document.getElementById(`colors-custom-${this.visible}`).style.display = 'none';
   }
 
   addNoedit(color) {
     const button = createButton(null, color.name, () => {
-      this.send(
-          'colors-noedit-target',
-          combineRGB(color.value[0], color.value[1], color.value[2]));
+      this.send('colors-noedit-target', combineRGB(color.value[0], color.value[1], color.value[2]));
     });
     button.className = 'width-7-5';
     this.noedit.appendChild(button);
@@ -128,33 +130,27 @@ class Colors {
     name_title.classList.add('width-10');
     r_range.addEventListener('input', () => {
       r_text.textContent = r_range.value;
-      color_display.style.backgroundColor =
-          this.generateBackground(r_range, g_range, b_range);
+      color_display.style.backgroundColor = this.generateBackground(r_range, g_range, b_range);
     });
     g_range.addEventListener('input', () => {
       g_text.textContent = g_range.value;
-      color_display.style.backgroundColor =
-          this.generateBackground(r_range, g_range, b_range);
+      color_display.style.backgroundColor = this.generateBackground(r_range, g_range, b_range);
     });
     b_range.addEventListener('input', () => {
       b_text.textContent = b_range.value;
-      color_display.style.backgroundColor =
-          this.generateBackground(r_range, g_range, b_range);
+      color_display.style.backgroundColor = this.generateBackground(r_range, g_range, b_range);
     });
     r_text.classList.add('width-3');
     g_text.classList.add('width-3');
     b_text.classList.add('width-3');
     color_display.className = 'color-sample-display';
     color_display.id = id + '-color-display';
-    color_display.style.backgroundColor =
-        this.generateBackground(r_range, g_range, b_range);
+    color_display.style.backgroundColor = this.generateBackground(r_range, g_range, b_range);
     target.classList.add('width-5');
     div.className = 'section-flex';
     div.id = id;
     send.addEventListener('click', () => {
-      this.send(
-          id + '-target',
-          combineRGB(r_range.value, g_range.value, b_range.value));
+      this.send(id + '-target', combineRGB(r_range.value, g_range.value, b_range.value));
     });
 
     div.appendChild(name_title);
@@ -182,21 +178,21 @@ class Colors {
     const payload = [];
     for (let i = 0; i < ids.length; i++) {
       payload.push({
-        'animation': 0,
-        'color': color,
-        'color_bg': 0,
-        'colors': [],
-        'arg1': 0,
-        'arg2': 0,
-        'arg3': 0,
-        'arg4': 0,
-        'arg5': 0,
-        'arg6': false,
-        'arg7': false,
-        'arg8': false,
-        'wait_ms': 40,
-        'inc_steps': 1,
-        'id': ids[i],
+        animation: 0,
+        color: color,
+        color_bg: 0,
+        colors: [],
+        arg1: 0,
+        arg2: 0,
+        arg3: 0,
+        arg4: 0,
+        arg5: 0,
+        arg6: false,
+        arg7: false,
+        arg8: false,
+        wait_ms: 40,
+        inc_steps: 1,
+        id: ids[i],
       });
     }
     console.log('Sending', payload);

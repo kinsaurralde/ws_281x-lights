@@ -149,7 +149,7 @@ node_modules:
 lint: all clean
 	${PRETTIER} ${PRETTIER_CONIG} --write ${CSS_DIR}*.css
 	${PRETTIER} ${PRETTIER_CONIG} --write ${HTML_DIR}*.html
-	find src/ -iname *.js | xargs ${CLANG_FORMAT} -i
+	find src/ -iname *.js | xargs ${PRETTIER} ${PRETTIER_CONIG} --write
 	${UGLIFYJS} ${WEBAPP_DIR}static/pixels/pixels.js --compress > ${BUILD_DIR}a.tmp
 	${UGLIFYJS} ${WEBAPP_DIR}static/lib/socket.io.js --compress > ${BUILD_DIR}b.tmp
 	mv ${BUILD_DIR}a.tmp ${WEBAPP_DIR}static/pixels/pixels.js

@@ -15,7 +15,8 @@
         "require-jsdoc": "off",
         "valid-jsdoc": "off",
         "camelcase": "off",
-        "no-empty": "warn"
+        "no-empty": "warn",
+        "max-len": [2, {"code": 100}]
     },
     "globals": {
         "createButton": "readonly",

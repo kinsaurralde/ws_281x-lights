@@ -10,10 +10,9 @@ class Sequences {
   }
 
   setupEventListeners() {
-    document.getElementById('sequences-stopall')
-        .addEventListener('click', () => {
-          fetch('/sequence/stopall');
-        });
+    document.getElementById('sequences-stopall').addEventListener('click', () => {
+      fetch('/sequence/stopall');
+    });
     socket.on('start_sequence', (data) => {
       console.log('Start Sequence', data);
       this.startSequence(data);
@@ -25,13 +24,15 @@ class Sequences {
   }
 
   getSequences() {
-    fetch('/getsequences').then((response) => response.json()).then((data) => {
-      console.log('Recieved Sequences', data.sequences);
-      for (let i = 0; i < data.sequences.length; i++) {
-        this.createSequence(data.sequences[i]);
-      }
-      this.setupEventListeners();
-    });
+    fetch('/getsequences')
+        .then((response) => response.json())
+        .then((data) => {
+          console.log('Recieved Sequences', data.sequences);
+          for (let i = 0; i < data.sequences.length; i++) {
+            this.createSequence(data.sequences[i]);
+          }
+          this.setupEventListeners();
+        });
   }
 
   createSequence(data) {
@@ -46,8 +47,7 @@ class Sequences {
 
     for (let i = 0; i < data.functions.length; i++) {
       const function_name = data.functions[i];
-      const button = createButton(
-          `sequences-function-${name}-${function_name}`, function_name);
+      const button = createButton(`sequences-function-${name}-${function_name}`, function_name);
       button.addEventListener('click', () => {
         const mode = document.getElementById(`${id}-mode`).value;
         const checked = document.getElementById(`${id}-infinite`).checked;
@@ -65,8 +65,7 @@ class Sequences {
     }
 
     const mode_title = createSecondTitle(null, 'Mode');
-    const mode_selector =
-        createSelect(`${id}-mode`, ['start', 'stop'], 'start');
+    const mode_selector = createSelect(`${id}-mode`, ['start', 'stop'], 'start');
     const iter_title = createSecondTitle(null, 'Iterations');
     const iter_selector = createNumber(`${id}-iter`, 1);
     const or_title = createSecondTitle(null, ' OR ');
@@ -108,8 +107,7 @@ class Sequences {
   }
 
   send(mode, sequence_name, function_name, iterations = null) {
-    console.log(
-        `Sequence Send: ${sequence_name} with function ${function_name}`);
+    console.log(`Sequence Send: ${sequence_name} with function ${function_name}`);
     let parameters = `sequence=${sequence_name}&function=${function_name}`;
     if (iterations != null) {
       parameters += `&iterations=${iterations}`;

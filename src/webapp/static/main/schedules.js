@@ -15,13 +15,15 @@ class Schedules {
   }
 
   getSchedules() {
-    fetch('/getschedules').then((response) => response.json()).then((data) => {
-      console.log('Recieved Schedules', data.schedules);
-      for (let i = 0; i < data.schedules.length; i++) {
-        this.createSchedule(data.schedules[i]);
-      }
-      this.setupEventListeners();
-    });
+    fetch('/getschedules')
+        .then((response) => response.json())
+        .then((data) => {
+          console.log('Recieved Schedules', data.schedules);
+          for (let i = 0; i < data.schedules.length; i++) {
+            this.createSchedule(data.schedules[i]);
+          }
+          this.setupEventListeners();
+        });
   }
 
   createSchedule(data) {
@@ -36,8 +38,7 @@ class Schedules {
 
     for (let i = 0; i < data.functions.length; i++) {
       const function_name = data.functions[i];
-      const button = createButton(
-          `schedule-function-${name}-${function_name}`, function_name);
+      const button = createButton(`schedule-function-${name}-${function_name}`, function_name);
       button.addEventListener('click', () => {
         const mode = document.getElementById(`${id}-mode`).value;
         this.send(mode, name, function_name);
@@ -47,8 +48,7 @@ class Schedules {
     }
 
     const mode_title = createSecondTitle(null, 'Mode');
-    const mode_selector =
-        createSelect(`${id}-mode`, ['start', 'stop'], 'start');
+    const mode_selector = createSelect(`${id}-mode`, ['start', 'stop'], 'start');
 
     div.appendChild(title);
     div.appendChild(createDivider());
@@ -62,8 +62,7 @@ class Schedules {
   }
 
   send(mode, schedule_name, function_name) {
-    console.log(
-        `Schedule Send: ${schedule_name} with function ${function_name}`);
+    console.log(`Schedule Send: ${schedule_name} with function ${function_name}`);
     const parameters = `schedule=${schedule_name}&function=${function_name}`;
     console.log(`Sending Schedule: /schedule/${mode}?${parameters}`);
     fetch(`/schedule/${mode}?${parameters}`);

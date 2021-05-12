@@ -122,21 +122,21 @@ function stringToBool(string) {
 }
 
 function combineRGB(r, g, b) {
-  return ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF);
+  return ((r & 0xff) << 16) | ((g & 0xff) << 8) | (b & 0xff);
 }
 
 function splitRGB(value) {
   return {
-    'r': value >> 16,
-    'g': (value >> 8) & 0xFF,
-    'b': value & 0xFF,
+    r: value >> 16,
+    g: (value >> 8) & 0xff,
+    b: value & 0xff,
   };
 }
 
 function createStatus() {
   return {
-    'error': false,
-    'message': '',
+    error: false,
+    message: '',
   };
 }
 

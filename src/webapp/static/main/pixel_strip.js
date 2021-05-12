@@ -13,8 +13,7 @@ class PixelStrip {
   createDiv() {
     const id = `pixel-strip-${this.name}`;
     const title = createSecondTitle(`${id}-title-name`, this.name);
-    const length =
-        createSecondTitle(`${id}-title-length`, `${this.length} pixels`);
+    const length = createSecondTitle(`${id}-title-length`, `${this.length} pixels`);
 
     for (let i = 0; i < this.length; i++) {
       this.pixels.push(new Pixel(i));

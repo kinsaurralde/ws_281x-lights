@@ -77,8 +77,7 @@ class Controllers {
   handleInitialzedResponse(initialized) {
     for (const name in initialized.initialized) {
       if (name in initialized.initialized) {
-        this.setStatusInitialized(
-            name, initialized.initialized[name] ? TRUE : FALSE);
+        this.setStatusInitialized(name, initialized.initialized[name] ? TRUE : FALSE);
       }
     }
   }
@@ -118,13 +117,11 @@ class Controllers {
       if (controller in version_info.versioninfo) {
         const data = version_info.versioninfo[controller];
         const version_string = `${data.major}.${data.minor}.${data.patch}`;
-        const version_match = (major === data.major && minor === data.minor);
-        const full_version_match = (version_match && patch === data.patch);
-        const status =
-            full_version_match ? GOOD : version_match ? WARNING : ERROR;
+        const version_match = major === data.major && minor === data.minor;
+        const full_version_match = version_match && patch === data.patch;
+        const status = full_version_match ? GOOD : version_match ? WARNING : ERROR;
         this.setStatusVersion(controller, status, version_string);
-        const hash_match =
-            esp_hash === data.esp_hash && rpi_hash === data.rpi_hash;
+        const hash_match = esp_hash === data.esp_hash && rpi_hash === data.rpi_hash;
         this.setStatusHashMatch(controller, hash_match ? TRUE : FALSE);
       }
     }
@@ -133,10 +130,8 @@ class Controllers {
   updatePing(data) {
     for (const controller in this.controllers) {
       if (controller in this.controllers) {
-        const div =
-            document.getElementById(`controllers-table-${controller}-ping`);
-        const div_mode_select =
-            document.getElementById(`status-table-${controller}-active`);
+        const div = document.getElementById(`controllers-table-${controller}-ping`);
+        const div_mode_select = document.getElementById(`status-table-${controller}-active`);
         if (controller in data) {
           if (data[controller] === null) {
             this.setStatus(div, FALSE, 'DISCONNECTED');
@@ -286,8 +281,8 @@ class Controllers {
         for (const name in this.brightness_values) {
           if (name in this.brightness_values) {
             values.push({
-              'name': name,
-              'value': this.brightness_values[name],
+              name: name,
+              value: this.brightness_values[name],
             });
           }
         }
@@ -312,7 +307,11 @@ class Controllers {
 
     const name = createSecondTitle(id + '-name', controller.name);
     const brightness_slider = createRange(
-        id + '-brightness-slider', controller.init.brightness, 0, 255);
+        id + '-brightness-slider',
+        controller.init.brightness,
+        0,
+        255,
+    );
     const brightness_value = document.createElement('span');
     brightness_value.id = id + '-brightness-value';
 
@@ -323,10 +322,10 @@ class Controllers {
     this.setStatus(status, UNKNOWN);
 
     this.brightness_link[controller.name] = {
-      'checked': box.checked,
-      'name': controller.name,
-      'slider': brightness_slider,
-      'text': brightness_value,
+      checked: box.checked,
+      name: controller.name,
+      slider: brightness_slider,
+      text: brightness_value,
     };
     box.addEventListener('input', () => {
       this.brightness_link[controller.name].checked = box.checked;
@@ -357,10 +356,10 @@ class Controllers {
 
   addStatusRow(name, initial_mode) {
     this.status[name] = {
-      'initialized': UNKNOWN,
-      'version': UNKNOWN,
-      'hash_match': UNKNOWN,
-      'connected': FALSE,
+      initialized: UNKNOWN,
+      version: UNKNOWN,
+      hash_match: UNKNOWN,
+      connected: FALSE,
     };
     const row = this.status_table.insertRow();
     const cells = [];
@@ -373,19 +372,12 @@ class Controllers {
     const connected = document.createElement('div');
     const version = document.createElement('div');
     const hash_match = document.createElement('div');
-    const mode = createSelect(
-        id + '-active',
-        [
-          'active',
-          'disabled',
-        ],
-        initial_mode);
+    const mode = createSelect(id + '-active', ['active', 'disabled'], initial_mode);
     mode.addEventListener('input', () => {
       this.changeMode(name, mode.value);
       const url = this.controllers[name].url;
       for (let i = 0; i < this.urls[url].length; i++) {
-        document.getElementById(`status-table-${this.urls[url][i]}-active`)
-            .value = mode.value;
+        document.getElementById(`status-table-${this.urls[url][i]}-active`).value = mode.value;
       }
     });
     this.setStatus(initialized, UNKNOWN);
@@ -410,7 +402,7 @@ class Controllers {
     if (mode === 'active') {
       fetch(`/enable?name=${name}`);
     } else if (mode === 'noreconnect') {
-      () => {};  // PASS
+      () => {}; // PASS
     } else if (mode === 'disabled') {
       fetch(`/disable?name=${name}`);
     }

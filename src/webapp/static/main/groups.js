@@ -34,8 +34,7 @@ class Groups {
     const group_id = this.num_groups + this.num_strips;
     for (let i = 0; i < this.num_strips; i++) {
       const cell = row.insertCell();
-      cell.appendChild(createCheckBox(
-          'target-group-' + group_id + '-' + this.names[i], true));
+      cell.appendChild(createCheckBox('target-group-' + group_id + '-' + this.names[i], true));
     }
     this.num_groups += 1;
   }

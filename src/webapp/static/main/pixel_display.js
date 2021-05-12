@@ -2,8 +2,8 @@
 /* globals PixelStrip controllers */
 
 const MAX_PIXEL_VW = 70;
-const MIN_PIXEL_COLS = 10;   // If changed, also change HTML
-const MAX_PIXEL_COLS = 150;  // If changed, also change HTML
+const MIN_PIXEL_COLS = 10; // If changed, also change HTML
+const MAX_PIXEL_COLS = 150; // If changed, also change HTML
 
 class PixelDisplay {
   constructor() {
@@ -55,8 +55,7 @@ class PixelDisplay {
       if (value >= 120) {
         document.documentElement.style.setProperty('--pixel-margin', '0');
       } else {
-        document.documentElement.style.setProperty(
-            '--pixel-margin', 'var(--pixel-margin-normal)');
+        document.documentElement.style.setProperty('--pixel-margin', 'var(--pixel-margin-normal)');
       }
       this.resizeTables(this.pixel_per_row.value);
       this.resizePixel(pixel_width);
