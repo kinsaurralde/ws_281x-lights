@@ -252,51 +252,51 @@
     <div class="divider"></div>
 
     <script>
-      const socket = io()
+      const socket = io();
 
-      const webapp_connected_div = document.getElementById("status-webapp-connected")
+      const webapp_connected_div = document.getElementById("status-webapp-connected");
 
       socket.on("connect", () => {
-        console.log("Connected")
-        document.documentElement.style.setProperty("--connection-outline", "0vw")
-        webapp_connected_div.textContent = "True"
-        webapp_connected_div.className = "green"
-      })
+        console.log("Connected");
+        document.documentElement.style.setProperty("--connection-outline", "0vw");
+        webapp_connected_div.textContent = "True";
+        webapp_connected_div.className = "green";
+      });
       socket.on("disconnect", () => {
-        console.log("Disconnected")
-        document.documentElement.style.setProperty("--connection-outline", "1vw")
-        webapp_connected_div.textContent = "False"
-        webapp_connected_div.className = "red"
-      })
+        console.log("Disconnected");
+        document.documentElement.style.setProperty("--connection-outline", "1vw");
+        webapp_connected_div.textContent = "False";
+        webapp_connected_div.className = "red";
+      });
 
       window.onload = function () {
-        window.controllers = new Controllers()
-        window.animations = new Animations()
-        window.colors = new Colors()
-        window.groups = new Groups()
-        window.pixel_display = new PixelDisplay()
-        window.sequences = new Sequences()
-        window.schedules = new Schedules()
-        window.simulator = new Simulator()
-        socket.emit("webpage_loaded")
-      }
+        window.controllers = new Controllers();
+        window.animations = new Animations();
+        window.colors = new Colors();
+        window.groups = new Groups();
+        window.pixel_display = new PixelDisplay();
+        window.sequences = new Sequences();
+        window.schedules = new Schedules();
+        window.simulator = new Simulator();
+        socket.emit("webpage_loaded");
+      };
 
       function loadedControllers() {
-        groups.init(controllers.getNames())
-        pixel_display.init(controllers.getSizes(), controllers.getIsActive())
-        simulator.init(controllers.getNames())
+        groups.init(controllers.getNames());
+        pixel_display.init(controllers.getSizes(), controllers.getIsActive());
+        simulator.init(controllers.getNames());
       }
 
       if ("serviceWorker" in navigator) {
         navigator.serviceWorker
           .register("./service-worker.js")
           .then(function (registration) {
-            console.log("Service Worker Registered!")
-            return registration
+            console.log("Service Worker Registered!");
+            return registration;
           })
           .catch(function (err) {
-            console.error("Unable to register service worker.", err)
-          })
+            console.error("Unable to register service worker.", err);
+          });
       } else {
       }
     </script>

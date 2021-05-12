@@ -1,63 +1,63 @@
 /* exported simpleColor simpleAnimation simpleSequence stopAllSequences */
 
-const controllers_section = document.getElementById("expand-controllers-section")
-const brightness_section = document.getElementById("expand-brightness-section")
-const colors_section = document.getElementById("expand-colors-section")
-const animations_section = document.getElementById("expand-animations-section")
-const sequences_section = document.getElementById("expand-sequences-section")
-const other_section = document.getElementById("expand-other-section")
+const controllers_section = document.getElementById("expand-controllers-section");
+const brightness_section = document.getElementById("expand-brightness-section");
+const colors_section = document.getElementById("expand-colors-section");
+const animations_section = document.getElementById("expand-animations-section");
+const sequences_section = document.getElementById("expand-sequences-section");
+const other_section = document.getElementById("expand-other-section");
 
 controllers_section.addEventListener("click", () => {
-  expandControllersSection()
-})
+  expandControllersSection();
+});
 brightness_section.addEventListener("click", () => {
-  expandBrightnessSection()
-})
+  expandBrightnessSection();
+});
 colors_section.addEventListener("click", () => {
-  expandColorsSection()
-})
+  expandColorsSection();
+});
 animations_section.addEventListener("click", () => {
-  expandAnimationsSection()
-})
+  expandAnimationsSection();
+});
 sequences_section.addEventListener("click", () => {
-  expandSequencesSection()
-})
+  expandSequencesSection();
+});
 other_section.addEventListener("click", () => {
-  expandOtherSection()
-})
+  expandOtherSection();
+});
 
 document.getElementById("close-expanded-button").addEventListener("click", () => {
-  showSections()
-})
+  showSections();
+});
 
 function expandControllersSection() {
-  hideSections()
-  controllers_section.style.display = "flex"
+  hideSections();
+  controllers_section.style.display = "flex";
 }
 
 function expandBrightnessSection() {
-  hideSections()
-  brightness_section.style.display = "flex"
+  hideSections();
+  brightness_section.style.display = "flex";
 }
 
 function expandColorsSection() {
-  hideSections()
-  colors_section.style.display = "flex"
+  hideSections();
+  colors_section.style.display = "flex";
 }
 
 function expandAnimationsSection() {
-  hideSections()
-  animations_section.style.display = "flex"
+  hideSections();
+  animations_section.style.display = "flex";
 }
 
 function expandSequencesSection() {
-  hideSections()
-  sequences_section.style.display = "flex"
+  hideSections();
+  sequences_section.style.display = "flex";
 }
 
 function expandOtherSection() {
-  hideSections()
-  other_section.style.display = "flex"
+  hideSections();
+  other_section.style.display = "flex";
 }
 
 function createAnimationArgs() {
@@ -77,48 +77,48 @@ function createAnimationArgs() {
     wait_ms: 40,
     inc_steps: 1,
     id: "a",
-  }
+  };
 }
 
 function send(payload) {
-  console.log("Sending", payload)
-  fetch("/data", { method: "post", body: JSON.stringify(payload) })
+  console.log("Sending", payload);
+  fetch("/data", { method: "post", body: JSON.stringify(payload) });
 }
 
 function simpleColor(r, g, b) {
-  const payload = [createAnimationArgs()]
-  payload[0].color = combineRGB(r, g, b)
-  send(payload)
+  const payload = [createAnimationArgs()];
+  payload[0].color = combineRGB(r, g, b);
+  send(payload);
 }
 
 function simpleAnimation(args) {
-  const payload = createAnimationArgs()
+  const payload = createAnimationArgs();
   for (const arg of Object.keys(args)) {
     if (arg in payload) {
-      payload[arg] = args[arg]
+      payload[arg] = args[arg];
     }
   }
-  send([payload])
+  send([payload]);
 }
 
 function simpleSequence(sequence_name, function_name) {
-  fetch(`/sequence/start?sequence=${sequence_name}&function=${function_name}`)
+  fetch(`/sequence/start?sequence=${sequence_name}&function=${function_name}`);
 }
 
 function stopAllSequences() {
-  fetch("/sequence/stopall")
+  fetch("/sequence/stopall");
 }
 
 function hideSections() {
-  const expanded_sections = document.getElementsByClassName("expanded-area")
+  const expanded_sections = document.getElementsByClassName("expanded-area");
   for (let i = 0; i < expanded_sections.length; i++) {
-    expanded_sections[i].style.display = "none"
+    expanded_sections[i].style.display = "none";
   }
-  document.documentElement.style.setProperty("--display-toggle-value", "none")
-  document.documentElement.style.setProperty("--expand-display-toggle-value", "flex")
+  document.documentElement.style.setProperty("--display-toggle-value", "none");
+  document.documentElement.style.setProperty("--expand-display-toggle-value", "flex");
 }
 
 function showSections() {
-  document.documentElement.style.setProperty("--display-toggle-value", "flex")
-  document.documentElement.style.setProperty("--expand-display-toggle-value", "none")
+  document.documentElement.style.setProperty("--display-toggle-value", "flex");
+  document.documentElement.style.setProperty("--expand-display-toggle-value", "none");
 }

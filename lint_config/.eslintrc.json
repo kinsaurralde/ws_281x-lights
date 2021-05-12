@@ -16,6 +16,7 @@
         "valid-jsdoc": "off",
         "camelcase": "off",
         "no-empty": "warn",
+        "semi": ["error", "always"],
         "max-len": [2, {"code": 100}]
     },
     "globals": {
