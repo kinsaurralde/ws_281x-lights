@@ -1,5 +1,7 @@
 /* globals simpleColor */
 
+const BUFFERED_WAIT_MS = 20;
+
 const rcss = document.documentElement.style;
 
 const color_display = document.getElementById("expanded-color-display");
@@ -16,6 +18,7 @@ const current_color = {
   g: 0,
   b: 0,
 };
+let buffer_waiting = false;
 
 setStartColor();
 updateLiveCheck();
@@ -60,6 +63,19 @@ function updateLiveCheck() {
   }
 }
 
+function bufferedColor(r, g, b) {
+  if (!buffer_waiting) {
+    buffer_waiting = true;
+    console.log("Start buffer");
+    setTimeout(function () {
+      simpleColor(r, g, b);
+      buffer_waiting = false;
+    }, BUFFERED_WAIT_MS);
+  } else {
+    console.log("Buffer already started");
+  }
+}
+
 function updateColor(nosend = false) {
   const r = current_color.r;
   const g = current_color.g;
@@ -68,7 +84,7 @@ function updateColor(nosend = false) {
   const color_css = `rgb(${color_rgb_text})`;
   const color_css_invert = `rgb(${255 - r}, ${255 - g}, ${255 - b})`;
   if (color_live.checked && !nosend) {
-    simpleColor(r, g, b);
+    bufferedColor(r, g, b);
   }
   color_text.textContent = color_rgb_text;
   rcss.setProperty("--expanded-color-value", color_css);

@@ -1,11 +1,17 @@
 /* exported simpleColor simpleAnimation simpleSequence stopAllSequences */
 
-const controllers_section = document.getElementById("expanded-controllers-area");
-const brightness_section = document.getElementById("expanded-brightness-area");
-const colors_section = document.getElementById("expanded-colors-area");
-const animations_section = document.getElementById("expanded-animations-area");
-const sequences_section = document.getElementById("expanded-sequences-area");
-const other_section = document.getElementById("expanded-other-area");
+const controllers_section = document.getElementById("expand-controllers-section");
+const brightness_section = document.getElementById("expand-brightness-section");
+const colors_section = document.getElementById("expand-color-section");
+const animations_section = document.getElementById("expand-animations-section");
+const sequences_section = document.getElementById("expand-sequences-section");
+const other_section = document.getElementById("expand-other-section");
+const controllers_area = document.getElementById("expanded-controllers-area");
+const brightness_area = document.getElementById("expanded-brightness-area");
+const colors_area = document.getElementById("expanded-colors-area");
+const animations_area = document.getElementById("expanded-animations-area");
+const sequences_area = document.getElementById("expanded-sequences-area");
+const other_area = document.getElementById("expanded-other-area");
 
 controllers_section.addEventListener("click", () => {
   expandControllersSection();
@@ -34,32 +40,32 @@ processQueryArgs();
 
 function expandControllersSection() {
   hideSections();
-  controllers_section.style.display = "flex";
+  controllers_area.style.display = "flex";
 }
 
 function expandBrightnessSection() {
   hideSections();
-  brightness_section.style.display = "flex";
+  brightness_area.style.display = "flex";
 }
 
 function expandColorsSection() {
   hideSections();
-  colors_section.style.display = "flex";
+  colors_area.style.display = "flex";
 }
 
 function expandAnimationsSection() {
   hideSections();
-  animations_section.style.display = "flex";
+  animations_area.style.display = "flex";
 }
 
 function expandSequencesSection() {
   hideSections();
-  sequences_section.style.display = "flex";
+  sequences_area.style.display = "flex";
 }
 
 function expandOtherSection() {
   hideSections();
-  other_section.style.display = "flex";
+  other_area.style.display = "flex";
 }
 
 function processQueryArgs() {
@@ -74,7 +80,7 @@ function processQueryArgs() {
       break;
     case "colors":
       expandColorsSection();
-      break
+      break;
     case "animations":
       expandAnimationsSection();
       break;

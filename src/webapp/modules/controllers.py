@@ -175,7 +175,7 @@ class Controllers:
                 log.info(f"Not sending to controller {controller_name} because it is disabled")
                 continue
             command["id"] = self.controllers[controller_name]["strip_id"]
-            self.manager.send(url, controller_name, "/data", "POST", [command], session_id)
+            self.manager.send(url, controller_name, "/data", "POST", [command], session_id, rtt_skip=True)
         return self.manager.endSession(session_id)
 
     def getConfig(self) -> dict:

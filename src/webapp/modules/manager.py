@@ -21,8 +21,8 @@ class ControllerManager:
         self.session_counter = 0
         self.sessions = {}
         self.sio = self.controller.socketio
-        self.latency = {}
         self.callbacks = {}
+        self.rtt = {}
         self.nosend = False
         self.startSession()
 
@@ -69,13 +69,29 @@ class ControllerManager:
         start_time = time.time()
         result = self._send_thread("GET", url, payload={}, controller_id=url, logs=False)
         end_time = time.time()
+        elapsed_time = end_time - start_time
         if result.good:
-            return end_time - start_time
+            self.rtt[url] = elapsed_time
+            return elapsed_time
+        self.rtt[url] = None
         log.warning(f"Failed to get RTT of {url}")
         return None
 
+    def isActive(self, url):
+        if url in self.rtt:
+            return not self.rtt[url] is None
+        return False
+
     def send(
-        self, url: str, controller_id="", path="", method="GET", payload=None, session_id=0, threaded=False
+        self,
+        url: str,
+        controller_id="",
+        path="",
+        method="GET",
+        payload=None,
+        session_id=0,
+        threaded=False,
+        rtt_skip=False,
     ) -> RequestResponse:
         """Make either GET or POST request to controller.
 
@@ -86,18 +102,21 @@ class ControllerManager:
         RequestResponse from actual thread will be stored in the current session and is retrieved when session ends.
         If session_id is not the default value, it is asumed threaded is True.
         This means callers do not need to set threaded if a session_id is provided.
+        If rtt_skip is True, automatically error if rtt for url is None
         """
         url += path
         if threaded or session_id != 0:
             if session_id not in self.sessions:
                 return RequestResponse(None, f"Session ID {session_id} is not valid", url, controller_id)
             # Create new thread and add to sessions
-            thread = threading.Thread(target=self._send_thread, args=(method, url, payload, controller_id, session_id))
+            thread = threading.Thread(
+                target=self._send_thread, args=(method, url, payload, controller_id, session_id, rtt_skip)
+            )
             thread.start()
             self.sessions[session_id]["threads"].append(thread)
             return RequestResponse(True, f"Started Send Thread", url, controller_id)
         # Directly return response from non threading request
-        return self._send_thread(method, url, payload, controller_id)
+        return self._send_thread(method, url, payload, controller_id, rtt_skip=rtt_skip)
 
     def onconnectCallback(self, callback_function) -> None:
         """Set the callback function for the onconnect event"""
@@ -111,7 +130,7 @@ class ControllerManager:
         self.nosend = value
 
     def _send_thread(
-        self, method: str, url: str, payload: object, controller_id: str, session_id=0, logs=True
+        self, method: str, url: str, payload: object, controller_id: str, session_id=0, rtt_skip=False, logs=True
     ) -> object:
         """Make request to url with given method. If error occurs, record error_message in self.sessions"""
         error_reason = ""
@@ -121,6 +140,8 @@ class ControllerManager:
         try:
             if self.nosend:
                 error_reason = "No send is true"
+            elif rtt_skip and not self.isActive(url):
+                error_reason = "Not Active"
             elif method == "GET":
                 response = requests.get(url, timeout=GET_TIMEOUT)
             elif method == "POST":
