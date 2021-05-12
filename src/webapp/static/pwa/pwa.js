@@ -1,11 +1,11 @@
 /* exported simpleColor simpleAnimation simpleSequence stopAllSequences */
 
-const controllers_section = document.getElementById("expand-controllers-section");
-const brightness_section = document.getElementById("expand-brightness-section");
-const colors_section = document.getElementById("expand-colors-section");
-const animations_section = document.getElementById("expand-animations-section");
-const sequences_section = document.getElementById("expand-sequences-section");
-const other_section = document.getElementById("expand-other-section");
+const controllers_section = document.getElementById("expanded-controllers-area");
+const brightness_section = document.getElementById("expanded-brightness-area");
+const colors_section = document.getElementById("expanded-colors-area");
+const animations_section = document.getElementById("expanded-animations-area");
+const sequences_section = document.getElementById("expanded-sequences-area");
+const other_section = document.getElementById("expanded-other-area");
 
 controllers_section.addEventListener("click", () => {
   expandControllersSection();
@@ -29,6 +29,8 @@ other_section.addEventListener("click", () => {
 document.getElementById("close-expanded-button").addEventListener("click", () => {
   showSections();
 });
+
+processQueryArgs();
 
 function expandControllersSection() {
   hideSections();
@@ -58,6 +60,31 @@ function expandSequencesSection() {
 function expandOtherSection() {
   hideSections();
   other_section.style.display = "flex";
+}
+
+function processQueryArgs() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const expanded = urlParams.get("expanded");
+  switch (expanded) {
+    case "controllers":
+      expandControllersSection();
+      break;
+    case "brightness":
+      expandBrightnessSection();
+      break;
+    case "colors":
+      expandColorsSection();
+      break
+    case "animations":
+      expandAnimationsSection();
+      break;
+    case "sequences":
+      expandSequencesSection();
+      break;
+    case "other":
+      expandOtherSection();
+      break;
+  }
 }
 
 function createAnimationArgs() {

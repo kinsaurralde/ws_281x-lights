@@ -52,14 +52,14 @@
   background-color: green;
 }
 
-#expanded-color-area input[type='range'] {
+#expanded-colors-area input[type='range'] {
   width: 80%;
   margin: 5px 10%;
   height: 8vh;
   border: 2px solid var(--expanded-color-value);
 }
 
-#expanded-color-area input[type='range']::-webkit-slider-thumb {
+#expanded-colors-area input[type='range']::-webkit-slider-thumb {
   width: 10vw;
   height: 8vh;
   border: 5px solid var(--text-color);
