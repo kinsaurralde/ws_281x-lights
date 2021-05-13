@@ -115,7 +115,7 @@ function createAnimationArgs() {
 
 function send(payload) {
   console.log("Sending", payload);
-  fetch("/data", { method: "post", body: JSON.stringify(payload) });
+  socket.emit("send", payload);
 }
 
 function simpleColor(r, g, b) {

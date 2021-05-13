@@ -518,6 +518,12 @@ def disconnect():
     log.notice(f"Client Disconnected: {request.remote_addr}")
 
 
+@socketio.on("send")
+def controllerSend(json):
+    log.notice(f"SocketIO Send: {json}")
+    controllers.send(json)
+
+
 @socketio.on("webpage_loaded")
 def webapgeLoaded():
     emitUpdatedData()

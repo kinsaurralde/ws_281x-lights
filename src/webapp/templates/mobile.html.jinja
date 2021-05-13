@@ -13,6 +13,7 @@
     />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <link rel="manifest" href="../static/manifest.json" />
+    <script src="../static/lib/socket.io.js"></script>
     <script defer src="../static/helpers.js"></script>
     <script defer src="../static/pwa/pwa.js"></script>
     <script defer src="../static/pwa/colors.js"></script>
@@ -253,9 +254,8 @@
   </body>
 
   <script>
-    const False = false
-    const True = true
-    document.getElementById("other-sw").textContent = "LOL";
+    const socket = io();
+
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
         .register("./service-worker.js")
@@ -266,9 +266,9 @@
         .catch(function (err) {
           console.error("Unable to register service worker.", err)
         })
-      document.getElementById("other-sw").textContent = "Supported";
+      document.getElementById("other-sw").textContent = "SW Supported";
     } else {
-      document.getElementById("other-sw").textContent = "Not Supported";
+      document.getElementById("other-sw").textContent = "SW Not Supported";
     }
   </script>
 </html>
