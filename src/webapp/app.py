@@ -192,7 +192,7 @@ def mobileIndex():
 
 @app.route("/offline")
 def offline():
-    return render_template("offline.html.jinja")
+    return app.send_static_file("offline.html")
 
 
 @app.route("/service-worker.js")

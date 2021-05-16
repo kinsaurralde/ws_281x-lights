@@ -50,6 +50,7 @@ body {
   flex-direction: column;
   overflow-x: auto;
   justify-content: left;
+  align-content: flex-start;
 }
 
 .mobile-color-box {
@@ -76,8 +77,8 @@ body {
 .mobile-button-box {
   width: max(12vw, 15vh);
   height: 11vh;
-  margin: 0.5vh;
-  border: 0.2vh solid var(--text-color);
+  margin: 0.6vh;
+  border: 0.4vh solid var(--text-color);
   text-align: center;
   font-size: 2vh;
   line-height: 3vh;
