@@ -1,9 +1,14 @@
-# Version Information
-MAJOR				= 2
-MINOR				= 3
-PATCH				= 1
-LABEL				= pwa
-
+## ----------------------------------------------------------------------------
+## Version Information
+## 
+MAJOR				= 2		## 
+MINOR				= 3		## 
+PATCH				= 1		## 
+LABEL				= pwa	## 
+## 
+## ----------------------------------------------------------------------------
+## Changeable variables with default value:
+## 
 # Paths
 
 SRC_DIR				= src/
@@ -35,7 +40,7 @@ HTML_VALIDATE_CONFG = --config lint_config/.htmlvalidate.json
 ESLINT_CONFIG		= --config lint_config/.eslintrc.json
 PYLINT_CONFIG		= --rcfile=lint_config/pylintrc
 
-WEBAPP_CONFIG_ARG	= "config/controllers_sample.yaml"
+WEBAPP_CONFIG_ARG	= "config/controllers_sample.yaml"	## 
 
 ESP_HASH			= $(shell sha1sum ${CONTROLLERS_DIR}controller.ino ${CONTROLLERS_DIR}pixels* ${CONTROLLERS_DIR}structs* | sha1sum | head -c 40)
 RPI_HASH			= $(shell sha1sum ${CONTROLLERS_DIR}*.py ${CONTROLLERS_DIR}pixels* ${CONTROLLERS_DIR}structs* | sha1sum | head -c 40)
@@ -47,7 +52,15 @@ WASM_PIXELS			= '_Pixels_new', '_Pixels_size', '_Pixels_getBrightness', '_Pixels
 
 WASM_EXPORTED		= -s "EXPORTED_FUNCTIONS=[${WASM_LIST}, ${WASM_PIXELS}]" -s "EXTRA_EXPORTED_RUNTIME_METHODS=['getValue']"
 
-all:
+## 
+## ----------------------------------------------------------------------------
+## Targets
+## 
+
+help:			## Show this help
+	@sed -n '/@sed/!s/## //p' $(MAKEFILE_LIST)
+
+build:			## Create and fill build directory with only relevant files for esp8266 controller, rpi controller, and webapp
 	# Create Directories
 	mkdir -p ${BUILD_ESP8266_DIR}
 	mkdir -p ${BUILD_DIR}raspberrypi/src
@@ -88,36 +101,48 @@ all:
 	rm -f ${BUILD_RPI_SRC_DIR}*.o
 
 	# Copy to webapp
-	cp -r ${WEBAPP_DIR} ${BUILD_DIR}
+	rm -rf ${BUILD_DIR}webapp/
+	mkdir ${BUILD_DIR}webapp
+	find ${WEBAPP_DIR}* -maxdepth 0 -type d -not -path "${WEBAPP_DIR}venv/*" -not -path "${WEBAPP_DIR}venv" -exec cp -r "{}" ${BUILD_DIR}webapp/ \;
+	find ${WEBAPP_DIR}* -maxdepth 0 -not -type d -exec cp "{}" ${BUILD_DIR}webapp/ \;
+	python3 -m venv ${BUILD_DIR}webapp/venv
+ifndef FULL_WEBAPP
+		rm -f ${BUILD_DIR}webapp/tests/*
+		rm -f ${BUILD_DIR}webapp/logs/*
+		rm -f ${BUILD_DIR}webapp/*test.*
+		rm -f ${BUILD_DIR}webapp/.coverage
+		rmdir ${BUILD_DIR}webapp/tests/
+endif
 
-test:
+
+test:			## Run all tests and get coverage report
 	make coverage
 
-test_webapp:
+test_webapp:		## Run webapp tests
 	cd src/webapp && python3 -m pytest && cd ../../
 
-coverage:
+coverage:		## Run webapp tests and get coverage reports
 	cd src/webapp && coverage run --source=. --omit="*/tests*,*/sequences*,version.py,conftest.py" -m pytest && coverage report && coverage html && cd ../../
 
-run_rpi: build
+run_rpi:		## Run rpi controller server with --test flag from BUILD_RPI_DIR
+	make build
 	cd ${BUILD_RPI_DIR} && python3 controller_server.py --test && cd ../../
 
-run_app: clean_logs
+run_app: 		## Run webapp with --config WEBAPP_CONFIG_ARG
+	make clean_logs
 	cd ${WEBAPP_DIR} && python3 app.py --config ${WEBAPP_CONFIG_ARG}
 
-run_app_simulate:
-	cd ${WEBAPP_DIR} && python3 app.py -d -s --config ${WEBAPP_CONFIG_ARG}
-
-run_interactive:
+run_interactive:	## Run webapp setup with interactive mode (does not start webserver)
 	cd ${WEBAPP_DIR} && python3 -i app.py --config ${WEBAPP_CONFIG_ARG} --nostart --noschedule
 
-run_app_nosend:
+run_app_nosend:		## Run webapp with --nosend
 	cd ${WEBAPP_DIR} && python3 app.py -d --nosend --config ${WEBAPP_CONFIG_ARG}
 
-run_local: all
+run_local:		## Run localtest.py
+	make build
 	cd ${TOOLS_DIR} && sudo python3 -i localtest.py
 
-setup:
+setup:			## Install required programs and modules through apt and pip
 	sudo apt update --fix-missing
 	sudo apt-get update
 	sudo apt install pylint
@@ -143,10 +168,12 @@ setup:
 	make node_modules
 	sudo npm i docsify-cli -g
 
-node_modules:
+node_modules:		## Install required node modules
 	npm install clang-format prettier html-validate eslint eslint-config-defaults eslint-config-google uglify-js
 
-lint: all clean
+lint:			## Reformat and check style
+	make build
+	make clean
 	${PRETTIER} ${PRETTIER_CONIG} --write ${CSS_DIR}*.css
 	${PRETTIER} ${PRETTIER_CONIG} --write ${HTML_DIR}*.html
 	find src/ -iname *.js | xargs ${PRETTIER} ${PRETTIER_CONIG} --write
@@ -159,29 +186,27 @@ lint: all clean
 	python3 -m black --line-length 120 ${PY_FILES}
 	python3 -m pylint ${PYLINT_CONFIG} ${PY_FILES}
 
-lol:
-	${UGLIFYJS} ${WEBAPP_DIR}static/pixels/pixels.js --compress > a.tmp
-	${UGLIFYJS} ${WEBAPP_DIR}static/lib/socket.io.js --compress > b.tmp
-
-upload_rpi: all
+upload_rpi:		## Run upload_rpi tool
+	make build
 	cd tools &&	python3 upload_rpi.py
 
 .PHONY: docs
-docs:
+docs:			## Run docs server
 	cp -r images/ docs/images
 	cp README.md docs/README.md
 	docsify serve docs
 
-git:
+git:			## Prepare repository for github
 	make clean
 	make test
 	make lint
 	git status
 
-clean_logs:
+clean_logs:		## Delete logs
 	rm -f ${WEBAPP_DIR}logs/*
 
-clean: clean_logs
+clean: 			## Delete logs, __pycache__, compiiled files, and build directory
+	make clean_logs
 	rm -fr ${BUILD_DIR}*
 	rm -f ${CONTROLLERS_DIR}*.so
 	rm -f ${WEBAPP_DIR}controller.py
@@ -191,11 +216,11 @@ clean: clean_logs
 	find . -name htmlcov -exec rm -rv {} +
 	find . -name .coverage -exec rm -rv {} +
 	
-wasm:
+wasm:			## Compile for wasm
 	./sdk/emsdk/emsdk activate > /dev/null
-	echo "If em++: not found, run"
-	echo "cd sdk/emsdk/ && source ./emsdk_env.sh && cd ../../"
+	@echo "If em++: not found, run"
+	@echo "cd sdk/emsdk/ && source ./emsdk_env.sh && cd ../../"
 	em++ ${WASM_ARGS} ${WASM_EXPORTED} -o ${WEBAPP_DIR}static/pixels/pixels.js ${CONTROLLERS_DIR}extern.cpp ${CONTROLLERS_DIR}structs.cpp ${CONTROLLERS_DIR}pixels.cpp
 
-wasm-optimized:
+wasm-optimized:		## Compile optimized wasm
 	em++ ${WASM_ARGS} -O3 ${WASM_EXPORTED} -o ${WEBAPP_DIR}static/pixels/pixels.js ${CONTROLLERS_DIR}extern.cpp ${CONTROLLERS_DIR}structs.cpp ${CONTROLLERS_DIR}pixels.cpp

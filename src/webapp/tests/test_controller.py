@@ -68,7 +68,7 @@ def test_valid_controller(client):
     response = client.post("/data", data=json.dumps([command]))
     assert response.status_code == 200
     assert response.content_type == "application/json"
-    check_standard_response(response, False, "request_response", 1)
+    check_standard_response(response, True, "request_response", 1)  # Error because not active
 
 
 def test_disabled_controller(client):
