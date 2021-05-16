@@ -6,26 +6,26 @@ const STATUS_COLUMNS = 6;
 
 const BRIGHTNESS_DELAY_MS = 100;
 
-const GOOD = 'GOOD';
-const WARNING = 'WARNING';
-const ERROR = 'ERROR';
-const FALSE = 'FALSE';
-const TRUE = 'TRUE';
-const PLAIN = 'PLAIN';
-const UNKNOWN = 'UNKNOWN';
+const GOOD = "GOOD";
+const WARNING = "WARNING";
+const ERROR = "ERROR";
+const FALSE = "FALSE";
+const TRUE = "TRUE";
+const PLAIN = "PLAIN";
+const UNKNOWN = "UNKNOWN";
 
 class Controllers {
   constructor() {
-    socket.on('update', (data) => {
+    socket.on("update", (data) => {
       this.handleUpdate(data);
     });
-    socket.on('brightness', (data) => {
+    socket.on("brightness", (data) => {
       this.handleBrightness(data);
     });
-    const table = document.getElementById('controller-table');
-    const status_table = document.getElementById('status-table');
-    this.table = table.getElementsByTagName('tbody')[0];
-    this.status_table = status_table.getElementsByTagName('tbody')[0];
+    const table = document.getElementById("controller-table");
+    const status_table = document.getElementById("status-table");
+    this.table = table.getElementsByTagName("tbody")[0];
+    this.status_table = status_table.getElementsByTagName("tbody")[0];
     this.status = {};
     this.urls = {};
     this.num_controllers = 0;
@@ -39,10 +39,10 @@ class Controllers {
   }
 
   fetchControllers() {
-    fetch('/getcontrollers')
+    fetch("/getcontrollers")
         .then((response) => response.json())
         .then((controllers) => {
-          console.log('Recieved Controllers', controllers);
+          console.log("Recieved Controllers", controllers);
           this.controllers = controllers;
           this.num_controllers = Object.keys(this.controllers).length;
           for (let i = 0; i < this.num_controllers; i++) {
@@ -53,24 +53,24 @@ class Controllers {
   }
 
   fetchInitialized() {
-    fetch('/getinitialized')
+    fetch("/getinitialized")
         .then((response) => response.json())
         .then((initialized) => {
-          console.log('Recieved Initialized', initialized);
+          console.log("Recieved Initialized", initialized);
           this.handleInitialzedResponse(initialized);
         });
   }
 
   handleUpdate(data) {
-    console.debug('Update', data);
-    if ('ping' in data) {
+    console.debug("Update", data);
+    if ("ping" in data) {
       this.updatePing(data.ping);
     }
-    if ('initialized' in data) {
-      this.handleInitialzedResponse(data['initialized']);
+    if ("initialized" in data) {
+      this.handleInitialzedResponse(data["initialized"]);
     }
-    if ('version' in data) {
-      this.handleVersionInfoResponse(data['version']);
+    if ("version" in data) {
+      this.handleVersionInfoResponse(data["version"]);
     }
   }
 
@@ -91,10 +91,10 @@ class Controllers {
   }
 
   fetchVersionInfo() {
-    fetch('/getversioninfo')
+    fetch("/getversioninfo")
         .then((response) => response.json())
         .then((version_info) => {
-          console.log('Recieved Version Info', version_info);
+          console.log("Recieved Version Info", version_info);
           this.handleVersionInfoResponse(version_info);
         });
   }
@@ -110,9 +110,9 @@ class Controllers {
     if (label.length > 0) {
       version += `_${label}`;
     }
-    document.getElementById('status-webapp-version').textContent = version;
-    document.getElementById('status-webapp-esphash').textContent = esp_hash;
-    document.getElementById('status-webapp-rpihash').textContent = rpi_hash;
+    document.getElementById("status-webapp-version").textContent = version;
+    document.getElementById("status-webapp-esphash").textContent = esp_hash;
+    document.getElementById("status-webapp-rpihash").textContent = rpi_hash;
     for (const controller in version_info.versioninfo) {
       if (controller in version_info.versioninfo) {
         const data = version_info.versioninfo[controller];
@@ -134,19 +134,19 @@ class Controllers {
         const div_mode_select = document.getElementById(`status-table-${controller}-active`);
         if (controller in data) {
           if (data[controller] === null) {
-            this.setStatus(div, FALSE, 'DISCONNECTED');
-            this.setStatusConnected(controller, FALSE, 'DISCONNECTED');
+            this.setStatus(div, FALSE, "DISCONNECTED");
+            this.setStatusConnected(controller, FALSE, "DISCONNECTED");
           } else if (data[controller] === false) {
-            div_mode_select.value = 'disabled';
-            this.setStatus(div, FALSE, 'DISABLED');
-            this.setStatusConnected(controller, FALSE, 'DISABLED');
+            div_mode_select.value = "disabled";
+            this.setStatus(div, FALSE, "DISABLED");
+            this.setStatusConnected(controller, FALSE, "DISABLED");
           } else {
             this.setStatus(div, PLAIN, data[controller].toFixed(3));
             this.setStatusConnected(controller, TRUE);
           }
         } else {
-          this.setStatus(div, FALSE, 'DISABLED');
-          this.setStatusConnected(controller, FALSE, 'DISABLED');
+          this.setStatus(div, FALSE, "DISABLED");
+          this.setStatusConnected(controller, FALSE, "DISABLED");
         }
       }
     }
@@ -154,20 +154,20 @@ class Controllers {
 
   setStatus(div, type, text = null) {
     div.classList.remove(...div.classList);
-    div.classList.add('section-title-secondary');
+    div.classList.add("section-title-secondary");
     if (text === null) {
       div.textContent = type;
     } else {
       div.textContent = text;
     }
     if (type === WARNING) {
-      div.classList.add('yellow');
+      div.classList.add("yellow");
     } else if (type === GOOD || type === TRUE) {
-      div.classList.add('green');
+      div.classList.add("green");
     } else if (type === PLAIN) {
-      div.classList.add('white');
+      div.classList.add("white");
     } else {
-      div.classList.add('red');
+      div.classList.add("red");
     }
   }
 
@@ -253,9 +253,9 @@ class Controllers {
 
   setBrightness(name, value) {
     const id = `controllers-table-${name}-brightness-`;
-    if (document.getElementById(id + 'slider') != null) {
-      document.getElementById(id + 'slider').value = value;
-      document.getElementById(id + 'value').textContent = value;
+    if (document.getElementById(id + "slider") != null) {
+      document.getElementById(id + "slider").value = value;
+      document.getElementById(id + "value").textContent = value;
     }
   }
 
@@ -288,37 +288,37 @@ class Controllers {
         }
         this.brightness_values = {};
         this.controllers[name].brightness_wait = false;
-        socket.emit('set_brightness', values);
+        socket.emit("set_brightness", values);
       }, BRIGHTNESS_DELAY_MS);
     }
   }
 
   addRow(controller) {
-    console.debug('Adding controller', controller);
+    console.debug("Adding controller", controller);
     this.controllers[controller.name].brightness_wait = false;
     if (!(controller.url in this.urls)) {
       this.urls[controller.url] = [];
     }
     this.urls[controller.url].push(controller.name);
     this.num_strips += 1;
-    const id = 'controllers-table-' + controller.name;
+    const id = "controllers-table-" + controller.name;
 
-    const box = createCheckBox(id + '-checkbox', false, null);
+    const box = createCheckBox(id + "-checkbox", false, null);
 
-    const name = createSecondTitle(id + '-name', controller.name);
+    const name = createSecondTitle(id + "-name", controller.name);
     const brightness_slider = createRange(
-        id + '-brightness-slider',
+        id + "-brightness-slider",
         controller.init.brightness,
         0,
         255,
     );
-    const brightness_value = document.createElement('span');
-    brightness_value.id = id + '-brightness-value';
+    const brightness_value = document.createElement("span");
+    brightness_value.id = id + "-brightness-value";
 
-    const ping = createSecondTitle(id + '-ping', '---');
+    const ping = createSecondTitle(id + "-ping", "---");
 
-    const status = document.createElement('div');
-    status.id = id + '-status';
+    const status = document.createElement("div");
+    status.id = id + "-status";
     this.setStatus(status, UNKNOWN);
 
     this.brightness_link[controller.name] = {
@@ -327,13 +327,13 @@ class Controllers {
       slider: brightness_slider,
       text: brightness_value,
     };
-    box.addEventListener('input', () => {
+    box.addEventListener("input", () => {
       this.brightness_link[controller.name].checked = box.checked;
     });
-    brightness_slider.addEventListener('input', () => {
+    brightness_slider.addEventListener("input", () => {
       this.sendBrightness(controller.name, brightness_slider.value);
     });
-    brightness_value.className = 'section-title-secondary';
+    brightness_value.className = "section-title-secondary";
     brightness_value.textContent = controller.init.brightness;
 
     const row = this.table.insertRow();
@@ -366,14 +366,14 @@ class Controllers {
     for (let i = 0; i < STATUS_COLUMNS; i++) {
       cells.push(row.insertCell());
     }
-    const id = 'status-table-' + name;
-    const display_name = createSecondTitle(id + '-name', name);
-    const initialized = document.createElement('div');
-    const connected = document.createElement('div');
-    const version = document.createElement('div');
-    const hash_match = document.createElement('div');
-    const mode = createSelect(id + '-active', ['active', 'disabled'], initial_mode);
-    mode.addEventListener('input', () => {
+    const id = "status-table-" + name;
+    const display_name = createSecondTitle(id + "-name", name);
+    const initialized = document.createElement("div");
+    const connected = document.createElement("div");
+    const version = document.createElement("div");
+    const hash_match = document.createElement("div");
+    const mode = createSelect(id + "-active", ["active", "disabled"], initial_mode);
+    mode.addEventListener("input", () => {
       this.changeMode(name, mode.value);
       const url = this.controllers[name].url;
       for (let i = 0; i < this.urls[url].length; i++) {
@@ -385,10 +385,10 @@ class Controllers {
     this.setStatus(version, UNKNOWN);
     this.setStatus(hash_match, UNKNOWN);
 
-    initialized.id = id + '-initialized';
-    connected.id = id + '-connected';
-    version.id = id + '-version';
-    hash_match.id = id + '-hashmatch';
+    initialized.id = id + "-initialized";
+    connected.id = id + "-connected";
+    version.id = id + "-version";
+    hash_match.id = id + "-hashmatch";
 
     cells[0].appendChild(display_name);
     cells[1].appendChild(initialized);
@@ -399,11 +399,11 @@ class Controllers {
   }
 
   changeMode(name, mode) {
-    if (mode === 'active') {
+    if (mode === "active") {
       fetch(`/enable?name=${name}`);
-    } else if (mode === 'noreconnect') {
+    } else if (mode === "noreconnect") {
       () => {}; // PASS
-    } else if (mode === 'disabled') {
+    } else if (mode === "disabled") {
       fetch(`/disable?name=${name}`);
     }
   }

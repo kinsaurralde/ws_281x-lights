@@ -25,7 +25,7 @@ BUILD_ESP8266_DIR	= ${BUILD_DIR}esp8266/controller/
 
 HTML_DIR			= ${WEBAPP_DIR}templates/
 CSS_DIR 			= ${WEBAPP_DIR}static/css/
-JS_FILES			= ${WEBAPP_DIR}static/*.js ${WEBAPP_DIR}static/main/*.js
+JS_FILES			= ${WEBAPP_DIR}static/*.js ${WEBAPP_DIR}static/main/*.js ${WEBAPP_DIR}static/pwa/*.js
 PY_FILES			= ${WEBAPP_DIR}*.py ${WEBAPP_DIR}tests/*.py ${WEBAPP_DIR}modules/*.py tools/*
 
 # Lint commands

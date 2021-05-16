@@ -2,7 +2,7 @@
 
 class Sequences {
   constructor() {
-    this.div = document.getElementById('sequences-div');
+    this.div = document.getElementById("sequences-div");
     this.status = createStatus();
     this.num_custom = 0;
     this.buttons = {};
@@ -10,24 +10,24 @@ class Sequences {
   }
 
   setupEventListeners() {
-    document.getElementById('sequences-stopall').addEventListener('click', () => {
-      fetch('/sequence/stopall');
+    document.getElementById("sequences-stopall").addEventListener("click", () => {
+      fetch("/sequence/stopall");
     });
-    socket.on('start_sequence', (data) => {
-      console.log('Start Sequence', data);
+    socket.on("start_sequence", (data) => {
+      console.log("Start Sequence", data);
       this.startSequence(data);
     });
-    socket.on('stop_sequence', (data) => {
-      console.log('Stop Sequence', data);
+    socket.on("stop_sequence", (data) => {
+      console.log("Stop Sequence", data);
       this.stopSequence(data);
     });
   }
 
   getSequences() {
-    fetch('/getsequences')
+    fetch("/getsequences")
         .then((response) => response.json())
         .then((data) => {
-          console.log('Recieved Sequences', data.sequences);
+          console.log("Recieved Sequences", data.sequences);
           for (let i = 0; i < data.sequences.length; i++) {
             this.createSequence(data.sequences[i]);
           }
@@ -36,11 +36,11 @@ class Sequences {
   }
 
   createSequence(data) {
-    console.debug('Create', data);
+    console.debug("Create", data);
     const row_num = this.num_custom;
     this.num_custom += 1;
     const name = data.name;
-    const id = 'sequences-' + row_num;
+    const id = "sequences-" + row_num;
     const div = createSectionFlex();
     const title = createSecondTitle(`${id}-name`, name);
     const functions = createSectionFlexNoBorder();
@@ -48,7 +48,7 @@ class Sequences {
     for (let i = 0; i < data.functions.length; i++) {
       const function_name = data.functions[i];
       const button = createButton(`sequences-function-${name}-${function_name}`, function_name);
-      button.addEventListener('click', () => {
+      button.addEventListener("click", () => {
         const mode = document.getElementById(`${id}-mode`).value;
         const checked = document.getElementById(`${id}-infinite`).checked;
         let iterations = parseInt(document.getElementById(`${id}-iter`).value);
@@ -64,20 +64,20 @@ class Sequences {
       functions.appendChild(button);
     }
 
-    const mode_title = createSecondTitle(null, 'Mode');
-    const mode_selector = createSelect(`${id}-mode`, ['start', 'stop'], 'start');
-    const iter_title = createSecondTitle(null, 'Iterations');
+    const mode_title = createSecondTitle(null, "Mode");
+    const mode_selector = createSelect(`${id}-mode`, ["start", "stop"], "start");
+    const iter_title = createSecondTitle(null, "Iterations");
     const iter_selector = createNumber(`${id}-iter`, 1);
-    const or_title = createSecondTitle(null, ' OR ');
-    const infinite_title = createSecondTitle(null, 'Infinite: ');
+    const or_title = createSecondTitle(null, " OR ");
+    const infinite_title = createSecondTitle(null, "Infinite: ");
     const infinite_selector = createCheckBox(`${id}-infinite`, false);
-    iter_selector.className = 'iter-selector';
-    iter_selector.addEventListener('input', () => {
-      if (iter_selector.value <= 0 && iter_selector.value != '') {
+    iter_selector.className = "iter-selector";
+    iter_selector.addEventListener("input", () => {
+      if (iter_selector.value <= 0 && iter_selector.value != "") {
         iter_selector.value = 1;
       }
     });
-    infinite_selector.addEventListener('click', () => {
+    infinite_selector.addEventListener("click", () => {
       if (infinite_selector.checked) {
         iter_selector.disabled = true;
       } else {
@@ -112,19 +112,19 @@ class Sequences {
     if (iterations != null) {
       parameters += `&iterations=${iterations}`;
     }
-    console.log('Sedning Sequence', parameters);
+    console.log("Sedning Sequence", parameters);
     fetch(`/sequence/${mode}?${parameters}`);
   }
 
   startSequence(data) {
     const id = `sequences-function-${data.name}`;
     const button = document.getElementById(id);
-    button.style.border = '0.1vw solid var(--highlight-color)';
+    button.style.border = "0.1vw solid var(--highlight-color)";
   }
 
   stopSequence(data) {
     const id = `sequences-function-${data.name}`;
     const button = document.getElementById(id);
-    button.style.border = '0.1vw solid var(--input-border)';
+    button.style.border = "0.1vw solid var(--input-border)";
   }
 }

@@ -3,8 +3,8 @@
 
 class Colors {
   constructor() {
-    this.noedit = document.getElementById('colors-noedit');
-    this.edit = document.getElementById('colors-edit');
+    this.noedit = document.getElementById("colors-noedit");
+    this.edit = document.getElementById("colors-edit");
     this.status = createStatus();
     this.visible = 0;
     this.num_custom = 0;
@@ -15,16 +15,16 @@ class Colors {
   }
 
   setupEventListeners() {
-    document.getElementById('colors-add').addEventListener('click', () => {
+    document.getElementById("colors-add").addEventListener("click", () => {
       this.addColor();
     });
-    document.getElementById('colors-remove').addEventListener('click', () => {
+    document.getElementById("colors-remove").addEventListener("click", () => {
       this.removeColor();
     });
   }
 
   getColors() {
-    fetch('/getcolors')
+    fetch("/getcolors")
         .then((response) => response.json())
         .then((colors) => {
           this.colors_data = colors.colors;
@@ -62,7 +62,7 @@ class Colors {
 
   addColor() {
     if (this.visible < this.num_custom) {
-      document.getElementById(`colors-custom-${this.visible}`).style.display = 'flex';
+      document.getElementById(`colors-custom-${this.visible}`).style.display = "flex";
       this.visible += 1;
     } else {
       this.addEditable(`custom_${this.visible + 1}`, 255, 255, 255);
@@ -74,19 +74,19 @@ class Colors {
       return;
     }
     this.visible -= 1;
-    document.getElementById(`colors-custom-${this.visible}`).style.display = 'none';
+    document.getElementById(`colors-custom-${this.visible}`).style.display = "none";
   }
 
   addNoedit(color) {
     const button = createButton(null, color.name, () => {
-      this.send('colors-noedit-target', combineRGB(color.value[0], color.value[1], color.value[2]));
+      this.send("colors-noedit-target", combineRGB(color.value[0], color.value[1], color.value[2]));
     });
-    button.className = 'width-7-5';
+    button.className = "width-7-5";
     this.noedit.appendChild(button);
   }
 
   getColorValue(color) {
-    if (color === 'none') {
+    if (color === "none") {
       return -1;
     }
     if (!isNaN(color)) {
@@ -114,43 +114,43 @@ class Colors {
     this.visible += 1;
     const row_num = this.num_custom;
     this.num_custom += 1;
-    const id = 'colors-custom-' + row_num;
-    const div = document.createElement('div');
-    const name_title = createSecondTitle(id + '-name', name);
-    const r_range = createRange(id + '-r', r, 0, 255);
-    const g_range = createRange(id + '-g', g, 0, 255);
-    const b_range = createRange(id + '-b', b, 0, 255);
-    const r_text = createSecondTitle(id + '-r-text', r);
-    const g_text = createSecondTitle(id + '-g-text', g);
-    const b_text = createSecondTitle(id + '-b-text', b);
-    const color_display = document.createElement('div');
-    const target = createSecondTitle(null, 'Target:');
-    const send = createButton(id + '-send', 'Send');
+    const id = "colors-custom-" + row_num;
+    const div = document.createElement("div");
+    const name_title = createSecondTitle(id + "-name", name);
+    const r_range = createRange(id + "-r", r, 0, 255);
+    const g_range = createRange(id + "-g", g, 0, 255);
+    const b_range = createRange(id + "-b", b, 0, 255);
+    const r_text = createSecondTitle(id + "-r-text", r);
+    const g_text = createSecondTitle(id + "-g-text", g);
+    const b_text = createSecondTitle(id + "-b-text", b);
+    const color_display = document.createElement("div");
+    const target = createSecondTitle(null, "Target:");
+    const send = createButton(id + "-send", "Send");
 
-    name_title.classList.add('width-10');
-    r_range.addEventListener('input', () => {
+    name_title.classList.add("width-10");
+    r_range.addEventListener("input", () => {
       r_text.textContent = r_range.value;
       color_display.style.backgroundColor = this.generateBackground(r_range, g_range, b_range);
     });
-    g_range.addEventListener('input', () => {
+    g_range.addEventListener("input", () => {
       g_text.textContent = g_range.value;
       color_display.style.backgroundColor = this.generateBackground(r_range, g_range, b_range);
     });
-    b_range.addEventListener('input', () => {
+    b_range.addEventListener("input", () => {
       b_text.textContent = b_range.value;
       color_display.style.backgroundColor = this.generateBackground(r_range, g_range, b_range);
     });
-    r_text.classList.add('width-3');
-    g_text.classList.add('width-3');
-    b_text.classList.add('width-3');
-    color_display.className = 'color-sample-display';
-    color_display.id = id + '-color-display';
+    r_text.classList.add("width-3");
+    g_text.classList.add("width-3");
+    b_text.classList.add("width-3");
+    color_display.className = "color-sample-display";
+    color_display.id = id + "-color-display";
     color_display.style.backgroundColor = this.generateBackground(r_range, g_range, b_range);
-    target.classList.add('width-5');
-    div.className = 'section-flex';
+    target.classList.add("width-5");
+    div.className = "section-flex";
     div.id = id;
-    send.addEventListener('click', () => {
-      this.send(id + '-target', combineRGB(r_range.value, g_range.value, b_range.value));
+    send.addEventListener("click", () => {
+      this.send(id + "-target", combineRGB(r_range.value, g_range.value, b_range.value));
     });
 
     div.appendChild(name_title);
@@ -165,7 +165,7 @@ class Colors {
     div.appendChild(color_display);
     div.appendChild(createSpaceS2());
     div.appendChild(target);
-    div.appendChild(createNumber(id + '-target', -1));
+    div.appendChild(createNumber(id + "-target", -1));
     div.appendChild(createSpaceS2());
     div.appendChild(send);
     this.edit.appendChild(div);
@@ -195,8 +195,8 @@ class Colors {
         id: ids[i],
       });
     }
-    console.log('Sending', payload);
+    console.log("Sending", payload);
     // simulator.handleData(payload);
-    fetch('/data', {method: 'post', body: JSON.stringify(payload)});
+    fetch("/data", {method: "post", body: JSON.stringify(payload)});
   }
 }

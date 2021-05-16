@@ -1,105 +1,105 @@
 /* eslint-disable no-unused-vars, no-redeclare */
 
 function createButton(id, text, onclick = null) {
-  const button = document.createElement('button');
-  button.type = 'button';
+  const button = document.createElement("button");
+  button.type = "button";
   button.textContent = text;
   button.id = id;
-  button.addEventListener('click', onclick);
+  button.addEventListener("click", onclick);
   return button;
 }
 
 function createNumber(id, value, oninput = null) {
-  const number = document.createElement('input');
-  number.type = 'number';
+  const number = document.createElement("input");
+  number.type = "number";
   number.id = id;
   number.value = value;
-  number.addEventListener('input', oninput);
+  number.addEventListener("input", oninput);
   return number;
 }
 
 function createTextBox(id, value, is_placeholder = false, oninput = null) {
-  const text = document.createElement('input');
-  text.type = 'text';
+  const text = document.createElement("input");
+  text.type = "text";
   text.id = id;
   if (is_placeholder) {
     text.placeholder = value;
   } else {
     text.value = value;
   }
-  text.addEventListener('input', oninput);
+  text.addEventListener("input", oninput);
   return text;
 }
 
 function createSelect(id, values, initial, oninput = null) {
-  const select = document.createElement('select');
+  const select = document.createElement("select");
   select.id = id;
   for (let i = 0; i < values.length; i++) {
-    const option = document.createElement('option');
+    const option = document.createElement("option");
     option.textContent = values[i];
     option.value = values[i];
     select.appendChild(option);
   }
   select.value = initial;
-  select.addEventListener('input', oninput);
+  select.addEventListener("input", oninput);
   return select;
 }
 
 function createRange(id, value, min, max, oninput = null) {
-  const range = document.createElement('input');
-  range.type = 'range';
+  const range = document.createElement("input");
+  range.type = "range";
   range.id = id;
   range.min = min;
   range.max = max;
   range.value = value;
-  range.addEventListener('input', oninput);
+  range.addEventListener("input", oninput);
   return range;
 }
 
 function createCheckBox(id, checked, oninput = null) {
-  const checkbox = document.createElement('input');
-  checkbox.type = 'checkbox';
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
   checkbox.id = id;
   checkbox.checked = checked;
-  checkbox.addEventListener('click', oninput);
+  checkbox.addEventListener("click", oninput);
   return checkbox;
 }
 
 function createSecondTitle(id, value) {
-  const div = document.createElement('div');
+  const div = document.createElement("div");
   div.id = id;
-  div.className = 'section-title-secondary';
+  div.className = "section-title-secondary";
   div.textContent = value;
   return div;
 }
 
 function createSpaceS2() {
-  const div = document.createElement('div');
-  div.className = 'space-s-2';
+  const div = document.createElement("div");
+  div.className = "space-s-2";
   return div;
 }
 
 function createDivider() {
-  const div = document.createElement('div');
-  div.className = 'divider';
+  const div = document.createElement("div");
+  div.className = "divider";
   return div;
 }
 
 function createVDivider() {
-  const div = document.createElement('div');
-  div.className = 'v-divider';
+  const div = document.createElement("div");
+  div.className = "v-divider";
   return div;
 }
 
 function createSectionFlex() {
-  const div = document.createElement('div');
-  div.className = 'section-flex';
+  const div = document.createElement("div");
+  div.className = "section-flex";
   return div;
 }
 
 function createSectionFlexNoBorder() {
-  const div = document.createElement('div');
-  div.className = 'section-flex-no-border';
+  const div = document.createElement("div");
+  div.className = "section-flex-no-border";
   return div;
 }
 
@@ -112,10 +112,10 @@ function getInputValue(id, blank = null) {
 }
 
 function stringToBool(string) {
-  if (typeof string === 'boolean') {
+  if (typeof string === "boolean") {
     return string;
   }
-  if (string.toLowerCase() == 'true') {
+  if (string.toLowerCase() == "true") {
     return true;
   }
   return false;
@@ -136,16 +136,16 @@ function splitRGB(value) {
 function createStatus() {
   return {
     error: false,
-    message: '',
+    message: "",
   };
 }
 
 function showSection(id) {
-  document.getElementById(id).style.display = 'block';
+  document.getElementById(id).style.display = "block";
 }
 
 function hideSection(id) {
-  document.getElementById(id).style.display = 'none';
+  document.getElementById(id).style.display = "none";
 }
 
 /* eslint-enable no-unused-vars */

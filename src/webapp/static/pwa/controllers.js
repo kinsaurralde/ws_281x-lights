@@ -1,4 +1,5 @@
-/* globals socket */
+/* globals */
+/* exported Controllers */
 
 const controllers_container = document.getElementById("controllers-container");
 
@@ -21,16 +22,16 @@ class Controllers {
 
   fetchControllers() {
     fetch("/getcontrollers")
-      .then((response) => response.json())
-      .then((controllers) => {
-        console.log("Recieved Controllers", controllers);
-        const keys = Object.keys(controllers);
-        this.num_controllers = Object.keys(controllers).length;
-        this.controllers = {};
-        for (let i = 0; i < this.num_controllers; i++) {
-          this.controllers[keys[i]] = new Controller(controllers[keys[i]]);
-        }
-      });
+        .then((response) => response.json())
+        .then((controllers) => {
+          console.log("Recieved Controllers", controllers);
+          const keys = Object.keys(controllers);
+          this.num_controllers = Object.keys(controllers).length;
+          this.controllers = {};
+          for (let i = 0; i < this.num_controllers; i++) {
+            this.controllers[keys[i]] = new Controller(controllers[keys[i]]);
+          }
+        });
   }
 
   updatePing(data) {

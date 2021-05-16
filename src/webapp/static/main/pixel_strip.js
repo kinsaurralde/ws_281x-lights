@@ -20,8 +20,8 @@ class PixelStrip {
     }
     this.createPixelTable(60);
 
-    title.classList.add('width-10');
-    length.classList.add('width-10');
+    title.classList.add("width-10");
+    length.classList.add("width-10");
     this.div.appendChild(title);
     this.div.appendChild(createVDivider());
     this.div.appendChild(length);
@@ -36,17 +36,17 @@ class PixelStrip {
   }
 
   show() {
-    this.div.style.display = 'flex';
+    this.div.style.display = "flex";
   }
 
   hide() {
-    this.div.style.display = 'none';
+    this.div.style.display = "none";
   }
 
   createPixelTable(width) {
     const height = Math.ceil(this.pixels.length / width);
-    this.table = document.createElement('table');
-    this.table.className = 'pixel-table';
+    this.table = document.createElement("table");
+    this.table.className = "pixel-table";
     for (let i = 0; i < height; i++) {
       const row = this.table.insertRow();
       for (let j = 0; j < width; j++) {
@@ -77,8 +77,8 @@ class Pixel {
   }
 
   createDiv() {
-    const div = document.createElement('div');
-    div.className = 'display-pixel';
+    const div = document.createElement("div");
+    div.className = "display-pixel";
     return div;
   }
 

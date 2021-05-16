@@ -2,7 +2,7 @@
 
 class Groups {
   constructor() {
-    this.table = document.getElementById('groups-table');
+    this.table = document.getElementById("groups-table");
     this.num_strips = 0;
     this.num_groups = 0;
     this.names = [];
@@ -15,13 +15,13 @@ class Groups {
     const row2 = this.table.insertRow();
     let cell = row.insertCell();
     let cell2 = row2.insertCell();
-    cell.textContent = 'Target Group ID';
-    cell2.textContent = '-1';
+    cell.textContent = "Target Group ID";
+    cell2.textContent = "-1";
     for (let i = 0; i < this.num_strips; i++) {
       cell = row.insertCell();
       cell.textContent = this.names[i];
       cell2 = row2.insertCell();
-      cell2.textContent = '✓';
+      cell2.textContent = "✓";
     }
     this.addRow();
   }
@@ -34,7 +34,7 @@ class Groups {
     const group_id = this.num_groups + this.num_strips;
     for (let i = 0; i < this.num_strips; i++) {
       const cell = row.insertCell();
-      cell.appendChild(createCheckBox('target-group-' + group_id + '-' + this.names[i], true));
+      cell.appendChild(createCheckBox("target-group-" + group_id + "-" + this.names[i], true));
     }
     this.num_groups += 1;
   }
@@ -51,7 +51,7 @@ class Groups {
     }
     const strips = [];
     for (let i = 0; i < this.num_strips; i++) {
-      const id = 'target-group-' + group_id + '-' + this.names[i];
+      const id = "target-group-" + group_id + "-" + this.names[i];
       if (document.getElementById(id).checked) {
         strips.push(this.names[i]);
       }
