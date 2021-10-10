@@ -1,0 +1,6 @@
+[submodule "sdk/emsdk"]
+	path = sdk/emsdk
+	url = https://github.com/emscripten-core/emsdk.git
+[submodule "sdk/nanopb"]
+	path = sdk/nanopb
+	url = https://github.com/nanopb/nanopb
