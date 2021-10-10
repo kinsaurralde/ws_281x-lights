@@ -1,0 +1,124 @@
+#expanded-animations-area {
+  flex-direction: column;
+  overflow: auto;
+  cursor: grab;
+}
+
+#expanded-animations-area::-webkit-scrollbar {
+  height: 25px;
+  background: black;
+  border: 2px solid white;
+  margin-bottom: 10px;
+}
+
+#expanded-animations-area::-webkit-scrollbar:hover,
+#expanded-animations-area::-webkit-scrollbar:active {
+  border-color: yellow;
+}
+
+#expanded-animations-area::-webkit-scrollbar-thumb:horizontal {
+  background: var(--input-background);
+  border: 1px solid white;
+  border-radius: 10px;
+}
+
+#expanded-animations-area::-webkit-scrollbar-thumb:horizontal:hover,
+#expanded-animations-area::-webkit-scrollbar-thumb:horizontal:active {
+  background-color: yellow;
+}
+
+.animation-container {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 2px solid var(--text-color);
+  border-radius: 15px;
+  width: 500px;
+  max-width: 80%;
+  /* height: 100%; */
+  margin: 15px;
+  padding: 10px;
+}
+
+.animation-container:hover {
+  border-color: yellow;
+}
+
+.animation-container:active {
+  border-color: green;
+}
+
+.animation-title {
+  width: 100%;
+  height: 6vh;
+  font-size: 4vh;
+  text-align: center;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.animation-send {
+  width: 100%;
+  height: 6vh;
+  font-size: 4vh;
+  text-align: center;
+  border: 1px solid var(--border-color);
+  border-radius: 15px;
+  padding-top: 1vh;
+  margin-top: 1vh;
+}
+
+.animation-args-container {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: start;
+  padding: 10px 0px;
+}
+
+.animation-arg {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  padding: 10px 0px;
+  border-bottom: 1px solid var(--input-background);
+}
+
+.animation-arg-name {
+  width: 100%;
+  font-size: 25px;
+  margin-bottom: 5px;
+}
+
+.animation-arg-name-shortened {
+  font-size: 25px;
+  margin-right: 10px;
+  margin-bottom: 5px;
+}
+
+.animation-arg-value {
+  font-size: 25px;
+  margin-left: 20px;
+}
+
+.animation-arg select {
+  width: 120px;
+  height: 40px;
+  font-size: 20px;
+}
+
+.animation-arg input[type='range'] {
+  width: 80%;
+  height: 5px;
+  margin: 20px 0px;
+}
+
+.animation-arg input[type='range']::-webkit-slider-thumb {
+  width: 30px;
+  height: 50px;
+}
+
+.animation-arg input[type='checkbox'] {
+  width: 30px;
+  height: 30px;
+}

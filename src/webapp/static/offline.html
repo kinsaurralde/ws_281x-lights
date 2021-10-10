@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Offline Page</title>
+  </head>
+
+  <body>
+    <div id="offline">Offline</div>
+    <div id="message">Could not connect to server</div>
+    <button id="reload">Reload</button>
+  </body>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      background-color: black;
+      color: white;
+      height: 100vh;
+      text-align: center;
+    }
+
+    #offline {
+      width: 100%;
+      font-size: 5rem;
+      margin-top: 10vh;
+    }
+
+    #message {
+      width: 100%;
+      font-size: 2rem;
+      margin-bottom: 25vh;
+    }
+
+    #reload {
+      padding: 1vw 8vw;
+      font-size: 1.5rem;
+      color: transparent;
+      border-radius: 10px;
+      border: 2px solid blue;
+      background-color: black;
+    }
+
+    #reload:hover {
+      color: yellow;
+      border-color: yellow;
+    }
+
+    #reload:active {
+      color: green;
+      border-color: green;
+    }
+
+    /* Animation from https://stackoverflow.com/questions/54702124/rainbow-text-animation-using-only-css */
+    div,
+    button {
+      background: linear-gradient(to right, #6666ff, #0099ff, #00ff00, #ff3399, #6666ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: rainbow_animation 6s ease-in-out infinite;
+      background-size: 400% 100%;
+    }
+
+    @keyframes rainbow_animation {
+      0%,
+      100% {
+        background-position: 0 0;
+      }
+
+      50% {
+        background-position: 100% 0;
+      }
+    }
+  </style>
+
+  <script>
+    document.getElementById('reload').addEventListener('click', function () {
+      window.location.reload();
+    });
+  </script>
+</html>

@@ -1,0 +1,6 @@
+Frame.usage_flag max_count: 10
+Frame.red max_count: 40
+Frame.green max_count: 40
+Frame.blue max_count: 40
+
+ListMax25.items max_count: 25

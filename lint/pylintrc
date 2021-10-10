@@ -1,0 +1,19 @@
+[MASTER]
+
+disable=
+    missing-module-docstring,
+    missing-function-docstring,
+    missing-class-docstring,
+    logging-format-interpolation,
+    too-few-public-methods,
+    bad-continuation,
+    cyclic-import,
+    too-many-return-statements,
+    too-many-instance-attributes
+
+[FORMAT]
+max-line-length=120
+function-naming-style=camelCase
+method-naming-style=camelCase
+const-naming-style=any
+good-names=i,j,k,r,g,b,n,ip,e

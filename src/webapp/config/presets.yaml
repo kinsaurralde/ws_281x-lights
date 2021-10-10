@@ -1,0 +1,135 @@
+---
+colors:
+  black:
+    value: [0, 0, 0]
+    tile: true
+  red:
+    value: [255, 0, 0]
+    tile: true
+  green:
+    value: [0, 255, 0]
+    tile: true
+  blue:
+    value: [0, 0, 255]
+    tile: true
+  yellow:
+    value: [255, 255, 0]
+    tile: true
+  cyan:
+    value: [0, 255, 255]
+    tile: true
+  magenta:
+    value: [255, 0, 255]
+    tile: true
+  white:
+    value: [255, 255, 255]
+    tile: true
+  orange:
+    value: [255, 55, 0]
+    tile: true
+  purple:
+    value: [55, 0, 225]
+    tile: true
+  turquoise:
+    value: [0, 255, 55]
+    tile: true
+  pink:
+    value: [255, 0, 55]
+    tile: true
+
+animation_args:
+  frame_ms:
+    type: int
+    min: 1
+    max: 60000
+  frame_multiplier:
+    type: int
+    min: 1
+    max: 25
+  animation:
+    type: animation
+  colors:
+    type: list
+    min: -1
+    max: 16777215
+    max_size: 100
+  color:
+    type: color
+    min: -1
+    max: 16777215
+  background_color:
+    type: color
+    min: -1
+    max: 16777215
+  length:
+    type: int
+    min: 0
+    max: 100
+  spacing:
+    type: int
+    min: 0
+    max: 100
+  steps:
+    type: int
+    min: 0
+    max: 100
+  reverse:
+    type: bool
+  reverse2:
+    type: bool
+
+animations:
+  Color:
+    color: random
+    frame_ms: 50
+    frame_multiplier: 1
+    web_options:
+      tile: true
+      tile_name: 'Random Color'
+      large_tile: false
+  Wipe:
+    color: random
+    background_color: none
+    reverse: false
+    frame_ms: 25
+    frame_multiplier: 2
+    web_options:
+      tile: true
+  Pulse:
+    colors: red, cyan, green, magenta, blue, yellow
+    background_color: none
+    length: 5 
+    spacing: 5 
+    reverse:  false
+    frame_ms: 40
+    frame_multiplier: 1
+    web_options:
+      tile: true
+  Rainbow:
+    reverse: false
+    frame_ms: 50
+    frame_multiplier: 2
+    web_options:
+      tile: true
+  Cycle:
+    colors: red, green, blue, red
+    steps: 50
+    frame_ms: 40
+    frame_multiplier: 1
+    web_options:
+      tile: true
+  RandomCycle:
+    frame_ms: 200
+    frame_multiplier: 1
+    web_options:
+      tile: true
+  Reverser:
+    reverse: true
+    reverse2: false
+    web_options:
+      tile: true
+
+web_options:
+  brightness: 100
+  frame_ms: 20
+  frame_multiplier: 1

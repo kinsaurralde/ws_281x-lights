@@ -1,0 +1,65 @@
+:root {
+  --pixel-width: 2.5vw;
+  --pixel-margin: var(--pixel-margin-normal);
+  --pixel-margin-normal: calc(var(--pixel-width) * 0.06);
+}
+
+#control-table tbody tr:nth-child(4n),
+#control-table tbody tr:nth-child(4n - 1) {
+  background-color: var(--body-background);
+}
+
+#control-table tbody tr:nth-child(4n - 2),
+#control-table tbody tr:nth-child(4n - 3) {
+  background-color: var(--input-background);
+}
+
+#colors-noedit button,
+#sequences-div button,
+#scheduler-div button {
+  margin: 0.25vh;
+}
+
+.space-between {
+  justify-content: space-between;
+}
+
+.green {
+  color: green;
+}
+
+.yellow {
+  color: yellow;
+}
+
+.red {
+  color: red;
+}
+
+.white {
+  color: white;
+}
+
+.display-pixel {
+  width: var(--pixel-width);
+  height: var(--pixel-width);
+  margin: var(--pixel-margin);
+  border-radius: calc(var(--pixel-width) * 0.3);
+  border: calc(var(--pixel-width) * 0.08) solid var(--text-color);
+}
+
+.pixel-table td,
+.pixel-table tr {
+  padding: 0;
+  border: none;
+  background-color: var(--body-background);
+}
+
+.iter-selector {
+  border-color: rgb(0, 100, 0) !important;
+}
+
+.iter-selector:disabled {
+  text-decoration: line-through red;
+  border-color: rgb(100, 0, 0) !important;
+}

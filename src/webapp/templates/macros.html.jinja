@@ -1,0 +1,60 @@
+{% macro mobileSection(name, body="") %}
+<div class="mobile-section display-toggle" id="section-{{name}}">
+  <div class="mobile-section-body">
+    <div class="mobile-section-title">{{name}}</div>
+    <div class="mobile-container" id="{{name}}-container">{{body}}</div>
+  </div>
+  <span class="mobile-section-expand" id="expand-{{name}}-section">
+    <img class="mobile-expand-icon" src="../static/icons/right_arrow.png" alt="Expand {{name}} Section" />
+  </span>
+</div>
+<div class="mobile-section-divider display-toggle"></div>
+{%- endmacro %}
+
+{# Expanded Sections #}
+
+{% macro expandedControllers() %}
+<div class="expanded-area" id="expanded-controllers-area"></div>
+{%- endmacro %}
+
+{% macro expandedBrightness(brightness, frame_ms, frame_multiplier) %}
+<div class="expanded-area" id="expanded-brightness-area">
+  <div class="brightness-centered-label"><div>Brightness:</div><div class="space-s-2"></div><span id="expanded-brightness-value"></span></div>
+  <input type='range' class='mobile-brightness-slider' id='expanded-brightness-slider' min='0' max='255' value="{{brightness}}" />
+  <div class="brightness-centered-label"><div>Frame ms:</div><div class="space-s-2"></div><span id="frame-ms-value"></span></div>
+  <input type='range' class='mobile-brightness-slider' id='frame-ms-brightness-slider' min='0' max='324' value="{{frame_ms}}" />
+  <div class="brightness-centered-label"><div>Frame multiplier:</div><div class="space-s-2"></div><span id="frame-multiplier-value"></span></div>
+  <input type='range' class='mobile-brightness-slider' id='frame-multiplier-brightness-slider' min='1' max='20' value="{{frame_multiplier}}" />
+  <div class="brightness-centered-label"><div>Animation FPS:</div><div class="space-s-2"></div><span id="animation-fps-value"></span></div>
+</div>
+{%- endmacro %}
+
+{% macro expandedColors() %}
+<div class="expanded-area" id="expanded-colors-area">
+  <div id="expanded-color-sliders">
+    <input type="range" id="expanded-color-r-slider" min="0" max="255" />
+    <input type="range" id="expanded-color-g-slider" min="0" max="255" />
+    <input type="range" id="expanded-color-b-slider" min="0" max="255" />
+  </div>
+  <div id="expanded-color-display-container">
+    <div id="expanded-color-display"><div id="expanded-color-send-text">Send</div></div>
+    <div id="expanded-color-text">255, 255, 255</div>
+  </div>
+  <div id="expanded-color-settings-container">
+    <div>Live:</div>
+    <input type="checkbox" id="expanded-color-live" checked />
+  </div>
+</div>
+{%- endmacro %}
+
+{% macro expandedAnimations() %}
+<div class="expanded-area" id="expanded-animations-area"></div>
+{%- endmacro %}
+
+{% macro expandedSequences() %}
+<div class="expanded-area" id="expanded-sequences-area"></div>
+{%- endmacro %}
+
+{% macro expandedOther() %}
+<div class="expanded-area" id="expanded-other-area"></div>
+{%- endmacro %}

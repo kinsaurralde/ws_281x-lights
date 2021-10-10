@@ -1,0 +1,83 @@
+{% import 'macros.html.jinja' as macros %}
+
+<!-- [html-validate-disable-next parser-error] -->
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+
+    <title>WS281X LEDs</title>
+    <meta name="description" content="WS281X LED Control Panel" />
+    <meta name="author" content="Kyle Insaurralde" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="manifest" href="../static/manifest.json" />
+    <script defer src="../static/js/pwa.js"></script>
+    <script defer src="../static/js/helpers.js"></script>
+    <script defer src="../static/js/buffered_call.js"></script>
+    <script defer src="../static/js/main.js"></script>
+    <script defer src="../static/js/tiles.js"></script>
+    <script defer src="../static/js/colors.js"></script>
+    <script defer src="../static/js/brightness.js"></script>
+    <script defer src="../static/js/animations.js"></script>
+    <script defer src="../static/js/controllers.js"></script>
+    <script defer src="../static/lib/socket.io.js"></script>
+    <link rel="apple-touch-icon" sizes="192x192" href="../static/icons/icon-192x192.png" />
+    <link rel="stylesheet" href="../static/css/main.css" />
+    <link rel="stylesheet" href="../static/css/mobile.css" />
+    <link rel="stylesheet" href="../static/css/mobile-expand.css" />
+    <link rel="stylesheet" href="../static/css/mobile-colors.css" />
+    <link rel="stylesheet" href="../static/css/mobile-brightness.css" />
+    <link rel="stylesheet" href="../static/css/mobile-animations.css" />
+    <link rel="stylesheet" href="../static/css/mobile-controllers.css" />
+  </head>
+
+  <body>
+    <div id="main-page">
+      <div class="mobile-section-divider"></div>
+      {{ macros.mobileSection("Controllers") }}
+      {{ macros.mobileSection("Brightness", "<input type='range' class='mobile-brightness-slider' id='main-brightness-slider' min='0' max='255' />") }}
+      {{ macros.mobileSection("Colors") }}
+      {{ macros.mobileSection("Animations") }}
+      {{ macros.mobileSection("Sequences") }}
+      {{ macros.mobileSection("Other") }}
+
+      <!-- Expaned Sections -->
+      <div id="expanded" class="expand-display-toggle">
+        <div id="expanded-container">
+          {{ macros.expandedControllers() }}
+          {{ macros.expandedBrightness(defaults["brightness"], defaults["frame_ms"], defaults["frame_multiplier"]) }}
+          {{ macros.expandedColors() }}
+          {{ macros.expandedAnimations() }}
+          {{ macros.expandedSequences() }} 
+          {{ macros.expandedOther() }}
+          <div class="mobile-section" id="close-expanded">
+            <button type="button" id="close-expanded-button" class="color-button">Done</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <script>
+    const rcss = document.documentElement.style;
+
+    window.onload = function () {
+      window.socket = io();
+      socket.on("connect", () => {
+        console.log("Connected");
+      });
+      socket.on("disconnect", () => {
+        console.log("Disconnected");
+      });
+      socket.on("ledinfo", (data) => {
+        handleLEDInfo(data);
+      });
+      window.global_colors = new Colors();
+      window.global_animations = new Animations();
+      window.global_controllers = new Controllers();
+      loadPWALayout();
+    };
+  </script>
+</html>

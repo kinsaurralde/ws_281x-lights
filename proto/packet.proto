@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+import "animation.proto";
+
+message Packet {
+    Header header = 1;
+    Options options = 2;
+    Payload payload = 10;
+}
+
+message Payload {
+    // If no payload set, treat as ping
+    oneof payload {
+        // Frequent
+        LEDInfo led_info = 1;
+        AnimationArgs animation_args = 10;
+        Frame frame = 11;
+        // Infrequent
+        Version version = 100;
+        ESPInfo esp_info = 101;
+    }
+}
+
+message Header {
+    Version version = 1;
+    Status status = 2;
+    int64 id = 3;
+    int64 timestamp_millis = 4;
+}
+
+message Options {
+    bool send_ack = 1;
+}
+
+message ESPInfo {
+    // Set true if values filled. If false, then request values be filled
+    bool is_request = 1;
+    // Values
+    uint32 heap_free = 2;
+    uint32 heap_frag = 3;
+    uint32 sketch_size = 4;
+    uint32 free_sketch_size = 5;
+    uint32 flash_chip_size = 6;
+    uint32 flash_chip_speed = 7;
+    uint32 cpu_freq = 8;
+    uint32 cycle_count = 9;
+    uint32 supply_voltage = 10;
+    uint32 chip_id = 11;
+    uint32 flash_id = 12;
+    uint32 flash_crc = 13;
+    uint32 millis = 14;
+}
+
+message Version {
+    int32 major = 1;
+    int32 minor = 2;
+    int32 patch = 3;
+    string label = 4;
+    Hash esp = 5;
+    Hash pixels = 6;
+}
+
+message Hash {
+    bytes value = 1;
+}
+
+enum Status {
+    // Set REQUEST for outgoing packet
+    REQUEST = 0;
+    // Set a value below for ACK packet
+    // Success
+    GOOD = 1;
+    // Generic Error
+    ERROR = 10;
+    CONNECTION_ERROR = 11;
+    ARGUMENT_ERROR = 12;
+    MISSING_PAYLOAD = 20;
+    MISSING_HEADER = 21;
+    MISSING_OPTIONS = 22;
+    // Specific Error
+    PACKET_TOO_LARGE = 30;
+}

@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+
+message AnimationArgs {
+    int32 frame_ms = 1;
+    AnimationType type = 2;
+    ListMax25 colors = 4;
+    int32 color = 5;
+    int32 background_color = 6;
+    int32 length = 7;
+    int32 spacing = 8;
+    int32 steps = 9;
+    int32 frame_multiplier = 10;
+    
+    bool reverse = 14;
+    bool reverse2 = 15;
+}
+
+message ListMax25 {
+    repeated int32 items = 1;
+}
+
+message Frame {
+    bool is_response = 1;
+    Brightness brightness = 2;
+    int32 start_pixel = 7;
+    int32 pixel_count = 8;
+    repeated uint32 usage_flag = 9;
+    repeated uint64 red = 10;
+    repeated uint64 green = 11;
+    repeated uint64 blue = 12;
+}
+
+message Brightness {
+    bool response = 1;
+    int32 brightness = 2;
+}
+
+message LEDInfo {
+    bool set_brightness = 1;
+    int32 brightness = 2;
+    bool set_num_leds = 3;
+    int32 num_leds = 4;
+    bool set_frame_ms = 5;
+    int32 frame_ms = 6;
+    bool set_frame_multiplier = 7;
+    int32 frame_multiplier = 8;
+    bool initialize = 9;
+    bool grb = 10;
+}
+
+enum AnimationType {
+    NONE = 0;
+    COLOR = 1;
+    WIPE = 2;
+    PULSE = 3;
+    RAINBOW = 4;
+    CYCLE = 5;
+    RANDOM_CYCLE = 6;
+    REVERSER = 7;
+}
+
+// enum ShiftMode {
+//     BLANK = 0;
+//     FIRST = 1;
+//     LOOP = 2;
+// }

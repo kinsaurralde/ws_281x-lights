@@ -1,0 +1,3 @@
+Version.label max_length: 16
+Hash.value max_size: 64
+Hash.value fixed_length: true
