@@ -119,8 +119,14 @@ function send(payload) {
 }
 
 function simpleColor(r, g, b) {
-  const payload = [createAnimationArgs()];
-  payload[0].color = combineRGB(r, g, b);
+  const controller_ids = controller.getActiveControllers();
+  const payload = [];
+  for (let i = 0; i < controller_ids.length; i++) {
+    const args = createAnimationArgs();
+    args.id = controller_ids[i];
+    args.color = combineRGB(r, g, b);
+    payload.push(args); 
+  }
   send(payload);
 }
 

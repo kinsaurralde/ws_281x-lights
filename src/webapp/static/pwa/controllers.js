@@ -41,12 +41,23 @@ class Controllers {
       }
     }
   }
+
+  getActiveControllers() {
+    let active = [];
+    for (let controller in this.controllers) {
+      if (this.controllers[controller].isActive()) {
+        active.push(controller);
+      }
+    }
+    return active;
+  }
 }
 
 class Controller {
   constructor(data) {
     console.log("Create", data);
     this.active = true;
+    this.disabled = false;
     this.name = data["name"];
     this.num_leds = data["init"]["num_leds"];
     this.brightness = data["init"]["brightness"];
@@ -54,8 +65,10 @@ class Controller {
     this.box.id = `controller-box-${this.name}`;
     this.box.className = "mobile-button-box";
     this.box.addEventListener("click", () => {
-      this.active = !this.active;
-      this.updateActive();
+      if (!this.disabled) {
+        this.active = !this.active;
+        this.updateActive();
+      }
     });
     this.updateActive();
     this.updatePing("---");
@@ -63,6 +76,7 @@ class Controller {
   }
 
   updatePing(ping) {
+    this.disabled = false;
     if (ping == null || ping == undefined) {
       this.box.innerText = `${this.name}\nERROR`;
       this.box.style.color = "red";
@@ -70,6 +84,7 @@ class Controller {
       this.box.innerText = `${this.name}\nDISABLED`;
       this.box.style.color = "red";
       this.active = false;
+      this.disabled = true;
       this.updateActive();
     } else {
       this.box.innerText = `${this.name}\n${ping} ms`;
