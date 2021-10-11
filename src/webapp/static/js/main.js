@@ -3,23 +3,23 @@
 
 const main_brightness_slider = document.getElementById('main-brightness-slider');
 main_brightness_slider.addEventListener('input', () => {
-  ledInfo({ brightness: main_brightness_slider.value });
+  ledInfo({brightness: main_brightness_slider.value});
 });
 
 function loadPWALayout() {
   fetch('/pwalayout')
-    .then((response) => response.json())
-    .then((layout) => {
-      addColorTiles(layout['colors']);
-      global_animations.addAnimationArgs(layout['animation_args']);
-      global_animations.addAnimations(layout['animations']);
-    });
+      .then((response) => response.json())
+      .then((layout) => {
+        addColorTiles(layout['colors']);
+        global_animations.addAnimationArgs(layout['animation_args']);
+        global_animations.addAnimations(layout['animations']);
+      });
   fetch('/controllers')
-    .then((response) => response.json())
-    .then((controllers) => {
-      console.log('Controllers', controllers);
-      global_controllers.addControllers(controllers['controllers']);
-    });
+      .then((response) => response.json())
+      .then((controllers) => {
+        console.log('Controllers', controllers);
+        global_controllers.addControllers(controllers['controllers']);
+      });
 }
 
 function ledInfo(values) {

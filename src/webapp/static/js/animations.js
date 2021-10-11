@@ -98,13 +98,13 @@ class Animations {
           arg_container.appendChild(this.createFrameMsSlider(tile_index, arg, default_value));
         } else {
           arg_container.appendChild(
-            this.createSlider(
-              tile_index,
-              arg,
-              default_value,
-              this.animation_args[arg]['min'],
-              this.animation_args[arg]['max']
-            )
+              this.createSlider(
+                  tile_index,
+                  arg,
+                  default_value,
+                  this.animation_args[arg]['min'],
+                  this.animation_args[arg]['max'],
+              ),
           );
         }
         break;
@@ -129,7 +129,7 @@ class Animations {
     }
     args = this.processArgs(args);
     args['type'] = animation;
-    send([{ controllers: ['all'], animation_args: args }]);
+    send([{controllers: ['all'], animation_args: args}]);
   }
 
   processArgs(args) {

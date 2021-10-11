@@ -27,7 +27,6 @@ class UDPManager:
 
     def send(self, url: str, packet: proto_packet.Packet) -> None:
         serialized = packet.SerializeToString()
-        print("Send", serialized, len(serialized))
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
             sock.settimeout(self.timeout)
             sock.connect((url, config.UDP_PORT))

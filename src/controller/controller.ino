@@ -1,6 +1,9 @@
 #include <Arduino.h>
+#include <EEPROM.h>
+#include <ESP8266HTTPClient.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266WiFi.h>
+#include <WiFiClient.h>
 #include <WiFiUDP.h>
 
 #define FASTLED_ESP8266_NODEMCU_PIN_ORDER
@@ -14,8 +17,9 @@
 #define WIFI_SSID "thebetterapartment"
 #define WIFI_PASSWORD "Mocha_Rosie4ever"
 
+#define EEPROM_ADDRESS_START 0
+#define EEPROM_SIZE 512
 #define LED_PIN 5
-
 #define BUILTIN_LED_A 16
 #define BUILTIN_LED_B 2
 
@@ -26,6 +30,7 @@ void handleHTTP();
 void handleRequest();
 
 WiFiUDP Udp;
+// IPAddress server_addr;
 ESP8266WebServer server(80);
 uint8_t buffer[PACKET_BUFFER_SIZE];
 
@@ -79,6 +84,21 @@ void setup() {
   neopixels.controllers = &FastLED.addLeds<NEOPIXEL, LED_PIN>(neopixels.leds, MAX_LED);
 
   Udp.begin(UDP_PORT);
+  EEPROM.begin(EEPROM_SIZE);
+
+  IPAddress previous_server_ip = readSavedServerIp();
+  Serial.print("Saved Server IP Address ");
+  Serial.println(previous_server_ip);
+  HTTPClient http;
+  WiFiClient client;
+
+  String server_path = "http://10.0.0.100:5000/controllerstartup";
+  // Your Domain name with URL path or IP address with path
+  http.begin(client, server_path.c_str());
+
+  // Send HTTP GET request
+  int httpResponseCode = http.POST(nullptr, 0);
+
   digitalWrite(BUILTIN_LED_A, LOW);
   digitalWrite(BUILTIN_LED_B, HIGH);
 }
@@ -87,6 +107,14 @@ void loop() {
   server.handleClient();
   handleUDP();
   updatePixels();
+}
+
+IPAddress readSavedServerIp() {
+  IPAddress saved_address;
+  for (int i = 0; i < 4; i++) {
+    saved_address[i] = EEPROM.read(EEPROM_ADDRESS_START + i);
+  }
+  return saved_address;
 }
 
 void updatePixels() {
@@ -143,6 +171,15 @@ Status handleLEDInfo(Packet& packet) {
   if (packet.payload.payload.led_info.initialize) {
     neopixels.grb = packet.payload.payload.led_info.grb;
     neopixels.initialized = true;
+    IPAddress remote_address = Udp.remoteIP();
+    IPAddress saved_address = readSavedServerIp();
+    if (saved_address != remote_address) {
+      for (int i = 0; i < 4; i++) {
+        EEPROM.write(EEPROM_ADDRESS_START + i, remote_address[i]);
+      }
+      EEPROM.commit();
+    }
+    Serial.println("Initialized");
   }
   neopixels.pixels.setLEDInfo(packet.payload.payload.led_info);
   if (packet.payload.payload.led_info.set_brightness) {
@@ -258,9 +295,10 @@ void handleRoot() {
   int page_bytes_written = snprintf(
       page, PAGE_SIZE,
       "<b>STATUS</b><br>Millis: %lu<br>Last Frame Millis: %lu<br>Frame Count: %d<br>UDP Request Count: %d<br>HTTP "
-      "Request Count: %d<br>VCC: %d<br>Free Heap: %d<br>Heap Fragmentation: %d<br><br>"
+      "Request Count: %d<br>VCC: %d<br>Free Heap: %d<br>Heap Fragmentation: %d<br>WiFi RSSI: %d<br>Server Ip: "
+      "%s<br><br>"
       "<b>PIXELS INFO</b><br>Frame ms: %d<br>Frame Multiplier: %d<br>Brightness: %d<br>Initialized: %d<br>GRB: "
-      "%d<br><br>"
+      "%d<br>Num Leds: %d<br><br>"
       "<b>ANIMATION ARGS</b><br>Type: %d<br>Color: %d<br>Background Color: %d<br>Length: %d<br>Spacing: %d<br>Steps: "
       "%d<br><br>"
       "<b>ESP INFO</b><br>Software Version: %d.%d.%d_%s<br>Sketch Size: %d<br>Free Sketch Size: %d<br>Flash Chip Size: "
@@ -268,9 +306,10 @@ void handleRoot() {
       "Written: ",
       // Status
       millis(), stats.last_frame_millis, stats.frame_count, stats.udp_packet_count, stats.http_packet_count,
-      ESP.getVcc(), ESP.getFreeHeap(), ESP.getHeapFragmentation(),
+      ESP.getVcc(), ESP.getFreeHeap(), ESP.getHeapFragmentation(), WiFi.RSSI(), readSavedServerIp().toString(),
       // Pixels Info
       pixel_info.frame_ms, pixel_info.frame_multiplier, pixel_info.brightness, pixel_info.initialize, pixel_info.grb,
+      pixel_info.num_leds,
       // Animation Args
       animation_args.type, animation_args.color, animation_args.background_color, animation_args.length,
       animation_args.spacing, animation_args.steps,
@@ -278,9 +317,6 @@ void handleRoot() {
       MAJOR, MINOR, PATCH, LABEL, ESP.getSketchSize(), ESP.getFreeSketchSpace(), ESP.getFlashChipSize(),
       ESP.getFlashChipSpeed(), ESP.getCpuFreqMHz(), ESP.getChipId(), ESP.getFlashChipId(), ESP.checkFlashCRC());
   page_bytes_written += snprintf(page + page_bytes_written, PAGE_SIZE, "%d", page_bytes_written + BYTES_WRITTEN_SIZE);
-  Serial.print(page_bytes_written);
-  Serial.print(" ");
-  Serial.println(strlen(page));
   server.sendHeader("Access-Control-Allow-Origin", "*");
   server.send(200, "text/html", page);
 }

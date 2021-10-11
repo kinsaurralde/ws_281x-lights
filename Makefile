@@ -71,7 +71,7 @@ version:
 	printf "ESP_HASH = 0x${ESP_HASH}\nPIXELS_HASH = 0x${PIXELS_HASH}" >> ${WEBAPP_DIR}version.py
 
 run-webapp-development:
-	cd src/webapp/ && python3 -B server.py --port=5000 && cd ../../
+	cd src/webapp/ && python3 -B server.py --port=5000 --ping-controllers && cd ../../
 
 npm-setup:
 	npm install prettier html-validate eslint eslint-config-defaults eslint-config-google

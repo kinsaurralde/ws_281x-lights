@@ -16,7 +16,7 @@ import config
 Payload.max_decode_packets = 100
 
 MAX_LOG_BYTES = 4000000
-ESP_IP_ADDRESS = "192.168.29.100"
+ESP_IP_ADDRESS = "10.0.0.72"
 
 LOG_FORMAT = "%(asctime)s %(levelname)-8s [%(name)-26s:%(funcName)-26s] %(message)s"
 logging.basicConfig(format=LOG_FORMAT, level=logging.DEBUG, datefmt="%Y-%m-%d %H:%M:%S")
@@ -121,16 +121,24 @@ def getControllers():
     return modules.createResponse(app, controllers_config)
 
 
+@app.route("/controllerstartup", methods=["POST"])
+def controllerStartUp():
+    remote_ip_addr = request.remote_addr
+    log.info(f"Controller startup: {remote_ip_addr}")
+    pm.send(remote_ip_addr, controllers.createControllerInitMessage(remote_ip_addr))
+    return ""
+
+
 @app.route("/version")
 def getversion():
     pm.getVersion()
-    return "hi"
+    return ""
 
 
 @app.route("/controllersdebug")
 def controllersDebug():
     pm.getESPInfo()
-    return "Hi"
+    return ""
 
 
 @socketio.on("animation")
@@ -171,7 +179,7 @@ try:
 
     pm = modules.PacketManager(socketio, controllers, presets_config)
     pm.setVersion(version.MAJOR, version.MINOR, version.PATCH)
-    pm.registerUrls(controllers.getControllerUrls())
+    pm.registerIps(controllers.getControllerIps())
     pm.sendList(controllers.createAllControllerInitMessages())
     if not args.background_disabled:
         pm.startBackgroundThread()

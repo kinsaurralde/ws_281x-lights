@@ -129,7 +129,7 @@ class Controller {
     debug_button_close.textContent = 'Hide Debug Info';
     debug_button_close.addEventListener('click', () => {
       this.hideDebugInfo();
-    })
+    });
     container.appendChild(debug_button_close);
     container.appendChild(divider);
     container.appendChild(this.debug_row);
@@ -137,36 +137,36 @@ class Controller {
   }
 
   showDebugInfo() {
-    fetch(`http://${this.url}/`).then((response) => response.text()).then((data) => {
-      const v_divider = document.createElement('div');
-      v_divider.className = 'v-divider';
-      this.hideDebugInfo();
-      const rows = data.split('<br>');
-      let debug_box = document.createElement('div');
-      debug_box.className = 'controller-debug-box';
-      for (let i = 0; i < rows.length; i++) {
-        let row_text = rows[i];
-        if (row_text.includes('<b>')) {
-          if (debug_box.innerHTML.length > 0) {
-            this.debug_row.appendChild(debug_box.cloneNode(true));
-            this.debug_row.appendChild(v_divider.cloneNode());
-            debug_box.innerHTML = '';
+    fetch(`http://${this.url}/`)
+        .then((response) => response.text())
+        .then((data) => {
+          const v_divider = document.createElement('div');
+          v_divider.className = 'v-divider';
+          this.hideDebugInfo();
+          const rows = data.split('<br>');
+          const debug_box = document.createElement('div');
+          debug_box.className = 'controller-debug-box';
+          for (let i = 0; i < rows.length; i++) {
+            let row_text = rows[i];
+            if (row_text.includes('<b>')) {
+              if (debug_box.innerHTML.length > 0) {
+                this.debug_row.appendChild(debug_box.cloneNode(true));
+                this.debug_row.appendChild(v_divider.cloneNode());
+                debug_box.innerHTML = '';
+              }
+              row_text = row_text.replace(/<\/*b>/g, '');
+            // console.log("New Box", content, debug_box.cloneNode());
+            // debug_box.textContent = content;
+            }
+            const row = document.createElement('div');
+            row.textContent = row_text;
+            debug_box.appendChild(row);
           }
-          row_text = row_text.replace(/<\/*b>/g, '');
-          // console.log("New Box", content, debug_box.cloneNode());
-          // debug_box.textContent = content;
-        }
-        const row = document.createElement('div');
-        row.textContent = row_text;
-        debug_box.appendChild(row);
-      }
-      this.debug_row.appendChild(debug_box.cloneNode(true));
-    });
+          this.debug_row.appendChild(debug_box.cloneNode(true));
+        });
   }
 
   hideDebugInfo() {
     this.debug_row.innerHTML = '';
   }
 }
-
-

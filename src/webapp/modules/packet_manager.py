@@ -28,7 +28,7 @@ class PacketManager:
         self.packet_count = 1
         self.ping_interval = config.DEFAULT_PING_INTERVAL
         self.background_interval = config.DEFAULT_BACKGROUND_INTERVAL
-        self.urls = []
+        self.ips = []
         self.presets_config = presets_config
         self.version = proto_packet.Version()
         self.send_pings = False
@@ -38,13 +38,13 @@ class PacketManager:
         self.background_thread = None
         self.ping_thread = None
 
-    def registerUrls(self, urls: typing.List[str]) -> None:
-        for url in urls:
-            self.registerUrl(url)
+    def registerIps(self, ips: typing.List[str]) -> None:
+        for ip in ips:
+            self.registerIp(ip)
 
-    def registerUrl(self, url: str) -> None:
-        if url not in self.urls:
-            self.urls.append(url)
+    def registerIp(self, ip: str) -> None:
+        if ip not in self.ips:
+            self.ips.append(ip)
 
     def sendList(self, items: typing.List[tuple], options=None, packet_options=None) -> None:
         for item in items:
@@ -52,15 +52,17 @@ class PacketManager:
                 continue
             self.send(item[0], item[1], options, packet_options)
 
-    def send(self, url: str, payload: proto_packet.Payload, options=None, packet_options=None) -> None:
+    def send(self, ip: str, payload: proto_packet.Payload, options=None, packet_options=None) -> None:
+        if payload is None:
+            return
         if options is None:
             options = proto_packet.Options()
         if packet_options is None:
             packet_options = PacketOptions()
-        if url not in self.urls:
-            self.urls.append(url)
+        if ip not in self.ips:
+            self.ips.append(ip)
         packet = self._createPacket(payload, options, packet_options)
-        self.udp_sender.send(url, packet)
+        self.udp_sender.send(ip, packet)
 
     def setPingInterval(self, value):
         if isinstance(value, int) and value > 0:
@@ -84,13 +86,9 @@ class PacketManager:
         payload.version.CopyFrom(proto_packet.Version())
         payload.version.major = 1
         packet = self._createPacket(payload, options, packet_options)
-        print(packet, packet.SerializeToString(), len(packet.SerializeToString()))
         response = requests.post(f"http://192.168.29.100/proto", packet.SerializeToString())
         packet = proto_packet.Packet()
-        print(response.content)
         packet.ParseFromString(response.content)
-        # print(packet.ParseFromString(response.content))
-        print(packet)
 
     def startBackgroundThread(self) -> None:
         self.background_thread = threading.Thread(target=self._backgroundThread, daemon=True)
@@ -102,11 +100,10 @@ class PacketManager:
         self.ping_thread.start()
 
     def getESPInfo(self) -> None:
-        for ip in self.controllers.getControllerUrls():
+        for ip in self.controllers.getControllerips():
             payload = proto_packet.Payload()
             payload.esp_info.is_request = True
             packet = self._createPacket(payload, proto_packet.Options(), PacketOptions())
-            print(len(packet.SerializeToString()))
             response = requests.post(f"http://{ip}/proto", packet.SerializeToString())
             # packet.ParseFromString(response.content)
             print(response.content)
@@ -123,7 +120,6 @@ class PacketManager:
         if "frame_multiplier" in led_info and led_info["frame_multiplier"] is not None:
             payload.led_info.set_frame_multiplier = True
             payload.led_info.frame_multiplier = int(led_info["frame_multiplier"])
-        print(payload)
         return payload
 
     def _createPacket(
@@ -159,7 +155,7 @@ class PacketManager:
         while self.ping_thread is not None:
             if not self.send_pings:
                 return
-            for url in self.urls:
+            for ip in self.ips:
                 ping_packet = self._createPacket(payload, options, packet_options)
-                self.udp_sender.send(url, ping_packet)
+                self.udp_sender.send(ip, ping_packet)
             time.sleep(self.ping_interval)

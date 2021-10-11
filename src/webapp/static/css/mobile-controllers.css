@@ -1,59 +1,58 @@
 body {
-    color: white;
+  color: white;
 }
 
 #expanded-controllers-area {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
 }
 
 .controller-container {
-    display: flex;
-    flex-wrap: wrap;
-    min-width: 70%;
-    padding: 10px 25px;
-    margin: 10px 0px;
-    border: 1px solid white;
-    border-radius: 20px;
-    font-size: 25px;
+  display: flex;
+  flex-wrap: wrap;
+  min-width: 70%;
+  padding: 10px 25px;
+  margin: 10px 0px;
+  border: 1px solid white;
+  border-radius: 20px;
+  font-size: 25px;
 }
 
-.controller-container input[type="range"] {
-    width: 250px;
-    height: 25px;
+.controller-container input[type='range'] {
+  width: 250px;
+  height: 25px;
 }
 
-.controller-container input[type="range"]::-webkit-slider-thumb {
-    width: 15px;
-    height: 25px;
+.controller-container input[type='range']::-webkit-slider-thumb {
+  width: 15px;
+  height: 25px;
 }
 
 .controller-container button {
-    width: 250px;
-    height: 30px;
-    font-size: 15px;
-    margin-right: 10px;
+  width: 250px;
+  height: 30px;
+  font-size: 15px;
+  margin-right: 10px;
 }
 
 .controller-debug-row {
-    width: 100%;
-    display: flex;
-    font-size: 15px;
+  width: 100%;
+  display: flex;
+  font-size: 15px;
 }
 
 .controller-debug-box {
-    padding: 10px;
-    margin: 0px 5px;
+  padding: 10px;
+  margin: 0px 5px;
 }
 
 @media screen and (max-width: 1000px) {
-    .controller-container {
-        display: block;
-    }
+  .controller-container {
+    display: block;
+  }
 
-    .controller-debug-row {
-        display: block;
-    }
+  .controller-debug-row {
+    display: block;
+  }
 }
-

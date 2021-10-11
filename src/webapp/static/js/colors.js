@@ -66,7 +66,7 @@ function bufferedColor(r, g, b) {
   if (!buffer_waiting) {
     buffer_waiting = true;
     console.log('Start buffer');
-    setTimeout(function () {
+    setTimeout(function() {
       simpleColor(r, g, b);
       buffer_waiting = false;
     }, BUFFERED_WAIT_MS);
@@ -122,7 +122,7 @@ function setStartColor() {
 }
 
 function simpleColor(r, g, b) {
-  send([{ controllers: ['all'], animation_args: { type: 'COLOR', color: combineRGB(r, g, b) } }]);
+  send([{controllers: ['all'], animation_args: {type: 'COLOR', color: combineRGB(r, g, b)}}]);
 }
 
 class Colors {

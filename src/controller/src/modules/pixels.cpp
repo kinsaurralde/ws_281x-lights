@@ -64,6 +64,9 @@ bool Pixels::frameReady(int time) {
 }
 
 void Pixels::setLEDInfo(const LEDInfo& led_info) {
+  if (led_info.initialize) {
+    info_.initialize = true;
+  }
   if (led_info.set_brightness) {
     info_.brightness = led_info.brightness;
   }

@@ -17,29 +17,29 @@ const animation_fps_text = document.getElementById('animation-fps-value');
 
 expanded_brightness_slider.addEventListener('input', () => {
   updateValueText();
-  ledinfo_send.add({ brightness: expanded_brightness_slider.value });
+  ledinfo_send.add({brightness: expanded_brightness_slider.value});
 });
 
 frame_ms_slider.addEventListener('input', () => {
   updateValueText();
-  ledinfo_send.add({ frame_ms: getScaledFrameMs() });
+  ledinfo_send.add({frame_ms: getScaledFrameMs()});
 });
 
 frame_multiplier_slider.addEventListener('input', () => {
   updateValueText();
-  ledinfo_send.add({ frame_multiplier: frame_multiplier_slider.value });
+  ledinfo_send.add({frame_multiplier: frame_multiplier_slider.value});
 });
 
 const FRAME_MS_SCALING = [
-  { upto: 0, amount: 0, base: 0 },
-  { upto: 180, amount: 1, base: 20 }, // 20 < frame_ms < 200
-  { upto: 190, amount: 5, base: 200 }, // 200 < frame_ms < 250
-  { upto: 215, amount: 10, base: 250 }, // 250 < frame_ms < 500
-  { upto: 240, amount: 20, base: 500 }, // 500 < frame_ms < 1000
-  { upto: 260, amount: 50, base: 1000 }, // 1000 < frame_ms < 2000
-  { upto: 290, amount: 100, base: 2000 }, // 2000 < frame_ms < 5000
-  { upto: 315, amount: 1000, base: 5000 }, // 5000 < frame_ms < 10000
-  { upto: 325, amount: 5000, base: 30000 }, // 30000 < frame_ms < 60000
+  {upto: 0, amount: 0, base: 0},
+  {upto: 180, amount: 1, base: 20}, // 20 < frame_ms < 200
+  {upto: 190, amount: 5, base: 200}, // 200 < frame_ms < 250
+  {upto: 215, amount: 10, base: 250}, // 250 < frame_ms < 500
+  {upto: 240, amount: 20, base: 500}, // 500 < frame_ms < 1000
+  {upto: 260, amount: 50, base: 1000}, // 1000 < frame_ms < 2000
+  {upto: 290, amount: 100, base: 2000}, // 2000 < frame_ms < 5000
+  {upto: 315, amount: 1000, base: 5000}, // 5000 < frame_ms < 10000
+  {upto: 325, amount: 5000, base: 30000}, // 30000 < frame_ms < 60000
 ];
 
 function getScaledFrameMs() {
