@@ -1,3 +1,5 @@
+/* exported Controllers */
+
 const controllers_tile_container = document.getElementById('Controllers-container');
 const controllers_row_container = document.getElementById('expanded-controllers-area');
 

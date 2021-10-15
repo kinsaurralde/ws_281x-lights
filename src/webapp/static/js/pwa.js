@@ -1,4 +1,5 @@
 /* exported simpleColor simpleAnimation simpleSequence stopAllSequences */
+/* globals startSliderAnimations stopSliderAnimations */
 
 const controllers_section = document.getElementById('expand-Controllers-section');
 const brightness_section = document.getElementById('expand-Brightness-section');

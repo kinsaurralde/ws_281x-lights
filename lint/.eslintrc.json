@@ -44,6 +44,7 @@
         "stringToBool": "readonly",
         "rcss": "readonly",
         "global_colors": "readonly",
-        "global_animations": "readonly"
+        "global_animations": "readonly",
+        "global_controllers": "readonly"
     }
 }

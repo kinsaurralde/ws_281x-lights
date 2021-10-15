@@ -1,4 +1,4 @@
-/* globals addColorTiles addAnimationTiles */
+/* globals addColorTiles */
 /* exported loadPWALayout send */
 
 const main_brightness_slider = document.getElementById('main-brightness-slider');
@@ -18,7 +18,7 @@ function loadPWALayout() {
       .then((response) => response.json())
       .then((controllers) => {
         console.log('Controllers', controllers);
-        global_controllers.addControllers(controllers['controllers']);
+        window.global_controllers.addControllers(controllers['controllers']);
       });
 }
 
