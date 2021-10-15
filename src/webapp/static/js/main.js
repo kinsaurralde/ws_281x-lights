@@ -18,7 +18,7 @@ function loadPWALayout() {
       .then((response) => response.json())
       .then((controllers) => {
         console.log('Controllers', controllers);
-        window.global_controllers.addControllers(controllers['controllers']);
+        global_controllers.addControllers(controllers['controllers']);
       });
 }
 

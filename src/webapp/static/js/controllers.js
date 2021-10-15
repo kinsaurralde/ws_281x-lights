@@ -6,7 +6,6 @@ const controllers_row_container = document.getElementById('expanded-controllers-
 class Controllers {
   constructor() {
     socket.on('rtt', (data) => {
-      console.log(data);
       for (const controller in data) {
         if (data.hasOwnProperty(controller)) {
           if (controller in this.controllers) {
@@ -41,8 +40,10 @@ class Controllers {
 
 class Controller {
   constructor(name, properties) {
+    this.rtt_value = null;
+
     this.name = name;
-    this.url = properties['url'];
+    this.ip = properties['ip'];
     this.ping = '---';
     this.status = 'ERROR';
     this.selected = false;
@@ -66,6 +67,7 @@ class Controller {
       this.tile.style.color = 'green';
     }
     this.tile.innerText = `${this.name}\n${this.ping} ms\n${this.status}`;
+    this.rtt_value.innerText = this.ping;
   }
 
   setSelected(value) {
@@ -111,6 +113,7 @@ class Controller {
     rtt.textContent = 'RTT (ms): ';
     rtt_value.textContent = '---';
     rtt.appendChild(rtt_value);
+    this.rtt_value = rtt_value;
     container.appendChild(rtt);
     container.appendChild(v_divider.cloneNode());
     brightness.textContent = 'Brightness: ';
@@ -139,7 +142,7 @@ class Controller {
   }
 
   showDebugInfo() {
-    fetch(`http://${this.url}/`)
+    fetch(`http://${this.ip}/`)
         .then((response) => response.text())
         .then((data) => {
           const v_divider = document.createElement('div');
@@ -157,8 +160,6 @@ class Controller {
                 debug_box.innerHTML = '';
               }
               row_text = row_text.replace(/<\/*b>/g, '');
-            // console.log("New Box", content, debug_box.cloneNode());
-            // debug_box.textContent = content;
             }
             const row = document.createElement('div');
             row.textContent = row_text;
