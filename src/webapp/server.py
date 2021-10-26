@@ -47,7 +47,7 @@ parser.add_argument(
     help="Number of seconds between main background thread runs",
     default=config.DEFAULT_BACKGROUND_INTERVAL,
 )
-parser.add_argument("--ping-controllers", action="store_true", help="Send a ping to controllers every 5 seconds")
+parser.add_argument("--ping-controllers", action="store_true", help="Send a ping to controllers every 15 seconds")
 parser.add_argument(
     "--ping-interval",
     type=int,

@@ -32,7 +32,7 @@ HTML_VALIDATE		= node_modules/html-validate/bin/html-validate.js
 ESLINT				= node_modules/eslint/bin/eslint.js
 
 # Programs
-NANOPB_COMPILER		= sdk/nanopb-src/generator/nanopb_generator.py
+NANOPB_COMPILER		= sdk/nanopb/generator/nanopb_generator.py
 
 # Other
 ESP_HASH			= $(shell sha256sum ${CONTROLLER_DIR}controller.ino | head -c 64)
@@ -46,6 +46,7 @@ nanopb:
 	mkdir -p proto/build/nanopb
 	mkdir -p proto/build/py
 # Compile for nanopb
+# cd proto && ls -al ../sdk/nanopb
 	cd proto && ./../${NANOPB_COMPILER} --timestamp --library-include-format=#include\ \"%s\" --strip-path --output-dir=build/nanopb/. *.proto
 # Compile for python
 	cd proto && protoc --python_out=build/py/. *.proto
@@ -55,6 +56,9 @@ nanopb:
 	mv proto/build/py/*_pb2.py src/webapp/
 # Delete build
 	rm -rf proto/build/
+
+config_generator:
+	cd tools/ && python3 config_generator.py
 
 version:
 	touch ${CONTROLLER_DIR}version.h

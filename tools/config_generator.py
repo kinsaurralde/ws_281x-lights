@@ -71,7 +71,7 @@ def python(path):
         file.write(line('ESP_IP_ADDRESS', '\'192.168.29.100\''))
         file.write(line('DEFAULT_QUEUE_MAX_SIZE', 5000))
         file.write(line('DEFAULT_BACKGROUND_INTERVAL', 5))
-        file.write(line('DEFAULT_PING_INTERVAL', 5))
+        file.write(line('DEFAULT_PING_INTERVAL', 15))
         file.write('\n')
         file.write('# CONSTANTS')
         file.write('\n')
