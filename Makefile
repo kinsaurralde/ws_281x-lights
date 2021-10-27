@@ -57,7 +57,7 @@ nanopb:
 # Delete build
 	rm -rf proto/build/
 
-config_generator:
+config-generator:
 	cd tools/ && python3 config_generator.py
 
 version:

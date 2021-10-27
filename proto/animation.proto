@@ -46,7 +46,8 @@ message LEDInfo {
     bool set_frame_multiplier = 7;
     int32 frame_multiplier = 8;
     bool initialize = 9;
-    bool grb = 10;
+    int32 initialize_port = 10;
+    bool grb = 11;
 }
 
 enum AnimationType {

@@ -1,7 +1,7 @@
 from .frame import encode, decode
 from .stats import Stats
 from .udp_manager import UDPManager
-from .packet_manager import PacketManager
+from .packet_manager import PacketManager, PacketOptions
 from .animations import Animations
 from .colors import Colors
 from .controllers import Controllers

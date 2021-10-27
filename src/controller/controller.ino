@@ -26,6 +26,7 @@
 ADC_MODE(ADC_VCC);
 
 void handleRoot();
+void handleRestart();
 void handleHTTP();
 void handleRequest();
 
@@ -78,6 +79,7 @@ void setup() {
   Serial.println(WiFi.localIP());  // Send the IP address of the ESP8266 to the computer
 
   server.on("/", handleRoot);
+  server.on("/restart", handleRestart);
   server.on("/proto", handleHTTP);
   server.begin();
 
@@ -87,20 +89,26 @@ void setup() {
   EEPROM.begin(EEPROM_SIZE);
 
   IPAddress previous_server_ip = readSavedServerIp();
+  uint16_t previous_server_port = readSavedPort();
   Serial.print("Saved Server IP Address ");
-  Serial.println(previous_server_ip);
+  Serial.print(previous_server_ip);
+  Serial.print(":");
+  Serial.println(previous_server_port);
   HTTPClient http;
   WiFiClient client;
 
-  String server_path = "http://10.0.0.100:5000/controllerstartup";
-  // Your Domain name with URL path or IP address with path
+  String server_path =
+      "http://" + previous_server_ip.toString() + ":" + String(previous_server_port) + "/controllerstartup";
   http.begin(client, server_path.c_str());
 
   // Send HTTP GET request
   int httpResponseCode = http.POST(nullptr, 0);
+  Serial.print("Initialize HTTP Response Code: ");
+  Serial.println(httpResponseCode);
 
   digitalWrite(BUILTIN_LED_A, LOW);
   digitalWrite(BUILTIN_LED_B, HIGH);
+  Serial.println("Finished Setup");
 }
 
 void loop() {
@@ -115,6 +123,12 @@ IPAddress readSavedServerIp() {
     saved_address[i] = EEPROM.read(EEPROM_ADDRESS_START + i);
   }
   return saved_address;
+}
+
+uint16_t readSavedPort() {
+  uint8_t l_byte = EEPROM.read(EEPROM_ADDRESS_START + 4);
+  uint8_t r_byte = EEPROM.read(EEPROM_ADDRESS_START + 5);
+  return (l_byte << 8) | (r_byte & 0xFF);
 }
 
 void updatePixels() {
@@ -173,10 +187,14 @@ Status handleLEDInfo(Packet& packet) {
     neopixels.initialized = true;
     IPAddress remote_address = Udp.remoteIP();
     IPAddress saved_address = readSavedServerIp();
-    if (saved_address != remote_address) {
+    uint16_t remote_port = packet.payload.payload.led_info.initialize_port;
+    uint16_t saved_port = readSavedPort();
+    if (saved_address != remote_address || saved_port != remote_port) {
       for (int i = 0; i < 4; i++) {
         EEPROM.write(EEPROM_ADDRESS_START + i, remote_address[i]);
       }
+      EEPROM.write(EEPROM_ADDRESS_START + 4, (remote_port >> 8) & 0xFF);
+      EEPROM.write(EEPROM_ADDRESS_START + 5, remote_port & 0xFF);
       EEPROM.commit();
     }
     Serial.println("Initialized");
@@ -319,4 +337,11 @@ void handleRoot() {
   page_bytes_written += snprintf(page + page_bytes_written, PAGE_SIZE, "%d", page_bytes_written + BYTES_WRITTEN_SIZE);
   server.sendHeader("Access-Control-Allow-Origin", "*");
   server.send(200, "text/html", page);
+}
+
+void handleRestart() {
+  Serial.println("Restarting . . .");
+  server.send(200, "text/html", "Restarting");
+  delay(1000);
+  ESP.restart();
 }

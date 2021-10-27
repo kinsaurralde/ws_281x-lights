@@ -12,12 +12,13 @@ class Controllers:
         self.groups = {"all": []}
         self._addControllers(config.get("controllers", {}))
 
-    def createAllControllerInitMessages(self):
+    def createAllControllerInitMessages(self, source_port):
         messages = []
         for controller in self.controllers:
             values = self.controllers[controller]
             led_info = proto_animation.LEDInfo()
             led_info.initialize = True
+            led_info.initialize_port = source_port
             led_info.grb = values["grb"]
             led_info.set_num_leds = True
             led_info.num_leds = values["num_leds"]
@@ -27,13 +28,14 @@ class Controllers:
             messages.append((values["ip"], payload))
         return messages
 
-    def createControllerInitMessage(self, ip):
+    def createControllerInitMessage(self, ip, source_port):
         controller = self.getControllerFromIp(ip)
         if controller is None:
             return None
         values = self.controllers[controller]
         led_info = proto_animation.LEDInfo()
         led_info.initialize = True
+        led_info.initialize_port = source_port
         led_info.grb = values["grb"]
         led_info.set_num_leds = True
         led_info.num_leds = values["num_leds"]

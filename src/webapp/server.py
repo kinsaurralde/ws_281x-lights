@@ -125,7 +125,7 @@ def getControllers():
 def controllerStartUp():
     remote_ip_addr = request.remote_addr
     log.info(f"Controller startup: {remote_ip_addr}")
-    pm.send(remote_ip_addr, controllers.createControllerInitMessage(remote_ip_addr))
+    pm.send(remote_ip_addr, controllers.createControllerInitMessage(remote_ip_addr, args.port))
     return ""
 
 
@@ -180,7 +180,7 @@ try:
     pm = modules.PacketManager(socketio, controllers, presets_config)
     pm.setVersion(version.MAJOR, version.MINOR, version.PATCH)
     pm.registerIps(controllers.getControllerIps())
-    pm.sendList(controllers.createAllControllerInitMessages())
+    pm.sendList(controllers.createAllControllerInitMessages(args.port))
     if not args.background_disabled:
         pm.startBackgroundThread()
     if args.ping_controllers:
