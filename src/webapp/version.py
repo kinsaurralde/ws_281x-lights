@@ -3,7 +3,7 @@
 
 MAJOR = 2
 MINOR = 3
-PATCH = 0
+PATCH = 1
 LABEL = "development"
 
 ESP_HASH = 0xfec6fa160dbfa47f644fa3304af7fb392d9ad09d3ad3cbfac3ec49b52c10f4be

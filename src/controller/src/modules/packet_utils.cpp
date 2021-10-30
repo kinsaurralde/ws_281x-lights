@@ -1,5 +1,7 @@
 #include "packet_utils.h"
 
+#include "logger.h"
+
 String formatVersion(const Version& v) {
   String result;
   result += String(v.major) + ".";
@@ -19,6 +21,7 @@ void serialWritePacketHeader(const Header& header) {
   Serial.println(header.timestamp_millis);
   Serial.print("\t\tVersion: ");
   Serial.println(formatVersion(version));
+  Logger::println("\tPacket2:\n\t\tId: %d\n\t\tStatus: %d\n\t\tTimestamp: %d\n\t\tVersion: %d.%d.%d", header.id, header.status, header.timestamp_millis, version.major, version.minor, version.patch);
 }
 
 Packet decodePacket(uint8_t* buffer, int length) {
@@ -26,10 +29,10 @@ Packet decodePacket(uint8_t* buffer, int length) {
   pb_istream_t stream = pb_istream_from_buffer(buffer, length);
   pb_decode(&stream, Packet_fields, &packet);
   if (DEBUG_PRINT) {
-    Serial.print("Decoded Packet of size: ");
-    Serial.println(length);
-    Serial.print("Packet has Payload: ");
-    Serial.println(packet.has_payload);
+    // Serial.print("Decoded Packet of size: ");
+    // Serial.println(length);
+    // Serial.print("Packet has Payload: ");
+    // Serial.println(packet.has_payload);
     if (packet.has_header) {
       serialWritePacketHeader(packet.header);
     }
@@ -42,8 +45,9 @@ int encodePacket(uint8_t* buffer, int buffer_size, Packet packet) {
   pb_encode(&ostream, Packet_fields, &packet);
   int message_length = ostream.bytes_written;
   if (DEBUG_PRINT) {
-    Serial.print("Encoded Packet of size: ");
-    Serial.println(message_length);
+    // Serial.print("Encoded Packet of size: ");
+    // Serial.println(message_length);
+    Logger::println("Encoded Packet of size: %d", message_length);
     if (packet.has_header) {
       serialWritePacketHeader(packet.header);
     }

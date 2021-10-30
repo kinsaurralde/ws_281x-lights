@@ -1,9 +1,9 @@
 #include <Arduino.h>
 #include <EEPROM.h>
+#include <WiFiClient.h>
 #include <ESP8266HTTPClient.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266WiFi.h>
-#include <WiFiClient.h>
 #include <WiFiUDP.h>
 
 #define FASTLED_ESP8266_NODEMCU_PIN_ORDER
@@ -12,6 +12,7 @@
 #include "config.h"
 #include "src/modules/packet_utils.h"
 #include "src/modules/pixels.h"
+#include "src/modules/logger.h"
 #include "version.h"
 
 #define WIFI_SSID "thebetterapartment"
@@ -103,12 +104,12 @@ void setup() {
 
   // Send HTTP GET request
   int httpResponseCode = http.POST(nullptr, 0);
-  Serial.print("Initialize HTTP Response Code: ");
-  Serial.println(httpResponseCode);
+  Logger::println("Initialize HTTP Response Code: %d", httpResponseCode);
 
   digitalWrite(BUILTIN_LED_A, LOW);
   digitalWrite(BUILTIN_LED_B, HIGH);
-  Serial.println("Finished Setup");
+
+  Logger::good("Finished Setup");
 }
 
 void loop() {
@@ -197,7 +198,7 @@ Status handleLEDInfo(Packet& packet) {
       EEPROM.write(EEPROM_ADDRESS_START + 5, remote_port & 0xFF);
       EEPROM.commit();
     }
-    Serial.println("Initialized");
+    Logger::good("Initialized");
   }
   neopixels.pixels.setLEDInfo(packet.payload.payload.led_info);
   if (packet.payload.payload.led_info.set_brightness) {
@@ -220,8 +221,7 @@ Status handlePacket(Packet& packet) {
     return Status_MISSING_PAYLOAD;
   }
   if (DEBUG_PRINT) {
-    Serial.print("Packet payload type: ");
-    Serial.println(packet.payload.which_payload);
+    Logger::println("Packet payload type: %d", packet.payload.which_payload);
   }
   Status status = Status_REQUEST;
   switch (packet.payload.which_payload) {
@@ -253,14 +253,9 @@ void handleUDP() {
     return;
   }
   stats.udp_packet_count += 1;
-  Serial.print("Received UDP packet of size ");
-  Serial.print(packet_size);
-  Serial.print(" From ");
-  Serial.print(Udp.remoteIP());
-  Serial.print(", port ");
-  Serial.println(Udp.remotePort());
+  Logger::println("Recieved UDP packet of size %d From %s:%d", packet_size, Udp.remoteIP().toString().c_str(), Udp.remotePort());
   if (packet_size > PACKET_BUFFER_SIZE) {
-    Serial.println("Packet exceeds UDP_BUFFER_SIZE");
+    Logger::error("Packet exceeds PACKET_BUFFER_SIZE (%d)", PACKET_BUFFER_SIZE);
     return;
   }
   digitalWrite(BUILTIN_LED_B, LOW);
@@ -287,10 +282,7 @@ void handleHTTP() {
   }
   String packet_string = server.arg("plain");
   int packet_size = packet_string.length();
-  Serial.print("Recieved HTTP request of size ");
-  Serial.print(packet_size);
-  Serial.print(" From ");
-  Serial.println(server.client().remoteIP());
+  Logger::println("Recieved HTTP request of size %d From %s", packet_size, server.client().remoteIP());
   if (packet_size >= PACKET_BUFFER_SIZE) {
     server.send(200, "text/plain", "Too Big");
     return;
@@ -340,7 +332,7 @@ void handleRoot() {
 }
 
 void handleRestart() {
-  Serial.println("Restarting . . .");
+  Logger::error("Restarting . . .");
   server.send(200, "text/html", "Restarting");
   delay(1000);
   ESP.restart();

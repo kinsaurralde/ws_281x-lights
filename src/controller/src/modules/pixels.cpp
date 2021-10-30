@@ -160,8 +160,7 @@ void Pixels::animation(const AnimationArgs& args) {
       reverser(args);
       break;
   }
-  print("Began animation ");
-  println(args.type);
+  Logger::println("Begin animation %d", args.type);
 }
 
 void Pixels::color(const AnimationArgs& args) {
@@ -192,7 +191,6 @@ void Pixels::pulse(const AnimationArgs& args) {
       }
     }
   }
-  println("");
   inc_args_.shift_mode = ShiftMode::LOOP;
   inc_args_.reverse = args.reverse;
   previous_show_time_ = 0;
@@ -230,9 +228,6 @@ void Pixels::cycle(const AnimationArgs& args) {
     steps = LIST_CAPACITY / num_color_changes;
     list_size = num_color_changes * steps;
   }
-  println(num_color_changes);
-  println(steps);
-  println(args.colors.items[0]);
   inc_args_.list.reset();
   inc_args_.list.setSize(list_size);
   for (int i = 0; i < num_color_changes; i++) {

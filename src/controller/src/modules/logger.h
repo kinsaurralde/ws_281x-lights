@@ -1,24 +1,16 @@
 #ifndef SRC_MODULES_LOGGER_H_
 #define SRC_MODULES_LOGGER_H_
 
-#if defined(ESP8266)
-#include <Arduino.h>
+#include <stdarg.h>
 
-void print(String text) { Serial.print(text); }
+void internalPrinter(const char* text, bool new_line=true);
+void printFormattedString(const char* text, va_list args);
 
-void print(int value) { Serial.print(value); }
-
-void println(String text) { Serial.println(text); }
-
-void println(int value) { Serial.println(value); }
-
-#else
-#include <iostream>
-#include <string>
-
-void print(std::string text) { std::cout << text; }
-
-void println(std::string text) { std::cout << text << std::endl; }
-#endif
+namespace Logger {
+  void println(const char* text, ...);
+  void good(const char* text, ...);
+  void warning(const char* text, ...);
+  void error(const char* text, ...);
+} // namespace: Logger
 
 #endif  // SRC_MODULES_LOGGER_H_

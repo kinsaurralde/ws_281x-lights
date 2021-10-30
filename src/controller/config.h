@@ -9,7 +9,7 @@ constexpr int ACK_PORT = 8001;
 constexpr int PACKET_BUFFER_SIZE = 2048;
 constexpr int MAX_BRIGHTNESS = 127;
 constexpr float BRIGHTNESS_MULTIPLIER = 0.5;
-constexpr bool DEBUG_PRINT = false;
+constexpr bool DEBUG_PRINT = true;
 
 constexpr int INIT_BRIGHTNESS = 100;
 constexpr int INIT_FRAME_MS = 30;
