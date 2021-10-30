@@ -1,18 +1,18 @@
 #include <Arduino.h>
 #include <EEPROM.h>
-#include <WiFiClient.h>
 #include <ESP8266HTTPClient.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266WiFi.h>
+#include <WiFiClient.h>
 #include <WiFiUDP.h>
 
 #define FASTLED_ESP8266_NODEMCU_PIN_ORDER
 #include <FastLED.h>
 
 #include "config.h"
+#include "src/modules/logger.h"
 #include "src/modules/packet_utils.h"
 #include "src/modules/pixels.h"
-#include "src/modules/logger.h"
 #include "version.h"
 
 #define WIFI_SSID "thebetterapartment"
@@ -216,6 +216,29 @@ Status handleVersion(Packet& packet) {
   return Status_GOOD;
 }
 
+Status setESPInfo(Packet* packet) {
+  if (packet == nullptr) {
+    return Status_ERROR;
+  }
+  if (!packet->payload.payload.esp_info.is_request) {
+    return Status_ARGUMENT_ERROR;
+  }
+  packet->payload.payload.esp_info.is_request = false;
+  packet->payload.payload.esp_info.heap_free = ESP.getFreeHeap();
+  packet->payload.payload.esp_info.heap_frag = ESP.getHeapFragmentation();
+  packet->payload.payload.esp_info.sketch_size = ESP.getSketchSize();
+  packet->payload.payload.esp_info.free_sketch_size = ESP.getFreeSketchSpace();
+  packet->payload.payload.esp_info.flash_chip_size = ESP.getFlashChipSize();
+  packet->payload.payload.esp_info.flash_chip_speed = ESP.getFlashChipSpeed();
+  packet->payload.payload.esp_info.cpu_freq = ESP.getCpuFreqMHz();
+  packet->payload.payload.esp_info.cycle_count = ESP.getCycleCount();
+  packet->payload.payload.esp_info.supply_voltage = ESP.getVcc();
+  packet->payload.payload.esp_info.chip_id = ESP.getChipId();
+  packet->payload.payload.esp_info.flash_id = ESP.getFlashChipId();
+  packet->payload.payload.esp_info.flash_crc = ESP.checkFlashCRC();
+  return Status_GOOD;
+}
+
 Status handlePacket(Packet& packet) {
   if (!packet.has_payload) {
     return Status_MISSING_PAYLOAD;
@@ -253,7 +276,8 @@ void handleUDP() {
     return;
   }
   stats.udp_packet_count += 1;
-  Logger::println("Recieved UDP packet of size %d From %s:%d", packet_size, Udp.remoteIP().toString().c_str(), Udp.remotePort());
+  Logger::println("Recieved UDP packet of size %d From %s:%d", packet_size, Udp.remoteIP().toString().c_str(),
+                  Udp.remotePort());
   if (packet_size > PACKET_BUFFER_SIZE) {
     Logger::error("Packet exceeds PACKET_BUFFER_SIZE (%d)", PACKET_BUFFER_SIZE);
     return;

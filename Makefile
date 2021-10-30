@@ -104,3 +104,7 @@ lint-check-py:
 
 lint-check-js:
 	find ${JS_FILES} -iname *.js | xargs ${ESLINT} --fix ${ESLINT_CONFIG}
+
+testing-logger:
+	g++ -o build/loggingtest src/controller/testing/main.cpp src/controller/src/nanopb/*.c src/controller/src/modules/*.cpp
+	./build/loggingtest

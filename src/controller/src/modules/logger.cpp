@@ -1,19 +1,19 @@
 #include "logger.h"
 
-#define RST_COLOR_CODE  "\x1B[0m"
-#define RED_COLOR_CODE  "\x1B[31m"
-#define GRN_COLOR_CODE  "\x1B[32m"
-#define YEL_COLOR_CODE  "\x1B[33m"
-#define BLU_COLOR_CODE  "\x1B[34m"
-#define MAG_COLOR_CODE  "\x1B[35m"
-#define CYN_COLOR_CODE  "\x1B[36m"
-#define WHT_COLOR_CODE  "\x1B[37m"
+#define RST_COLOR_CODE "\x1B[0m"
+#define RED_COLOR_CODE "\x1B[31m"
+#define GRN_COLOR_CODE "\x1B[32m"
+#define YEL_COLOR_CODE "\x1B[33m"
+#define BLU_COLOR_CODE "\x1B[34m"
+#define MAG_COLOR_CODE "\x1B[35m"
+#define CYN_COLOR_CODE "\x1B[36m"
+#define WHT_COLOR_CODE "\x1B[37m"
 
 #define STRING_BUFFER_SIZE 256
 
 #include <stdarg.h>
 
-constexpr char *COLORS[4] = {RST_COLOR_CODE, RED_COLOR_CODE, GRN_COLOR_CODE, YEL_COLOR_CODE};
+constexpr const char* COLORS[4] = {RST_COLOR_CODE, RED_COLOR_CODE, GRN_COLOR_CODE, YEL_COLOR_CODE};
 constexpr int RST_CODE = 0;
 constexpr int RED_CODE = 1;
 constexpr int GRN_CODE = 2;
@@ -55,27 +55,24 @@ void printFormattedString(const char* text, va_list args) {
 void setColor(int color_index) {
   if (IS_SERIAL_PRINT) {
     switch (color_index) {
-    case RED_CODE:
-      internalPrinter("Error: ", false);
-      break;
-    case YEL_CODE:
-      internalPrinter("Warning: ", false);
-      break;
-    case GRN_CODE:
-      internalPrinter("Good: ", false);
-      break;
-    default:
-      break;
+      case RED_CODE:
+        internalPrinter("Error: ", false);
+        break;
+      case YEL_CODE:
+        internalPrinter("Warning: ", false);
+        break;
+      case GRN_CODE:
+        internalPrinter("Good: ", false);
+        break;
+      default:
+        break;
     }
   } else {
     internalPrinter(COLORS[color_index], false);
-
   }
 }
 
-void resetColor() {
-  setColor(RST_CODE);
-}
+void resetColor() { setColor(RST_CODE); }
 
 namespace Logger {
 
@@ -115,5 +112,4 @@ void error(const char* text, ...) {
   resetColor();
   va_end(args);
 }
-} // namespace: Logger
-
+}  // namespace Logger
