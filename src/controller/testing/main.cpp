@@ -1,6 +1,9 @@
 #include "../src/modules/logger.h"
 #include "../src/nanopb/packet.pb.h"
 #include "../src/modules/packet_utils.h"
+#include "controller.cpp"
+
+#include <iostream>
 
 Packet createPacket() {
     Packet packet = Packet_init_zero;
@@ -17,6 +20,61 @@ Packet createPacket() {
     return packet;
 }
 
+AnimationArgs createColorArgs(int color) {
+    AnimationArgs args = AnimationArgs_init_zero;
+    args.type = AnimationType_COLOR;
+    args.color = color;
+    args.frame_ms = 50;
+    return args;
+}
+
+AnimationArgs createRainbowArgs() {
+    AnimationArgs args = AnimationArgs_init_zero;
+    args.type = AnimationType_RAINBOW;
+    args.frame_ms = 50;
+    return args;
+}
+
+AnimationArgs createPulseArgs() {
+    ListMax25 colors = ListMax25_init_zero;
+    colors.items[0] = 255;
+    colors.items[1] = 500;
+    colors.items[2] = 1000;
+    colors.items[3] = 2000;
+    colors.items[4] = 3000;
+    colors.items[5] = 4000;
+    colors.items_count = 6;
+    AnimationArgs args = AnimationArgs_init_zero;
+    args.type = AnimationType_PULSE;
+    args.background_color = 3;
+    args.length = 5;
+    args.spacing = 5;
+    args.colors = colors;
+    args.frame_ms = 50;
+    return args;
+}
+
+void setAnimationArgs(Packet& packet, AnimationArgs args) {
+    packet.payload.payload.animation_args = args;
+    packet.has_payload = true;
+    packet.payload.which_payload = Payload_animation_args_tag;
+}
+
+void printLeds(uint32_t* leds) {
+    for (int i = 0; i < MAX_LED; i++) {
+        std::cout << leds[i] << " ";
+    }
+    std::cout << std::endl << std::endl;
+}
+
+void runAnimation(int loops) {
+    uint32_t* leds = getLeds();
+    for (int i = 0; i < loops; i++) {
+        updatePixels(0);
+        printLeds(leds);
+    }
+}
+
 int main() {
     Logger::println("Test1");
     Logger::println("Test%d", 2);
@@ -26,5 +84,9 @@ int main() {
     Packet p = createPacket();
     Header header = p.header;
     serialWritePacketHeader(header);
+    setAnimationArgs(p, createPulseArgs());
+    Logger::println("Handle Packet Status: %d", handlePacket(p));
+    runAnimation(1);
+    // Logger::println("First Led %d", leds[0]);
     return 0;
 }

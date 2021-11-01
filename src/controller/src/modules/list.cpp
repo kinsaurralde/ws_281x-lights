@@ -7,7 +7,7 @@ void List::reset() {
 }
 
 void List::setSize(int value) {
-  if (isValidIndex(size_)) {
+  if (isValidIndex(value)) {
     size_ = value;
   } else {
     size_ = LIST_CAPACITY;

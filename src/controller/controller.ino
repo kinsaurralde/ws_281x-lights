@@ -78,6 +78,8 @@ void setup() {
   Serial.println("Connection established!");
   Serial.print("IP address:\t");
   Serial.println(WiFi.localIP());  // Send the IP address of the ESP8266 to the computer
+  Serial.print("Last Reset Reason: ");
+  Serial.println(ESP.getResetReason());
 
   server.on("/", handleRoot);
   server.on("/restart", handleRestart);
@@ -108,14 +110,13 @@ void setup() {
 
   digitalWrite(BUILTIN_LED_A, LOW);
   digitalWrite(BUILTIN_LED_B, HIGH);
-
   Logger::good("Finished Setup");
 }
 
 void loop() {
   server.handleClient();
   handleUDP();
-  updatePixels();
+  updatePixels(millis());
 }
 
 IPAddress readSavedServerIp() {
@@ -132,12 +133,12 @@ uint16_t readSavedPort() {
   return (l_byte << 8) | (r_byte & 0xFF);
 }
 
-void updatePixels() {
-  if (neopixels.pixels.frameReady(millis())) {
+void updatePixels(unsigned long millis) {
+  if (neopixels.pixels.frameReady(millis)) {
     neopixels.pixels.increment();
     displayFrameBuffer(neopixels.pixels.get());
     stats.frame_count += 1;
-    stats.last_frame_millis = millis();
+    stats.last_frame_millis = millis;
   }
 }
 
@@ -336,7 +337,7 @@ void handleRoot() {
       "<b>ANIMATION ARGS</b><br>Type: %d<br>Color: %d<br>Background Color: %d<br>Length: %d<br>Spacing: %d<br>Steps: "
       "%d<br><br>"
       "<b>ESP INFO</b><br>Software Version: %d.%d.%d_%s<br>Sketch Size: %d<br>Free Sketch Size: %d<br>Flash Chip Size: "
-      "%d<br>Flash Chip Speed: %d<br>CPU Frequency: %dMHz<br>Chip Id: %d<br>Flash Id: %d<br>Flash Crc: %d<br><br>Bytes "
+      "%d<br>Flash Chip Speed: %d<br>CPU Frequency: %dMHz<br>Chip Id: %d<br>Flash Id: %d<br>Flash Crc: %d<br>Stack Free Cont: %d<br><br>Bytes "
       "Written: ",
       // Status
       millis(), stats.last_frame_millis, stats.frame_count, stats.udp_packet_count, stats.http_packet_count,
@@ -349,7 +350,7 @@ void handleRoot() {
       animation_args.spacing, animation_args.steps,
       // Esp Info
       MAJOR, MINOR, PATCH, LABEL, ESP.getSketchSize(), ESP.getFreeSketchSpace(), ESP.getFlashChipSize(),
-      ESP.getFlashChipSpeed(), ESP.getCpuFreqMHz(), ESP.getChipId(), ESP.getFlashChipId(), ESP.checkFlashCRC());
+      ESP.getFlashChipSpeed(), ESP.getCpuFreqMHz(), ESP.getChipId(), ESP.getFlashChipId(), ESP.checkFlashCRC(), ESP.getFreeContStack());
   page_bytes_written += snprintf(page + page_bytes_written, PAGE_SIZE, "%d", page_bytes_written + BYTES_WRITTEN_SIZE);
   server.sendHeader("Access-Control-Allow-Origin", "*");
   server.send(200, "text/html", page);

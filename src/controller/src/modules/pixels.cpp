@@ -55,7 +55,10 @@ void Pixels::setFrameBuffer(int index, int color) {
   frame_buffer_.pixels[index] = color;
 }
 
-bool Pixels::frameReady(int time) {
+bool Pixels::frameReady(unsigned long time) {
+  if (time == 0) {
+    return true;
+  }
   if (time - info_.frame_ms >= previous_show_time_) {
     previous_show_time_ = time;
     return true;

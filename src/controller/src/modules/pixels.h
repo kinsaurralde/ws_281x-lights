@@ -27,7 +27,7 @@ class Pixels {
  public:
   Pixels();
 
-  bool frameReady(int time);
+  bool frameReady(unsigned long time);
 
   void setLEDInfo(const LEDInfo& led_info);
   const LEDInfo& getLEDInfo();
@@ -38,7 +38,7 @@ class Pixels {
   void animation(const AnimationArgs& args);
 
  private:
-  int previous_show_time_;
+  unsigned long previous_show_time_;
   int frame_count_;
   FrameBuffer frame_buffer_;
   LEDInfo info_;

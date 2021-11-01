@@ -79,4 +79,5 @@ enum Status {
     MISSING_OPTIONS = 22;
     // Specific Error
     PACKET_TOO_LARGE = 30;
+    ESP_ONLY_OPTION = 31;
 }
