@@ -70,14 +70,14 @@ enum Status {
     // Set a value below for ACK packet
     // Success
     GOOD = 1;
-    // Generic Error
+    // Error
     ERROR = 10;
     CONNECTION_ERROR = 11;
     ARGUMENT_ERROR = 12;
+    NOT_IMPLEMENTED = 13;
     MISSING_PAYLOAD = 20;
     MISSING_HEADER = 21;
     MISSING_OPTIONS = 22;
-    // Specific Error
     PACKET_TOO_LARGE = 30;
     ESP_ONLY_OPTION = 31;
 }

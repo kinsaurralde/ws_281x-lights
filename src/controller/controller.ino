@@ -10,6 +10,7 @@
 #include <FastLED.h>
 
 #include "config.h"
+#include "src/modules/controller.h"
 #include "src/modules/logger.h"
 #include "src/modules/packet_utils.h"
 #include "src/modules/pixels.h"
@@ -37,11 +38,9 @@ ESP8266WebServer server(80);
 uint8_t buffer[PACKET_BUFFER_SIZE];
 
 typedef struct {
-  Pixels pixels;
   CRGB leds[MAX_LED];
-  CLEDController* controllers;
-  bool grb;
-  bool initialized;
+  CLEDController* cled_controller;
+  Controller controller;
 } Neopixels;
 
 typedef struct {
@@ -86,7 +85,7 @@ void setup() {
   server.on("/proto", handleHTTP);
   server.begin();
 
-  neopixels.controllers = &FastLED.addLeds<NEOPIXEL, LED_PIN>(neopixels.leds, MAX_LED);
+  neopixels.cled_controller = &FastLED.addLeds<NEOPIXEL, LED_PIN>(neopixels.leds, MAX_LED);
 
   Udp.begin(UDP_PORT);
   EEPROM.begin(EEPROM_SIZE);
@@ -134,141 +133,18 @@ uint16_t readSavedPort() {
 }
 
 void updatePixels(unsigned long millis) {
-  if (neopixels.pixels.frameReady(millis)) {
-    neopixels.pixels.increment();
-    displayFrameBuffer(neopixels.pixels.get());
+  if (neopixels.controller.updatePixels(millis)) {
     stats.frame_count += 1;
     stats.last_frame_millis = millis;
+    displayFrameBuffer(neopixels.controller.getFrameBuffer());
   }
 }
 
 void displayFrameBuffer(const FrameBuffer& frame) {
   for (int i = 0; i < frame.pixel_count && i < MAX_LED; i++) {
-    int value = frame.pixels[i];
-    if (neopixels.grb) {
-      int r = (value >> 8) & 0xFF;
-      int g = (value >> 16) & 0xFF;
-      int b = value & 0xFF;
-      value = r << 16 | g << 8 | b;
-    }
-    neopixels.leds[i] = (uint32_t)value;
+    neopixels.leds[i] = (uint32_t)frame.pixels[i];
   }
-  neopixels.controllers->showLeds(frame.brightness);
-}
-
-Status displayFrame(Packet& packet) {
-  Frame frame = packet.payload.payload.frame;
-  if (!frame.has_brightness) {
-    frame.brightness = Brightness_init_zero;
-    frame.brightness.brightness = neopixels.pixels.getLEDInfo().brightness;
-  }
-  if (frame.pixel_count == 0) {
-    return Status_ARGUMENT_ERROR;
-  }
-  for (int i = 0; i < frame.pixel_count && i < MAX_LED; i++) {
-    int index = i / ITEMS_PER_COLOR_BLOCK;
-    int offset = (i % ITEMS_PER_COLOR_BLOCK) * BITS_PER_BYTE;
-    int r = (frame.red[index] >> offset) & 0xFF;
-    int g = (frame.green[index] >> offset) & 0xFF;
-    int b = (frame.blue[index] >> offset) & 0xFF;
-    int value = r << 16 | g << 8 | b;
-    neopixels.leds[i] = (uint32_t)value;
-  }
-  neopixels.controllers->showLeds(frame.brightness.brightness);
-  return Status_GOOD;
-}
-
-Status beginAnimation(Packet& packet) {
-  neopixels.pixels.animation(packet.payload.payload.animation_args);
-  return Status_GOOD;
-}
-
-Status handleLEDInfo(Packet& packet) {
-  if (packet.payload.payload.led_info.initialize) {
-    neopixels.grb = packet.payload.payload.led_info.grb;
-    neopixels.initialized = true;
-    IPAddress remote_address = Udp.remoteIP();
-    IPAddress saved_address = readSavedServerIp();
-    uint16_t remote_port = packet.payload.payload.led_info.initialize_port;
-    uint16_t saved_port = readSavedPort();
-    if (saved_address != remote_address || saved_port != remote_port) {
-      for (int i = 0; i < 4; i++) {
-        EEPROM.write(EEPROM_ADDRESS_START + i, remote_address[i]);
-      }
-      EEPROM.write(EEPROM_ADDRESS_START + 4, (remote_port >> 8) & 0xFF);
-      EEPROM.write(EEPROM_ADDRESS_START + 5, remote_port & 0xFF);
-      EEPROM.commit();
-    }
-    Logger::good("Initialized");
-  }
-  neopixels.pixels.setLEDInfo(packet.payload.payload.led_info);
-  if (packet.payload.payload.led_info.set_brightness) {
-    neopixels.controllers->showLeds(packet.payload.payload.led_info.brightness);
-  }
-  return Status_GOOD;
-}
-
-Status handleVersion(Packet& packet) {
-  packet.payload.payload.version.major = MAJOR;
-  packet.payload.payload.version.minor = MINOR;
-  packet.payload.payload.version.patch = PATCH;
-  // packet.payload.payload.version.label = LABEL;
-  // strcpy(packet.payload.payload.version.label, LABEL);
-  return Status_GOOD;
-}
-
-Status setESPInfo(Packet* packet) {
-  if (packet == nullptr) {
-    return Status_ERROR;
-  }
-  if (!packet->payload.payload.esp_info.is_request) {
-    return Status_ARGUMENT_ERROR;
-  }
-  packet->payload.payload.esp_info.is_request = false;
-  packet->payload.payload.esp_info.heap_free = ESP.getFreeHeap();
-  packet->payload.payload.esp_info.heap_frag = ESP.getHeapFragmentation();
-  packet->payload.payload.esp_info.sketch_size = ESP.getSketchSize();
-  packet->payload.payload.esp_info.free_sketch_size = ESP.getFreeSketchSpace();
-  packet->payload.payload.esp_info.flash_chip_size = ESP.getFlashChipSize();
-  packet->payload.payload.esp_info.flash_chip_speed = ESP.getFlashChipSpeed();
-  packet->payload.payload.esp_info.cpu_freq = ESP.getCpuFreqMHz();
-  packet->payload.payload.esp_info.cycle_count = ESP.getCycleCount();
-  packet->payload.payload.esp_info.supply_voltage = ESP.getVcc();
-  packet->payload.payload.esp_info.chip_id = ESP.getChipId();
-  packet->payload.payload.esp_info.flash_id = ESP.getFlashChipId();
-  packet->payload.payload.esp_info.flash_crc = ESP.checkFlashCRC();
-  return Status_GOOD;
-}
-
-Status handlePacket(Packet& packet) {
-  if (!packet.has_payload) {
-    return Status_MISSING_PAYLOAD;
-  }
-  if (DEBUG_PRINT) {
-    Logger::println("Packet payload type: %d", packet.payload.which_payload);
-  }
-  Status status = Status_REQUEST;
-  switch (packet.payload.which_payload) {
-    case Payload_animation_args_tag:
-      status = beginAnimation(packet);
-      break;
-    case Payload_frame_tag:
-      status = displayFrame(packet);
-      break;
-    case Payload_version_tag:
-      status = handleVersion(packet);
-      break;
-    case Payload_led_info_tag:
-      status = handleLEDInfo(packet);
-      break;
-    case Payload_esp_info_tag:
-      status = setESPInfo(&packet);
-      break;
-    default:
-      status = Status_MISSING_PAYLOAD;
-      break;
-  }
-  return status;
+  neopixels.cled_controller->showLeds(frame.brightness);
 }
 
 void handleUDP() {
@@ -286,7 +162,7 @@ void handleUDP() {
   digitalWrite(BUILTIN_LED_B, LOW);
   Udp.read(buffer, PACKET_BUFFER_SIZE);
   Packet packet = decodePacket(buffer, packet_size);
-  Status status = handlePacket(packet);
+  Status status = neopixels.controller.handlePacket(packet);
   if (packet.has_options && packet.options.send_ack) {
     Udp.beginPacket(Udp.remoteIP(), ACK_PORT);
     packet.header.status = status;
@@ -314,7 +190,7 @@ void handleHTTP() {
   }
   packet_string.getBytes(buffer, PACKET_BUFFER_SIZE);
   Packet packet = decodePacket(buffer, packet_size);
-  Status status = handlePacket(packet);
+  Status status = neopixels.controller.handlePacket(packet);
   packet.header.status = status;
   packet_size = encodePacket(buffer, PACKET_BUFFER_SIZE, packet);
   buffer[packet_size] = 0;
@@ -325,8 +201,8 @@ void handleRoot() {
   constexpr int PAGE_SIZE = 1024;
   constexpr int BYTES_WRITTEN_SIZE = 3;
   char page[PAGE_SIZE];
-  const LEDInfo& pixel_info = neopixels.pixels.getLEDInfo();
-  const AnimationArgs& animation_args = neopixels.pixels.getAnimationArgs();
+  const LEDInfo& pixel_info = neopixels.controller.getPixels().getLEDInfo();
+  const AnimationArgs& animation_args = neopixels.controller.getPixels().getAnimationArgs();
   int page_bytes_written = snprintf(
       page, PAGE_SIZE,
       "<b>STATUS</b><br>Millis: %lu<br>Last Frame Millis: %lu<br>Frame Count: %d<br>UDP Request Count: %d<br>HTTP "
@@ -337,7 +213,8 @@ void handleRoot() {
       "<b>ANIMATION ARGS</b><br>Type: %d<br>Color: %d<br>Background Color: %d<br>Length: %d<br>Spacing: %d<br>Steps: "
       "%d<br><br>"
       "<b>ESP INFO</b><br>Software Version: %d.%d.%d_%s<br>Sketch Size: %d<br>Free Sketch Size: %d<br>Flash Chip Size: "
-      "%d<br>Flash Chip Speed: %d<br>CPU Frequency: %dMHz<br>Chip Id: %d<br>Flash Id: %d<br>Flash Crc: %d<br>Stack Free Cont: %d<br><br>Bytes "
+      "%d<br>Flash Chip Speed: %d<br>CPU Frequency: %dMHz<br>Chip Id: %d<br>Flash Id: %d<br>Flash Crc: %d<br>Stack "
+      "Free Cont: %d<br><br>Bytes "
       "Written: ",
       // Status
       millis(), stats.last_frame_millis, stats.frame_count, stats.udp_packet_count, stats.http_packet_count,
@@ -350,7 +227,8 @@ void handleRoot() {
       animation_args.spacing, animation_args.steps,
       // Esp Info
       MAJOR, MINOR, PATCH, LABEL, ESP.getSketchSize(), ESP.getFreeSketchSpace(), ESP.getFlashChipSize(),
-      ESP.getFlashChipSpeed(), ESP.getCpuFreqMHz(), ESP.getChipId(), ESP.getFlashChipId(), ESP.checkFlashCRC(), ESP.getFreeContStack());
+      ESP.getFlashChipSpeed(), ESP.getCpuFreqMHz(), ESP.getChipId(), ESP.getFlashChipId(), ESP.checkFlashCRC(),
+      ESP.getFreeContStack());
   page_bytes_written += snprintf(page + page_bytes_written, PAGE_SIZE, "%d", page_bytes_written + BYTES_WRITTEN_SIZE);
   server.sendHeader("Access-Control-Allow-Origin", "*");
   server.send(200, "text/html", page);

@@ -1,7 +1,8 @@
 #include "../src/modules/logger.h"
 #include "../src/nanopb/packet.pb.h"
 #include "../src/modules/packet_utils.h"
-#include "controller.cpp"
+#include "../src/modules/framebuffer.h"
+#include "../src/modules/controller.h"
 
 #include <iostream>
 
@@ -67,15 +68,16 @@ void printLeds(uint32_t* leds) {
     std::cout << std::endl << std::endl;
 }
 
-void runAnimation(int loops) {
-    uint32_t* leds = getLeds();
+void runAnimation(Controller& controller, int loops) {
     for (int i = 0; i < loops; i++) {
-        updatePixels(0);
-        printLeds(leds);
+        FrameBuffer frame_buffer = controller.getFrameBuffer();
+        controller.updatePixels(0);
+        printLeds(frame_buffer.pixels);
     }
 }
 
 int main() {
+    Controller* controller = new Controller();
     Logger::println("Test1");
     Logger::println("Test%d", 2);
     Logger::error("This is %cn error", 'a');
@@ -84,9 +86,8 @@ int main() {
     Packet p = createPacket();
     Header header = p.header;
     serialWritePacketHeader(header);
-    setAnimationArgs(p, createPulseArgs());
-    Logger::println("Handle Packet Status: %d", handlePacket(p));
-    runAnimation(1);
-    // Logger::println("First Led %d", leds[0]);
+    setAnimationArgs(p, createRainbowArgs());
+    Logger::println("Handle Packet Status: %d", controller->handlePacket(p));
+    runAnimation(*controller, 3);
     return 0;
 }

@@ -52,7 +52,17 @@ void Pixels::setFrameBuffer(int index, int color) {
   if (color < 0 || index < 0 || index > frame_buffer_.pixel_count) {
     return;
   }
-  frame_buffer_.pixels[index] = color;
+  frame_buffer_.pixels[index] = processColor(color);
+}
+
+int Pixels::processColor(int color) {
+  if (info_.grb) {
+    int r = (color >> 16) & 0xFF;
+    int g = (color >> 8) & 0xFF;
+    int b = color & 0xFF;
+    return g << 16 | r << 8 | b;
+  }
+  return color;
 }
 
 bool Pixels::frameReady(unsigned long time) {
@@ -69,6 +79,7 @@ bool Pixels::frameReady(unsigned long time) {
 void Pixels::setLEDInfo(const LEDInfo& led_info) {
   if (led_info.initialize) {
     info_.initialize = true;
+    info_.grb = led_info.grb;
   }
   if (led_info.set_brightness) {
     info_.brightness = led_info.brightness;
@@ -128,6 +139,8 @@ void Pixels::shifter() {
 }
 
 void Pixels::cycler() { setAll(inc_args_.list.getNext()); }
+
+void Pixels::setFrameBuffer(const FrameBuffer frame_buffer) { frame_buffer_ = frame_buffer; }
 
 void Pixels::animation(const AnimationArgs& args) {
   this->frame_count_ = 0;
