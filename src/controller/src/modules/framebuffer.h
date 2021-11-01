@@ -1,6 +1,9 @@
 #ifndef SRC_MODULES_FRAMEBUFFER_H_
 #define SRC_MODULES_FRAMEBUFFER_H_
 
+#include <cstdint>
+#include <cstring>
+
 #include "../../config.h"
 
 typedef struct FrameBuffer {

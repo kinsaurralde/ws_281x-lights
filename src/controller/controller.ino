@@ -33,7 +33,6 @@ void handleHTTP();
 void handleRequest();
 
 WiFiUDP Udp;
-// IPAddress server_addr;
 ESP8266WebServer server(80);
 uint8_t buffer[PACKET_BUFFER_SIZE];
 
