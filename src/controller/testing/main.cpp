@@ -56,10 +56,10 @@ AnimationArgs createPulseArgs() {
     return args;
 }
 
-void setAnimationArgs(Packet& packet, AnimationArgs args) {
-    packet.payload.payload.animation_args = args;
-    packet.has_payload = true;
-    packet.payload.which_payload = Payload_animation_args_tag;
+void setAnimationArgs(Packet* packet, AnimationArgs args) {
+    packet->payload.payload.animation_args = args;
+    packet->has_payload = true;
+    packet->payload.which_payload = Payload_animation_args_tag;
 }
 
 void printLeds(uint32_t* leds) {
@@ -69,10 +69,10 @@ void printLeds(uint32_t* leds) {
     std::cout << std::endl << std::endl;
 }
 
-void runAnimation(Controller& controller, int loops) {
+void runAnimation(Controller* controller, int loops) {
     for (int i = 0; i < loops; i++) {
-        FrameBuffer frame_buffer = controller.getFrameBuffer();
-        controller.updatePixels(0);
+        FrameBuffer frame_buffer = controller->getFrameBuffer();
+        controller->updatePixels(0);
         printLeds(frame_buffer.pixels);
     }
 }
@@ -92,8 +92,8 @@ int main() {
     Packet p = createPacket();
     Header header = p.header;
     serialWritePacketHeader(header);
-    setAnimationArgs(p, createRainbowArgs());
-    Logger::println("Handle Packet Status: %d", controller->handlePacket(p));
-    runAnimation(*controller, 2);
+    setAnimationArgs(&p, createRainbowArgs());
+    Logger::println("Handle Packet Status: %d", controller->handlePacket(&p));
+    runAnimation(controller, 2);
     return 0;
 }

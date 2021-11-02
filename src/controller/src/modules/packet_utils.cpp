@@ -20,14 +20,14 @@ Packet decodePacket(uint8_t* buffer, int length) {
   return packet;
 }
 
-int encodePacket(uint8_t* buffer, int buffer_size, Packet& packet) {
+int encodePacket(uint8_t* buffer, int buffer_size, Packet* packet) {
   pb_ostream_t ostream = pb_ostream_from_buffer(buffer, buffer_size);
-  pb_encode(&ostream, Packet_fields, &packet);
+  pb_encode(&ostream, Packet_fields, packet);
   int message_length = ostream.bytes_written;
   if (DEBUG_PRINT) {
     Logger::println("Encoded Packet of size: %d", message_length);
-    if (packet.has_header) {
-      serialWritePacketHeader(packet.header);
+    if (packet->has_header) {
+      serialWritePacketHeader(packet->header);
     }
   }
   return message_length;

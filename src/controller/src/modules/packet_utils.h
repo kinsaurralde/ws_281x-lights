@@ -12,6 +12,6 @@ void serialWritePacketHeader(const Header& header);
 
 Packet decodePacket(uint8_t* buffer, int length);
 
-int encodePacket(uint8_t* buffer, int buffer_size, Packet& packet);
+int encodePacket(uint8_t* buffer, int buffer_size, Packet* packet);
 
 #endif  // SRC_MODULES_PACKET_UTILS_H_

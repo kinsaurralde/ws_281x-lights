@@ -3,3 +3,4 @@ node_modules/
 *.log
 build/*
 !.gitkeep
+compile_commands.json

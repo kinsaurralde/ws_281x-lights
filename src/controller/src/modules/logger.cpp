@@ -53,8 +53,8 @@ void printFormattedString(const char* text, va_list args) {
   internalPrinter(buffer);
   LogMessage message = LogMessage_init_zero;
   message.type = current_type;
-  strcpy(message.message, buffer);
-  if (sendLogMessage) {
+  strncpy(message.message, buffer, STRING_BUFFER_SIZE);
+  if (sendLogMessage != nullptr) {
     sendLogMessage(message);
   }
 }
@@ -96,7 +96,6 @@ void println(const char* text, ...) {
 void good(const char* text, ...) {
   va_list args;
   va_start(args, text);
-  char buffer[STRING_BUFFER_SIZE];
   setColor(LogType_LOG_GOOD);
   printFormattedString(text, args);
   resetColor();
@@ -106,7 +105,6 @@ void good(const char* text, ...) {
 void warning(const char* text, ...) {
   va_list args;
   va_start(args, text);
-  char buffer[STRING_BUFFER_SIZE];
   setColor(LogType_LOG_WARNING);
   printFormattedString(text, args);
   resetColor();
@@ -116,7 +114,6 @@ void warning(const char* text, ...) {
 void error(const char* text, ...) {
   va_list args;
   va_start(args, text);
-  char buffer[STRING_BUFFER_SIZE];
   setColor(LogType_LOG_ERROR);
   printFormattedString(text, args);
   resetColor();

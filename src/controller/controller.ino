@@ -45,7 +45,7 @@ typedef struct {
 } Neopixels;
 
 typedef struct {
-  unsigned long last_frame_millis;
+  uint64_t last_frame_millis;
   int frame_count;
   int udp_packet_count;
   int http_packet_count;
@@ -161,7 +161,7 @@ void sendLogMessage(LogMessage message) {
   Udp.endPacket();
 }
 
-void updatePixels(unsigned long millis) {
+void updatePixels(uint64_t millis) {
   if (neopixels.controller.updatePixels(millis)) {
     stats.frame_count += 1;
     stats.last_frame_millis = millis;

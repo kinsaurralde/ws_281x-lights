@@ -26,9 +26,9 @@ class Controller {
 
   Pixels& getPixels();
   const FrameBuffer& getFrameBuffer();
-  bool updatePixels(unsigned long millis);
+  bool updatePixels(uint64_t millis);
 
-  Status handlePacket(Packet& packet);
+  Status handlePacket(Packet* packet);
 
   void setSaveServerIp(void (*callback)(uint16_t));
 
@@ -36,11 +36,11 @@ class Controller {
   Pixels pixels_;
   void (*saveServerIp)(uint16_t);
 
-  Status beginAnimation(Packet& packet);
-  Status setFrameBuffer(Packet& packet);
-  Status setLedInfo(Packet& packet);
-  Status getVersion(Packet& packet);
-  Status getESPInfo(Packet* packet);
+  Status beginAnimation(const Packet& packet);
+  Status setFrameBuffer(const Packet& packet);
+  Status setLedInfo(const Packet& packet);
+  static Status getVersion(Packet* packet);
+  static Status getESPInfo(Packet* packet);
 };
 
 #endif  // SRC_MODULES_CONTROLLER_H_

@@ -9,7 +9,7 @@ LINE_LENGTH = 120
 
 # Directories
 CONTROLLER_DIR = src/controller/
-CONTROLLER_MODULES = ${CONTROLLER_DIR}/src/modules/
+CONTROLLER_MODULES = ${CONTROLLER_DIR}src/modules/
 WEBAPP_DIR = src/webapp/
 WEBAPP_MODULES = ${WEBAPP_DIR}modules/
 WEBAPP_STATIC = ${WEBAPP_DIR}static/
@@ -20,7 +20,7 @@ PY_FILES			= ${WEBAPP_DIR}server.py ${WEBAPP_DIR}modules/*
 JS_FILES			= ${WEBAPP_STATIC}*.js ${WEBAPP_STATIC}js
 
 # Lint Options
-CPPLINT_OPTIONS 	=  --linelength=${LINE_LENGTH} --recursive --exclude=src/controller/src/nanopb/* --root=src/controller --filter=-legal/copyright,-build/include_subdir 
+CLANGTIDY_OPTIONS	= -checks=-*,clang-analyzer*,readability*,performance*,portability*,google*,-readability-magic-numbers,-clang-analyzer-valist.Uninitialized
 PYLINT_CONFIG		= --rcfile=lint/pylintrc
 PRETTIER_CONIG		= --config lint/.prettierrc.json
 HTML_VALIDATE_CONFG = --config lint/.htmlvalidate.json
@@ -95,9 +95,8 @@ lint:
 
 lint-check: lint-check-cpp lint-check-py lint-check-js
 
-lint-check-cpp:
-	cpplint ${CPPLINT_OPTIONS} src/controller/*
-	cpplint ${CPPLINT_OPTIONS} src/controller/controller.ino
+lint-check-cpp: clang
+	clang-tidy ${CLANGTIDY_OPTIONS} ${CONTROLLER_MODULES}* ${CONTROLLER_DIR}testing/*.cpp
 
 lint-check-py:
 	python3 -m pylint ${PYLINT_CONFIG} ${PY_FILES}
@@ -105,6 +104,10 @@ lint-check-py:
 lint-check-js:
 	find ${JS_FILES} -iname *.js | xargs ${ESLINT} --fix ${ESLINT_CONFIG}
 
-testing-controller:
-	g++ -o build/loggingtest src/controller/testing/main.cpp src/controller/src/nanopb/*.c src/controller/src/modules/*.cpp
+clang:
+	clang++ -Wall -MJ a.o.json -std=c++11 -o build/loggingtest src/controller/testing/main.cpp src/controller/src/nanopb/*.c src/controller/src/modules/*.cpp
+	sed -e '1 i\[' -e '$$a\]' *.o.json > compile_commands.json
+	rm *.o.json
+
+main-test: clang
 	./build/loggingtest

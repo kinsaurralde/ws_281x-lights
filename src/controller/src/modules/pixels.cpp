@@ -55,7 +55,7 @@ void Pixels::setFrameBuffer(int index, int color) {
   frame_buffer_.pixels[index] = processColor(color);
 }
 
-int Pixels::processColor(int color) {
+int Pixels::processColor(int color) const {
   if (info_.grb) {
     int r = (color >> 16) & 0xFF;
     int g = (color >> 8) & 0xFF;
@@ -65,7 +65,7 @@ int Pixels::processColor(int color) {
   return color;
 }
 
-bool Pixels::frameReady(unsigned long time) {
+bool Pixels::frameReady(uint64_t time) {
   if (time == 0) {
     return true;
   }

@@ -21,7 +21,7 @@ class Pixels {
  public:
   Pixels();
 
-  bool frameReady(unsigned long time);
+  bool frameReady(uint64_t time);
 
   void setLEDInfo(const LEDInfo& led_info);
   const LEDInfo& getLEDInfo();
@@ -29,11 +29,11 @@ class Pixels {
 
   const FrameBuffer& get();
   void increment();
-  void setFrameBuffer(const FrameBuffer frame_buffer);
+  void setFrameBuffer(FrameBuffer frame_buffer);
   void animation(const AnimationArgs& args);
 
  private:
-  unsigned long previous_show_time_;
+  uint64_t previous_show_time_;
   int frame_count_;
   FrameBuffer frame_buffer_;
   LEDInfo info_;
@@ -43,7 +43,7 @@ class Pixels {
 
   void setAll(int color);
   void setFrameBuffer(int index, int color);
-  int processColor(int color);
+  int processColor(int color) const;
 
   static int rainbowWheel(int pos);
   int setPixel(int id, int value);

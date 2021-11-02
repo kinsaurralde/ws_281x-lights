@@ -11,31 +11,31 @@
 #if defined(ESP8266)
 #include <Arduino.h>
 
-Status getEspInfo(EspInfo& esp_info) {
-  esp_info.is_request = false;
-  esp_info.heap_free = ESP.getFreeHeap();
-  esp_info.heap_frag = ESP.getHeapFragmentation();
-  esp_info.sketch_size = ESP.getSketchSize();
-  esp_info.free_sketch_size = ESP.getFreeSketchSpace();
-  esp_info.flash_chip_size = ESP.getFlashChipSize();
-  esp_info.flash_chip_speed = ESP.getFlashChipSpeed();
-  esp_info.cpu_freq = ESP.getCpuFreqMHz();
-  esp_info.cycle_count = ESP.getCycleCount();
-  esp_info.supply_voltage = ESP.getVcc();
-  esp_info.chip_id = ESP.getChipId();
-  esp_info.flash_id = ESP.getFlashChipId();
-  esp_info.flash_crc = ESP.checkFlashCRC();
+Status getEspInfo(EspInfo* esp_info) {
+  esp_info->is_request = false;
+  esp_info->heap_free = ESP.getFreeHeap();
+  esp_info->heap_frag = ESP.getHeapFragmentation();
+  esp_info->sketch_size = ESP.getSketchSize();
+  esp_info->free_sketch_size = ESP.getFreeSketchSpace();
+  esp_info->flash_chip_size = ESP.getFlashChipSize();
+  esp_info->flash_chip_speed = ESP.getFlashChipSpeed();
+  esp_info->cpu_freq = ESP.getCpuFreqMHz();
+  esp_info->cycle_count = ESP.getCycleCount();
+  esp_info->supply_voltage = ESP.getVcc();
+  esp_info->chip_id = ESP.getChipId();
+  esp_info->flash_id = ESP.getFlashChipId();
+  esp_info->flash_crc = ESP.checkFlashCRC();
   return Status_GOOD;
 }
 #else
-Status getEspInfo(EspInfo& esp_info) { return Status_ESP_ONLY_OPTION; }
+Status getEspInfo(EspInfo* esp_info) { return Status_ESP_ONLY_OPTION; }
 #endif
 
 Pixels& Controller::getPixels() { return pixels_; }
 
 const FrameBuffer& Controller::getFrameBuffer() { return pixels_.get(); }
 
-bool Controller::updatePixels(unsigned long millis) {
+bool Controller::updatePixels(uint64_t millis) {
   if (pixels_.frameReady(millis)) {
     pixels_.increment();
     return true;
@@ -43,17 +43,17 @@ bool Controller::updatePixels(unsigned long millis) {
   return false;
 }
 
-Status Controller::handlePacket(Packet& packet) {
-  if (!packet.has_payload) {
+Status Controller::handlePacket(Packet* packet) {
+  if (!packet->has_payload) {
     return Status_MISSING_PAYLOAD;
   }
   if (DEBUG_PRINT) {
-    Logger::println("Packet payload type: %d", packet.payload.which_payload);
+    Logger::println("Packet payload type: %d", packet->payload.which_payload);
   }
   Status status = Status_REQUEST;
-  switch (packet.payload.which_payload) {
+  switch (packet->payload.which_payload) {
     case Payload_animation_args_tag:
-      status = beginAnimation(packet);
+      status = beginAnimation(*packet);
       break;
     case Payload_frame_tag:
       // status = setFrameBuffer(packet);
@@ -63,10 +63,10 @@ Status Controller::handlePacket(Packet& packet) {
       status = getVersion(packet);
       break;
     case Payload_led_info_tag:
-      status = setLedInfo(packet);
+      status = setLedInfo(*packet);
       break;
     case Payload_esp_info_tag:
-      status = getESPInfo(&packet);
+      status = getESPInfo(packet);
       break;
     default:
       status = Status_MISSING_PAYLOAD;
@@ -77,12 +77,12 @@ Status Controller::handlePacket(Packet& packet) {
 
 void Controller::setSaveServerIp(void (*callback)(uint16_t)) { saveServerIp = callback; }
 
-Status Controller::beginAnimation(Packet& packet) {
+Status Controller::beginAnimation(const Packet& packet) {
   pixels_.animation(packet.payload.payload.animation_args);
   return Status_GOOD;
 }
 
-Status Controller::setFrameBuffer(Packet& packet) {
+Status Controller::setFrameBuffer(const Packet& packet) {
   FrameBuffer frame_buffer = FrameBuffer();
   Frame frame = packet.payload.payload.frame;
   if (frame.pixel_count == 0) {
@@ -100,14 +100,14 @@ Status Controller::setFrameBuffer(Packet& packet) {
     int g = (frame.green[index] >> offset) & 0xFF;
     int b = (frame.blue[index] >> offset) & 0xFF;
     int value = r << 16 | g << 8 | b;
-    frame_buffer.pixels[i] = (uint32_t)value;
+    frame_buffer.pixels[i] = static_cast<uint32_t>(value);
   }
   return Status_GOOD;
 }
 
-Status Controller::setLedInfo(Packet& packet) {
+Status Controller::setLedInfo(const Packet& packet) {
   if (packet.payload.payload.led_info.initialize) {
-    if (saveServerIp) {
+    if (saveServerIp != nullptr) {
       saveServerIp(packet.payload.payload.led_info.initialize_port);
     }
     Logger::good("Initialized");
@@ -116,10 +116,10 @@ Status Controller::setLedInfo(Packet& packet) {
   return Status_GOOD;
 }
 
-Status Controller::getVersion(Packet& packet) {
-  packet.payload.payload.version.major = MAJOR;
-  packet.payload.payload.version.minor = MINOR;
-  packet.payload.payload.version.patch = PATCH;
+Status Controller::getVersion(Packet* packet) {
+  packet->payload.payload.version.major = MAJOR;
+  packet->payload.payload.version.minor = MINOR;
+  packet->payload.payload.version.patch = PATCH;
   return Status_GOOD;
 }
 
@@ -131,5 +131,5 @@ Status Controller::getESPInfo(Packet* packet) {
     return Status_ARGUMENT_ERROR;
   }
   EspInfo esp_info = EspInfo();
-  return getEspInfo(esp_info);
+  return getEspInfo(&esp_info);
 }
