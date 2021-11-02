@@ -75,6 +75,8 @@ Status Controller::handlePacket(Packet& packet) {
   return status;
 }
 
+void Controller::setSaveServerIp(void (*callback)(uint16_t)) { saveServerIp = callback; }
+
 Status Controller::beginAnimation(Packet& packet) {
   pixels_.animation(packet.payload.payload.animation_args);
   return Status_GOOD;
@@ -105,6 +107,9 @@ Status Controller::setFrameBuffer(Packet& packet) {
 
 Status Controller::setLedInfo(Packet& packet) {
   if (packet.payload.payload.led_info.initialize) {
+    if (saveServerIp) {
+      saveServerIp(packet.payload.payload.led_info.initialize_port);
+    }
     Logger::good("Initialized");
   }
   pixels_.setLEDInfo(packet.payload.payload.led_info);

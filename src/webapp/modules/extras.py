@@ -3,26 +3,33 @@ import logging
 
 import yaml
 
+# pylint: disable=protected-access
 
+ESP = 15
 NOTICE = 25
 SUCCESS = 35
 
+def addCustomLogLevels():
+    logging.addLevelName(SUCCESS, "SUCCESS")
 
-class CustomLogger(logging.getLoggerClass()):
-    """Custom logging class that defines extra levels"""
+    def success(self, message, *args, **kws):
+        self._log(SUCCESS, message, args, **kws)
 
-    def __init__(self, name, level=logging.NOTSET):
-        super().__init__(name, level)
-        logging.addLevelName(NOTICE, "NOTICE")
-        logging.addLevelName(SUCCESS, "SUCCESS")
+    logging.Logger.success = success
 
-    def notice(self, msg, *args, **kwargs):
-        if self.isEnabledFor(NOTICE):
-            self._log(NOTICE, msg, args, **kwargs)
+    logging.addLevelName(NOTICE, "NOTICE")
 
-    def success(self, msg, *args, **kwargs):
-        if self.isEnabledFor(SUCCESS):
-            self._log(SUCCESS, msg, args, **kwargs)
+    def notice(self, message, *args, **kws):
+        self._log(NOTICE, message, args, **kws)
+
+    logging.Logger.notice = notice
+
+    logging.addLevelName(ESP, "ESP")
+
+    def esp(self, message, *args, **kws):
+        self._log(ESP, message, args, **kws)
+
+    logging.Logger.esp = esp
 
 
 class RequestResponse:

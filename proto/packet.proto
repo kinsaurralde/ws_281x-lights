@@ -64,6 +64,11 @@ message Hash {
     bytes value = 1;
 }
 
+message LogMessage {
+    LogType type = 1;
+    string message = 2;
+}
+
 enum Status {
     // Set REQUEST for outgoing packet
     REQUEST = 0;
@@ -80,4 +85,11 @@ enum Status {
     MISSING_OPTIONS = 22;
     PACKET_TOO_LARGE = 30;
     ESP_ONLY_OPTION = 31;
+}
+
+enum LogType {
+    LOG_UNSET = 0;
+    LOG_GOOD = 1;
+    LOG_WARNING = 2;
+    LOG_ERROR = 3;
 }

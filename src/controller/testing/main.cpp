@@ -1,8 +1,9 @@
 #include "../src/modules/logger.h"
-#include "../src/nanopb/packet.pb.h"
 #include "../src/modules/packet_utils.h"
 #include "../src/modules/framebuffer.h"
 #include "../src/modules/controller.h"
+#include "../src/nanopb/packet.pb.h"
+
 
 #include <iostream>
 
@@ -76,8 +77,13 @@ void runAnimation(Controller& controller, int loops) {
     }
 }
 
+void sendLogMessage(LogMessage message) {
+    std::cout << "Log Message: " << message.message << std::endl;
+}
+
 int main() {
     Controller* controller = new Controller();
+    Logger::setSendLogMessage(sendLogMessage);
     Logger::println("Test1");
     Logger::println("Test%d", 2);
     Logger::error("This is %cn error", 'a');
@@ -88,6 +94,6 @@ int main() {
     serialWritePacketHeader(header);
     setAnimationArgs(p, createRainbowArgs());
     Logger::println("Handle Packet Status: %d", controller->handlePacket(p));
-    runAnimation(*controller, 3);
+    runAnimation(*controller, 2);
     return 0;
 }

@@ -27,7 +27,6 @@ def formatTimestampToSecondsAgo(timestamps):
 
 def getRTTData():
     data = packet_manager.stats.filterRecentNSecs("rtt", 15)
-    print(data)
     traces = list()
     for t in data:
             traces.append(plotly.graph_objs.Scatter(

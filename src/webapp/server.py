@@ -20,7 +20,7 @@ ESP_IP_ADDRESS = "10.0.0.72"
 
 LOG_FORMAT = "%(asctime)s %(levelname)-8s [%(name)-26s:%(funcName)-26s] %(message)s"
 logging.basicConfig(format=LOG_FORMAT, level=logging.DEBUG, datefmt="%Y-%m-%d %H:%M:%S")
-logging.setLoggerClass(modules.CustomLogger)
+modules.addCustomLogLevels()
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
@@ -66,6 +66,8 @@ logging.getLogger("urllib3.connectionpool").setLevel("WARNING")
 
 log = logging.getLogger("app")
 coloredlogs.DEFAULT_LEVEL_STYLES["info"] = {"color": "black", "bold": True}
+coloredlogs.DEFAULT_LEVEL_STYLES["esp"] = {"color": "cyan", "faint": True}
+
 coloredlogs.install(level="DEBUG", fmt=LOG_FORMAT, logger=log)
 log_file_handler = RotatingFileHandler(
     "logs/app.log", mode="a", maxBytes=args.logging_max_bytes_per_file, backupCount=args.logging_backup_count
@@ -169,11 +171,13 @@ def disconnect():
 
 
 try:
+    remote_log_manager = modules.RemoteLogManager()
+    remote_log_manager.start()
     presets_config = modules.openYaml("config/presets.yaml")
     controllers_config = modules.openYaml(args.controller_config)
 
-    log.notice(f"Presets Config: {presets_config}")
-    log.notice(f"Controllers Config: {controllers_config}")
+    log.info(f"Presets Config: {presets_config}")
+    log.info(f"Controllers Config: {controllers_config}")
 
     controllers = modules.Controllers(controllers_config)
 

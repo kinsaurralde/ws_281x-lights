@@ -30,8 +30,11 @@ class Controller {
 
   Status handlePacket(Packet& packet);
 
+  void setSaveServerIp(void (*callback)(uint16_t));
+
  private:
   Pixels pixels_;
+  void (*saveServerIp)(uint16_t);
 
   Status beginAnimation(Packet& packet);
   Status setFrameBuffer(Packet& packet);

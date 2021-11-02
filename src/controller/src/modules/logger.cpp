@@ -1,5 +1,9 @@
 #include "logger.h"
 
+#include <stdarg.h>
+
+#include "../nanopb/packet.pb.h"
+
 #define RST_COLOR_CODE "\x1B[0m"
 #define RED_COLOR_CODE "\x1B[31m"
 #define GRN_COLOR_CODE "\x1B[32m"
@@ -11,13 +15,10 @@
 
 #define STRING_BUFFER_SIZE 256
 
-#include <stdarg.h>
+constexpr const char* COLORS[4] = {RST_COLOR_CODE, GRN_COLOR_CODE, YEL_COLOR_CODE, RED_COLOR_CODE};
 
-constexpr const char* COLORS[4] = {RST_COLOR_CODE, RED_COLOR_CODE, GRN_COLOR_CODE, YEL_COLOR_CODE};
-constexpr int RST_CODE = 0;
-constexpr int RED_CODE = 1;
-constexpr int GRN_CODE = 2;
-constexpr int YEL_CODE = 3;
+LogType current_type = LogType_LOG_UNSET;
+void (*sendLogMessage)(LogMessage);
 
 #if defined(ESP8266)
 #include <Arduino.h>
@@ -50,31 +51,40 @@ void printFormattedString(const char* text, va_list args) {
   char buffer[STRING_BUFFER_SIZE];
   vsprintf(buffer, text, args);
   internalPrinter(buffer);
+  LogMessage message = LogMessage_init_zero;
+  message.type = current_type;
+  strcpy(message.message, buffer);
+  if (sendLogMessage) {
+    sendLogMessage(message);
+  }
 }
 
-void setColor(int color_index) {
+void setColor(LogType type) {
+  current_type = type;
   if (IS_SERIAL_PRINT) {
-    switch (color_index) {
-      case RED_CODE:
+    switch (type) {
+      case LogType_LOG_ERROR:
         internalPrinter("Error: ", false);
         break;
-      case YEL_CODE:
+      case LogType_LOG_WARNING:
         internalPrinter("Warning: ", false);
         break;
-      case GRN_CODE:
+      case LogType_LOG_GOOD:
         internalPrinter("Good: ", false);
         break;
       default:
         break;
     }
   } else {
-    internalPrinter(COLORS[color_index], false);
+    internalPrinter(COLORS[type], false);
   }
 }
 
-void resetColor() { setColor(RST_CODE); }
+void resetColor() { setColor(LogType_LOG_UNSET); }
 
 namespace Logger {
+
+void setSendLogMessage(void (*callback)(LogMessage)) { sendLogMessage = callback; }
 
 void println(const char* text, ...) {
   va_list args;
@@ -87,7 +97,7 @@ void good(const char* text, ...) {
   va_list args;
   va_start(args, text);
   char buffer[STRING_BUFFER_SIZE];
-  setColor(GRN_CODE);
+  setColor(LogType_LOG_GOOD);
   printFormattedString(text, args);
   resetColor();
   va_end(args);
@@ -97,7 +107,7 @@ void warning(const char* text, ...) {
   va_list args;
   va_start(args, text);
   char buffer[STRING_BUFFER_SIZE];
-  setColor(YEL_CODE);
+  setColor(LogType_LOG_WARNING);
   printFormattedString(text, args);
   resetColor();
   va_end(args);
@@ -107,7 +117,7 @@ void error(const char* text, ...) {
   va_list args;
   va_start(args, text);
   char buffer[STRING_BUFFER_SIZE];
-  setColor(RED_CODE);
+  setColor(LogType_LOG_ERROR);
   printFormattedString(text, args);
   resetColor();
   va_end(args);

@@ -12,6 +12,7 @@ parser.add_argument('--cpp-output-dir', default='../src/controller/',
 
 parser.add_argument('--udp-port', type=int, default=8000, help='Port to send udp packets to ESP.')
 parser.add_argument('--ack-port', type=int, default=8001, help='Port to recieve ack packets from ESP.')
+parser.add_argument('--log-port', type=int, default=8002, help='Port to recieve log packets from ESP.')
 parser.add_argument('--packet-buffer-size', type=int, default=2048, help='Size of packet buffer on ESP. This value may not be safe to change.')
 parser.add_argument('--max-brightness', type=int, default=127, choices=range(0, 256), help='Maximum pixel brightnes. Must be in range 0 to 255.')
 parser.add_argument('--brightness-multiplier', type=float, default=0.5, help='Amount to multiple brightness values by on ESP. Should be in range 0 to 1.')
@@ -37,6 +38,7 @@ def cpp(path):
         file.write('\n')
         file.write(line('int', 'UDP_PORT', args.udp_port))
         file.write(line('int', 'ACK_PORT', args.ack_port))
+        file.write(line('int', 'LOG_PORT', args.log_port))
         file.write(line('int', 'PACKET_BUFFER_SIZE', args.packet_buffer_size))
         file.write(line('int', 'MAX_BRIGHTNESS', args.max_brightness))
         file.write(line('float', 'BRIGHTNESS_MULTIPLIER', args.brightness_multiplier))
@@ -67,6 +69,7 @@ def python(path):
         file.write('\n')
         file.write(line('UDP_PORT', args.udp_port))
         file.write(line('ACK_PORT', args.ack_port))
+        file.write(line('LOG_PORT', args.log_port))
         file.write(line('PACKET_BUFFER_SIZE', args.packet_buffer_size))
         file.write(line('ESP_IP_ADDRESS', '\'192.168.29.100\''))
         file.write(line('DEFAULT_QUEUE_MAX_SIZE', 5000))

@@ -21,7 +21,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=_b('\n\x0cpacket.proto\x1a\x0f\x61nimation.proto\"W\n\x06Packet\x12\x17\n\x06header\x18\x01 \x01(\x0b\x32\x07.Header\x12\x19\n\x07options\x18\x02 \x01(\x0b\x32\x08.Options\x12\x19\n\x07payload\x18\n \x01(\x0b\x32\x08.Payload\"\xb0\x01\n\x07Payload\x12\x1c\n\x08led_info\x18\x01 \x01(\x0b\x32\x08.LEDInfoH\x00\x12(\n\x0e\x61nimation_args\x18\n \x01(\x0b\x32\x0e.AnimationArgsH\x00\x12\x17\n\x05\x66rame\x18\x0b \x01(\x0b\x32\x06.FrameH\x00\x12\x1b\n\x07version\x18\x64 \x01(\x0b\x32\x08.VersionH\x00\x12\x1c\n\x08\x65sp_info\x18\x65 \x01(\x0b\x32\x08.ESPInfoH\x00\x42\t\n\x07payload\"b\n\x06Header\x12\x19\n\x07version\x18\x01 \x01(\x0b\x32\x08.Version\x12\x17\n\x06status\x18\x02 \x01(\x0e\x32\x07.Status\x12\n\n\x02id\x18\x03 \x01(\x03\x12\x18\n\x10timestamp_millis\x18\x04 \x01(\x03\"\x1b\n\x07Options\x12\x10\n\x08send_ack\x18\x01 \x01(\x08\"\xaa\x02\n\x07\x45SPInfo\x12\x12\n\nis_request\x18\x01 \x01(\x08\x12\x11\n\theap_free\x18\x02 \x01(\r\x12\x11\n\theap_frag\x18\x03 \x01(\r\x12\x13\n\x0bsketch_size\x18\x04 \x01(\r\x12\x18\n\x10\x66ree_sketch_size\x18\x05 \x01(\r\x12\x17\n\x0f\x66lash_chip_size\x18\x06 \x01(\r\x12\x18\n\x10\x66lash_chip_speed\x18\x07 \x01(\r\x12\x10\n\x08\x63pu_freq\x18\x08 \x01(\r\x12\x13\n\x0b\x63ycle_count\x18\t \x01(\r\x12\x16\n\x0esupply_voltage\x18\n \x01(\r\x12\x0f\n\x07\x63hip_id\x18\x0b \x01(\r\x12\x10\n\x08\x66lash_id\x18\x0c \x01(\r\x12\x11\n\tflash_crc\x18\r \x01(\r\x12\x0e\n\x06millis\x18\x0e \x01(\r\"p\n\x07Version\x12\r\n\x05major\x18\x01 \x01(\x05\x12\r\n\x05minor\x18\x02 \x01(\x05\x12\r\n\x05patch\x18\x03 \x01(\x05\x12\r\n\x05label\x18\x04 \x01(\t\x12\x12\n\x03\x65sp\x18\x05 \x01(\x0b\x32\x05.Hash\x12\x15\n\x06pixels\x18\x06 \x01(\x0b\x32\x05.Hash\"\x15\n\x04Hash\x12\r\n\x05value\x18\x01 \x01(\x0c*\xd2\x01\n\x06Status\x12\x0b\n\x07REQUEST\x10\x00\x12\x08\n\x04GOOD\x10\x01\x12\t\n\x05\x45RROR\x10\n\x12\x14\n\x10\x43ONNECTION_ERROR\x10\x0b\x12\x12\n\x0e\x41RGUMENT_ERROR\x10\x0c\x12\x13\n\x0fNOT_IMPLEMENTED\x10\r\x12\x13\n\x0fMISSING_PAYLOAD\x10\x14\x12\x12\n\x0eMISSING_HEADER\x10\x15\x12\x13\n\x0fMISSING_OPTIONS\x10\x16\x12\x14\n\x10PACKET_TOO_LARGE\x10\x1e\x12\x13\n\x0f\x45SP_ONLY_OPTION\x10\x1f\x62\x06proto3')
+  serialized_pb=_b('\n\x0cpacket.proto\x1a\x0f\x61nimation.proto\"W\n\x06Packet\x12\x17\n\x06header\x18\x01 \x01(\x0b\x32\x07.Header\x12\x19\n\x07options\x18\x02 \x01(\x0b\x32\x08.Options\x12\x19\n\x07payload\x18\n \x01(\x0b\x32\x08.Payload\"\xb0\x01\n\x07Payload\x12\x1c\n\x08led_info\x18\x01 \x01(\x0b\x32\x08.LEDInfoH\x00\x12(\n\x0e\x61nimation_args\x18\n \x01(\x0b\x32\x0e.AnimationArgsH\x00\x12\x17\n\x05\x66rame\x18\x0b \x01(\x0b\x32\x06.FrameH\x00\x12\x1b\n\x07version\x18\x64 \x01(\x0b\x32\x08.VersionH\x00\x12\x1c\n\x08\x65sp_info\x18\x65 \x01(\x0b\x32\x08.ESPInfoH\x00\x42\t\n\x07payload\"b\n\x06Header\x12\x19\n\x07version\x18\x01 \x01(\x0b\x32\x08.Version\x12\x17\n\x06status\x18\x02 \x01(\x0e\x32\x07.Status\x12\n\n\x02id\x18\x03 \x01(\x03\x12\x18\n\x10timestamp_millis\x18\x04 \x01(\x03\"\x1b\n\x07Options\x12\x10\n\x08send_ack\x18\x01 \x01(\x08\"\xaa\x02\n\x07\x45SPInfo\x12\x12\n\nis_request\x18\x01 \x01(\x08\x12\x11\n\theap_free\x18\x02 \x01(\r\x12\x11\n\theap_frag\x18\x03 \x01(\r\x12\x13\n\x0bsketch_size\x18\x04 \x01(\r\x12\x18\n\x10\x66ree_sketch_size\x18\x05 \x01(\r\x12\x17\n\x0f\x66lash_chip_size\x18\x06 \x01(\r\x12\x18\n\x10\x66lash_chip_speed\x18\x07 \x01(\r\x12\x10\n\x08\x63pu_freq\x18\x08 \x01(\r\x12\x13\n\x0b\x63ycle_count\x18\t \x01(\r\x12\x16\n\x0esupply_voltage\x18\n \x01(\r\x12\x0f\n\x07\x63hip_id\x18\x0b \x01(\r\x12\x10\n\x08\x66lash_id\x18\x0c \x01(\r\x12\x11\n\tflash_crc\x18\r \x01(\r\x12\x0e\n\x06millis\x18\x0e \x01(\r\"p\n\x07Version\x12\r\n\x05major\x18\x01 \x01(\x05\x12\r\n\x05minor\x18\x02 \x01(\x05\x12\r\n\x05patch\x18\x03 \x01(\x05\x12\r\n\x05label\x18\x04 \x01(\t\x12\x12\n\x03\x65sp\x18\x05 \x01(\x0b\x32\x05.Hash\x12\x15\n\x06pixels\x18\x06 \x01(\x0b\x32\x05.Hash\"\x15\n\x04Hash\x12\r\n\x05value\x18\x01 \x01(\x0c\"5\n\nLogMessage\x12\x16\n\x04type\x18\x01 \x01(\x0e\x32\x08.LogType\x12\x0f\n\x07message\x18\x02 \x01(\t*\xd2\x01\n\x06Status\x12\x0b\n\x07REQUEST\x10\x00\x12\x08\n\x04GOOD\x10\x01\x12\t\n\x05\x45RROR\x10\n\x12\x14\n\x10\x43ONNECTION_ERROR\x10\x0b\x12\x12\n\x0e\x41RGUMENT_ERROR\x10\x0c\x12\x13\n\x0fNOT_IMPLEMENTED\x10\r\x12\x13\n\x0fMISSING_PAYLOAD\x10\x14\x12\x12\n\x0eMISSING_HEADER\x10\x15\x12\x13\n\x0fMISSING_OPTIONS\x10\x16\x12\x14\n\x10PACKET_TOO_LARGE\x10\x1e\x12\x13\n\x0f\x45SP_ONLY_OPTION\x10\x1f*F\n\x07LogType\x12\r\n\tLOG_UNSET\x10\x00\x12\x0c\n\x08LOG_GOOD\x10\x01\x12\x0f\n\x0bLOG_WARNING\x10\x02\x12\r\n\tLOG_ERROR\x10\x03\x62\x06proto3')
   ,
   dependencies=[animation__pb2.DESCRIPTOR,])
 
@@ -78,12 +78,43 @@ _STATUS = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=869,
-  serialized_end=1079,
+  serialized_start=924,
+  serialized_end=1134,
 )
 _sym_db.RegisterEnumDescriptor(_STATUS)
 
 Status = enum_type_wrapper.EnumTypeWrapper(_STATUS)
+_LOGTYPE = _descriptor.EnumDescriptor(
+  name='LogType',
+  full_name='LogType',
+  filename=None,
+  file=DESCRIPTOR,
+  values=[
+    _descriptor.EnumValueDescriptor(
+      name='LOG_UNSET', index=0, number=0,
+      serialized_options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='LOG_GOOD', index=1, number=1,
+      serialized_options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='LOG_WARNING', index=2, number=2,
+      serialized_options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='LOG_ERROR', index=3, number=3,
+      serialized_options=None,
+      type=None),
+  ],
+  containing_type=None,
+  serialized_options=None,
+  serialized_start=1136,
+  serialized_end=1206,
+)
+_sym_db.RegisterEnumDescriptor(_LOGTYPE)
+
+LogType = enum_type_wrapper.EnumTypeWrapper(_LOGTYPE)
 REQUEST = 0
 GOOD = 1
 ERROR = 10
@@ -95,6 +126,10 @@ MISSING_HEADER = 21
 MISSING_OPTIONS = 22
 PACKET_TOO_LARGE = 30
 ESP_ONLY_OPTION = 31
+LOG_UNSET = 0
+LOG_GOOD = 1
+LOG_WARNING = 2
+LOG_ERROR = 3
 
 
 
@@ -506,6 +541,44 @@ _HASH = _descriptor.Descriptor(
   serialized_end=866,
 )
 
+
+_LOGMESSAGE = _descriptor.Descriptor(
+  name='LogMessage',
+  full_name='LogMessage',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='type', full_name='LogMessage.type', index=0,
+      number=1, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='message', full_name='LogMessage.message', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=868,
+  serialized_end=921,
+)
+
 _PACKET.fields_by_name['header'].message_type = _HEADER
 _PACKET.fields_by_name['options'].message_type = _OPTIONS
 _PACKET.fields_by_name['payload'].message_type = _PAYLOAD
@@ -533,6 +606,7 @@ _HEADER.fields_by_name['version'].message_type = _VERSION
 _HEADER.fields_by_name['status'].enum_type = _STATUS
 _VERSION.fields_by_name['esp'].message_type = _HASH
 _VERSION.fields_by_name['pixels'].message_type = _HASH
+_LOGMESSAGE.fields_by_name['type'].enum_type = _LOGTYPE
 DESCRIPTOR.message_types_by_name['Packet'] = _PACKET
 DESCRIPTOR.message_types_by_name['Payload'] = _PAYLOAD
 DESCRIPTOR.message_types_by_name['Header'] = _HEADER
@@ -540,7 +614,9 @@ DESCRIPTOR.message_types_by_name['Options'] = _OPTIONS
 DESCRIPTOR.message_types_by_name['ESPInfo'] = _ESPINFO
 DESCRIPTOR.message_types_by_name['Version'] = _VERSION
 DESCRIPTOR.message_types_by_name['Hash'] = _HASH
+DESCRIPTOR.message_types_by_name['LogMessage'] = _LOGMESSAGE
 DESCRIPTOR.enum_types_by_name['Status'] = _STATUS
+DESCRIPTOR.enum_types_by_name['LogType'] = _LOGTYPE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 Packet = _reflection.GeneratedProtocolMessageType('Packet', (_message.Message,), dict(
@@ -591,6 +667,13 @@ Hash = _reflection.GeneratedProtocolMessageType('Hash', (_message.Message,), dic
   # @@protoc_insertion_point(class_scope:Hash)
   ))
 _sym_db.RegisterMessage(Hash)
+
+LogMessage = _reflection.GeneratedProtocolMessageType('LogMessage', (_message.Message,), dict(
+  DESCRIPTOR = _LOGMESSAGE,
+  __module__ = 'packet_pb2'
+  # @@protoc_insertion_point(class_scope:LogMessage)
+  ))
+_sym_db.RegisterMessage(LogMessage)
 
 
 # @@protoc_insertion_point(module_scope)

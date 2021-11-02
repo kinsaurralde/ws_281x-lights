@@ -32,6 +32,8 @@ void handleRestart();
 void handleHTTP();
 void handleRequest();
 
+void saveServerIp(uint16_t remote_port);
+
 WiFiUDP Udp;
 ESP8266WebServer server(80);
 uint8_t buffer[PACKET_BUFFER_SIZE];
@@ -58,6 +60,8 @@ void setup() {
   pinMode(BUILTIN_LED_B, OUTPUT);
   digitalWrite(BUILTIN_LED_A, HIGH);
   digitalWrite(BUILTIN_LED_B, LOW);
+  Logger::setSendLogMessage(sendLogMessage);
+  neopixels.controller.setSaveServerIp(saveServerIp);
   delay(10);
   Serial.println('\n');
 
@@ -117,6 +121,21 @@ void loop() {
   updatePixels(millis());
 }
 
+void saveServerIp(uint16_t remote_port) {
+  IPAddress remote_address = Udp.remoteIP();
+  IPAddress saved_address = readSavedServerIp();
+  uint16_t saved_port = readSavedPort();
+  if (saved_address != remote_address || saved_port != remote_port) {
+    Logger::println("Saving Server IP: %s:%d", remote_address.toString().c_str(), remote_port);
+    for (int i = 0; i < 4; i++) {
+      EEPROM.write(EEPROM_ADDRESS_START + i, remote_address[i]);
+    }
+    EEPROM.write(EEPROM_ADDRESS_START + 4, (remote_port >> 8) & 0xFF);
+    EEPROM.write(EEPROM_ADDRESS_START + 5, remote_port & 0xFF);
+    EEPROM.commit();
+  }
+}
+
 IPAddress readSavedServerIp() {
   IPAddress saved_address;
   for (int i = 0; i < 4; i++) {
@@ -129,6 +148,17 @@ uint16_t readSavedPort() {
   uint8_t l_byte = EEPROM.read(EEPROM_ADDRESS_START + 4);
   uint8_t r_byte = EEPROM.read(EEPROM_ADDRESS_START + 5);
   return (l_byte << 8) | (r_byte & 0xFF);
+}
+
+void sendLogMessage(LogMessage message) {
+  uint8_t message_buffer[260];
+  IPAddress server = readSavedServerIp();
+  Udp.beginPacket(server, 8002);
+  pb_ostream_t ostream = pb_ostream_from_buffer(message_buffer, 260);
+  pb_encode(&ostream, LogMessage_fields, &message);
+  int message_length = ostream.bytes_written;
+  Udp.write(message_buffer, message_length);
+  Udp.endPacket();
 }
 
 void updatePixels(unsigned long millis) {

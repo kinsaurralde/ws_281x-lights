@@ -105,8 +105,7 @@ class PacketManager:
             payload.esp_info.is_request = True
             packet = self._createPacket(payload, proto_packet.Options(), PacketOptions())
             response = requests.post(f"http://{ip}/proto", packet.SerializeToString())
-            # packet.ParseFromString(response.content)
-            print(response.content)
+            packet.ParseFromString(response.content)
 
     @staticmethod
     def createLEDInfoPayload(led_info: dict) -> list:
