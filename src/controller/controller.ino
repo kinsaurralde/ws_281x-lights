@@ -15,9 +15,7 @@
 #include "src/modules/packet_utils.h"
 #include "src/modules/pixels.h"
 #include "version.h"
-
-#define WIFI_SSID "thebetterapartment"
-#define WIFI_PASSWORD "Mocha_Rosie4ever"
+#include "wifi_credentials.h"
 
 #define EEPROM_ADDRESS_START 0
 #define EEPROM_SIZE 512
@@ -191,13 +189,13 @@ void handleUDP() {
   digitalWrite(BUILTIN_LED_B, LOW);
   Udp.read(buffer, PACKET_BUFFER_SIZE);
   Packet packet = decodePacket(buffer, packet_size);
-  Status status = neopixels.controller.handlePacket(packet);
+  Status status = neopixels.controller.handlePacket(&packet);
   if (packet.has_options && packet.options.send_ack) {
     Udp.beginPacket(Udp.remoteIP(), ACK_PORT);
     packet.header.status = status;
     packet.options = Options_init_zero;
     packet.payload = Payload_init_zero;
-    packet_size = encodePacket(buffer, PACKET_BUFFER_SIZE, packet);
+    packet_size = encodePacket(buffer, PACKET_BUFFER_SIZE, &packet);
     Udp.write(buffer, packet_size);
     Udp.endPacket();
   }
@@ -219,9 +217,9 @@ void handleHTTP() {
   }
   packet_string.getBytes(buffer, PACKET_BUFFER_SIZE);
   Packet packet = decodePacket(buffer, packet_size);
-  Status status = neopixels.controller.handlePacket(packet);
+  Status status = neopixels.controller.handlePacket(&packet);
   packet.header.status = status;
-  packet_size = encodePacket(buffer, PACKET_BUFFER_SIZE, packet);
+  packet_size = encodePacket(buffer, PACKET_BUFFER_SIZE, &packet);
   buffer[packet_size] = 0;
   server.send(200, "application/octet-stream", String((char*)buffer));
 }

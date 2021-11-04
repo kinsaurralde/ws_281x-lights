@@ -173,7 +173,7 @@ def disconnect():
 try:
     remote_log_manager = modules.RemoteLogManager()
     remote_log_manager.start()
-    presets_config = modules.openYaml("config/presets.yaml")
+    presets_config = modules.openYaml("config/example.presets.yaml")
     controllers_config = modules.openYaml(args.controller_config)
 
     log.info(f"Presets Config: {presets_config}")

@@ -1,0 +1,4 @@
+---
+wifi:
+  ssid: wifissid
+  password: wifipassword

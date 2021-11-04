@@ -1,6 +1,8 @@
 node_modules/
 .vscode/
-*.log
+*.log*
 build/*
 !.gitkeep
 compile_commands.json
+**/config/*.yaml
+!**/config/example.*.yaml

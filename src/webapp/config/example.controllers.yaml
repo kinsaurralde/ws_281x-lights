@@ -1,0 +1,13 @@
+---
+groups:
+  # group named all is automatically created and should not be listed here
+  a:
+    - test
+controllers:
+  test:
+    ip: 10.0.0.72
+    num_leds: 60
+    init_brightness: 100
+    grb: false
+    start_enabled: true
+    active: true

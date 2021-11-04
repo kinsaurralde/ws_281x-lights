@@ -1,6 +1,6 @@
 # Version Information
-MAJOR				= 2
-MINOR				= 3
+MAJOR				= 3
+MINOR				= 0
 PATCH				= 0
 LABEL				= development
 
@@ -14,6 +14,9 @@ WEBAPP_DIR = src/webapp/
 WEBAPP_MODULES = ${WEBAPP_DIR}modules/
 WEBAPP_STATIC = ${WEBAPP_DIR}static/
 WEBAPP_TEMPLATES = ${WEBAPP_DIR}templates/
+BUILD_DIR = build/
+WEBAPP_BUILD_DIR = ${BUILD_DIR}webapp/
+CONTROLLER_BUILD_DIR = ${BUILD_DIR}esp/
 
 # Files
 PY_FILES			= ${WEBAPP_DIR}server.py ${WEBAPP_DIR}modules/*
@@ -111,3 +114,11 @@ clang:
 
 main-test: clang
 	./build/loggingtest
+
+clean:
+	rm -rf ${BUILD_DIR}*
+
+build: nanopb version
+	rm -rf ${WEBAPP_BUILD_DIR}
+	rm -rf ${CONTROLLER_BUILD_DIR}
+	cd tools/ && python3 build.py
