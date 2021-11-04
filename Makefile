@@ -118,7 +118,10 @@ main-test: clang
 clean:
 	rm -rf ${BUILD_DIR}*
 
-build: nanopb version
+build: nanopb version build-copy-only
+	
+
+build-copy-only:
 	rm -rf ${WEBAPP_BUILD_DIR}
 	rm -rf ${CONTROLLER_BUILD_DIR}
 	cd tools/ && python3 build.py
