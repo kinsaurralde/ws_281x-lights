@@ -188,6 +188,7 @@ try:
     if not args.background_disabled:
         pm.startBackgroundThread()
     if args.ping_controllers:
+        pm.setPingInterval(args.ping_interval)
         pm.startPingThread()
 
     colors = modules.Colors()

@@ -47,9 +47,7 @@ Status Controller::handlePacket(Packet* packet) {
   if (!packet->has_payload) {
     return Status_MISSING_PAYLOAD;
   }
-  if (DEBUG_PRINT) {
-    Logger::println("Packet payload type: %d", packet->payload.which_payload);
-  }
+  Logger::println("Packet payload type: %d", packet->payload.which_payload);
   Status status = Status_REQUEST;
   switch (packet->payload.which_payload) {
     case Payload_animation_args_tag:

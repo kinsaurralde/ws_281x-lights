@@ -35,6 +35,7 @@ void saveServerIp(uint16_t remote_port);
 WiFiUDP Udp;
 ESP8266WebServer server(80);
 uint8_t buffer[PACKET_BUFFER_SIZE];
+char web_page[1024];
 
 typedef struct {
   CRGB leds[MAX_LED];
@@ -78,8 +79,6 @@ void setup() {
   Serial.println("Connection established!");
   Serial.print("IP address:\t");
   Serial.println(WiFi.localIP());  // Send the IP address of the ESP8266 to the computer
-  Serial.print("Last Reset Reason: ");
-  Serial.println(ESP.getResetReason());
 
   server.on("/", handleRoot);
   server.on("/restart", handleRestart);
@@ -106,9 +105,21 @@ void setup() {
 
   // Send HTTP GET request
   int httpResponseCode = http.POST(nullptr, 0);
-  Logger::println("Initialize HTTP Response Code: %d", httpResponseCode);
+  if (httpResponseCode == 200) {
+    digitalWrite(BUILTIN_LED_A, LOW);
+    Logger::good("Initialize HTTP Response Code: %d", httpResponseCode);
+  } else {
+    Logger::warning("Initialize HTTP Response Code: %d", httpResponseCode);
+  }
 
-  digitalWrite(BUILTIN_LED_A, LOW);
+  rst_info* reset_info;
+  reset_info = ESP.getResetInfoPtr();
+  if (reset_info->reason == 0 || reset_info->reason == 6) {
+    Logger::println("Last Reset Reason: %s", ESP.getResetReason().c_str());
+  } else {
+    Logger::error("Last Reset Reason: %s", ESP.getResetReason().c_str());
+  }
+
   digitalWrite(BUILTIN_LED_B, HIGH);
   Logger::good("Finished Setup");
 }
@@ -132,6 +143,7 @@ void saveServerIp(uint16_t remote_port) {
     EEPROM.write(EEPROM_ADDRESS_START + 5, remote_port & 0xFF);
     EEPROM.commit();
   }
+  digitalWrite(BUILTIN_LED_A, LOW);
 }
 
 IPAddress readSavedServerIp() {
@@ -227,14 +239,14 @@ void handleHTTP() {
 void handleRoot() {
   constexpr int PAGE_SIZE = 1024;
   constexpr int BYTES_WRITTEN_SIZE = 3;
-  char page[PAGE_SIZE];
   const LEDInfo& pixel_info = neopixels.controller.getPixels().getLEDInfo();
   const AnimationArgs& animation_args = neopixels.controller.getPixels().getAnimationArgs();
   int page_bytes_written = snprintf(
-      page, PAGE_SIZE,
-      "<b>STATUS</b><br>Millis: %lu<br>Last Frame Millis: %lu<br>Frame Count: %d<br>UDP Request Count: %d<br>HTTP "
-      "Request Count: %d<br>VCC: %d<br>Free Heap: %d<br>Heap Fragmentation: %d<br>WiFi RSSI: %d<br>Server Ip: "
-      "%s<br><br>"
+      web_page, PAGE_SIZE,
+      "<b>STATUS</b><br>Millis: %lu<br>"
+      "Last Frame Millis: %lld<br>Frame Count: %d<br>UDP Request Count: %d<br>HTTP "
+      "Request Count: %d<br>"
+      "VCC: %d<br>Free Heap: %d<br>Heap Fragmentation: %d<br>WiFi RSSI: %d<br>Server Ip: %s<br><br>"
       "<b>PIXELS INFO</b><br>Frame ms: %d<br>Frame Multiplier: %d<br>Brightness: %d<br>Initialized: %d<br>GRB: "
       "%d<br>Num Leds: %d<br><br>"
       "<b>ANIMATION ARGS</b><br>Type: %d<br>Color: %d<br>Background Color: %d<br>Length: %d<br>Spacing: %d<br>Steps: "
@@ -245,7 +257,7 @@ void handleRoot() {
       "Written: ",
       // Status
       millis(), stats.last_frame_millis, stats.frame_count, stats.udp_packet_count, stats.http_packet_count,
-      ESP.getVcc(), ESP.getFreeHeap(), ESP.getHeapFragmentation(), WiFi.RSSI(), readSavedServerIp().toString(),
+      ESP.getVcc(), ESP.getFreeHeap(), ESP.getHeapFragmentation(), WiFi.RSSI(), readSavedServerIp().toString().c_str(),
       // Pixels Info
       pixel_info.frame_ms, pixel_info.frame_multiplier, pixel_info.brightness, pixel_info.initialize, pixel_info.grb,
       pixel_info.num_leds,
@@ -256,9 +268,11 @@ void handleRoot() {
       MAJOR, MINOR, PATCH, LABEL, ESP.getSketchSize(), ESP.getFreeSketchSpace(), ESP.getFlashChipSize(),
       ESP.getFlashChipSpeed(), ESP.getCpuFreqMHz(), ESP.getChipId(), ESP.getFlashChipId(), ESP.checkFlashCRC(),
       ESP.getFreeContStack());
-  page_bytes_written += snprintf(page + page_bytes_written, PAGE_SIZE, "%d", page_bytes_written + BYTES_WRITTEN_SIZE);
+  page_bytes_written +=
+      snprintf(web_page + page_bytes_written, PAGE_SIZE, "%d", page_bytes_written + BYTES_WRITTEN_SIZE);
+  Logger::println("Status Page Bytes Written: %d", page_bytes_written);
   server.sendHeader("Access-Control-Allow-Origin", "*");
-  server.send(200, "text/html", page);
+  server.send(200, "text/html", web_page);
 }
 
 void handleRestart() {
