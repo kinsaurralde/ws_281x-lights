@@ -92,4 +92,5 @@ enum LogType {
     LOG_GOOD = 1;
     LOG_WARNING = 2;
     LOG_ERROR = 3;
+    LOG_ESP_EXCEPTION = 10;
 }

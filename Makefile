@@ -50,7 +50,7 @@ nanopb:
 	mkdir -p proto/build/py
 # Compile for nanopb
 # cd proto && ls -al ../sdk/nanopb
-	cd proto && ./../${NANOPB_COMPILER} --timestamp --library-include-format=#include\ \"%s\" --strip-path --output-dir=build/nanopb/. *.proto
+	cd proto && ./../${NANOPB_COMPILER} --library-include-format=#include\ \"%s\" --strip-path --output-dir=build/nanopb/. *.proto
 # Compile for python
 	cd proto && protoc --python_out=build/py/. *.proto
 # Move nanopb protos

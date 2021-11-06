@@ -41,5 +41,7 @@ class RemoteLogManager:
                     log.warning(message)
                 elif log_message.type == proto_packet.LOG_ERROR:
                     log.error(message)
+                elif log_message.type == proto_packet.LOG_ESP_EXCEPTION:
+                    log.critical(message)
                 else:
                     log.esp(message)
