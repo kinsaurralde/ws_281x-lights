@@ -15,17 +15,8 @@ class Controllers:
     def createAllControllerInitMessages(self, source_port):
         messages = []
         for controller in self.controllers:
-            values = self.controllers[controller]
-            led_info = proto_animation.LEDInfo()
-            led_info.initialize = True
-            led_info.initialize_port = source_port
-            led_info.grb = values["grb"]
-            led_info.set_num_leds = True
-            led_info.num_leds = values["num_leds"]
-            led_info.set_brightness = values["init_brightness"]
-            payload = proto_packet.Payload()
-            payload.led_info.CopyFrom(led_info)
-            messages.append((values["ip"], payload))
+            ip = self.controllers[controller].get("ip", None)
+            messages.append((ip, self.createControllerInitMessage(ip, source_port)))
         return messages
 
     def createControllerInitMessage(self, ip, source_port):
@@ -39,15 +30,27 @@ class Controllers:
         led_info.grb = values["grb"]
         led_info.set_num_leds = True
         led_info.num_leds = values["num_leds"]
-        led_info.set_brightness = values["init_brightness"]
+        led_info.set_brightness = True
+        led_info.brightness = values["init_brightness"]
         payload = proto_packet.Payload()
         payload.led_info.CopyFrom(led_info)
         return payload
 
+    def getControllerIps(self, names):
+        ips = []
+        for name in names:
+            if name in self.groups:
+                for controller in self.groups[name]:
+                    ips.append(self.controllers[controller]["ip"])
+            elif name in self.controllers:
+                ips.append(self.controllers[name]["ip"])
+        return ips
+
+
     def getControllerFromIp(self, ip):
         return self.ips.get(ip, None)
 
-    def getControllerIps(self):
+    def getAllControllerIps(self):
         return self.ips.keys()
 
     def addRtt(self, ip, rtt):

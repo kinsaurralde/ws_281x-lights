@@ -10,8 +10,9 @@ log.setLevel("DEBUG")
 
 
 class Animations:
-    def __init__(self, colors, config) -> None:
+    def __init__(self, colors, config, controllers) -> None:
         self.colors = colors
+        self.controllers = controllers
         self.animations = self._processAnimationConfig(config["animations"])
         self.animation_args = config["animation_args"]
 
@@ -21,7 +22,8 @@ class Animations:
         for animation in animations:
             if "controllers" not in animation or "animation_args" not in animation:
                 continue
-            # controllers = animation["controllers"]
+            controllers = animation["controllers"]
+            ips = self.controllers.getControllerIps(controllers)
             args = self._fillMissingArgs(animation["animation_args"])
             if args is None:
                 continue
@@ -39,7 +41,8 @@ class Animations:
             payload.animation_args.reverse2 = args.get("reverse2", 0)
             if "colors" in args:
                 payload.animation_args.colors.CopyFrom(args["colors"])
-            packets.append(payload)
+            for ip in ips:
+                packets.append((ip, payload))
         return packets
 
     def _fillMissingArgs(self, args) -> Optional[dict]:

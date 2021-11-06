@@ -26,18 +26,9 @@ class UDPManager:
         self._startAckThread()
 
     def send(self, url: str, packet: proto_packet.Packet) -> None:
-        serialized = packet.SerializeToString()
-        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
-            sock.settimeout(self.timeout)
-            sock.connect((url, config.UDP_PORT))
-            try:
-                sock.sendall(serialized)
-            except OSError:
-                log.error(f"Failed to send {serialized} to {url}", exc_info=True)
-            self.waiting_for_ack_queue_lock.acquire()
-            self.waiting_for_ack_queue.append((packet.header.id, url))
-            self.waiting_for_ack_queue_lock.release()
-            log.info(f"Send packet {packet.header.id} to {url} with {len(serialized)} bytes")
+        thread = threading.Thread(target=self._send, args=(url, packet))
+        thread.start()
+        
 
     def processAckQueue(self) -> None:
         start_time = time.time()
@@ -62,6 +53,20 @@ class UDPManager:
             self.controllers.addRtt(ip, "---")
         self.waiting_for_ack_queue.clear()
         self.waiting_for_ack_queue_lock.release()
+
+    def _send(self, url: str, packet: proto_packet.Packet):
+        serialized = packet.SerializeToString()
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+            sock.settimeout(self.timeout)
+            sock.connect((url, config.UDP_PORT))
+            try:
+                sock.sendall(serialized)
+            except OSError:
+                log.error(f"Failed to send {serialized} to {url}", exc_info=True)
+            self.waiting_for_ack_queue_lock.acquire()
+            self.waiting_for_ack_queue.append((packet.header.id, url))
+            self.waiting_for_ack_queue_lock.release()
+            log.info(f"Send packet {packet.header.id} to {url} with {len(serialized)} bytes")
 
     def _startAckThread(self) -> None:
         self.ack_thread = threading.Thread(target=self._ackThread, daemon=True)

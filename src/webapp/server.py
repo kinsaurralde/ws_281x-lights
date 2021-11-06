@@ -147,8 +147,7 @@ def controllersDebug():
 def handleAnimation(data):
     log.notice(f"Recieved socketio 'animation': {data}")
     payloads = animations.createAnimationPayload(data)
-    for payload in payloads:
-        pm.send(ESP_IP_ADDRESS, payload)
+    pm.sendList(payloads)
 
 
 @socketio.on("ledinfo")
@@ -183,7 +182,7 @@ try:
 
     pm = modules.PacketManager(socketio, controllers, presets_config)
     pm.setVersion(version.MAJOR, version.MINOR, version.PATCH)
-    pm.registerIps(controllers.getControllerIps())
+    pm.registerIps(controllers.getAllControllerIps())
     pm.sendList(controllers.createAllControllerInitMessages(args.port))
     if not args.background_disabled:
         pm.startBackgroundThread()
@@ -194,7 +193,7 @@ try:
     colors = modules.Colors()
     colors.addColors(presets_config["colors"])
 
-    animations = modules.Animations(colors, presets_config)
+    animations = modules.Animations(colors, presets_config, controllers)
 
     metrics_dashboard = dash.Dash(__name__, server=app, url_base_pathname="/dashboard/")
     dashapp.setup.setup(app, metrics_dashboard, pm)
