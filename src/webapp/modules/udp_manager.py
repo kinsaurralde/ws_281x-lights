@@ -49,8 +49,9 @@ class UDPManager:
 
     def checkWaitingQueue(self):
         self.waiting_for_ack_queue_lock.acquire()
-        for _, ip in self.waiting_for_ack_queue:
+        for id, ip in self.waiting_for_ack_queue:
             self.controllers.addRtt(ip, "---")
+            log.warning(f"Did not recieve ack for packet {id} from {ip}")
         self.waiting_for_ack_queue.clear()
         self.waiting_for_ack_queue_lock.release()
 

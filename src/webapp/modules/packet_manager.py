@@ -57,6 +57,7 @@ class PacketManager:
             return
         if options is None:
             options = proto_packet.Options()
+            options.send_ack = True
         if packet_options is None:
             packet_options = PacketOptions()
         if ip not in self.ips:
