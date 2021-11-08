@@ -122,7 +122,12 @@ function setStartColor() {
 }
 
 function simpleColor(r, g, b) {
-  send([{controllers: ['all'], animation_args: {type: 'COLOR', color: combineRGB(r, g, b)}}]);
+  send([
+    {
+      controllers: window.global_controllers.getSelectedControllers(),
+      animation_args: {type: 'COLOR', color: combineRGB(r, g, b)},
+    },
+  ]);
 }
 
 class Colors {

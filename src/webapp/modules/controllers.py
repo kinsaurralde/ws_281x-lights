@@ -46,7 +46,6 @@ class Controllers:
                 ips.append(self.controllers[name]["ip"])
         return ips
 
-
     def getControllerFromIp(self, ip):
         return self.ips.get(ip, None)
 

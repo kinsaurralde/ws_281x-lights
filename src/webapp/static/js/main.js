@@ -23,7 +23,8 @@ function loadPWALayout() {
 }
 
 function ledInfo(values) {
-  values['controllers'] = ['all'];
+  values['controllers'] = global_controllers.getSelectedControllers();
+  console.log(values);
   socket.emit('ledinfo', values);
 }
 

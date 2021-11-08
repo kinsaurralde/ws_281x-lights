@@ -13,6 +13,8 @@ import modules
 import version
 import config
 
+import packet_pb2 as proto_packet
+
 Payload.max_decode_packets = 100
 
 MAX_LOG_BYTES = 4000000
@@ -154,8 +156,12 @@ def handleAnimation(data):
 def handleBrightness(data):
     log.info(f"Recieved socketio 'ledinfo': {data}")
     socketio.emit("ledinfo", data)
+    ips = controllers.getControllerIps(data.get("controllers", []))
     payload = pm.createLEDInfoPayload(data)
-    pm.send(ESP_IP_ADDRESS, payload)
+    options = proto_packet.Options()
+    options.send_ack = False
+    for ip in ips:
+        pm.send(ip, payload, options)
 
 
 @socketio.on("connect")

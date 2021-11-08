@@ -28,7 +28,6 @@ class UDPManager:
     def send(self, url: str, packet: proto_packet.Packet) -> None:
         thread = threading.Thread(target=self._send, args=(url, packet))
         thread.start()
-        
 
     def processAckQueue(self) -> None:
         start_time = time.time()
@@ -49,9 +48,9 @@ class UDPManager:
 
     def checkWaitingQueue(self):
         self.waiting_for_ack_queue_lock.acquire()
-        for id, ip in self.waiting_for_ack_queue:
+        for packet_id, ip in self.waiting_for_ack_queue:
             self.controllers.addRtt(ip, "---")
-            log.warning(f"Did not recieve ack for packet {id} from {ip}")
+            log.warning(f"Did not recieve ack for packet {packet_id} from {ip}")
         self.waiting_for_ack_queue.clear()
         self.waiting_for_ack_queue_lock.release()
 
@@ -64,9 +63,10 @@ class UDPManager:
                 sock.sendall(serialized)
             except OSError:
                 log.error(f"Failed to send {serialized} to {url}", exc_info=True)
-            self.waiting_for_ack_queue_lock.acquire()
-            self.waiting_for_ack_queue.append((packet.header.id, url))
-            self.waiting_for_ack_queue_lock.release()
+            if packet.options.send_ack:
+                self.waiting_for_ack_queue_lock.acquire()
+                self.waiting_for_ack_queue.append((packet.header.id, url))
+                self.waiting_for_ack_queue_lock.release()
             log.info(f"Send packet {packet.header.id} to {url} with {len(serialized)} bytes")
 
     def _startAckThread(self) -> None:

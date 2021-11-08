@@ -129,7 +129,8 @@ class Animations {
     }
     args = this.processArgs(args);
     args['type'] = animation;
-    send([{controllers: ['all'], animation_args: args}]);
+    console.log('Controllers', window.global_controllers.getSelectedControllers());
+    send([{controllers: window.global_controllers.getSelectedControllers(), animation_args: args}]);
   }
 
   processArgs(args) {
