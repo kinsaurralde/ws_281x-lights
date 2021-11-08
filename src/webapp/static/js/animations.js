@@ -9,7 +9,6 @@ class Animations {
   }
 
   addAnimationArgs(args) {
-    console.log(args);
     this.animation_args = args;
   }
 
@@ -45,7 +44,6 @@ class Animations {
   }
 
   createLargeAnimationTile(animation, defaults) {
-    console.log(animation, defaults);
     const tile_index = this.large_tiles.length;
     this.large_tiles.push({
       type: animation,
@@ -129,7 +127,6 @@ class Animations {
     }
     args = this.processArgs(args);
     args['type'] = animation;
-    console.log('Controllers', window.global_controllers.getSelectedControllers());
     send([{controllers: window.global_controllers.getSelectedControllers(), animation_args: args}]);
   }
 

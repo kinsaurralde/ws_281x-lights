@@ -2,7 +2,6 @@
 /* exported startSliderAnimations stopSliderAnimations handleLEDInfo */
 
 const ledinfo_send = new BufferedCall((values) => {
-  console.log(values);
   ledInfo(values);
 }, 50);
 

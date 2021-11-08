@@ -65,13 +65,10 @@ function updateLiveCheck() {
 function bufferedColor(r, g, b) {
   if (!buffer_waiting) {
     buffer_waiting = true;
-    console.log('Start buffer');
     setTimeout(function() {
       simpleColor(r, g, b);
       buffer_waiting = false;
     }, BUFFERED_WAIT_MS);
-  } else {
-    console.log('Buffer already started');
   }
 }
 

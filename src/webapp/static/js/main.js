@@ -10,6 +10,7 @@ function loadPWALayout() {
   fetch('/pwalayout')
       .then((response) => response.json())
       .then((layout) => {
+        console.debug('PWA Layout', layout);
         addColorTiles(layout['colors']);
         global_animations.addAnimationArgs(layout['animation_args']);
         global_animations.addAnimations(layout['animations']);
@@ -17,18 +18,18 @@ function loadPWALayout() {
   fetch('/controllers')
       .then((response) => response.json())
       .then((controllers) => {
-        console.log('Controllers', controllers);
+        console.debug('Controllers', controllers);
         global_controllers.addControllers(controllers['controllers']);
       });
 }
 
 function ledInfo(values) {
   values['controllers'] = global_controllers.getSelectedControllers();
-  console.log(values);
+  console.debug('LED Info:', values);
   socket.emit('ledinfo', values);
 }
 
 function send(payload) {
-  console.log('Sending', payload);
+  console.debug('Sending', payload);
   socket.emit('animation', payload);
 }

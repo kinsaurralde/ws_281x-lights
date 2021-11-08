@@ -44,7 +44,6 @@ class Colors:
         result = []
         for color in colors:
             result.append(self.getColor(color))
-        print(self.colors)
         return result
 
     def validateColor(self, color) -> bool:
