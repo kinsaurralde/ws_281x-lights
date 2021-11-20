@@ -110,6 +110,8 @@ class Animations {
         title.className = 'animation-arg-name-shortened';
         arg_container.appendChild(this.createToggle(tile_index, arg, default_value));
         break;
+      case 'list':
+        arg_container.appendChild(this.createColorList(tile_index, arg, default_value));
     }
     return arg_container;
   }
@@ -140,7 +142,8 @@ class Animations {
             break;
           }
           case 'colors': {
-            processed_args['colors'] = this.getValuesOfColorList(args['colors'].split(','));
+            console.log('ARGS', args);
+            processed_args['colors'] = this.getValuesOfColorList(args['colors']);
             break;
           }
           case 'tile':
@@ -165,7 +168,7 @@ class Animations {
     return values;
   }
 
-  createColorSelector(tile_index, arg_name, value) {
+  createColorSelector(tile_index, arg_name, value, index = null) {
     const select = document.createElement('select');
     const colors = global_colors.getColorList();
     colors.unshift('random');
@@ -177,11 +180,38 @@ class Animations {
       select.appendChild(option);
     }
     select.value = value;
-    this.updateTileValue(tile_index, arg_name, select.value);
+    this.updateTileValue(tile_index, arg_name, select.value, index);
     select.addEventListener('input', () => {
-      this.updateTileValue(tile_index, arg_name, select.value);
+      this.updateTileValue(tile_index, arg_name, select.value, index);
     });
     return select;
+  }
+
+  createColorList(tile_index, arg_name, values) {
+    this.large_tiles[tile_index][arg_name] = [];
+    const container = document.createElement('div');
+    const split_values = values.split(',');
+    for (let i = 0; i < split_values.length; i++) {
+      container.appendChild(this.createColorSelector(tile_index, arg_name, split_values[i].trim(), i));
+      this.large_tiles[tile_index][arg_name].push(split_values[i].trim());
+    }
+    container.appendChild(this.createColorListPlusButton());
+    container.appendChild(this.createColorListMinusButton());
+    return container;
+  }
+
+  createColorListPlusButton() {
+    const button = document.createElement('button');
+    button.className = 'color-list-button';
+    button.textContent = '+';
+    return button;
+  }
+
+  createColorListMinusButton() {
+    const button = document.createElement('button');
+    button.className = 'color-list-button';
+    button.textContent = '-';
+    return button;
   }
 
   createSlider(tile_index, arg_name, value, min, max) {
@@ -241,9 +271,13 @@ class Animations {
     return toggle;
   }
 
-  updateTileValue(tile_index, arg_name, value) {
+  updateTileValue(tile_index, arg_name, value, index = null) {
     if (tile_index < this.large_tiles.length) {
-      this.large_tiles[tile_index][arg_name] = value;
+      if (index === null) {
+        this.large_tiles[tile_index][arg_name] = value;
+      } else {
+        this.large_tiles[tile_index][arg_name][index] = value;
+      }
     }
   }
 }
