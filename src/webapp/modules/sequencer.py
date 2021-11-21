@@ -6,10 +6,12 @@ import config
 log = logging.getLogger(__name__)
 log.setLevel("DEBUG")
 
+
 class Sequencer:
-    def __init__(self, config) -> None:
+    def __init__(self, globals, config) -> None:
         self._setupSequences(config["sequences"])
         self.sequences = {}
+        self.globals = globals
 
     def _setupSequences(self, config):
         self.sequences = config

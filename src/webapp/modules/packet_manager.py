@@ -22,14 +22,13 @@ class PacketOptions:
 
 
 class PacketManager:
-    def __init__(self, socketio, controllers, presets_config) -> None:
+    def __init__(self, socketio, controllers) -> None:
         self.socketio = socketio
         self.controllers = controllers
         self.packet_count = 1
         self.ping_interval = config.DEFAULT_PING_INTERVAL
         self.background_interval = config.DEFAULT_BACKGROUND_INTERVAL
         self.ips = []
-        self.presets_config = presets_config
         self.version = proto_packet.Version()
         self.send_pings = False
         self.stats = modules.Stats()

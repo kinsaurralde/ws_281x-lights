@@ -10,11 +10,11 @@ log.setLevel("DEBUG")
 
 
 class Animations:
-    def __init__(self, colors, config, controllers) -> None:
+    def __init__(self, colors, controllers, animations_config, animation_args_config) -> None:
         self.colors = colors
         self.controllers = controllers
-        self.animations = self._processAnimationConfig(config["animations"])
-        self.animation_args = config["animation_args"]
+        self.animations = self._processAnimationConfig(animations_config)
+        self.animation_args = animation_args_config
 
     def getDefaultAnimationArgs(self, type):
         args = self._fillMissingArgs({"type": type})

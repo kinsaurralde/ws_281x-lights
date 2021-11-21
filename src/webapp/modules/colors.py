@@ -6,9 +6,11 @@ import config
 log = logging.getLogger(__name__)
 log.setLevel("DEBUG")
 
+
 class Colors:
-    def __init__(self) -> None:
+    def __init__(self, config) -> None:
         self.colors = {}
+        self.addColors(config)
 
     def addColor(self, color, r, g, b):
         self.colors[color.upper().strip()] = {"r": r, "g": g, "b": b, "value": rgbToInt(r, g, b)}

@@ -87,6 +87,25 @@ log.info("STARTED APP SERVER")
 log.notice(f"Parsed Args: {args}")
 
 
+class Global:
+    def __init__(self, socketio, presets_config, controllers_config, sequences_config) -> None:
+        animation_config = presets_config.get("animations", None)
+        animation_args_config = presets_config.get("animation_args", None)
+        colors_config = presets_config.get("colors", None)
+        if animation_config is None or animation_args_config is None or colors_config is None:
+            log.critical("Incomplete presets config")
+            raise Exception("Incomplete presets config")
+        # 1st init group
+        self.socketio = socketio
+        self.colors = modules.Colors(colors_config)
+        self.controllers = modules.Controllers(controllers_config)
+        # 2nd init group
+        self.animations = modules.Animations(self.colors, self.controllers, animation_config, animation_args_config)
+        self.pm = modules.PacketManager(self.socketio, self.controllers)
+        # 3rd init group
+        self.sequencer = modules.Sequencer(self, sequences_config)
+
+
 @app.before_request
 def beforeRequest():
     log.notice(f"[{request.remote_addr}] {request.method} - {request.path}")
@@ -129,39 +148,40 @@ def getControllers():
 def controllerStartUp():
     remote_ip_addr = request.remote_addr
     log.info(f"Controller startup: {remote_ip_addr}")
-    pm.send(remote_ip_addr, controllers.createControllerInitMessage(remote_ip_addr, args.port))
+    g.pm.send(remote_ip_addr, g.controllers.createControllerInitMessage(remote_ip_addr, args.port))
     return ""
 
 
 @app.route("/version")
 def getversion():
-    pm.getVersion()
+    g.pm.getVersion()
     return ""
 
 
 @app.route("/controllersdebug")
 def controllersDebug():
-    pm.getESPInfo()
+    g.pm.getESPInfo()
     return ""
 
 
 @socketio.on("animation")
 def handleAnimation(data):
     log.notice(f"Recieved socketio 'animation': {data}")
-    payloads = animations.createAnimationPayload(data)
-    pm.sendList(payloads)
+    payloads = g.animations.createAnimationPayload(data)
+    g.pm.sendList(payloads)
 
 
 @socketio.on("ledinfo")
 def handleBrightness(data):
     log.info(f"Recieved socketio 'ledinfo': {data}")
     socketio.emit("ledinfo", data)
-    ips = controllers.getControllerIps(data.get("controllers", []))
-    payload = pm.createLEDInfoPayload(data)
+    ips = g.controllers.getControllerIps(data.get("controllers", []))
+    payload = g.pm.createLEDInfoPayload(data)
     options = proto_packet.Options()
     options.send_ack = False
     for ip in ips:
-        pm.send(ip, payload, options)
+        g.pm.send(ip, payload, options)
+
 
 @socketio.on("sequence_start")
 def handleSequenceStart(data):
@@ -191,28 +211,19 @@ try:
     log.info(f"Controllers Config: {controllers_config}")
     log.info(f"Sequences Config: {sequences_config}")
 
-    controllers = modules.Controllers(controllers_config)
+    g = Global(socketio, presets_config, controllers_config, sequences_config)
 
-    pm = modules.PacketManager(socketio, controllers, presets_config)
-    pm.setVersion(version.MAJOR, version.MINOR, version.PATCH)
-    pm.registerIps(controllers.getAllControllerIps())
-    pm.sendList(controllers.createAllControllerInitMessages(args.port))
+    g.pm.setVersion(version.MAJOR, version.MINOR, version.PATCH)
+    g.pm.registerIps(g.controllers.getAllControllerIps())
+    g.pm.sendList(g.controllers.createAllControllerInitMessages(args.port))
     if not args.background_disabled:
-        pm.startBackgroundThread()
+        g.pm.startBackgroundThread()
     if args.ping_controllers:
-        pm.setPingInterval(args.ping_interval)
-        pm.startPingThread()
-
-    colors = modules.Colors()
-    colors.addColors(presets_config["colors"])
-
-    animations = modules.Animations(colors, presets_config, controllers)
-
-    sequencer = modules.Sequencer(sequences_config)
-
+        g.pm.setPingInterval(args.ping_interval)
+        g.pm.startPingThread()
 
     metrics_dashboard = dash.Dash(__name__, server=app, url_base_pathname="/dashboard/")
-    dashapp.setup.setup(app, metrics_dashboard, pm)
+    dashapp.setup.setup(app, metrics_dashboard, g.pm)
 except Exception as e:  # pylint: disable=broad-except
     logging.critical(f"Setup failed: {e}", exc_info=True)
     sys.exit(1)

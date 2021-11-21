@@ -12,6 +12,7 @@ SUCCESS = 35
 log = logging.getLogger(__name__)
 log.setLevel("DEBUG")
 
+
 def addCustomLogLevels():
     logging.addLevelName(SUCCESS, "SUCCESS")
 
@@ -88,6 +89,7 @@ def openYaml(path):
     with open(path) as open_file:
         data = yaml.safe_load(open_file)
     return data
+
 
 def openYamlBackup(path, backup_path):
     try:
