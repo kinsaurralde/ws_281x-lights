@@ -179,6 +179,13 @@ void Pixels::animation(const AnimationArgs& args) {
   Logger::println("Begin animation %d", args.type);
 }
 
+void Pixels::clear() {
+  setAll(0);
+  incrementor = &Pixels::nothing;
+  animation_args_ = AnimationArgs_init_zero;
+  previous_show_time_ = 0;
+}
+
 void Pixels::color(const AnimationArgs& args) {
   setAll(args.color);
   incrementor = &Pixels::nothing;

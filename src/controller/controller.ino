@@ -201,7 +201,7 @@ void handleUDP() {
   digitalWrite(BUILTIN_LED_B, LOW);
   Udp.read(buffer, PACKET_BUFFER_SIZE);
   Packet packet = decodePacket(buffer, packet_size);
-  Status status = neopixels.controller.handlePacket(&packet);
+  Status status = neopixels.controller.handlePacket(&packet, millis());
   if (packet.has_options && packet.options.send_ack) {
     Udp.beginPacket(Udp.remoteIP(), ACK_PORT);
     packet.header.status = status;
@@ -229,7 +229,7 @@ void handleHTTP() {
   }
   packet_string.getBytes(buffer, PACKET_BUFFER_SIZE);
   Packet packet = decodePacket(buffer, packet_size);
-  Status status = neopixels.controller.handlePacket(&packet);
+  Status status = neopixels.controller.handlePacket(&packet, millis());
   packet.header.status = status;
   packet_size = encodePacket(buffer, PACKET_BUFFER_SIZE, &packet);
   buffer[packet_size] = 0;
@@ -244,7 +244,7 @@ void handleRoot() {
   int page_bytes_written = snprintf(
       web_page, PAGE_SIZE,
       "<b>STATUS</b><br>Millis: %lu<br>"
-      "Last Frame Millis: %lld<br>Frame Count: %d<br>UDP Request Count: %d<br>HTTP "
+      "Last Frame Millis: %lld<br>Auto Off Millis: %lld<br>Frame Count: %d<br>UDP Request Count: %d<br>HTTP "
       "Request Count: %d<br>"
       "VCC: %d<br>Free Heap: %d<br>Heap Fragmentation: %d<br>WiFi RSSI: %d<br>Server Ip: %s<br><br>"
       "<b>PIXELS INFO</b><br>Frame ms: %d<br>Frame Multiplier: %d<br>Brightness: %d<br>Initialized: %d<br>GRB: "
@@ -256,8 +256,9 @@ void handleRoot() {
       "Free Cont: %d<br><br>Bytes "
       "Written: ",
       // Status
-      millis(), stats.last_frame_millis, stats.frame_count, stats.udp_packet_count, stats.http_packet_count,
-      ESP.getVcc(), ESP.getFreeHeap(), ESP.getHeapFragmentation(), WiFi.RSSI(), readSavedServerIp().toString().c_str(),
+      millis(), stats.last_frame_millis, neopixels.controller.getAutoOffTime(), stats.frame_count,
+      stats.udp_packet_count, stats.http_packet_count, ESP.getVcc(), ESP.getFreeHeap(), ESP.getHeapFragmentation(),
+      WiFi.RSSI(), readSavedServerIp().toString().c_str(),
       // Pixels Info
       pixel_info.frame_ms, pixel_info.frame_multiplier, pixel_info.brightness, pixel_info.initialize, pixel_info.grb,
       pixel_info.num_leds,

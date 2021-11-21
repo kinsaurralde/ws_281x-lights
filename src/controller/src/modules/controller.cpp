@@ -36,6 +36,12 @@ Pixels& Controller::getPixels() { return pixels_; }
 const FrameBuffer& Controller::getFrameBuffer() { return pixels_.get(); }
 
 bool Controller::updatePixels(uint64_t millis) {
+  if (auto_off_time_ > 0 && millis > auto_off_time_) {
+    pixels_.clear();
+    Logger::warning("Reached auto off time");
+    auto_off_time_ = 0;
+    return true;
+  }
   if (pixels_.frameReady(millis)) {
     pixels_.increment();
     return true;
@@ -43,7 +49,7 @@ bool Controller::updatePixels(uint64_t millis) {
   return false;
 }
 
-Status Controller::handlePacket(Packet* packet) {
+Status Controller::handlePacket(Packet* packet, uint64_t millis) {
   if (!packet->has_payload) {
     return Status_MISSING_PAYLOAD;
   }
@@ -51,7 +57,7 @@ Status Controller::handlePacket(Packet* packet) {
   Status status = Status_REQUEST;
   switch (packet->payload.which_payload) {
     case Payload_animation_args_tag:
-      status = beginAnimation(*packet);
+      status = beginAnimation(*packet, millis);
       break;
     case Payload_frame_tag:
       // status = setFrameBuffer(packet);
@@ -75,7 +81,10 @@ Status Controller::handlePacket(Packet* packet) {
 
 void Controller::setSaveServerIp(void (*callback)(uint16_t)) { saveServerIp = callback; }
 
-Status Controller::beginAnimation(const Packet& packet) {
+uint64_t Controller::getAutoOffTime() { return auto_off_time_; }
+
+Status Controller::beginAnimation(const Packet& packet, uint64_t millis) {
+  auto_off_time_ = millis + AUTO_OFF_MILLIS;
   pixels_.animation(packet.payload.payload.animation_args);
   return Status_GOOD;
 }

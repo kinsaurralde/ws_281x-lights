@@ -22,21 +22,24 @@ typedef struct EspInfo {
 
 class Controller {
  public:
-  Controller(){};
+  Controller() : auto_off_time_(0){};
 
   Pixels& getPixels();
   const FrameBuffer& getFrameBuffer();
   bool updatePixels(uint64_t millis);
 
-  Status handlePacket(Packet* packet);
+  Status handlePacket(Packet* packet, uint64_t millis);
 
   void setSaveServerIp(void (*callback)(uint16_t));
 
+  uint64_t getAutoOffTime();
+
  private:
+  uint64_t auto_off_time_;
   Pixels pixels_;
   void (*saveServerIp)(uint16_t);
 
-  Status beginAnimation(const Packet& packet);
+  Status beginAnimation(const Packet& packet, uint64_t millis);
   Status setFrameBuffer(const Packet& packet);
   Status setLedInfo(const Packet& packet);
   static Status getVersion(Packet* packet);

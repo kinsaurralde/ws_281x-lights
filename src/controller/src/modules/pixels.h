@@ -31,6 +31,7 @@ class Pixels {
   void increment();
   void setFrameBuffer(FrameBuffer frame_buffer);
   void animation(const AnimationArgs& args);
+  void clear();
 
  private:
   uint64_t previous_show_time_;
