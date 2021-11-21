@@ -163,6 +163,11 @@ def handleBrightness(data):
     for ip in ips:
         pm.send(ip, payload, options)
 
+@socketio.on("sequence_start")
+def handleSequenceStart(data):
+    log.notice(f"Recieved socketio 'sequence_start': {data}")
+    # sequencer
+
 
 @socketio.on("connect")
 def connect():
@@ -178,11 +183,13 @@ def disconnect():
 try:
     remote_log_manager = modules.RemoteLogManager()
     remote_log_manager.start()
-    presets_config = modules.openYaml("config/example.presets.yaml")
-    controllers_config = modules.openYaml(args.controller_config)
+    presets_config = modules.openYamlBackup("config/presets.yaml", "config/example.presets.yaml")
+    controllers_config = modules.openYamlBackup(args.controller_config, "config/exmaple.controllers.yaml")
+    sequences_config = modules.openYamlBackup("config/sequences.yaml", "config/example.sequences.yaml")
 
     log.info(f"Presets Config: {presets_config}")
     log.info(f"Controllers Config: {controllers_config}")
+    log.info(f"Sequences Config: {sequences_config}")
 
     controllers = modules.Controllers(controllers_config)
 
@@ -201,6 +208,9 @@ try:
 
     animations = modules.Animations(colors, presets_config, controllers)
 
+    sequencer = modules.Sequencer(sequences_config)
+
+
     metrics_dashboard = dash.Dash(__name__, server=app, url_base_pathname="/dashboard/")
     dashapp.setup.setup(app, metrics_dashboard, pm)
 except Exception as e:  # pylint: disable=broad-except
@@ -208,4 +218,5 @@ except Exception as e:  # pylint: disable=broad-except
     sys.exit(1)
 
 if __name__ == "__main__":  # pragma: no cover
-    socketio.run(app, debug=args.flask_debug, host="0.0.0.0", port=args.port, use_reloader=False)
+    if not args.flask_nostart:
+        socketio.run(app, debug=args.flask_debug, host="0.0.0.0", port=args.port, use_reloader=False)

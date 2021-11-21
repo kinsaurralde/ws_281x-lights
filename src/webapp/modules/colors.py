@@ -1,7 +1,10 @@
 import random
+import logging
 
 import config
 
+log = logging.getLogger(__name__)
+log.setLevel("DEBUG")
 
 class Colors:
     def __init__(self) -> None:
@@ -41,6 +44,8 @@ class Colors:
         return value
 
     def getColorList(self, colors):
+        if isinstance(colors, str):
+            colors = colors.split(",")
         result = []
         for color in colors:
             result.append(self.getColor(color))

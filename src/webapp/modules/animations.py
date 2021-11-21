@@ -16,6 +16,10 @@ class Animations:
         self.animations = self._processAnimationConfig(config["animations"])
         self.animation_args = config["animation_args"]
 
+    def getDefaultAnimationArgs(self, type):
+        args = self._fillMissingArgs({"type": type})
+        return args
+
     def createAnimationPayload(self, animations):
         # pylint: disable=no-member
         packets = []
@@ -86,23 +90,23 @@ class Animations:
             return value.upper() in self.animations
         return False
 
-    def _getAnimationType(self, name):
+    @staticmethod
+    def _getAnimationType(name):
         name = name.upper()
-        if name in self.animations:
-            if name == "COLOR":
-                return AnimationType.COLOR
-            if name == "WIPE":
-                return AnimationType.WIPE
-            if name == "PULSE":
-                return AnimationType.PULSE
-            if name == "RAINBOW":
-                return AnimationType.RAINBOW
-            if name == "CYCLE":
-                return AnimationType.CYCLE
-            if name == "RANDOMCYCLE":
-                return AnimationType.RANDOM_CYCLE
-            if name == "REVERSER":
-                return AnimationType.REVERSER
+        if name == "COLOR":
+            return AnimationType.COLOR
+        if name == "WIPE":
+            return AnimationType.WIPE
+        if name == "PULSE":
+            return AnimationType.PULSE
+        if name == "RAINBOW":
+            return AnimationType.RAINBOW
+        if name == "CYCLE":
+            return AnimationType.CYCLE
+        if name == "RANDOMCYCLE":
+            return AnimationType.RANDOM_CYCLE
+        if name == "REVERSER":
+            return AnimationType.REVERSER
         return AnimationType.NONE
 
     @staticmethod
@@ -130,6 +134,8 @@ def validateBool(value):
 
 
 def validateList(values, max_size, lower, upper):
+    if values is None:
+        return False
     if len(values) > max_size:
         return False
     for value in values:

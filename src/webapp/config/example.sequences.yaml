@@ -1,0 +1,13 @@
+---
+sequences:
+  sample1:
+    module: sequences.sample1
+    functions:
+      - a
+      - b
+  sample2:
+    module: sequences.sample2
+    functions:
+      - a
+      - b
+      - c
