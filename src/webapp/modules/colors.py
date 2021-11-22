@@ -8,9 +8,9 @@ log.setLevel("DEBUG")
 
 
 class Colors:
-    def __init__(self, config) -> None:
+    def __init__(self, colors_config) -> None:
         self.colors = {}
-        self.addColors(config)
+        self.addColors(colors_config)
 
     def addColor(self, color, r, g, b):
         self.colors[color.upper().strip()] = {"r": r, "g": g, "b": b, "value": rgbToInt(r, g, b)}

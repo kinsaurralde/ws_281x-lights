@@ -1,20 +1,18 @@
 import logging
 import importlib
 
-import config
-
 log = logging.getLogger(__name__)
 log.setLevel("DEBUG")
 
 
 class Sequencer:
-    def __init__(self, globals, config) -> None:
+    def __init__(self, modules, config) -> None:
         self._setupSequences(config["sequences"])
         self.sequences = {}
-        self.globals = globals
+        self.modules = modules
 
-    def _setupSequences(self, config):
-        self.sequences = config
+    def _setupSequences(self, sequences):
+        self.sequences = sequences
         for name, values in self.sequences.items():
             if "module" not in values or "functions" not in values:
                 log.warning(f"Sequence {name} missing module")

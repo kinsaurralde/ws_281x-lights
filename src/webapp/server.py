@@ -101,7 +101,7 @@ class Global:
         self.controllers = modules.Controllers(controllers_config)
         # 2nd init group
         self.animations = modules.Animations(self.colors, self.controllers, animation_config, animation_args_config)
-        self.pm = modules.PacketManager(self.socketio, self.controllers)
+        self.packet_manager = modules.PacketManager(self.socketio, self.controllers)
         # 3rd init group
         self.sequencer = modules.Sequencer(self, sequences_config)
 
@@ -131,36 +131,36 @@ def pageNotFound(error):
 
 @app.route("/")
 def root():
-    return render_template("mobile.html.jinja", defaults=presets_config["web_options"])
+    return render_template("mobile.html.jinja", defaults=presets_config_file["web_options"])
 
 
 @app.route("/pwalayout")
 def pwaLayout():
-    return modules.createResponse(app, presets_config)
+    return modules.createResponse(app, presets_config_file)
 
 
 @app.route("/controllers")
 def getControllers():
-    return modules.createResponse(app, controllers_config)
+    return modules.createResponse(app, controllers_config_file)
 
 
 @app.route("/controllerstartup", methods=["POST"])
 def controllerStartUp():
     remote_ip_addr = request.remote_addr
     log.info(f"Controller startup: {remote_ip_addr}")
-    g.pm.send(remote_ip_addr, g.controllers.createControllerInitMessage(remote_ip_addr, args.port))
+    g.packet_manager.send(remote_ip_addr, g.controllers.createControllerInitMessage(remote_ip_addr, args.port))
     return ""
 
 
 @app.route("/version")
 def getversion():
-    g.pm.getVersion()
+    g.packet_manager.getVersion()
     return ""
 
 
 @app.route("/controllersdebug")
 def controllersDebug():
-    g.pm.getESPInfo()
+    g.packet_manager.getESPInfo()
     return ""
 
 
@@ -168,7 +168,7 @@ def controllersDebug():
 def handleAnimation(data):
     log.notice(f"Recieved socketio 'animation': {data}")
     payloads = g.animations.createAnimationPayload(data)
-    g.pm.sendList(payloads)
+    g.packet_manager.sendList(payloads)
 
 
 @socketio.on("ledinfo")
@@ -176,11 +176,11 @@ def handleBrightness(data):
     log.info(f"Recieved socketio 'ledinfo': {data}")
     socketio.emit("ledinfo", data)
     ips = g.controllers.getControllerIps(data.get("controllers", []))
-    payload = g.pm.createLEDInfoPayload(data)
+    payload = g.packet_manager.createLEDInfoPayload(data)
     options = proto_packet.Options()
     options.send_ack = False
     for ip in ips:
-        g.pm.send(ip, payload, options)
+        g.packet_manager.send(ip, payload, options)
 
 
 @socketio.on("sequence_start")
@@ -203,27 +203,27 @@ def disconnect():
 try:
     remote_log_manager = modules.RemoteLogManager()
     remote_log_manager.start()
-    presets_config = modules.openYamlBackup("config/presets.yaml", "config/example.presets.yaml")
-    controllers_config = modules.openYamlBackup(args.controller_config, "config/exmaple.controllers.yaml")
-    sequences_config = modules.openYamlBackup("config/sequences.yaml", "config/example.sequences.yaml")
+    presets_config_file = modules.openYamlBackup("config/presets.yaml", "config/example.presets.yaml")
+    controllers_config_file = modules.openYamlBackup(args.controller_config, "config/exmaple.controllers.yaml")
+    sequences_config_file = modules.openYamlBackup("config/sequences.yaml", "config/example.sequences.yaml")
 
-    log.info(f"Presets Config: {presets_config}")
-    log.info(f"Controllers Config: {controllers_config}")
-    log.info(f"Sequences Config: {sequences_config}")
+    log.info(f"Presets Config: {presets_config_file}")
+    log.info(f"Controllers Config: {controllers_config_file}")
+    log.info(f"Sequences Config: {sequences_config_file}")
 
-    g = Global(socketio, presets_config, controllers_config, sequences_config)
+    g = Global(socketio, presets_config_file, controllers_config_file, sequences_config_file)
 
-    g.pm.setVersion(version.MAJOR, version.MINOR, version.PATCH)
-    g.pm.registerIps(g.controllers.getAllControllerIps())
-    g.pm.sendList(g.controllers.createAllControllerInitMessages(args.port))
+    g.packet_manager.setVersion(version.MAJOR, version.MINOR, version.PATCH)
+    g.packet_manager.registerIps(g.controllers.getAllControllerIps())
+    g.packet_manager.sendList(g.controllers.createAllControllerInitMessages(args.port))
     if not args.background_disabled:
-        g.pm.startBackgroundThread()
+        g.packet_manager.startBackgroundThread()
     if args.ping_controllers:
-        g.pm.setPingInterval(args.ping_interval)
-        g.pm.startPingThread()
+        g.packet_manager.setPingInterval(args.ping_interval)
+        g.packet_manager.startPingThread()
 
     metrics_dashboard = dash.Dash(__name__, server=app, url_base_pathname="/dashboard/")
-    dashapp.setup.setup(app, metrics_dashboard, g.pm)
+    dashapp.setup.setup(app, metrics_dashboard, g.packet_manager)
 except Exception as e:  # pylint: disable=broad-except
     logging.critical(f"Setup failed: {e}", exc_info=True)
     sys.exit(1)

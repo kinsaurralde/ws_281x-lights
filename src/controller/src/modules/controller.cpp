@@ -81,7 +81,7 @@ Status Controller::handlePacket(Packet* packet, uint64_t millis) {
 
 void Controller::setSaveServerIp(void (*callback)(uint16_t)) { saveServerIp = callback; }
 
-uint64_t Controller::getAutoOffTime() { return auto_off_time_; }
+uint64_t Controller::getAutoOffTime() const { return auto_off_time_; }
 
 Status Controller::beginAnimation(const Packet& packet, uint64_t millis) {
   auto_off_time_ = millis + AUTO_OFF_MILLIS;

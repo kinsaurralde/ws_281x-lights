@@ -16,8 +16,8 @@ class Animations:
         self.animations = self._processAnimationConfig(animations_config)
         self.animation_args = animation_args_config
 
-    def getDefaultAnimationArgs(self, type):
-        args = self._fillMissingArgs({"type": type})
+    def getDefaultAnimationArgs(self, animation_type):
+        args = self._fillMissingArgs({"type": animation_type})
         return args
 
     def createAnimationPayload(self, animations):

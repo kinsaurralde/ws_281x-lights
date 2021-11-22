@@ -93,7 +93,7 @@ int main() {
     Header header = p.header;
     serialWritePacketHeader(header);
     setAnimationArgs(&p, createRainbowArgs());
-    Logger::println("Handle Packet Status: %d", controller->handlePacket(&p));
+    Logger::println("Handle Packet Status: %d", controller->handlePacket(&p, 0));
     runAnimation(controller, 2);
     return 0;
 }

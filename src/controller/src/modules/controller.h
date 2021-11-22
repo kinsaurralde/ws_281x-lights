@@ -32,7 +32,7 @@ class Controller {
 
   void setSaveServerIp(void (*callback)(uint16_t));
 
-  uint64_t getAutoOffTime();
+  uint64_t getAutoOffTime() const;
 
  private:
   uint64_t auto_off_time_;
