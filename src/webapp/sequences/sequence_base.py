@@ -9,48 +9,17 @@ class SequenceBase:
         self.name = "UNSET"
         self.function_table = {}
 
-    def setup(self, name, functions):
+    def setup(self, name, send_callback, functions):
         self.name = name
+        self.send = send_callback
         self._createFunctions(functions)
 
     @staticmethod
     def createAnimationArgs():
         return {
-            "id": "all",
-            "animation": 0,
-            "color": 0,
-            "color_bg": 0,
-            "colors": [],
-            "wait_ms": 40,
-            "inc_steps": 1,
-            "steps": 1,
-            "arg1": 0,
-            "arg2": 0,
-            "arg3": 0,
-            "arg4": 0,
-            "arg5": 0,
-            "arg6": False,
-            "arg7": False,
-            "arg8": False,
+            "controllers": [],
+            "animation_args": {}
         }
-
-    @staticmethod
-    def combineRGB(r, g, b):
-        return (int(r) & 0xFF) << 16 | (int(g) & 0xFF) << 8 | (int(b) & 0xFF)
-
-    def convertColor(self, color):
-        value = [0, 0, 0]
-        if isinstance(color, int):
-            return color
-        if color in self.colors:
-            value = self.colors[color]
-        return self.combineRGB(value[0], value[1], value[2])
-
-    def convertColors(self, colors):
-        result = []
-        for color in colors:
-            result.append(self.convertColor(color))
-        return result
 
     def sleep(self, value):
         name = self.sequencer.thread_local.name
@@ -63,76 +32,70 @@ class SequenceBase:
             if not self.sequencer.checkActive(name):
                 raise Exception("Early Exit")
 
-    def color(self, controller_id="all", color=0):
+    def color(self, color=0):
         args = self.createAnimationArgs()
-        args["id"] = controller_id
-        args["animation"] = 0
-        args["color"] = self.convertColor(color)
-        args["wait_ms"] = 1000
+        args["controllers"] = ["all"]
+        args["animation_args"]["type"] = "color"
+        args["animation_args"]["color"] = color
         self.send(args)
 
-    def wipe(self, controller_id="all", color=0, background=-1, shift_amount=1, reverse=False, wait_ms=40, steps=1):
+    def wipe(self, color=0, background=-1, reverse=False, frame_ms=40, steps=1):
         args = self.createAnimationArgs()
-        args["id"] = controller_id
-        args["animation"] = 1
-        args["color"] = self.convertColor(color)
-        args["color_bg"] = int(background)
-        args["arg1"] = int(shift_amount)
-        args["arg6"] = bool(reverse)
-        args["inc_steps"] = int(steps)
-        args["wait_ms"] = int(wait_ms)
+        args["controllers"] = ["all"]
+        args["animation_args"]["type"] = "wipe"
+        args["animation_args"]["color"] = color
+        args["animation_args"]["backgtound_color"] = int(background)
+        args["animation_args"]["reverse"] = bool(reverse)
+        args["animation_args"]["frame_multiplier"] = int(steps)
+        args["animation_args"]["frame_ms"] = int(frame_ms)
         self.send(args)
 
-    def pulse(self, controller_id="all", colors=["red", "blue", "green"], background=-1, length=5, spacing=5, shift_amount=1, pattern_size=-1, reverse=False, wait_ms=40, steps=1):
+    def pulse(self, colors=["red", "blue", "green"], background=-1, length=5, spacing=5, reverse=False, frame_ms=40, steps=1):
         args = self.createAnimationArgs()
-        args["id"] = controller_id
-        args["animation"] = 2
-        args["colors"] = self.convertColors(colors)
-        args["color_bg"] = int(background)
-        args["arg1"] = int(length)
-        args["arg2"] = int(spacing)
-        args["arg3"] = int(shift_amount)
-        args["arg4"] = int(pattern_size)
-        args["arg6"] = bool(reverse)
-        args["inc_steps"] = int(steps)
-        args["wait_ms"] = int(wait_ms)
+        args["controllers"] = ["all"]
+        args["animation_args"]["type"] = "pulse"
+        args["animation_args"]["colors"] = colors
+        args["animation_args"]["background_color"] = int(background)
+        args["animation_args"]["length"] = int(length)
+        args["animation_args"]["spacing"] = int(spacing)
+        args["animation_args"]["reverse"] = bool(reverse)
+        args["animation_args"]["frame_multiplier"] = int(steps)
+        args["animation_args"]["frame_ms"] = int(frame_ms)
         self.send(args)
 
-    def rainbow(self, controller_id="all", shift_amount=1, reverse=False, wait_ms=40, steps=1):
+    def rainbow(self, reverse=False, frame_ms=40, steps=1):
         args = self.createAnimationArgs()
-        args["id"] = controller_id
-        args["animation"] = 3
-        args["arg3"] = int(shift_amount)
-        args["arg6"] = bool(reverse)
-        args["inc_steps"] = int(steps)
-        args["wait_ms"] = int(wait_ms)
+        args["controllers"] = ["all"]
+        args["animation_args"]["type"] = "rainbow"
+        args["animation_args"]["reverse"] = bool(reverse)
+        args["animation_args"]["frame_multiplier"] = int(steps)
+        args["animation_args"]["frame_ms"] = int(frame_ms)
         self.send(args)
 
-    def cycle(self, controller_id="all", colors=["red", "blue", "green", "red"], steps_between_colors=100, wait_ms=40, steps=1):
+    def cycle(self, colors=["red", "blue", "green", "red"], steps_between_colors=100, frame_ms=40, steps=1):
         args = self.createAnimationArgs()
-        args["id"] = controller_id
-        args["animation"] = 4
-        args["colors"] = self.convertColors(colors)
-        args["arg1"] = int(steps_between_colors)
-        args["inc_steps"] = int(steps)
-        args["wait_ms"] = int(wait_ms)
+        args["controllers"] = ["all"]
+        args["animation_args"]["type"] = "cycle"
+        args["animation_args"]["colors"] = colors
+        args["animation_args"]["steps"] = int(steps_between_colors)
+        args["animation_args"]["frame_multiplier"] = int(steps)
+        args["animation_args"]["frame_ms"] = int(frame_ms)
         self.send(args)
 
-    def randomCycle(self, controller_id="all", seed=0, wait_ms=250, steps=1):
+    def randomCycle(self, frame_ms=250, steps=1):
         args = self.createAnimationArgs()
-        args["id"] = controller_id
-        args["animation"] = 5
-        args["arg1"] = int(seed)
-        args["inc_steps"] = int(steps)
-        args["wait_ms"] = int(wait_ms)
+        args["controllers"] = ["all"]
+        args["animation_args"]["type"] = "randomcycle"
+        args["animation_args"]["frame_multiplier"] = int(steps)
+        args["animation_args"]["frame_ms"] = int(frame_ms)
         self.send(args)
 
-    def reverser(self, controller_id="all", reverse_animation=True, reverse_pixels=False):
+    def reverser(self, reverse_animation=True, reverse_pixels=False):
         args = self.createAnimationArgs()
-        args["id"] = controller_id
-        args["animation"] = 6
-        args["arg6"] = bool(reverse_animation)
-        args["arg7"] = bool(reverse_pixels)
+        args["controllers"] = ["all"]
+        args["animation_args"]["type"] = "reverser"
+        args["animation_args"]["reverse"] = bool(reverse_animation)
+        args["animation_args"]["reverse2"] = bool(reverse_pixels)
         self.send(args)
     
     def run(self, function_name):
@@ -146,171 +109,3 @@ class SequenceBase:
             except AttributeError:
                 log.warning(f"Function {function} for sequence {self.name} does not exist!")
         log.info(f"Sequence {self.name} has functions {self.function_table.keys()}")
-
-Preset = {
-    'color_blue': {
-        'color': 255
-    },
-    'wipe_green': {
-        'color': 65280
-    },
-    'wipe_green_r': {
-        'color': 65280,
-        'reverse': True
-    },
-    'pulse_red': {
-        'colors': ["red"]
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

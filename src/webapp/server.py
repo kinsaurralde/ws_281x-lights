@@ -82,7 +82,9 @@ log_color_file_handler.setFormatter(coloredlogs.ColoredFormatter(fmt=LOG_FORMAT)
 logging.root.addHandler(log_file_handler)
 logging.root.addHandler(log_color_file_handler)
 log.setLevel("INFO")
-log.info("STARTED APP SERVER")
+log.success(f"{'*' * 100}")
+log.success("STARTING")
+log.success(f"{'*' * 100}")
 
 log.notice(f"Parsed Args: {args}")
 
@@ -230,4 +232,5 @@ except Exception as e:  # pylint: disable=broad-except
 
 if __name__ == "__main__":  # pragma: no cover
     if not args.flask_nostart:
+        log.success("STARTING FLASK SERVER")
         socketio.run(app, debug=args.flask_debug, host="0.0.0.0", port=args.port, use_reloader=False)

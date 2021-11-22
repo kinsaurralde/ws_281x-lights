@@ -25,11 +25,13 @@ class Animations:
         packets = []
         for animation in animations:
             if "controllers" not in animation or "animation_args" not in animation:
+                log.warning(f"Animation missing 'controllers' or 'animation_args'")
                 continue
             controllers = animation["controllers"]
             ips = self.controllers.getControllerIps(controllers)
             args = self._fillMissingArgs(animation["animation_args"])
             if args is None:
+                log.warning("Animation args missing")
                 continue
             log.info(f"Create Animation Args: {args}")
             payload = proto_packet.Payload()

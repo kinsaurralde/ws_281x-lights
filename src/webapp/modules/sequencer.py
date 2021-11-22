@@ -7,9 +7,13 @@ log.setLevel("DEBUG")
 
 class Sequencer:
     def __init__(self, modules, config) -> None:
-        self._setupSequences(config["sequences"])
         self.sequences = {}
         self.modules = modules
+        self._setupSequences(config["sequences"])
+
+    def send(self, args):
+        payloads = self.modules.animations.createAnimationPayload([args])
+        self.modules.packet_manager.sendList(payloads)
 
     def _setupSequences(self, sequences):
         self.sequences = sequences
@@ -19,10 +23,10 @@ class Sequencer:
                 continue
             module_path = values["module"]
             functions = values["functions"]
-            print(f"{name}: {module_path} {functions}")
             try:
                 mod = importlib.import_module(module_path)
                 sequence = mod.Sequence()
-                sequence.setup(name, functions)
+                sequence.setup(name, self.send, functions)
+                sequence.run("a")
             except ModuleNotFoundError:
                 log.error(f"Sequence {name} cannout find module {module_path}")

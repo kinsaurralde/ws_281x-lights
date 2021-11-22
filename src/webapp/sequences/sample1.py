@@ -10,4 +10,5 @@ class Sequence(SequenceBase):
         super().__init__()
 
     def a(self):
-        log.critical("Test A")
+        log.info(f"Start sequence {self.name}-a")
+        self.color(color="random")

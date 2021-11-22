@@ -42,7 +42,7 @@ class Colors:
         keys = list(self.colors.keys())
         value = 0
         while value == 0:
-            value = self.colors[keys[random.randint(0, len(keys) - 1)]]
+            value = self.colors[keys[random.randint(0, len(keys) - 1)]]["value"]
         return value
 
     def getColorList(self, colors):
@@ -56,7 +56,8 @@ class Colors:
     def validateColor(self, color) -> bool:
         if isinstance(color, int):
             return config.MIN_COLOR <= color <= config.MAX_COLOR
-        return color == "none" or color == "random" or color in self.colors
+        color = color.upper()
+        return color == "NONE" or color == "RANDOM" or color in self.colors
 
 
 def rgbToInt(r, g, b):
